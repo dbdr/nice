@@ -26,11 +26,12 @@ import bossa.util.Location;
    @version $Date$
    @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
 */
-public class StaticFieldAccess extends MethodDeclaration
+public class JavaFieldAccess extends FieldAccess
 {
-  public StaticFieldAccess(LocatedString className,String fieldName,
-			   LocatedString name,Constraint cst,
-			   Monotype returnType, FormalParameters parameters)
+  public JavaFieldAccess
+    (LocatedString className,String fieldName,
+     LocatedString name,Constraint cst,
+     Monotype returnType, FormalParameters parameters)
   {
     super(name, cst, returnType, parameters);
     this.className = className;
@@ -40,11 +41,11 @@ public class StaticFieldAccess extends MethodDeclaration
       User.error(name, name + " should have no parameters");    
   }
   
-  private StaticFieldAccess(LocatedString className,String fieldName,
-			    LocatedString name,
-			    mlsub.typing.Constraint cst,
-			    mlsub.typing.Monotype returnType, 
-			    mlsub.typing.Monotype[] parameters)
+  private JavaFieldAccess(LocatedString className,String fieldName,
+			  LocatedString name,
+			  mlsub.typing.Constraint cst,
+			  mlsub.typing.Monotype returnType, 
+			  mlsub.typing.Monotype[] parameters)
   {
     super(name, null, null, null);
     this.className = className;
@@ -56,6 +57,13 @@ public class StaticFieldAccess extends MethodDeclaration
   static MethodDeclaration make(Field f)
   {
     try{
+      f.getReflectField();
+    }
+    catch(java.lang.NoSuchFieldException e){
+      User.error("Field " + f + " does not exist");
+    }
+    
+    try{
       mlsub.typing.Monotype[] params;
       if(!f.getStaticFlag())
 	{
@@ -65,7 +73,7 @@ public class StaticFieldAccess extends MethodDeclaration
       else
 	params = null;
     
-      StaticFieldAccess res = new StaticFieldAccess
+      JavaFieldAccess res = new JavaFieldAccess
 	(new LocatedString(f.getDeclaringClass().getName(),
 			   Location.nowhere()),
 	 f.getName(),
@@ -74,13 +82,9 @@ public class StaticFieldAccess extends MethodDeclaration
 	 null,
 	 nice.tools.code.Types.getMonotype(f.getType()), 
 	 params);
-      try{
-	res.field = f.getReflectField();
-      }
-      catch(java.lang.NoSuchFieldException e){
-	User.error("Field "+f+" does not exist");
-      }
-    
+
+      res.field = f;
+      
       return res;
     }
     catch(nice.tools.code.Types.ParametricClassException e){
@@ -102,31 +106,31 @@ public class StaticFieldAccess extends MethodDeclaration
     if(field==null)
       User.error(this,
 		 "Field "+fieldName+" not found in class "+className);
-
-    if(!java.lang.reflect.Modifier.isStatic(field.getModifiers()))
-      User.error(this,
-		 fieldName+" should be a static field");
   }
   
   /****************************************************************
    * Reflection
    ****************************************************************/
 
-  java.lang.reflect.Field getField(LocatedString javaClass, String name)
+  Field getField(LocatedString javaClass, String name)
   {
-    Class c = nice.tools.code.Types.lookupJavaClass(javaClass.toString());
-
-    if(c==null)
-      User.error(javaClass,"Class "+javaClass+" not found");
+    ClassType c = null;
+    try { 
+      c = (ClassType) nice.tools.code.Types.type(javaClass.toString()); 
+      if (c == null)
+	User.error(javaClass,"Class " + javaClass + " not found");
+    }
+    catch(ClassCastException e) { 
+      User.error(javaClass, 
+		 javaClass + " is a primitive type, it has no field");
+    }
     
     // remembers the fully qualified name
     className.content = c.getName();
     
-    java.lang.reflect.Field[] fields = c.getFields();
-    
-    for(int i = 0;i<fields.length;i++)
-      if(name.equals(fields[i].getName()))
-	return fields[i];
+    for(Field f = c.getFields(); f != null; f = f.getNext())
+      if(name.equals(f.getName()))
+	return f;
     
     return null;
   }
@@ -135,21 +139,7 @@ public class StaticFieldAccess extends MethodDeclaration
   LocatedString className;
   
   private String fieldName;
-  
-  java.lang.reflect.Field field;
 
-  /****************************************************************
-   * Code generation
-   ****************************************************************/
-
-  protected gnu.mapping.Procedure computeDispatchMethod()
-  {
-    return new gnu.kawa.reflect.StaticGet
-      ((ClassType) gnu.bytecode.Type.make(field.getDeclaringClass()),
-       field.getName(),
-       Type.make(field.getType()),field.getModifiers());
-  }
-  
   /****************************************************************
    * Module interface
    ****************************************************************/
@@ -181,7 +171,7 @@ public class StaticFieldAccess extends MethodDeclaration
   public String toString()
   {
     if (getType() == null)
-      return "StaticFieldAccess " + symbol.name;
+      return "JavaFieldAccess " + symbol.name;
     else
       return interfaceString();
   }

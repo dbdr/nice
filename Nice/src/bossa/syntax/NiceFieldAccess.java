@@ -32,9 +32,9 @@ import java.util.*;
    @version $Date$
    @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
  */
-public class FieldAccessMethod extends MethodDeclaration
+public class NiceFieldAccess extends FieldAccess
 {
-  public FieldAccessMethod
+  public NiceFieldAccess
     (ClassDefinition classDef, 
      LocatedString fieldName, Monotype fieldType,
      List classTypeParameters)
@@ -53,17 +53,16 @@ public class FieldAccessMethod extends MethodDeclaration
     return new FormalParameters(res);
   }
   
-  /** 
-   * true if this method represent the access to the field of an object.
-   */
-  public boolean isFieldAccess() { return true; }
-
   public final TypeConstructor classTC;
 
   public final String fieldName;
   
   /** The java class this method is defined in */
   ClassDefinition definition;
+
+  /****************************************************************
+   * Module interface
+   ****************************************************************/
 
   public void printInterface(java.io.PrintWriter s)
   {
@@ -74,19 +73,12 @@ public class FieldAccessMethod extends MethodDeclaration
    * Code generation
    ****************************************************************/
 
-  protected gnu.mapping.Procedure computeDispatchMethod()
-  {
-    Internal.error("Should not be used as a real method");
-    return null;
-  }
-
   private Type fieldType()
   {
     return javaReturnType();
   }
   
-  private Field field;
-  Field field()
+  protected Field field()
   {
     if (field == null)
       {
@@ -96,21 +88,5 @@ public class FieldAccessMethod extends MethodDeclaration
 	  field = owner.addField(fieldName, fieldType(), Access.PUBLIC);
       }
     return field;
-  }
-  
-  gnu.expr.Expression compileAccess(Expression parameter)
-  {
-    gnu.expr.Expression res = Inline.inline
-      (new GetFieldProc(field()), parameter.generateCode());
-
-    return res;
-    
-  }
-  
-  gnu.expr.Expression compileAssign(Expression parameter, 
-			   gnu.expr.Expression value)
-  {
-    return Inline.inline
-      (new SetFieldProc(field()), parameter.generateCode(), value);
   }
 }

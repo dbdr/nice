@@ -13,33 +13,40 @@
 package nice.doc;
 
 /**
-   Centralizes information about a program. 
-   It can then be used to parse command line arguments, display help,
-   produce manpages, ...
+   Answers to standard command-line options.
 
    @version $Date$
    @author Daniel Bonniot (bonniot@users.sourceforge.net)
-*/
+ */
 
-import nice.getopt;
-
-class Program
+void help(Program prg)
 {
-  String name;
-  String longName;
-  String shortDescription;
-  /** Syntax for non-option arguments */
-  ?String arguments;
-  /** Unix manual section (1 to 9) */
-  String manualSection;
-  ?String author;
-  ?String seeAlso;
-
-  Sequence<Option> options;
+  println(printUsage(prg));
+  println(printOptions(prg.options));
+  System.exit(1);
 }
 
-/** Parses the list of strings according to the options,
-    and returns the non-options arguments. */
-Sequence<String> parse(Program prg, Array<String> arguments) = 
-  parse(prg.name, arguments, prg.options);
+void usage(Program prg)
+{
+  println(printUsage(prg));
+  println("Type \"" + prg.name + " --help\" to list the options");
+  System.exit(0);
+}
 
+void man(Program prg)
+{
+  println(printMan(prg));
+  System.exit(0);
+}
+
+String printUsage(Program prg)
+{
+  StringBuffer res = new StringBuffer("Usage: ");
+  res.append(prg.name);
+  if (prg.options != null)
+    res.append(" [OPTIONS]");
+  if (prg.arguments != null)
+    res.append(' ').append(notNull(prg.arguments).toUpperCase());
+  res.append('\n');
+  return res.toString();
+}

@@ -50,6 +50,7 @@ main(args)
   prg.author = "Daniel Bonniot <bonniot@users.sourceforge.net>, <Daniel.Bonniot@inria.fr>";
   prg.seeAlso = "http://nice.sourceforge.net        the Nice Home Page\n";
   prg.manualSection = "1";
+  prg.arguments = "package";
   prg.options = 
   [
    option('?', "sourcepath",
@@ -106,18 +107,10 @@ main(args)
 
 
    option('h', "help", "Print help message and exit",
-	  fun()=>
-            {
-	      println(printOptions(prg.options));
-	      System.exit(1);
-	    }),
+	  fun()=> help(prg)),
 
    option('?', "man", "Print man page to stdout",
-	  fun()=>
-            {
-	      println(man(prg));
-	      System.exit(0);
-	    }),
+	  fun()=> man(prg)),
 
    option('?', "version",
 	  "Print version info and exit",
@@ -125,7 +118,7 @@ main(args)
 
    option('?', "usage",
 	  "Print usage information and exit",
-	  fun()=>usage()),
+	  fun()=>usage(prg)),
 
    option('?', "memory",
 	  "Print memory usage information after compilation",
@@ -138,7 +131,7 @@ main(args)
       if (rest.size() > 1)
 	println("Supply only one package on the command line.\n" +
 		"nicec will automatically find dependancies.");
-      usage();
+      usage(prg);
     }
 
   compilation.setMainPackage(rest[0]);
@@ -171,13 +164,6 @@ main(args)
   if (memInfo) printMemoryUsage();
 
   OutputMessages.exit();
-}
-
-void usage()
-{
-  println("Usage: nicec [options] [package]");
-  println("Type \"nicec --help\" for a list of options");
-  System.exit(0);
 }
 
 void version()

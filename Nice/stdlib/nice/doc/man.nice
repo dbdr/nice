@@ -21,7 +21,7 @@ package nice.doc;
 
 import nice.getopt;
 
-String man(Program prg)
+String printMan(Program prg)
 {
   StringBuffer res = new StringBuffer();
 
@@ -49,7 +49,8 @@ String man(Program prg)
   res.append(" \\- ").append(prg.shortDescription).append('\n');
 
   res.append(".SH SYNOPSIS\n");
-  res.append("Not written yet.\n");
+  res.append(manUsage(prg));
+  res.append('\n');
 
   res.append(man(prg.options));
 
@@ -59,3 +60,13 @@ String man(Program prg)
   return res.toString();
 }
 
+String manUsage(Program prg)
+{
+  StringBuffer res = new StringBuffer();
+  res.append(".B").append(prg.name).append("\n\\&");
+  if (prg.options != null)
+    res.append("[OPTIONS]");
+  if (prg.arguments != null)
+    res.append(' ').append(prg.arguments);
+  return res.toString();
+}

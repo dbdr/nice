@@ -1,0 +1,56 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="Author" content="Daniel Bonniot">
+   <meta name="GENERATOR" content="Mozilla/4.7 [en] (WinNT; I) [Netscape]">
+   <meta name="KeyWords" content="nice, nicec, nicer, install">
+   <meta name="Description" content="Installation instructions for Unix and Windows.">
+   <title>Installing the Nice compiler</title>
+<link rel=stylesheet href="style.css">
+</head>
+<body text="#000000" bgcolor="#FFFFFF" link="#0000EF" vlink="#51188E" alink="#FF0000">
+
+<center>
+<h1>
+Installing the <font face="Comic Sans MS">Nice</font> compiler</h1></center>
+
+<blockquote>&nbsp;
+<br><font color="#FF0000">At the moment, these instructions only deal with
+Unix-like systems.</font>
+<p>Download the <a href="Nice.tar">Nice.tar</a> file. If you have root
+access type:
+<br><tt>cd /usr</tt>
+<br><tt>tar xf /location/to/nice.tar</tt>
+<p>Otherwise, you can install Nice to your home directory:
+<br><tt>cd</tt>
+<br><tt>tar xf /location/to/Nice.tar</tt>
+<p>That's it! <font face="Comic Sans MS">Nice</font> automatically recognizes
+where it is installed.
+<br>The <font face="Comic Sans MS">Nice</font> tools are placed in the
+<tt>./bin</tt> subdirectory. It may be a good idea to have it in your <tt>PATH</tt>.
+<h4>
+Emacs mode</h4>
+There is an <a href="http://www.gnu.org/software/emacs/">Emacs</a> mode
+for <font face="Comic Sans MS">Nice</font>, which makes Emacs the editor
+of choice for Nice programs!
+<br>To enable it, place this in your <tt>.emacs</tt> file:
+<p><tt>;; Nice</tt>
+<br><tt>(setq load-path</tt>
+<br><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (cons "~/lib/nice" load-path))</tt>
+<br><tt>(setq auto-mode-alist</tt>
+<br><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (cons '("\\.nice$" . nice-mode)
+auto-mode-alist))</tt>
+<br><tt>(autoload 'nice-mode "nice-mode" "Major mode for editing Nice programs."
+t)</tt>
+<p>The first line is there to ensure that the <tt>nice-mode.el</tt> file
+is in your Emacs <tt>load-path</tt>. You may also do that by moving the
+file to some standard place. Or you may have to replace <tt>~</tt> by <tt>/usr</tt>
+or <tt>/usr/local</tt> depending on where you installed Nice.
+<p>The <font face="Comic Sans MS">Nice</font> mode will then be loaded
+automatically when you open <tt>.nice</tt> files. Type <tt>C-h m</tt> for
+the documentation of the mode.
+<br><font color="#000000"></font>&nbsp;</blockquote>
+
+</body>
+</html>

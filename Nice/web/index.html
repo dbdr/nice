@@ -1,0 +1,85 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="Author" content="Daniel Bonniot">
+   <meta name="GENERATOR" content="Mozilla/4.7 [en] (WinNT; I) [Netscape]">
+   <meta name="KeyWords" content="java, nice, programming language, compiler, free, object oriented, functional">
+   <meta name="Description" content="Nice is an advanced progamming language that extends Java with parametric types, functional programming and more!">
+   <title>The Nice programming language</title>
+<link rel=stylesheet href="style.css">
+</head>
+<body text="#000000" bgcolor="#FFFFFF" link="#0000EF" vlink="#51188E" alink="#FF0000">
+
+<center>
+<h1>
+The <font face="Comic Sans MS">Nice</font> programming language</h1></center>
+
+<blockquote>&nbsp;
+<h2>
+&nbsp;&nbsp;&nbsp; What is <font face="Comic Sans MS">Nice</font> ?</h2>
+<font face="Comic Sans MS">Nice</font> is a research programming language.
+It demonstrates how the powerful
+<a href="http://www.cma.ensmp.fr/Francois.Bourdoncle/popl97.html">ML-Sub
+type system</a> can be used in practice.
+<br><font face="Comic Sans MS">Nice</font> is an object-oriented language,
+with parametric, polymorphic types, higher-order functions, and more. It
+combines the advantages of object-orientation and functional programming.
+<p>Using Java libraries within Nice programs is straightforward. The Nice
+compiler produces java bytecode, which means Nice programs can be executed
+on virtually any platform, with any Java Virtual Machine. The compiler
+is itself written in Java (and partly in Nice). <font color="#FF0000">The
+compiler needs a 1.2 or higher JVM to run</font>.
+<br>&nbsp;
+<h2>
+&nbsp;&nbsp;&nbsp; The language</h2>
+There is no real manual for the moment. You can find information about
+the rationale of the language in my <a href="DEA.ps">graduation report</a>.
+<br>This short <b><a href="language.html">tutorial</a></b> should help
+you to start with the language, but it's not complete in any way.
+<br>Having a look at the <a href="collections.nice">collection.nice</a>
+file can help you discover features not presented in the <a href="language.html">tutorial</a>.
+<br>&nbsp;
+<h2>
+&nbsp;&nbsp;&nbsp; Download</h2>
+The <font face="Comic Sans MS">Nice</font> compiler is freely available
+(a source release is planned) on the <a href="install.html">installation
+page</a>.
+<h2>
+&nbsp;&nbsp;&nbsp; Compiling instructions</h2>
+<font face="Comic Sans MS">Nice</font> source files are grouped by <i>packages</i>.
+You don't compile files, you compile packages.
+<br>Each package resides in a separate directory.
+<br>I suggest you create a root directory for your nice packages:
+<br><tt>cd</tt>
+<br><tt>mkdir nice</tt>
+<p>Each time you begin writing a new package, just create a directory for
+it.
+<br>For instance, for package <tt>my.package:</tt>
+<br><tt>cd ~/nice</tt>
+<br><tt>mkdir -p my/package</tt>
+<p>Then you put all the <font face="Comic Sans MS">Nice</font> source files,
+with <tt>.nice</tt> extension, in that directory. The names of the files
+have no importance (for the compiler, but they should be meaningful to
+you of course).
+<br>To compile your new package:
+<br><tt>cd ~/nice</tt>
+<br><tt>nicec my.package</tt>
+<p>To get a list of the compiler's command line options, use:
+<br><tt>nicec --help </tt>or <tt>nicec -h</tt> (GNU style options are used,
+thanks to package <tt>nice.opt</tt>).
+<p>If your package has a <tt>main(args) </tt>method (args has type<i> </i><tt>Array&lt;String></tt>),
+then it is executable, and the compilation will create a jar file, which
+can be executed with
+<br><tt>nicer my/package.jar</tt>
+<p>All imported packages are found automatically, and recompiled if necessary.
+<br>Nice enjoys separate compilation.
+<br>&nbsp;
+<h2>
+<font color="#000000">&nbsp;&nbsp;&nbsp; Contact</font></h2>
+<font color="#000000">Feel free to contact <a href="mailto:d.bonniot@mail.dotcom.fr">Daniel
+Bonniot</a> for any question, any request or to offer help!</font>
+<br><font color="#000000"></font>&nbsp;</blockquote>
+
+</body>
+</html>

@@ -53,6 +53,7 @@ DateFormat getDateInstance(int style) = native DateFormat DateFormat.getDateInst
   native void PrintStream.print  (Object);
 <Any T> void println (PrintStream ps, T object) = 
   native void PrintStream.println(Object);
+String getAbsolutePath (File) = native String File.getAbsolutePath();
 
 /**
    In Java, System.out and System.err are possibly null.

@@ -1271,13 +1271,8 @@ Window createMyWindow()
 	<programlisting lang="nice"><![CDATA[
 (int, int) minMax(int x, int y) = x < y ? (x, y) : (y, x);
 
-void printTuple((int, int) tuple)
+void printTuple((int x, int y))
 {
-  /** Declare two local variables, and assign to each the corresponding value
-      in the tuple.
-  */
-  (int x, int y) = tuple;
-
   println("(" + x + ", " + y + ")");
 }
 
@@ -1287,6 +1282,13 @@ void main(String[] args)
   printTuple(minMax(42, 41));
 }
 ]]></programlisting>
+
+	<para>
+	 Note that <literal>printTuple</literal> has only one argument,
+	 which is a tuple. We give the names <literal>x</literal> and
+	 <literal>y</literal> to the two components of this tuple, so that
+	 we can use them directly in the implementation of the method.
+	</para>
       </example>
 
     </section>

@@ -111,7 +111,6 @@ typecheck(e@IdentExp)
 nullnessInfo(test) = (null, false);
 nullnessInfo(test@CallExp)
 {
-  // pas bon: test.function est deja resolue. Voir b.s.analyse CallExp
   boolean isAlwaysNull;
   if (test.isCallTo("=="))
     isAlwaysNull = true;
@@ -131,6 +130,38 @@ nullnessInfo(test@CallExp)
   return (localVariable(notNull(notNull(test.arguments).getExp(varPosition))), isAlwaysNull);
 }
 
+/** 
+    Collects knowledge about more precise type in branches of conditionals.
+    
+    At the moments only tests agains null are considered.
+    Later, instanceof tests will also be taken into account.
+*/
+
+var int ifLevel;
+var Stack<int> levels = new Vector();
+var Stack<<MonoSymbol, mlsub.typing.Monotype>> conditionalTypes = 
+  new Vector();
+
+void enterIf() { ifLevel++; }
+void exitIf()
+{ 
+  ifLevel--;
+  while (levels.size() > 0 && levels.top() == ifLevel)
+    {
+      levels.pop();
+      MonoSymbol variable; 
+      mlsub.typing.Monotype baseType;
+      (variable, baseType) = conditionalTypes.pop();
+      variable.type = baseType;
+    }
+}
+
+void pushConditionalType(MonoSymbol variable, mlsub.typing.Monotype baseType)
+{
+  levels.push(ifLevel);
+  conditionalTypes.push((variable, baseType));
+}
+
 typecheck(e@IfExp)
 {
   Expression condition = notNull(e.condition);
@@ -147,44 +178,60 @@ typecheck(e@IfExp)
        condition + " has type " + condition.getType());
   }
 
-  ?MonoSymbol variable;
-  boolean isAlwaysNull;
-  (variable, isAlwaysNull) = nullnessInfo(condition);
+  enterIf();
 
-  if (variable == null)
-    {
-      typecheck(e.thenExp);
-      typecheck(e.elseExp);
-      return;
-    }
+  try{
+    ?MonoSymbol variable;
+    boolean isAlwaysNull;
+    (variable, isAlwaysNull) = nullnessInfo(condition);
 
-  MonoSymbol variable = notNull(variable);
+    if (variable == null)
+      {
+	typecheck(e.thenExp);
+	typecheck(e.elseExp);
+	// FIXME: handle finally properly and this can go out
+	exitIf();
+	return;
+      }
 
-  if (! isAlwaysNull)
-    // variable is non-null in the 'then' part
-    {
-      mlsub.typing.Monotype type = notNull(variable.type);
-      variable.type = makeSure(type);
-      typecheck(e.thenExp);
+    MonoSymbol variable = notNull(variable);
 
-      variable.type = type;
-      typecheck(e.elseExp);
-
-      if (e.elseUnreachable)
+    if (! isAlwaysNull)
+      // variable is non-null in the 'then' part
+      {
+	mlsub.typing.Monotype type = variable.type;
 	variable.type = makeSure(type);
-    }
-  else
-    // variable is non-null in the 'else' part
-    {
-      mlsub.typing.Monotype type = variable.type;
-      typecheck(e.thenExp);
+	typecheck(e.thenExp);
 
-      variable.type = makeSure(type);
-      typecheck(e.elseExp);
-
-      if (! e.thenUnreachable)
 	variable.type = type;
-    }
+	typecheck(e.elseExp);
+
+	// If else never returns, the variable is known to be non-null
+	// up-to the end of this conditional block
+	if (e.elseUnreachable)
+	  {
+	    variable.type = makeSure(type);
+	    pushConditionalType(variable, type);
+	  }
+      }
+    else
+      // variable is non-null in the 'else' part
+      {
+	mlsub.typing.Monotype type = variable.type;
+	typecheck(e.thenExp);
+
+	variable.type = makeSure(type);
+	typecheck(e.elseExp);
+
+	if (e.thenUnreachable)
+	  pushConditionalType(variable, type);
+	else
+	  variable.type = type;
+      }
+  }
+  finally{
+    exitIf();
+  }
 }
 
 typecheck(e@IncrementExp)

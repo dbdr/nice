@@ -26,3 +26,8 @@ class Array<T> {}
   assert j[0] == 1;
   j[0] = 2;
   assert i[0] == 1 && j[0] == 2;
+
+/// PASS
+  var String[] foo = ["hello"]; 
+  foo += ["world"];  
+  assert foo[0].equals("hello") && foo[1].equals("world");

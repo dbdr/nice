@@ -312,7 +312,8 @@ public class CallExp extends Expression
     if (function.isFieldAccess())
       res = function.getFieldAccessMethod().compileAccess(compileParams());
     else
-      res = new gnu.expr.ApplyExp(function.generateCode(), compileParams());
+      res = new gnu.expr.ApplyExp(function.generateCodeInCallPosition(), 
+                                  compileParams());
 
     return EnsureTypeProc.ensure(res, Types.javaType(type));
   }
@@ -321,17 +322,6 @@ public class CallExp extends Expression
   { 
     gnu.expr.Expression[] params = 
       Expression.compile(arguments.computedExpressions);
-
-    // wraps the arguments that reference methods into LambdaExps
-    for(int i=0; i<params.length; i++)
-      if(params[i] instanceof gnu.expr.QuoteExp)
-	{
-	  gnu.expr.QuoteExp q = (gnu.expr.QuoteExp) params[i];
-	  if(q.getValue() instanceof gnu.expr.PrimProcedure)
-	    {
-	      params[i] = ((gnu.expr.PrimProcedure) q.getValue()).wrapInLambda();
-	    }
-	}
 
     // Make sure the arguments have the expected bytecode type,
     // matching the instantiated type of the (polymorphic) function.

@@ -303,4 +303,33 @@ public class Gen
     code.emitSwap();
     code.emitPutField(field);
   }
+
+  /** Creates a LambdaExp that applies a Procedure
+   * to the appropriate number of arguments.
+   *
+   * This is usefull to generate an Expression from a given Procedure.
+   */
+  public static LambdaExp wrapInLambda(gnu.mapping.Procedure proc)
+  {
+    int numArgs = proc.minArgs();
+
+    LambdaExp lambda = new LambdaExp();
+    lambda.min_args = lambda.max_args = numArgs;
+
+    Expression[] args = new Expression[numArgs];
+    for (int i = 0; i < numArgs; i++)
+      {
+        // The parameters have type Object, since calls to anonymous functions
+        // have never precise types.
+        // Besides, work would be needed to know the types in the case
+        // of inlined methods (macros).
+	Declaration decl = lambda.addDeclaration("param__" + i, 
+                                                 Type.pointer_type);
+	
+	args[i] = new ReferenceExp(decl);
+      }
+    
+    lambda.body = new ApplyExp(proc, args);
+    return lambda;
+  }  
 }

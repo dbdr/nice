@@ -77,6 +77,19 @@ public class SymbolExp extends Expression
     }
   }
   
+  gnu.expr.Expression generateCodeInCallPosition()
+  {
+    try {
+      gnu.expr.Expression res = symbol.compileInCallPosition();
+      location().write(res);
+      return res;
+    }
+    catch(FieldAccess.UsingAsValue e) {
+      throw User.error(this, 
+		       "You must supply the object that contains this field");
+    }
+  }
+  
   /** @return the declaration of the variable denoted by this expression,
       or <code>null</code> if this expression is not a variable.
   */

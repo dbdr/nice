@@ -333,6 +333,11 @@ public abstract class MethodDeclaration extends Definition
       return getDefinition().getCode();
     }
 
+    gnu.expr.Expression compileInCallPosition()
+    {
+      return getDefinition().getCodeInCallPosition();
+    }
+
     String explainWhyMatchFails(Arguments arguments)
     {
       return MethodDeclaration.this.explainWhyMatchFails(arguments);
@@ -371,7 +376,13 @@ public abstract class MethodDeclaration extends Definition
     this.code = code;
   }
   
-  final gnu.expr.Expression getCode() 
+  gnu.expr.Expression getCode() 
+  {
+    // Default implementation.
+    return getCodeInCallPosition();
+  }
+  
+  final gnu.expr.Expression getCodeInCallPosition() 
   {
     if (code == null)
       {

@@ -24,8 +24,7 @@ import java.util.*;
 /**
    A Native Java Method.
 
-   @version $Date$
-   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
+   @author Daniel Bonniot (bonniot@users.sourceforge.net)
 */
 public class JavaMethod extends MethodDeclaration
 {
@@ -95,6 +94,11 @@ public class JavaMethod extends MethodDeclaration
   protected gnu.expr.Expression computeCode()
   {
     return new QuoteExp(new PrimProcedure(reflectMethod));
+  }
+
+  gnu.expr.Expression getCode() 
+  {
+    return nice.tools.code.Gen.wrapInLambda(new PrimProcedure(reflectMethod));
   }
   
   /****************************************************************

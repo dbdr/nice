@@ -48,12 +48,15 @@ public class InlinedMethod extends MethodDeclaration
   void typecheck()
   {
     super.typecheck();
-    // forces the reflection search
-    getCode();
+    findProcedure();
   }
 
-  protected gnu.expr.Expression computeCode()
+  private void findProcedure()
   {
+    if (this.procedure != null)
+      // Already done.
+      return;
+
     Class refClass = null;
     try{
       refClass = Class.forName(inlineProcedure.toString());
@@ -83,7 +86,7 @@ public class InlinedMethod extends MethodDeclaration
     catch(InvocationTargetException e){
       User.error(inlineProcedure,
 		 "Inlined method " + inlineProcedure +
-		 ": " + e.getLocalizedMessage());
+		 ": " + e.getMessage());
     }
     catch(IllegalAccessException e){
       User.error(inlineProcedure,
@@ -103,7 +106,18 @@ public class InlinedMethod extends MethodDeclaration
 		   " cannot be inlined, but will be called anyway");
 
     this.procedure = (gnu.mapping.Procedure) o;
+  }
+
+  protected gnu.expr.Expression computeCode()
+  {
+    findProcedure();
     return new gnu.expr.QuoteExp(procedure);
+  }
+
+  gnu.expr.Expression getCode() 
+  {
+    findProcedure();
+    return nice.tools.code.Gen.wrapInLambda(procedure);
   }
 
   private static Class[] string1 = new Class[]{ "".getClass() };

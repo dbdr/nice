@@ -1,0 +1,9 @@
+/// PASS
+  (int,int)->int typeCheckerHelper = `+`;
+  int i = typeCheckerHelper(1,2);
+  assert i == 3;
+
+/// PASS
+  assert id(`&&`)(true, true);
+  /// Toplevel
+  <T> T id(T x) = x;

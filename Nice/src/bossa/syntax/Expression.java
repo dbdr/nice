@@ -226,6 +226,16 @@ public abstract class Expression
   }
   
   /**
+     Creates the bytecode expression to evaluate this Expression,
+     when it is used as a function that is immediately called.
+   */
+  gnu.expr.Expression generateCodeInCallPosition()
+  {
+    // Default implementation.
+    return generateCode();
+  }
+  
+  /**
    * Maps {@link #generateCode()} over a list of expressions.
    */
   public static gnu.expr.Expression[] compile(List expressions)

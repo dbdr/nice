@@ -144,6 +144,14 @@ abstract class VarSymbol extends Node implements Located
 				       decl);
   }
 
+  /** @return code that accesses this variable, when it is used
+      as the function of a call. */
+  gnu.expr.Expression compileInCallPosition()
+  {
+    // Default implementation.
+    return compile();
+  }
+
   static gnu.expr.Expression[] compile(VarSymbol[] syms)
   {
     gnu.expr.Expression[] res = new gnu.expr.Expression[syms.length];

@@ -40,6 +40,7 @@ void compileComponent(Compilation compilation, List<Module> modules,
   notNull(compilation.root).freezeGlobalContext();
 
   try {
+    modules.foreach(Module m => m.typecheck());
     modules.foreach(Module m => m.compile());
 
     if (doLink)

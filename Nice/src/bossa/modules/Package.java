@@ -267,10 +267,6 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
 
   public void compile()
   {
-    typecheck();
-
-    addProgress(PROGRESS_TYPECHECK);
-
     compilation.exitIfErrors();
     generateCode();
 
@@ -316,7 +312,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     return contextFrozen;
   }
   
-  private void typecheck()
+  public void typecheck()
   {
     // An interface file does not have to be typecheked.
     // It is known to be type correct from previous compilation!
@@ -327,6 +323,8 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
       compilation.progress(this, "typechecking");
     
     ast.typechecking(compiling());
+
+    addProgress(PROGRESS_TYPECHECK);
   }
 
   public void link()

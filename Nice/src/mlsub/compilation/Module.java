@@ -41,10 +41,12 @@ public interface Module
   /** Resolve local entities, that might increase the global context. */
   void localResolve();
 
+  /** Check types. */
+  void typecheck();
+
   /** Compile the module.
 
       This may involve:
-       - typecheking
        - code generation
        - saving the interface of the module
   */

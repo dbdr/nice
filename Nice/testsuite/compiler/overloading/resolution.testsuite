@@ -73,3 +73,33 @@ int foo() = 42;
 /// PASS
   /// Toplevel
   void foo(int e) requires e >= 0 {}
+
+/// PASS
+  /// package rohan.C dontcompile
+  /// Toplevel
+
+import rohan.A;
+import rohan.B;
+
+class CC {
+void g() {
+B d = new B(l: []); // no crash if this is... new B();
+}
+}   
+
+  /// package rohan.A dontcompile
+  /// Toplevel
+
+import rohan.B;
+
+class B {
+List<B> l = new ArrayList();
+}
+
+  /// package rohan.B
+  /// Toplevel
+
+import rohan.A;
+import rohan.C;
+
+void dummy() {}

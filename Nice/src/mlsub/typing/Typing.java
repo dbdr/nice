@@ -12,7 +12,7 @@
 
 // File    : Typing.java
 // Created : Tue Jul 20 11:57:17 1999 by bonniot
-//$Modified: Wed Aug 02 19:31:11 2000 by Daniel Bonniot $
+//$Modified: Fri Aug 04 14:09:54 2000 by Daniel Bonniot $
 
 package mlsub.typing;
 
@@ -63,7 +63,7 @@ public final class Typing
   static public void introduce(Element e)
   {    
     if(dbg) 
-      Debug.println("Typing introduced "+e);
+      Debug.println("Typing introduced " + e);
 
     // a monotype var introduced earlier must be given a new null kind
     // the cleaner way would be to reset it to null when we leave this level

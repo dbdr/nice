@@ -12,7 +12,7 @@
 
 // File    : Variance.java
 // Created : Fri Jul 23 12:15:46 1999 by bonniot
-//$Modified: Wed Aug 02 17:19:23 2000 by Daniel Bonniot $
+//$Modified: Fri Aug 04 14:08:57 2000 by Daniel Bonniot $
 
 package mlsub.typing;
 
@@ -63,7 +63,7 @@ public final class Variance
 
   public Monotype freshMonotype()
   {
-    TypeConstructor tc = new TypeConstructor(this);	    
+    TypeConstructor tc = new TypeConstructor(this);
     Typing.introduce(tc);
 
     Monotype[] tp = MonotypeVar.news(this.size);

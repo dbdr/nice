@@ -99,7 +99,7 @@ foo(@A){}
   class C<T> extends A<T> { 
   A<T> cons; 
   } 
-  <Any T> A<T> j(A<A<T>>); 
+  <T> A<T> j(A<A<T>>); 
   j(b@B) = new B(cons: j(b.cons)); 
   j(c@C) = new C(cons: j(c.cons)); 
 

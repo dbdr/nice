@@ -188,7 +188,6 @@ TOKEN: /* Keywords */
 
 | < AT:         "@"          	>
 | < EXACTLY_AT: "#"          	>
-| < ANY_:	"Any"        	> /* Nice specific */
 
 // Assertions
 | < ASSERT:     "assert"     	>
@@ -447,7 +446,6 @@ Token doted_string_component():
 { Token t; }
 {
   ( t = <IDENT> 
-  | t = "Any"
   | t = "alike"
   | t = "var"
   | t = "inline" 
@@ -585,9 +583,7 @@ TypeSymbol binder(Collection atomics):
     return second; 
   }
 | { boolean sure = false; }
-  [ t="Any" { User.warning(makeLocation(t), "The 'Any' keyword is deprecated, leave it away."); }
-  | "!" { sure = true; } 
-  ]
+  [ "!" { sure = true; } ]
   id=monotypeVar()
   { 
     if (sure)

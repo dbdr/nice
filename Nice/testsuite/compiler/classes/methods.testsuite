@@ -13,7 +13,7 @@ abstract class B
 /// PASS
   /// Toplevel
 class A {
-  <Any T> T local(void -> T f) {
+  <T> T local(void -> T f) {
     return f();
   }
 }

@@ -11,7 +11,7 @@
   String s = null || "";
 
 /// Global
-<Any T> T fail() { throw new Error(); }
+<T> T fail() { throw new Error(); }
 
 /// PASS
   ?String s = "" || fail();

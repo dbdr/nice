@@ -37,7 +37,7 @@ class Item {}
   heapsort(d);
   assert d[1] == 0;
   /// Toplevel
-<Any T | T <: double, int <: T >
+<T | T <: double, int <: T >
 void heapsort(T[] ra) {
   ra[1] = ra[0];
 }

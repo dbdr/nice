@@ -26,7 +26,7 @@
   void->int f = () => 1;
 
 /// PASS
-  String s = (<Any T>(T x)=>x)("ABC");
+  String s = (<T>(T x)=>x)("ABC");
 
 /// PASS
   int->() f = int i => {};

@@ -20,7 +20,7 @@
 
 /// PASS
   /// TOPLEVEL
-  <Any T> T id(T x) = x;
+  <T> T id(T x) = x;
   var int->int x = id(int y => y + 1);
 
 /// PASS

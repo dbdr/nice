@@ -8,16 +8,16 @@ void usePolymorphicFunction () {
   accessRef(new Ref(value: ""));
 }
 
-<Any C, Any R | C <: Ref<R> > void accessRef (Ref<R> r) {}
+<C, R | C <: Ref<R> > void accessRef (Ref<R> r) {}
 
 /// FAIL
   /// COMMENT Currently we allow only <C T> if C is a type constructor.
   /// Toplevel
-  <Any T, T U> void f();
+  <T, T U> void f();
 
 /// PASS
   /// Toplevel
-<Any T> int m(T);
+<T> int m(T);
 m(x) = 0;
 m(c@Collection) = c.size();
 

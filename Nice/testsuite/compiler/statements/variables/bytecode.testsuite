@@ -1,7 +1,7 @@
 /// PASS
   assert foo([1.0,2.0], true) == 1.0;
   /// Toplevel
-<Any T | T <: double, int <: T >
+<T | T <: double, int <: T >
 T foo(T[] a, boolean first) 
 {
   T res;

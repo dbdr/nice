@@ -21,7 +21,7 @@
 
 /// PASS
   /// Toplevel
-<Any T> void f()
+<T> void f()
 {
   T[] a = new T[0];
 }

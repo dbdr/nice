@@ -1,9 +1,9 @@
 /// COMMENT Test typing related to nullness markers.
 /// PASS
   /// toplevel
-<Any T> void nonnull(!T);
+<T> void nonnull(!T);
 
-nonnull(x@String) {}
+nonnull(String x) {}
 nonnull(x) {}
 
 /// PASS

@@ -56,7 +56,7 @@ archive archive2 archive3 share/java/nice.jar: src/nice/tools/compiler.jar
 
 
 setDate:
-	cd src/nice/tools/compiler; ./setBuildDate
+	cd src/nice/tools/compiler; ./setBuildDate ${VERSION}
 
 deb:
 	@echo Creating Debian package version ${VERSION}

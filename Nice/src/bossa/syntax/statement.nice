@@ -1,0 +1,66 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2004                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package bossa.syntax;
+
+import bossa.util.*;
+
+/**
+   Abstract ancestor for all statements.
+   Descendants have "Stmt" suffix.
+
+*/
+public abstract class Statement implements Located
+{
+  Location loc = Location.nowhere();
+
+  gnu.expr.Expression generateCode();
+
+  location() = loc;
+
+  public void setLocation(Location l)
+  {
+    loc=l;
+  }
+}
+
+gnu.expr.Expression[] compileStatements(Statement[] statements)
+{
+  gnu.expr.Expression[] res = cast(new gnu.expr.Expression[statements.length]);
+  for (int i = 0; i < statements.length; i++)
+    {
+      Statement s = statements[i];
+
+      if (s == null)
+        {
+          res[i] = gnu.expr.QuoteExp.voidExp;
+          continue;
+        }
+
+      try {
+         res[i] = s.generateCode();
+      }
+      catch(UserError e) {
+        // Make sure that the error is attached to a location.
+        // If not, it's better than nothing to located the error in
+        // the containing statement.
+        if (e.location == null)
+          e.location = s.location();
+        // Rethrow.
+        throw e;
+      }
+
+      if (s.location() != null)
+        s.location().write(res[i]);
+    }
+  return res;
+}

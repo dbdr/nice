@@ -2468,7 +2468,7 @@ Statement LocalDeclaration() :
   [ "=" e=Expression() ] 
   { res = bossa.syntax.dispatch.createLocalVariable(id,type,constant,e); }
   ( LOOKAHEAD( "," <IDENT> ( "=" | ";" | ",") ) 
-    "," id=ident() {e=null;} [ "=" e=Expression() ] { bossa.syntax.dispatch.addNextLocal(res,id,e); } )*
+    "," id=ident() {e=null;} [ "=" e=Expression() ] { bossa.syntax.fun.addNextLocal(res,id,e); } )*
 
   { return res; }
 }

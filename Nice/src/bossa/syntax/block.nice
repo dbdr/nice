@@ -103,7 +103,7 @@ public class Block extends Statement
         // in order to define the locals before their use.
         // That is why we can't set body's body at construction.
         let res = this.addLocals(locals.iterator(), body);
-        body.setExpressions(Statement.compile(statements));
+        body.setExpressions(compileStatements(statements));
         return res;
       }
 

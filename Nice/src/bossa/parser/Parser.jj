@@ -702,11 +702,14 @@ FunType OLDfunmonotype():
     Token t;
 }
 {
-    "fun" "(" [ dom=monotypes() ] ")" 
-    t="(" [ codom=monotype() ] ")"
+    t="fun" "(" [ dom=monotypes() ] ")" 
+    "(" [ codom=monotype() ] ")"
     { 
       if (codom == null) codom = ConstantExp.synVoidType;
-      return new FunType(dom, codom); 
+      FunType res = new FunType(dom, codom);
+      System.out.println(new Location(t).toString() + ": This syntax is deprecated. You should use:");
+      System.out.println(res.toString());
+      return res; 
     }
 }
 

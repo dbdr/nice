@@ -343,7 +343,8 @@ void main(String[] args)
 
     <section id="namedParameters"><title>Named parameters</title>
       <para>
-	When calling a function (or a <link linkend="method">method</link>)
+	When <link linkend="call">calling</link> a function 
+	(or a <link linkend="method">method</link>)
 	it is possible to specify the name of a parameter, followed by
 	<literal>:</literal> before the value given to that parameter.
 	Named parameters can be given in any order.
@@ -697,6 +698,56 @@ Window createMyWindow()
   </chapter>
 
   <chapter><title>Expressions</title>
+    <section id="call"><title>Function calls</title>
+      <para>
+        A call is usually of the form <literal>f(e1, ..., en)</literal>.
+	<literal>f</literal> can be a function name, a method name, or
+	more generally any expression which has a functional type
+	(for instance, a local parameter).
+	<literal>e1, ..., en</literal> is the list of arguments to the 
+	function. Arguments can optionally be 
+	<link linkend="namedParameters">named</link>.
+      </para>
+
+      <para>
+        In many object-oriented languages, methods are called with the
+	syntax <literal>e1.f(e2, ..., en)</literal>. This syntax is also 
+	accepted in Nice, and is completely equivalent to the previous one.
+	In particular, <literal>e.f</literal> can be used to retrieve the value
+	of the field <literal>f</literal> in the object <literal>e</literal>
+	<footnote>
+	  <para>
+	    A consequence of these rules is that if the field 
+	    <literal>f</literal> contains a function, it must be called with
+	    <literal>(e.f)(e1, ..., en)</literal>.
+	  </para>
+	</footnote>.
+      </para>
+
+      <para>
+        It is possible that a name refers to several unrelated functions.
+	In that case, the types (and if applicable names)
+	of the arguments are used to try to disambiguate which function
+	must be called. If only one function is applicable, it is called.
+	Moreoever, if several functions are applicable, but one has a more
+	restricted domain than all the others, it is chosen
+	<footnote>
+	  <para>
+	    For instance, suppose two functions 
+	    <literal><![CDATA[<T> void foo(Collection<T>)]]></literal> and 
+	    <literal><![CDATA[<T> void foo(List<T>)]]></literal> are declared, 
+	    and <literal>aList</literal> is an expression of static type 
+	    <literal>List</literal>.
+	    The expression <literal>foo(aList)</literal> will result in
+	    calling the second <literal>foo</literal> function, 
+	    because <literal>List</literal>
+	    is a subclass of <literal>Collection</literal>.
+	  </para>
+	</footnote>.
+	Otherwise, the compiler reports an ambiguity error.
+      </para>
+    </section>
+
     <section><title>Tuples</title>
       <para>
        A tuple is a groupment of several values in a single expression.
@@ -725,7 +776,7 @@ Window createMyWindow()
        A funny feature is that swapping two variables can be done without a 
        temporary variable, using tuples: <literal>(x, y) = (y, x)</literal>.
        An important use of tuples is to allow a function or a method 
-       to return several values. Example <xref linkend="tupleEx" /> defines
+       to return several values. <xref linkend="tupleEx" /> defines
        and uses the function <literal>minMax</literal>, which takes 
        two integers, and returns the smallest first, the biggest second.
       </para>

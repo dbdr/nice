@@ -98,6 +98,19 @@ public class NiceClass extends ClassDefinition.ClassImplementation
     return get(definition.getSuperClass());
   }
 
+  /** List of symbols for calling constructors of this class. */
+  private ArrayList constructors = new ArrayList(10);
+
+  void addConstructorCallSymbol(MethodDeclaration.Symbol sym)
+  {
+    constructors.add(sym);
+  }
+
+  List getConstructorCallSymbols()
+  {
+    return (List) constructors.clone();
+  }
+
   /****************************************************************
    * Fields
    ****************************************************************/

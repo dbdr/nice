@@ -26,16 +26,37 @@ public class InitializeProc extends ProcedureN implements Inlineable
 {
   public InitializeProc (Method constructor)
   {
+    this(constructor, false);
+  }
+
+  /**
+     @param implicitThis true if a 'this' argument should be added
+       during the call.
+  */
+  public InitializeProc (Method constructor, boolean implicitThis)
+  {
     this.constructor = constructor;
+    this.implicitThis = implicitThis;
   }
 
   public InitializeProc (ConstructorExp method)
   {
-    this.method = method; 
+    this(method, false);
+  }
+
+  /**
+     @param implicitThis true if a 'this' argument should be added
+       during the call.
+  */
+  public InitializeProc (ConstructorExp method, boolean implicitThis)
+  {
+    this.method = method;
+    this.implicitThis = implicitThis;
   }
 
   private Method constructor;
   private ConstructorExp method;
+  private boolean implicitThis;
 
   public void compile (ApplyExp exp, Compilation comp, Target target)
   {
@@ -46,9 +67,19 @@ public class InitializeProc extends ProcedureN implements Inlineable
     Expression[] args = exp.getArgs();
     Type[] types = constructor.getParameterTypes();
 
-    args[0].compile(comp, Target.pushObject);
-    for (int i = 1; i < args.length; i++)
-      args[i].compile(comp, types[i - 1]);
+    int arg = 0;
+    int type = 0;
+    if (implicitThis)
+      code.emitPushThis();
+    else
+      args[arg++].compile(comp, Target.pushObject);
+    for (; arg < args.length; arg++)
+      args[arg].compile(comp, types[type++]);
+
+    // Add dummy arguments to match the bytecode constructor.
+    if (method != null)
+      for (int i = 0; i < method.dummyArgs; i++)
+        code.emitPushInt(0);
 
     code.emitInvokeSpecial(constructor);
   }

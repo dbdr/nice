@@ -53,6 +53,11 @@ public class InstantiateProc extends ProcedureN implements Inlineable
     for (int i = 0; i < args.length; i++)
       args[i].compile(comp, types[i]);
 
+    // Add dummy arguments to match the bytecode constructor.
+    if (method !=null)
+      for (int i = 0; i < method.dummyArgs; i++)
+        code.emitPushInt(0);
+
     code.emitInvokeSpecial(constructor);
     target.compileFromStack(comp, type);
   }

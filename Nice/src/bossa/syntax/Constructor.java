@@ -47,6 +47,18 @@ class Constructor extends MethodDeclaration
     this.classe = classe;
     this.fields = fields;
     this.index = index;
+
+    mlsub.typing.Polytype type = new mlsub.typing.Polytype
+      (getType().getConstraint(), 
+       new mlsub.typing.FunType(getArgTypes(), PrimitiveType.voidType));
+    classe.addConstructorCallSymbol
+      (new MethodDeclaration.Symbol(name, type) {
+          gnu.expr.Expression compileInCallPosition()
+          {
+            getCode();
+            return initializeFromConstructor;
+          }
+        });
   }
 
   private NiceClass classe;
@@ -64,6 +76,9 @@ class Constructor extends MethodDeclaration
 
   /** Call the constructor, with all the arguments. */
   private Expression initialize;
+
+  /** Call the constructor, with all the arguments, with an implicit this argument. */
+  private Expression initializeFromConstructor;
 
   /** Call the constructor, with only non-default arguments. */
   private Expression initializeOmitDefaults;
@@ -124,6 +139,7 @@ class Constructor extends MethodDeclaration
         else
           {
             initialize = new QuoteExp(new InitializeProc(m));
+            initializeFromConstructor = new QuoteExp(new InitializeProc(m, true));
             instantiate = new QuoteExp(new InstantiateProc(m));
           }
         return;
@@ -143,6 +159,7 @@ class Constructor extends MethodDeclaration
     else
       {
         initialize = new QuoteExp(new InitializeProc(lambda));
+        initializeFromConstructor = new QuoteExp(new InitializeProc(lambda, true));
         instantiate = new QuoteExp(new InstantiateProc(lambda));
       }
   }

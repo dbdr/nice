@@ -57,20 +57,54 @@ public class CustomConstructor extends UserOperator
 
   void resolveBody()
   {
+    resolveThis((Block) body);
     body = bossa.syntax.dispatch.analyse
       (body, thisScope, thisTypeScope, false);
+  }
+
+  private void resolveThis(Block block)
+  {
+    Statement last = block.statements[block.statements.length - 1];
+    if (last instanceof Block)
+      {
+        resolveThis((Block) last);
+        return;
+      }
+
+    try {
+      CallExp call = (CallExp) ((ExpressionStmt) last).exp;
+      IdentExp ident = (IdentExp) call.function;
+      if (! call.function.toString().equals("this"))
+        User.error(this, 
+                   "The last statement must be a call to 'this' constructor");
+
+      Location loc = ident.location();
+      call.function = new OverloadedSymbolExp
+        (classe.getConstructorCallSymbols(), FormalParameters.thisName);
+      call.function.setLocation(loc);
+    }
+    catch(ClassCastException ex) {
+      User.error(this, 
+                 "The last statement must be a call to 'this' constructor");
+    }
   }
 
   void innerTypecheck() throws TypingEx
   {
     super.innerTypecheck();
 
-    bossa.syntax.dispatch.typecheck(body); 
+    bossa.syntax.dispatch.typecheck(body);
   }
 
   public void printInterface(java.io.PrintWriter s)
   {
     s.print("new " + className + "(" + parameters + ");\n");
+  }
+
+  public void compile()
+  {
+    // Make sure the constructor is generated.
+    getCode();
   }
 
   protected gnu.expr.Expression computeCode()
@@ -82,12 +116,12 @@ public class CustomConstructor extends UserOperator
       }
 
     ConstructorExp lambda = Gen.createCustomConstructor
-      ((ClassType) javaReturnType(), javaArgTypes(), parameters.getMonoSymbols());
+      ((ClassType) javaReturnType(), javaArgTypes(), getSymbols());
 
     Gen.setMethodBody(lambda, body.generateCode());
     classe.getClassExp().addMethod(lambda);
 
-    return lambda;
+    return new QuoteExp(new InstantiateProc(lambda));
   }
 
   LocatedString className;

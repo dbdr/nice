@@ -1,13 +1,35 @@
 /// Global
   class Point { double x; double y; }
 
-/// PASS bug
+/// PASS
+  assert abs(p.x - 1) < 0.01 && abs(p.y) < 0.01;
+  
   /// Toplevel
 /* Use the custom constructor before its declaration. */
-let Point origin = new Point(angle: 0, distance: 0);
+let Point p = new Point(angle: 0, distance: 1);
 
 new Point(double angle, double distance) 
 { this(x: distance * cos(angle), y: distance * sin(angle)); }
+
+/// PASS
+  /// Toplevel
+/* Use the custom constructor before the declaration of the class. */
+let Point2 origin = new Point2(angle: 0, distance: 0);
+
+class Point2 { double x; double y; }
+new Point2(double angle, double distance) 
+{ this(x: distance * cos(angle), y: distance * sin(angle)); }
+
+/// PASS bug
+  /// Toplevel
+new Point(double angle, double distance) 
+{ this(x: distance * cos(angle), y: distance * sin(angle)); }
+
+new Point((double angle, double distance) polarCoordinates) 
+{ 
+  // Forward to another custom constructor.
+  this(angle: angle, distance: distance);
+}
 
 /// PASS bug
   var p = new Point(angle: 0, distance: 1);

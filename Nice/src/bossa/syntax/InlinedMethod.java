@@ -54,14 +54,14 @@ public class InlinedMethod extends MethodDeclaration
 
   protected gnu.mapping.Procedure computeDispatchMethod()
   {
-    Class refClass;
-
-    String name = inlineProcedure.toString();
-    refClass = nice.tools.code.Types.lookupQualifiedJavaClass(name);
-
-    if (refClass == null)
+    Class refClass = null;
+    try{
+      refClass = Class.forName(inlineProcedure.toString());
+    }
+    catch(ClassNotFoundException e){
       User.error(inlineProcedure, 
 		 "Inlined method " + inlineProcedure + " was not found");
+    }
 
     Method m = null;
     Object[] params = new Object[]{ parameter };

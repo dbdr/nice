@@ -2445,14 +2445,17 @@ Statement LocalFunctionDeclaration() :
 Statement LocalTupleDeclaration(List statements) :
 {
   Expression e;
+  Token first,last;
 }
 {
-  "(" { List parts = new LinkedList(); Expression part; }
+  first="(" { List parts = new LinkedList(); Expression part; }
   part = LocalTuplePart(statements) { parts.add(part); }
   ( "," part = LocalTuplePart(statements) { parts.add(part); } )+
-  ")"
+  last=")"
   "=" e=Expression() ";" 
-  { return new ExpressionStmt(AssignExp.create(new TupleExp(parts), e)); }
+  { Expression exp = AssignExp.create(new TupleExp(parts), e);
+    exp.setLocation(new Location(first,last));
+    return new ExpressionStmt(exp); }
 }
 
 Expression LocalTuplePart(List statements) :

@@ -12,7 +12,7 @@
 
 // File    : parser.jj
 // Created : Thu Jul 01 10:27:05 1999 by bonniot
-//$Modified: Thu May 25 17:33:34 2000 by Daniel Bonniot $
+//$Modified: Tue May 30 22:26:29 2000 by Daniel Bonniot $
 // Description : Parseur JavaCC pour Bossa
 //   Tokens based on the Jazz parser
 
@@ -161,7 +161,6 @@ TOKEN: /* Keywords */
 | < DO:		"do"		>
 //| < TRUE:       "true"       	>
 //| < FALSE:      "false"      	>
-| < FORMAT:     "format"     	>
 | < ERROR:      "error"      	>
 | < FUN:        "fun"        	>
 | < ALIKE:      "alike"      	>
@@ -1013,6 +1012,11 @@ MethodDefinition methodDefinition():
 					  name,cst,returnType,parameters);
 	}
 	int dot=method.toString().lastIndexOf('.');
+	if(dot==-1){
+	  System.err.println("class or method name missing");
+	  System.exit(-1);
+	}
+	
 	String methodName=method.toString().substring(dot+1,method.toString().length());
 	LocatedString className=method.substring(0,dot);
 

@@ -12,7 +12,7 @@
 
 // File    : Package.java
 // Created : Wed Oct 13 16:09:47 1999 by bonniot
-//$Modified: Fri May 26 16:23:36 2000 by Daniel Bonniot $
+//$Modified: Tue May 30 17:54:11 2000 by Daniel Bonniot $
 
 package bossa.modules;
 
@@ -342,7 +342,8 @@ public class Package implements mlsub.compilation.Module
       Manifest manifest = new Manifest();
 
       manifest.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION,"1.0");
-      manifest.getMainAttributes().put(Attributes.Name.MAIN_CLASS, name+".package");
+      manifest.getMainAttributes().put(Attributes.Name.MAIN_CLASS, 
+				       this.name+".package");
      
       jar = new JarOutputStream(out, manifest);
     }
@@ -499,11 +500,17 @@ public class Package implements mlsub.compilation.Module
     
     try{
       c.setSourceFile(name+sourceExt);
-      String filename = c.getName().replace('.',File.separatorChar)+".class";
+      String filename = c.getName();
+
       if(jar==null)
-	c.writeToFile(new File(rootDirectory, filename));
+	{
+	  filename = filename.replace('.', File.separatorChar)+".class";
+	  c.writeToFile(new File(rootDirectory, filename));
+	}
       else
 	{
+	  // Jar and Zip files use forward slashes
+	  filename = filename.replace('.', '/')+".class";
 	  jar.putNextEntry(new JarEntry(filename));
 	  c.writeToStream(jar);
 	}

@@ -102,6 +102,49 @@ PrintStream stderr () = native System.err;
 
 //               PACKAGE: java.util
 
+<T> boolean add(Collection<T>, T) = native boolean Collection.add(Object);
+<T> void clear(Collection<T>) = native void Collection.clear();
+<T> boolean isEmpty(Collection<T>) = native boolean Collection.isEmpty();
+<T> int size(Collection<T>) = native int Collection.size();
+<T,U | T <: U> U[] toArray(Collection<T>) = native Object[] Collection.toArray();
+<T,U,V | T <: ?V, ?V <: ?U > ?U[] toArray(Collection<T>, ?V[]) = native Object[] Collection.toArray(Object[]);
+
+<T> void add(List<T>, int, T) = native void List.add(int, Object);
+<T> T get(List<T>, int) = native Object List.get(int);
+<T> T set(List<T>, int, T) = native Object List.set(int, Object);
+<T> List<T> subList(List<T>, int, int) = native List List.subList(int, int);
+
+<T> boolean hasNext(Iterator<T>) = native boolean Iterator.hasNext();
+<T> T next(Iterator<T>) = native Object Iterator.next();
+<T> void remove(Iterator<T>) = native void Iterator.remove();
+<T,U | U <: T> void add(ListIterator<T>, U) = native void ListIterator.add(Object);
+<T> boolean hasPrevious(ListIterator<T>) = native boolean ListIterator.hasPrevious();
+<T> int nextIndex(ListIterator<T>) = native int ListIterator.nextIndex();
+<T> T previous(ListIterator<T>) = native Object ListIterator.previous();
+<T> int previousIndex(ListIterator<T>) = native int ListIterator.previousIndex();
+<T,U | U <: T> void set(ListIterator<T>, U) = native void ListIterator.set(Object);
+<T> int compare(Comparator<T>, T, T) = native int Comparator.compare(Object, Object);
+<T,U | U <: T> ?Comparator<U> comparator(SortedSet<T>) = native Comparator SortedSet.comparator();
+<T> T first(SortedSet<T>) = native Object SortedSet.first();
+<T> T last(SortedSet<T>) = native Object SortedSet.last();
+<T,U | T <: U> SortedSet<T> headSet(SortedSet<T>, U) = native SortedSet SortedSet.headSet(Object);
+<T,U | T <: U> SortedSet<T> tailSet(SortedSet<T>, U) = native SortedSet SortedSet.tailSet(Object);
+<T,U,V | T <: U, T <: V> SortedSet<T> subSet(SortedSet<T>, U, V) = native SortedSet SortedSet.subSet(Object, Object);
+
+<K,V> void clear(Map<K,V>) = native void Map.clear();
+<K,V> boolean isEmpty(Map<K,V>) = native boolean Map.isEmpty();
+<K,V> int size(Map<K,V>) = native int Map.size();
+<K,V,T | K <: T> ?Comparator<T> comparator(SortedMap<K,V>) = native Comparator SortedMap.comparator();
+<K,V> K firstKey(SortedMap<K,V>) = native Object SortedMap.firstKey();
+<K,V> K lastKey(SortedMap<K,V>) = native Object SortedMap.lastKey();
+<K,V,L | K <: L> SortedMap<K,V> headMap(SortedMap<K,V>, L) = native SortedMap SortedMap.headMap(Object);
+<K,V,L | K <: L> SortedMap<K,V> tailMap(SortedMap<K,V>, L) = native SortedMap SortedMap.tailMap(Object);
+<K,V,L,M | K <: L, K <: M> SortedMap<K,V> subMap(SortedMap<K,V>, L, M) = native SortedMap SortedMap.subMap(Object, Object);
+<K,V> K getKey(Map.Entry<K,V>) = native Object Map.Entry.getKey();
+<K,V> V getValue(Map.Entry<K,V>) = native Object Map.Entry.getValue();
+<K,V> V setValue(Map.Entry<K,V>, V) = native Object Map.Entry.setValue(Object);
+
+
 <T> Iterator<T> iterator(Collection<T>) = 
   native Iterator Collection.iterator();
 <T> ListIterator<T> listIterator(Collection<T>) = 

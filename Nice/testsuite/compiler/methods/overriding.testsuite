@@ -184,3 +184,33 @@ class A {}
 class B {}
 void foo(A a) {}
 override void foo(B b) {}
+
+/// PASS
+  /// Toplevel
+<T> void foo(T x) {}
+override void foo(String s) {}
+
+/// PASS
+  List<String> list = new ArrayList();
+  list.add("abc");
+  list.foo();
+  /// Toplevel
+<T> void foo(Collection<T> list) {}
+// This is NOT an override
+void foo(List<int> list)
+{
+  int i = list[0]+1;
+}
+
+/// FAIL
+  /// Toplevel
+<T> void foo(Collection<T> list) {}
+// This is NOT an override
+override void foo(List<int> list) {}
+
+/// FAIL
+  /// Toplevel
+class A<+T> {}
+void foo(A<Object> x) {}
+// This is NOT an override
+override void foo(A<String> x) {}

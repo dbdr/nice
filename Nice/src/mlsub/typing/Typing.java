@@ -237,6 +237,26 @@ public final class Typing
     leq(((MonotypeConstructor) m.equivalent()).getTC(), t);
   }
   
+  /** Assert that the vars are matching the base head constructors. */
+  public static void leqHead(Monotype[] vars, Monotype[] base)
+    throws TypingEx
+  {
+    for (int i = 0; i < vars.length; i++)
+      {
+        Monotype var = vars[i];
+        nice.tools.typing.Types.setMarkedKind(var);
+        nice.tools.typing.Types.setMarkedKind(base[i]);
+
+        TypeConstructor baseMarker = base[i].head();
+        if (baseMarker != null)
+          leq(var.head(), baseMarker);
+
+        TypeConstructor tag = nice.tools.typing.Types.constructor(base[i]);
+        if (tag != null)
+          leq(nice.tools.typing.Types.equivalent(vars[i]), tag);
+      }
+  }
+
   /****************************************************************
    * Testing Polytype <= Polytype
    ****************************************************************/

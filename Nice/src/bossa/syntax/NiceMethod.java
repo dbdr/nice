@@ -232,7 +232,8 @@ public class NiceMethod extends UserOperator
         Domain itsDomain = Types.domain(s.getType());
 
         // Do we have a smaller domain?
-        if (! (Typing.smaller(ourDomain, itsDomain, true)))
+        if (! (Typing.smaller(ourDomain, itsDomain, true))
+            ||  Types.typeParameterDispatch(getType(), s.getType()))
           continue;
 
         if (! Types.covariantSpecialization(getType(), s.getType()))

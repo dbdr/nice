@@ -272,4 +272,53 @@ public final class Types
     // OK, spec is a covariant specialization
     return true;
   }
+
+  /**
+     @returns true if the spec type specializes type parameters of the original
+       type (which can not be checked at runtime during dispatch, and therefore
+       should not count as overriding).
+  */
+  public static boolean typeParameterDispatch(Polytype spec, Polytype origin)
+  {
+    Monotype[] originalParams = parameters(origin);
+
+    if (originalParams.length == 0)
+      return false;
+
+    Typing.enter();
+    try {
+
+      try {
+        Polytype clonedSpec = spec.cloneType();
+
+        Constraint.enter(origin.getConstraint());
+        Constraint.enter(clonedSpec.getConstraint());
+
+        // For all argument types ...
+        Monotype[] args = MonotypeVar.news(originalParams.length);
+        Typing.introduce(args);
+
+        // ... that can be used for the first method ...
+        Typing.leq(args, originalParams);
+
+        // ... and that will be dispatched to the specialized method ...
+        Typing.leqHead(args, parameters(clonedSpec));
+
+        Typing.implies();
+
+        // ... check that those args fit in the 'specialized' method ...
+        Constraint.enter(spec.getConstraint());
+        Typing.leq(args, parameters(spec));
+      }
+      finally {
+        Typing.leave();
+      }
+    }
+    catch (TypingEx ex) {
+      return true;
+    }
+
+    // OK, no covariant dispatch
+    return false;
+  }
 }

@@ -58,7 +58,7 @@ public class NewArrayExp extends Expression
   void computeType()
   {
     Monotype monotype;
-    Constraint cst;
+    Constraint cst = Constraint.True;
 
     TypeConstructor[] nullVars;
     boolean zero = findZero(knownDimensions);
@@ -78,70 +78,73 @@ public class NewArrayExp extends Expression
       }
     else
       nullVars = null;
-    
+
+    // Whether the element are surely not null
+    boolean sure = false;
+
     if (resolvedType instanceof MonotypeVar)
       {
 	MonotypeVar res = (MonotypeVar) resolvedType;
-	TypeConstructor tc = new TypeConstructor("nullness", PrimitiveType.maybeTC.variance, false, false);
-	MonotypeVar raw = new MonotypeVar(res.getName()+"raw");
-	MonotypeConstructor eq = MonotypeConstructor.apply(tc, raw);
-	TypeSymbol[] vars;
-	if (nullVars == null)
-	  vars = new TypeSymbol[]{tc, raw};
-	else
-	  {
-	    vars = new TypeSymbol[nullVars.length + 2];
-	    System.arraycopy(nullVars, 0, vars, 2, nullVars.length);
-	    vars[0] = tc;
-	    vars[1] = raw;
-	  }
-	cst = new Constraint(vars, new AtomicConstraint[]{
-	  new TypeConstructorLeqCst(tc, PrimitiveType.maybeTC),
-	  new MonotypeLeqCst(eq, res),
-	  new MonotypeLeqCst(res, eq)});
 
-	if (nullVars != null)
-	  monotype = MonotypeConstructor.apply(nullVars[nullVars.length - 1],
-					       raw);
-	else
-	  monotype = bossa.syntax.Monotype.maybe(raw);
+        if (res.getKind() == mlsub.typing.NullnessKind.instance)
+          monotype = Types.rawType(res.equivalent());
+        else
+          monotype = res;
+            /*
+            TypeConstructor tc = new TypeConstructor("nullness", PrimitiveType.maybeTC.variance, false, false);
+            MonotypeVar raw = new MonotypeVar(res.getName()+"raw");
+            MonotypeConstructor eq = MonotypeConstructor.apply(tc, raw);
+            TypeSymbol[] vars;
+            if (nullVars == null)
+              vars = new TypeSymbol[]{tc, raw};
+            else
+              {
+                vars = new TypeSymbol[nullVars.length + 2];
+                System.arraycopy(nullVars, 0, vars, 2, nullVars.length);
+                vars[0] = tc;
+                vars[1] = raw;
+              }
+            cst = new Constraint(vars, new AtomicConstraint[]{
+              new TypeConstructorLeqCst(tc, PrimitiveType.maybeTC),
+              new MonotypeLeqCst(eq, res),
+              new MonotypeLeqCst(res, eq)});
+
+            if (nullVars != null)
+              monotype = MonotypeConstructor.apply(nullVars[nullVars.length - 1],
+                                                   raw);
+            else
+              monotype = bossa.syntax.Monotype.maybe(raw);
+            */
+          }
       }
     else if (resolvedType == mlsub.typing.TopMonotype.instance)
       {
         monotype = mlsub.typing.TopMonotype.instance;
-	if (nullVars != null)
-	  {
-	    monotype = MonotypeConstructor.apply(nullVars[nullVars.length - 1],
-						 monotype);
-	    cst = new Constraint(nullVars, null);
-	  }
-        else
-          {
-            monotype = bossa.syntax.Monotype.maybe(monotype);
-            cst = Constraint.True;
-          }
       }
     else
       {
 	if (!(resolvedType instanceof TypeConstructor))
 	  User.error(ident, ident + " should be a class");
-    
-	cst = Constraint.True;
 
 	TypeConstructor tc = (TypeConstructor) resolvedType;
 	monotype = new MonotypeConstructor(tc, MonotypeVar.news(tc.arity()));
+
 	if (Types.isPrimitive(tc))
-	  monotype = bossa.syntax.Monotype.sure(monotype);
-	else if (nullVars != null)
-	  {
-	    monotype = MonotypeConstructor.apply(nullVars[nullVars.length - 1],
-						 monotype);
-	    cst = new Constraint(nullVars, null);
-	  }
-	else
-	  monotype = bossa.syntax.Monotype.maybe(monotype);	  
+          sure = true;
       }
-    
+
+    // Add the nullness marker to the element type.
+    if (sure)
+      monotype = bossa.syntax.Monotype.sure(monotype);
+    else if (nullVars == null)
+      monotype = bossa.syntax.Monotype.maybe(monotype);
+    else
+      {
+        monotype = MonotypeConstructor.apply
+          (nullVars[nullVars.length - 1], monotype);
+        cst = new Constraint(nullVars, null);
+      }
+
     for (int i = 0; i < unknownDimensions; i++)
       {
 	monotype = new MonotypeConstructor

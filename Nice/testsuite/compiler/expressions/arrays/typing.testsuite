@@ -11,3 +11,8 @@
 
 /// FAIL
   new int[""];
+
+/// PASS
+  /// Toplevel
+<T> ?T[] foo(!T x) = new T[1];
+<T> ?T[] foo2(int length) = new T[length];

@@ -102,13 +102,14 @@ public class RetypedJavaMethod extends JavaMethod
     if(reflectMethod != null)
       return;
     
-    Type holder = TypeImport.lookup(className);
-    if(holder == null)
+    Type holderType = TypeImport.lookup(className);
+    if (holderType == null)
       User.error(this,
 		 "Class " + className + " was not found");
     
-    if(!(holder instanceof ClassType))
+    if (!(holderType instanceof ClassType))
       User.error(className, className + " is a primitive type");
+    ClassType holder = (ClassType) holderType;
     
     className = new LocatedString(holder.getName(), className.location());
     
@@ -132,15 +133,13 @@ public class RetypedJavaMethod extends JavaMethod
     javaTypes.set(0, new LocatedString(javaRetType.getName(), 
 				       retTypeString.location()));
     
-    reflectMethod = 
-      ((ClassType) holder).getDeclaredMethod (methodName, javaArgType);
+    reflectMethod = holder.getDeclaredMethod(methodName, javaArgType);
     
     if (reflectMethod == null)
       {
 	try {
           reflectMethod = 
-        	((ClassType) holder).getDeclaredMethod (methodName,
-			javaArgType.length);
+            holder.getDeclaredMethod(methodName, javaArgType.length);
         } catch (Error e) {
           User.error(this, "The types of the arguments don't exactly match any of the declarations");
 	}
@@ -150,7 +149,7 @@ public class RetypedJavaMethod extends JavaMethod
               User.error(className, "class " + holder.getName() + " has no constructor with " + javaArgType.length + " arguments");
 	    else
               User.error(className, "No method named " + methodName + " with " +
-		javaArgType.length +" arguments was not found in class " +
+		javaArgType.length + " arguments was found in class " +
 		holder.getName());
 	  }
 

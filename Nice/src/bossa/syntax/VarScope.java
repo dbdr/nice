@@ -63,7 +63,7 @@ class LocalVarScope extends VarScope
   public LocalVarScope(VarScope outer)
   {
     this.outer = outer;
-    this.defs = new HashMultiTable();
+    this.defs = new HashMap();
   }
 
   public LocalVarScope(VarScope outer, Collection /* of VarSymbol */ defs)
@@ -79,7 +79,7 @@ class LocalVarScope extends VarScope
 
   void removeSymbol(/*VarSymbol*/Symbol sym)
   {
-    defs.remove(sym.name, sym);
+    defs.remove(sym.name);
   }
 
   /**
@@ -91,15 +91,19 @@ class LocalVarScope extends VarScope
    */
   public List lookup(LocatedString i)
   {
-    List res = defs.getAll(i);
-    
-    if(res!=null)
-      return res;
-    
+    Object res = defs.get(i);
+
+    if (res != null)
+      {
+        LinkedList l = new LinkedList();
+        l.add(res);
+        return l;
+      }
+
     if(outer!=null)
       return outer.lookup(i);
 
-    return new LinkedList();
+    return Collections.EMPTY_LIST;
   }
 
   List globalLookup(LocatedString i)
@@ -113,12 +117,12 @@ class LocalVarScope extends VarScope
   /****************************************************************
    * Debugging
    ****************************************************************/
-  
+
   public String toString()
   {
-    return defs.elementCount()+";;\n"+outer;
+    return defs.size()+";;\n"+outer;
   }
-  
+
   private VarScope outer;
-  private HashMultiTable defs;
+  private HashMap defs;
 }

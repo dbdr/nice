@@ -1,0 +1,5 @@
+/// PASS
+  /// Toplevel
+  // This is an empty package.
+  // Note: to really test this, the testsuite should not produce any
+  // code for this case (like the empty main).

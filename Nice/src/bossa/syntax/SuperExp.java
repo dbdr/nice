@@ -17,6 +17,7 @@ import bossa.util.*;
 import gnu.expr.*;
 import gnu.bytecode.*;
 import mlsub.typing.*;
+import nice.tools.code.Types;
 
 import mlsub.typing.Polytype;
 import mlsub.typing.Monotype;
@@ -131,16 +132,14 @@ public class SuperExp extends Expression
 	  constraint = addLeq(type.getConstraint(), superAlternative.getPatterns(), monotype.domain());
 	else
 	  {
-	    TypeConstructor superTC = findTCforClass
-	      (currentMethod.firstArgument(), 
-	       superMethod.getDeclaringClass());
+	    TypeConstructor superTC = null;
+            try {
+              superTC = Types.typeConstructor(superMethod.getDeclaringClass());
+            }
+            catch(Types.NotIntroducedClassException ex ) {}
 
 	    if (superTC == null)
 	      {
-		// This probably means that super comes from a special
-		// class that is not in the Nice hierarchy, like
-		// java.lang.Object (because of variances).
-		    
 		// Our safe bet is to assert that the argument is 
 		// above Object
 		superTC = JavaClasses.object
@@ -176,19 +175,6 @@ public class SuperExp extends Expression
       newAtoms[newAtoms.length - 1 - i] = new TypeConstructorLeqMonotypeCst(p[i].tc, m[i]);
 
     return new Constraint(c.binders(), newAtoms);
-  }
-
-  private static TypeConstructor findTCforClass(TypeConstructor tc, 
-						ClassType t)
-  {
-    if (nice.tools.code.Types.get(tc) == t)
-      return tc;
-
-    TypeConstructor superClass = ClassDefinition.get(tc).getSuperClass();
-    if (superClass != null)
-      return findTCforClass(superClass, t);
-
-    return null;
   }
 
   /****************************************************************

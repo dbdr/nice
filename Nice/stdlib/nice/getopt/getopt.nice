@@ -52,17 +52,17 @@ parse(progName@String, args, options)
   int c = g.getopt();
   while (c != -1)
     {
-      ?Option choosen = options.find(fun(Option o)=> o.optval == c);
-      if (choosen != null)
-	notNull(choosen).doAction(g);
+      ?Option chosen = options.find(fun(Option o)=> o.optval == c);
+      if (chosen != null)
+	chosen.doAction(g);
       
       c = g.getopt();
     }
 
   int index = getOptind(g);
-  Vector<String> res = makeVector(args.size()-index);
-  for(; index<args.size(); index = index+1)
-    res.add(args.get(index));
+  Vector<String> res = makeVector(args.length - index);
+  for(; index<args.length; index++)
+    res.add(args[index]);
 
   return res;
 }

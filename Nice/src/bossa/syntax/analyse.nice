@@ -455,6 +455,17 @@ analyse(c@ConstantExp, info)
   return c;
 }
 
+analyse(e@TypeConstantExp, info)
+{
+  LocatedString name = cast(e.value);
+  ?gnu.bytecode.Type type = nice.tools.code.Types.type(name.toString()); //info.typeMap.lookup(name);
+  if (type == null)
+    throw unknownIdent(name);
+
+  e.value = object(type);
+  return e;
+}
+
 analyse(e@TupleExp, info)
 {
   analyseExps(notNull(e.expressions), info);

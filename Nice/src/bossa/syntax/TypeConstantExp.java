@@ -1,7 +1,7 @@
 /**************************************************************************/
 /*                                N I C E                                 */
 /*             A high-level object-oriented research language             */
-/*                        (c) Daniel Bonniot 2001                         */
+/*                        (c) Daniel Bonniot 2002                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -10,18 +10,19 @@
 /*                                                                        */
 /**************************************************************************/
 
-package nice.lang;
+package bossa.syntax;
 
 /**
-   Various native constructs.
+   A type used as an expression.
 
    @version $Date$
-   @author Daniel Bonniot (Daniel.Bonniot@inria.fr)
+   @author daniel (bonniot@users.sourceforge.net)
  */
 
-void `throw`(java.lang.Throwable exception) = inline nice.lang.inline.Throw();
-
-<Any T> boolean `instanceof`(T value, String className) =
-  Class.forName(className).isInstance(object(value));
-
-Class `class`(Type) = inline nice.lang.inline.Class();
+class TypeConstantExp extends ConstantExp
+{
+  TypeConstantExp(LocatedString name)
+  {
+    super(ConstantExp.typeTC, name, name.toString(), name.location());
+  }
+}

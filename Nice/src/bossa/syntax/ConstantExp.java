@@ -240,6 +240,11 @@ public class ConstantExp extends Expression
     return res;
   }
   
+  public static Expression makeType(LocatedString representation)
+  {
+    return new TypeConstantExp(representation);
+  }
+  
   /****************************************************************
    * Primitive Types
    ****************************************************************/
@@ -343,6 +348,13 @@ public class ConstantExp extends Expression
 	return gnu.bytecode.Type.pointer_type;
       }
     
+    if (name.equals("nice.lang.Type"))
+      {
+	typeTC = tc;
+	// to differ with the null result, which signals error
+	return gnu.bytecode.Type.pointer_type;
+      }
+
     return null;
   }
   
@@ -355,6 +367,7 @@ public class ConstantExp extends Expression
   // syntatic types
   public static Monotype synVoidType;
 
+  static TypeConstructor typeTC;
   static TypeConstructor throwableTC;
   static TypeConstructor throwableTC()
   {

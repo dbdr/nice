@@ -1,0 +1,11 @@
+/// PASS
+  Class c = String.class;
+
+/// PASS
+  Class c = String[].class;
+
+/// PASS
+  Class c = String[][].class;
+
+/// FAIL
+  Class c = NotExisting.class;

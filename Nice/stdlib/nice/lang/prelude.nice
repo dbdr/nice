@@ -72,6 +72,7 @@ class char   extends int    = native;
 double doubleValue(Number) = native double Number.doubleValue();
 
 class Throwable = native java.lang.Throwable;
+class Type = native;
 
 /* 
    Allows to consider any nice object as an instance of java.lang.Object

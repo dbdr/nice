@@ -424,7 +424,8 @@ LocatedString doted_string():
   t = <IDENT>
   { image = new StringBuffer(t.image); loc = new Location(t); }
 
-  ( "." t=doted_string_component() 
+  ( LOOKAHEAD(2) // needed to distinguish with ".class"
+    "." t=doted_string_component() 
     { image.append(".").append(t.image); 
       loc.englobe(new Location(t)); } 
   )*
@@ -1857,12 +1858,11 @@ Expression PrimaryPrefix() :
   //AllocationExpression()
   res=newExp()
 
-/* What's that ?
 |
-  LOOKAHEAD( ResultType() "." "class" )
-  ResultType() "." "class"
-*/
-
+  LOOKAHEAD( doted_array_string() "." "class" )
+  { LocatedString name; Token t; }
+  name=doted_array_string() "." t="class"
+  { return CallExp.create(symb(t), ConstantExp.makeType(name)); }
 |
   //Name()
   res=identExp()

@@ -329,7 +329,8 @@ public class ApplyExp extends Expression
 	return;
       }
 
-    if (comp.curLambda.isHandlingTailCalls()
+    if (comp.curLambda != null &&
+	comp.curLambda.isHandlingTailCalls()
 	&& ! comp.curLambda.getInlineOnly())
       {
 	ClassType typeContext = comp.typeCallContext;

@@ -37,6 +37,10 @@
   var int->int x = int y => y + 1;
   
 /// PASS
+  /// Toplevel
+var List<String> test2 = (()=> new ArrayList()) ();
+
+/// PASS
   /* Modifying a global var. */
   x = 1;
   /// TOPLEVEL

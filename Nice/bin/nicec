@@ -70,16 +70,7 @@ while true; do
   case "x$1" in
     x-J*) read_java_arg "`expr substr "$1" 3 1000`";;
     x-e) 
-	cp ${HOME}/Nice/src/nice/tools/compiler.jar ${HOME}/Nice/src/nice/tools/.compiler.jar
-	NICE=${NICE_DEVEL-${HOME}/Nice/src/nice/tools/.compiler.jar:${HOME}/Nice/classes:${HOME}/Nice/stdlib:${HOME}/Nice/src:}
-	NICEJAR=${HOME}/Nice/stdlib
-	doTest=false;;
-    x-eJ) 
-	NICE=${HOME}/Nice/classes:${HOME}/Nice/lib/nice/Nice.jar
-	NICEJAR=${HOME}/Nice/stdlib
-	doTest=false;;
-    x-el) 
-	NICE=${NICE_DEVEL-${HOME}/Nice/classes:${HOME}/Nice/stdlib:${HOME}/Nice/src:${HOME}/Nice/src/nice/tools/.compiler.jar}
+	NICE=${HOME}/Nice/src/nice/tools/compiler.jar:${HOME}/Nice/stdlib:${HOME}/Nice/src:${HOME}/Nice/classes
 	NICEJAR=${HOME}/Nice/stdlib
 	doTest=false;;
     *) break;;

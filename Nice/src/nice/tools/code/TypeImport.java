@@ -97,15 +97,15 @@ public class TypeImport
 
   public static Type lookupQualified(String className)
   {
-    Type res = Type.loadFromClasspath(className);
+    Type res = Type.lookupType(className);
     if (res != null)
       return res;
 
     Class c = lookupQualifiedJavaClass(className);
-    
+
     if (c == null)
       return null;
-	
+
     return gnu.bytecode.Type.make(c);
   }
 

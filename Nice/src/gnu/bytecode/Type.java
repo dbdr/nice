@@ -91,38 +91,11 @@ public abstract class Type {
 	  }
 	else
 	  {
-	    type = loadFromClasspath(name);
-	    if (type == null)
-	      type = new ClassType(name, ClassType.EXISTING_CLASS);
+            type = new ClassType(name, ClassType.EXISTING_CLASS);
 	  }
 	mapNameToType.put(name, type);
       }
     return type;
-  }
-
-  private static nice.tools.code.ClassLoader loader;
-  static {
-    String runtime = nice.tools.code.TypeImport.getRuntime();
-    loader = new nice.tools.code.ClassLoader
-      (runtime, 
-       new nice.tools.code.ClassLoader.Registrar() {
-	 public void register(String name, ClassType type)
-	 {
-	   getMapNameToType().put(name, type);
-	 }
-       });
-  }
-
-  public static Type loadFromClasspath(String name)
-  {
-    Type type = lookupType(name);
-    if (type != null)
-      return type;
-
-    if (name.startsWith("java.util."))
-      return loader.load(name);
-    else
-      return null;
   }
 
   /** Register that the Type for class is type. */
@@ -170,7 +143,7 @@ public abstract class Type {
 	  return (Type) t;
       }
 
-    type = loadFromClasspath(reflectClass.getName());
+    type = lookupType(reflectClass.getName());
     if (type != null)
       return type;
 

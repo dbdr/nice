@@ -33,3 +33,5 @@ Description: Extension of Java with parametric types, multi-methods, and more.
      parameters. 
    * Nice detects more errors during compilation: programs written in Nice
      never throw NullPointerException nor ClassCastException.
+ .
+ For more information see http://nice.sourceforge.net

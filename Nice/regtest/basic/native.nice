@@ -13,6 +13,10 @@ import java.io.*;
 
 <Any T> T nop(T) = inline regtest.basic.Nop();
 
+// rebind static and non-static fields
+String stringS() = native Fields.stringS;
+String stringI(Fields) = native Fields.stringI;
+
 void test_native();
 test_native()
 {
@@ -24,11 +28,11 @@ test_native()
 
   Fields.intS = 2;
   Fields.stringS = "Static field is: ";
-  println(notNull(Fields.stringS) + Fields.intS);
+  println(Fields.stringS + Fields.intS);
 
   Fields f = new Fields();
   f.intI = 3;
   f.stringI = "Instance field is: ";
-  println(notNull(f.stringI) + f.intI);
+  println(f.stringI + f.intI);
 }
 

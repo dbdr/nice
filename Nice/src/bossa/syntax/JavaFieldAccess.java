@@ -38,9 +38,6 @@ public class JavaFieldAccess extends FieldAccess
     super(name, cst, parameters, returnType);
     this.className = className;
     this.fieldName = fieldName;
-    
-    if(arity != 0)
-      User.error(name, name + " should have no parameters");    
   }
   
   private JavaFieldAccess(LocatedString className,String fieldName,
@@ -112,6 +109,17 @@ public class JavaFieldAccess extends FieldAccess
 	if(field == null)
 	  User.error(this,
 		     "Field "+fieldName+" not found in class "+className);
+    
+	if (field.getStaticFlag())
+	  {
+	    if (arity != 0)
+	      User.error(name, name + " should have no parameters");
+	  }
+	else
+	  {
+	    if (arity != 1)
+	      User.error(name, name + " should have exactly one parameter");
+	  }
 
 	JavaClasses.registerNativeField(this, field);
       }

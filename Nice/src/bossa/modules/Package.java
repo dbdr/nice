@@ -146,9 +146,9 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     if (source instanceof JarSource)
       User.error(this, name + " should be recompiled, but it was loaded from an archive file");
     
-    if (Debug.modules)
+    if (Debug.modules && date > source.lastCompilation)
       Debug.println
-      (this + " was compiled " + new java.util.Date(lastModification()) + 
+      (this + " was compiled " + new java.util.Date(source.lastCompilation) + 
        "\nA required package changed " + new java.util.Date(date) );
 
     read(true);
@@ -166,7 +166,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     outputBytecode = new ClassType(name + ".package");
     outputBytecode.setSuper("java.lang.Object");
     outputBytecode.setModifiers(Access.FINAL | Access.PUBLIC);
-    outputBytecode.requireExistingClass(false);
+    outputBytecode.setExisting(false);
   }
   
   private static List expand(List definitions)
@@ -637,7 +637,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
       res = new ClassType(className);
     }
 
-    res.requireExistingClass(false);
+    res.setExisting(false);
     return res;
   }
 

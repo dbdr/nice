@@ -17,13 +17,23 @@ set ORIGINALCLASSPATH=%CLASSPATH%
 
 rem -- do we have a nice environment variable?
 if not "%NICE%" == "" goto gotNice
+
+rem -- try some standard places
+
+set NICE=c:\nice
+if exists %NICE%\nice.jar goto gotNice
+
+set NICE="c:\Program Files\nice"
+if exists %NICE%\nice.jar goto gotNice
+
 echo You must set NICE to point to the directory you've installed nice in e.g.
 echo set NICE=c:\java\nice
+echo You can do it by modidying this script (nicec.bat) or in Autoexec.bat
 goto cleanup
 :gotNice
 
 rem -- set up the reference to the nice jar file
-set NICEJAR=%NICE%\share\java\nice.jar
+set NICEJAR=%NICE%\nice.jar
 set CLASSPATH=%CLASSPATH%;%NICEJAR%
 java -Dnice.systemJar=%NICEJAR% -Dnice.runtime=%NICEJAR% nice.tools.compiler.package %1 %2 %3 %4 %5 %6 %7 %8 %9
 

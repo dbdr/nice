@@ -439,6 +439,38 @@ void main(String[] args)
       <para>
       </para>
     </section>
+
+    <section id="conversion"><title>Conversion between primitive types</title>
+      <para>
+	The primitive types are, from the largest to the smallest:
+	<literal>double, float, long, int, short, byte</literal>, 
+	and <literal>char</literal> which is smaller than 
+	<literal>int</literal> but incomparable with <literal>short</literal>.
+	Conversion from a smaller to a larger type is automatic.
+	Conversion from a larger to a smaller type must be done explicitely,
+	since they can lose information about the magnitude of the value.
+      </para>
+      <para>
+	The explicit conversion is done by calling a special function, 
+	whose name is the target type. For instance, here is code to read
+	characters from a <literal>Reader</literal>, whose 
+	<literal>read</literal> method returns an <literal>int</literal> 
+	(<literal>-1</literal> meaning that the end of stream has been 
+	reached):
+
+	<example><title>Converting a value of a primitive type</title>
+	<programlisting lang="nice">
+BufferedReader r = new BufferedReader(new InputStreamReader(System.in));
+
+int v;
+while ((v = r.read()) != -1) {
+  char c = char(v);
+  ... // Do something the the character.
+}</programlisting>
+      </example>
+
+      </para>
+    </section>
   </chapter>
 
   <chapter><title>Interfacing with Java</title>

@@ -157,7 +157,6 @@ public ConstantExp createIntegerConstantExp(LocatedString representation)
     return res;
   }
   catch(NumberFormatException e) {
-    e.printStackTrace();
     throw User.error(representation, rep + " is not a valid number");
   }
 }
@@ -200,11 +199,6 @@ private (long, boolean) parseInteger(String rep)
     {
       index += 2;
       radix = 2;
-    }
-  else if (rep.startsWith("#", index)) 
-    {
-      index++;
-      radix = 16;
     }
   else if (rep.startsWith("0", index) && rep.length() > 1 + index) 
     {

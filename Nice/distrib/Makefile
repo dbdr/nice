@@ -52,9 +52,9 @@ tar ${TARFILE}: $(DEB)
 rpm ${RPMDIR}/${RPMFILE}: ${TARFILE}
 	${clean-tmp}
 	cp rpmmacros ~/.rpmmacros
-	mkdir -p ${RPMTMP}/usr
+	mkdir -p ${RPMTMP}
 	mkdir -p tmp/BUILD
-	cd ${RPMTMP}/usr && tar xzf ${CURDIR}/${TARFILE}
+	cd ${RPMTMP} && tar xzf ${CURDIR}/${TARFILE} && mv nice-$(VERSION) usr
 	cd tmp && tar zcf ${CURDIR}/tmp/Nice-${VERSION}.tar.gz Nice-${VERSION}
 	sed "s/VERSION/${VERSION}/" Nice.spec > tmp/Nice-${VERSION}.spec
 	rpmbuild --target=noarch --buildroot=${CURDIR}/${RPMTMP} -bb tmp/Nice-${VERSION}.spec

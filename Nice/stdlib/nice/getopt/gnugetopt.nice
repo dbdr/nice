@@ -27,35 +27,16 @@ import java.text.*;
 let char noOptionsLeft = '\1';
 let char undefinedOption = '\0';
 
-public class Getopt {
+private let int REQUIRE_ORDER = 1;
+private let int PERMUTE = 2;
+private let int RETURN_IN_ORDER = 3;
+private let boolean posixly_correct = System.getProperty("gnu.posixly_correct") != null;
 
-private final int REQUIRE_ORDER = 1;
-private final int PERMUTE = 2;
-private final int RETURN_IN_ORDER = 3;
-
-private ?String optarg = null;
-private String nextchar = "";
-private boolean posixly_correct = System.getProperty("gnu.posixly_correct", null) != null;
-private boolean longopt_handled = false;
-private boolean endparse = false;
-private boolean opterr = true;
-private char optopt = '?';
-private int optind = 0;
-private int longind = 0;
-private int first_nonopt = 1;
-private int last_nonopt = 1;
-private final int ordering = 2;//== PERMUTE
-
-private String progname;
-private String[] argv;
-private String optstring = " ";
-private LongOpt[] long_options;
-private boolean long_only = false;
-
-//public Getopt(String progname, String[] argv, String optstring, 
-//       LongOpt[] long_options, boolean long_only)
-public void initGetopt()
+public Getopt makeGetopt(String progname, String[] argv, String optstring, 
+			 LongOpt[] long_options, boolean long_only = false)
 {
+  int ordering = PERMUTE;
+
   if (optstring.length() == 0)
     optstring = " ";
 
@@ -64,19 +45,43 @@ public void initGetopt()
     {
       ordering = RETURN_IN_ORDER;
       if (optstring.length() > 1)
-        this.optstring = optstring.substring(1);
+        optstring = optstring.substring(1);
     }
   else if (optstring.charAt(0) == '+')
     {
       ordering = REQUIRE_ORDER;
       if (optstring.length() > 1)
-        this.optstring = optstring.substring(1);
+        optstring = optstring.substring(1);
     }
   else if (posixly_correct)
     {
       ordering = REQUIRE_ORDER;
     }
+
+  return new Getopt(progname: progname, argv: argv, optstring: optstring,
+		    long_options: long_options, 
+		    ordering: ordering, long_only: long_only);
 }
+
+public class Getopt {
+
+private ?String optarg = null;
+private String nextchar = "";
+private boolean longopt_handled = false;
+private boolean endparse = false;
+private boolean opterr = true;
+private char optopt = '?';
+private int optind = 0;
+private int longind = 0;
+private int first_nonopt = 1;
+private int last_nonopt = 1;
+private final int ordering;
+
+private String progname;
+private String[] argv;
+private String optstring = " ";
+private LongOpt[] long_options;
+private boolean long_only = false;
 
 
 public void setOptstring(String optstring)

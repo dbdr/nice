@@ -44,9 +44,9 @@ parse(progName@String, args, options)
   ?LongOpt[] longOpts = new LongOpt[longOptions.size];
   for (int i = 0; i < longOpts.length; i++)
     longOpts[i] = longOptions.get(i);
-  Getopt g = new Getopt(progname: progName, argv: args, optstring: shortOptions,
+  Getopt g = makeGetopt(progname: progName, argv: args, 
+			optstring: shortOptions, 
 			long_options: elementsNotNull(longOpts));
-  g.initGetopt();
   // Parsing loop
   char c = g.getopt();
   while (c != noOptionsLeft)

@@ -1,0 +1,77 @@
+package examples.events;
+
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+
+import nice.ui.common;
+
+
+var ActionEvent -> void blueColor;
+var ActionEvent -> void grayColor;
+var ActionEvent -> void offBlueColor;
+var ActionEvent -> void offGrayColor;
+
+void changeColor(JPanel p, Color c) 
+  = p.setBackground(c);
+
+void offButton(JButton button, ActionEvent -> void action) 
+  = button.removeActionListener(actionPerformed: action);
+  
+JPanel makePanel()
+{ 
+	// create the panel
+	JPanel panel = new JPanel();
+	 
+  // switches background to blue
+  blueColor = (ActionEvent e) => changeColor(panel,Color.blue);
+  JButton blueButton = new JButton("BLUE").init
+    (actionPerformed: blueColor
+     );
+  
+  // switches background to gray
+  grayColor = (ActionEvent e) => changeColor(panel,Color.gray);
+  JButton grayButton = new JButton("GRAY").init
+    (actionPerformed: grayColor
+     );  
+  
+  // switches off grayButtons action
+  offBlueColor = (ActionEvent e) => offButton(blueButton, blueColor);
+  JButton offBlueButton = new JButton("Switch off BLUE").init
+    (actionPerformed: offBlueColor
+     ); 
+    
+  // switches off grayButtons action
+  offGrayColor = (ActionEvent e) => offButton(grayButton, grayColor);
+  JButton offGrayButton = new JButton("Switch off GRAY").init
+    (actionPerformed: offGrayColor
+     );
+  
+  // add the 3 buttons
+  panel.add(blueButton);
+  panel.add(grayButton);
+  panel.add(offBlueButton);
+  panel.add(offGrayButton);
+  
+  return panel;
+}
+
+JFrame makeFrame()
+{
+	JFrame frame = new JFrame("TestFrame");
+	frame.addWindowListener(windowClosing: (WindowEvent e) => System.exit(0));
+	
+  // add the panel to the contentPane of this frame
+  ?java.awt.Container contentPane = frame.getContentPane();
+  if(contentPane != null) contentPane.add(BorderLayout.CENTER,makePanel());
+   
+  // set dimensions and show
+  frame.setSize(500,100);
+  
+  return frame;
+}
+
+void main(String[] args)
+{
+  makeFrame().show();
+}

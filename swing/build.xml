@@ -1,4 +1,4 @@
-<project name="swinglib" default="deploy-swing" basedir=".">
+<project name="swinglib" default="compile-common" basedir=".">
 
 	<description>
         File to build all separate packages of the Nice Swing Library and examples that come with it
@@ -14,10 +14,10 @@
 	<!-- set global properties for this build -->
 	<property name="source" location="src"/>
 	<property name="classes" location="classes"/>
-	<property name="classes-lib" location="classes/swinglib"/>
+	<property name="classes-lib" location="classes/niceswing"/>
 	<property name="classes-examples" location="classes/examples"/>
 	<property name="deploy" location="deploy"/>
-	<property name="deploy-lib" location="deploy/swinglib"/>
+	<property name="deploy-lib" location="deploy/niceswing"/>
 	<property name="deploy-examples" location="deploy/examples"/>
 	
 	
@@ -148,7 +148,7 @@
 	<target 
 	  name="compile-common" 
 	  depends="init-classes-lib" 
-	  description="compile content of nice.common from ${src} to ${classes}"
+	  description="compile content of nice.ui.common from ${src} to ${classes}"
 	  >
 	  <nicec 
 	    package="nice.ui.common" 
@@ -156,7 +156,20 @@
 	    sourcepath="${source}"
 	   />
 	</target>	
-		
+	
+	<target 
+	  name="deploy-common" 
+	  depends="init-deploy-lib" 
+	  description="compile content of nice.ui.common from ${source} to ${classes} and deploy it in ${deploy-lib}/niceswing.jar"
+	  >
+          <nicec 
+            package="nice.ui.common" 
+            destination="${classes-lib}" 
+            sourcepath="${source}" 
+            jar="${deploy-lib}/niceswing.jar"
+           />
+	</target>
+	
 	<target 
 	  name="compile-beans" 
 	  depends="init-classes-lib" 

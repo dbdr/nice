@@ -60,12 +60,12 @@ The implementations of a single method may even occur in several files
 <p>So after the two above class definitions, we write two
 <b>implementations</b> for method <tt>display</tt>:
 <PRE>
-<FONT COLOR="#cd0000">display</FONT>(p<FONT COLOR="#0000ee">@</FONT><FONT COLOR="#b7860b">Person</FONT>) 
+<FONT COLOR="#cd0000">display</FONT>(<FONT COLOR="#b7860b">Person</FONT> p) 
 { 
   <FONT COLOR="#0000ee">return</FONT> p.name + <FONT COLOR="#a020f0">&quot; (age=&quot;</FONT> + p.age + <FONT COLOR="#a020f0">&quot;)&quot;</FONT>; 
 } 
 
-<FONT COLOR="#cd0000">display</FONT>(p<FONT COLOR="#0000ee">@</FONT><FONT COLOR="#b7860b">Worker</FONT>) 
+<FONT COLOR="#cd0000">display</FONT>(<FONT COLOR="#b7860b">Worker</FONT> p) 
 { 
   <FONT COLOR="#0000ee">return</FONT> p.name + <FONT COLOR="#a020f0">&quot; (age+&quot;</FONT> + p.age + <FONT COLOR="#a020f0">&quot;, salary=&quot;</FONT> + p.salary + <FONT COLOR="#a020f0">&quot;)&quot;</FONT>; 
 } 
@@ -123,7 +123,7 @@ that tests if any two objects are equal.
 &nbsp; <font color="#B7860B">int</font> <font color="#CD0000">age</font>;
 }
 
-<font color="#CD0000">equals</font>(p1<font color="#0000EE">@</font><font color="#B7860B">Person</font>, p2<font color="#0000EE">@</font><font color="#B7860B">Person</font>) =
+<font color="#CD0000">equals</font>(<font color="#B7860B">Person</font> p1, <font color="#B7860B">Person</font> p2) =
 &nbsp; p1.name.equals(p2.name) &amp;&amp;
 &nbsp; p1.age==p2.age;</pre>
 </blockquote>
@@ -385,8 +385,8 @@ arguments. The syntax for functional types is <tt>(T1, T2, ..., Tn)
 </li>
 
 <li>
-<b>Functional-like syntax for method implementations</b>. One can write <tt>f(x@P)
-= e; </tt>as an equivalent form for <tt>f(x@p) { return e; }</tt>. This
+<b>Functional-like syntax for method implementations</b>. One can write <tt>f(P x)
+= e; </tt>as an equivalent form for <tt>f(P x) { return e; }</tt>. This
 is very handy when defining methods that return simple values, depending
 on the type of the argument -- that is doing <i>pattern-matching</i>.</li>
 

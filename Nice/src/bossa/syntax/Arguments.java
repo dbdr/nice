@@ -50,6 +50,13 @@ public class Arguments
     this.arguments = (Argument[]) args.toArray(new Argument[args.size()]);
   }
 
+  public Arguments(Argument[] arguments)
+  {
+    this.arguments = arguments;
+  }
+
+  public static Arguments noArguments = new Arguments(new Argument[0]);
+
   public void addReceiver(Expression value)
   {
     if (arguments[0] != null)

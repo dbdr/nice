@@ -37,13 +37,7 @@ public class SymbolExp extends Expression
 
   FieldAccess getFieldAccessMethod()
   {
-    if(symbol instanceof MethodDeclaration.Symbol)
-      {
-        MethodDeclaration.Symbol s = (MethodDeclaration.Symbol) symbol;
-        if(s.getDefinition() instanceof FieldAccess)
-          return (FieldAccess) s.getDefinition();
-      }
-    return null;
+    return symbol.getFieldAccessMethod();
   }
 
   void computeType()

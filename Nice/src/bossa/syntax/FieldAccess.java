@@ -63,13 +63,12 @@ abstract class FieldAccess extends MethodDeclaration
 
   protected Declaration fieldDecl;
   
-  public gnu.expr.Expression compileAccess(Arguments arguments)
+  public gnu.expr.Expression compileAccess(gnu.expr.Expression[] arguments)
   {
-    if (arguments.size() == 0)
+    if (arguments.length == 0)
       return Inline.inline(new GetFieldProc(fieldDecl));
     else
-      return Inline.inline(new GetFieldProc(fieldDecl), 
-			   arguments.getExp(0).generateCode());
+      return Inline.inline(new GetFieldProc(fieldDecl), arguments[0]);
   }
   
   public gnu.expr.Expression compileAssign(gnu.expr.Expression value)

@@ -127,8 +127,16 @@ implements Function
     Typing.implies();
 
     Node.currentFunction = this;
-    try{ bossa.syntax.dispatch.typecheck(body); }
-    finally{ Node.currentFunction = null; }
+    if (parameters.hasThis())
+      Node.thisExp = new SymbolExp(symbols[0], location());
+
+    try{ 
+      bossa.syntax.dispatch.typecheck(body); 
+    }
+    finally{ 
+      Node.currentFunction = null; 
+      Node.thisExp = null;
+    }
 
     // set bytecode types for type variables
     mlsub.typing.FunType ft = (mlsub.typing.FunType) getType().getMonotype();

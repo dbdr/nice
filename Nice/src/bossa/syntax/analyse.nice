@@ -350,7 +350,7 @@ Expression analyseIdent(IdentExp e, Info info, boolean assigned)
       if (sym != null)
 	if (!e.alwaysOverloadedSymbol)
 	  {
-	    if (sym instanceof bossa.syntax.Block$LocalVariable$Symbol)
+	    if (sym instanceof Block.LocalVariable.Symbol)
 	      {
 		Block.LocalVariable.Symbol s = cast(sym);
 		if (assigned)
@@ -372,7 +372,14 @@ Expression analyseIdent(IdentExp e, Info info, boolean assigned)
 
   if (symbols != null && symbols.size() > 0)
     if (!e.alwaysOverloadedSymbol() && symbols.size() == 1)
-      return new SymbolExp(symbols[0], e.location());
+      {
+	VarSymbol sym = symbols[0];
+	if (sym.isFieldAccess())
+	  return new CallExp(new OverloadedSymbolExp(symbols.impl, e.ident),
+			     Arguments.noArguments);
+
+	return new SymbolExp(sym, e.location());
+      }
     else
       return new OverloadedSymbolExp(symbols.impl, e.ident);
   if (e.enableClassExp)

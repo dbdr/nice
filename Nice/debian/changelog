@@ -1,5 +1,6 @@
 nice (0.7.1) unstable; urgency=low
 
+  * Fields can be accessed without specifying this.
   * The default syntax for tuple types is now (T1, ..., Tn)
   * Made "instanceof" work with classes defined in the same package.
   * Enhanced error message for invalid calls to anonymous functions.

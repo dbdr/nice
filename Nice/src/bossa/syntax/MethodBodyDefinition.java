@@ -399,6 +399,9 @@ public class MethodBodyDefinition extends Definition
 	}
 
       Node.currentFunction = this;
+      if (declaration.formalParameters().hasThis())
+	Node.thisExp = new SymbolExp(parameters[0], location());
+
       try{
 	bossa.syntax.dispatch.typecheck(body);
       } catch(UserError ex){
@@ -407,6 +410,7 @@ public class MethodBodyDefinition extends Definition
     }
     finally{
       Node.currentFunction = null;
+      Node.thisExp = null;
       if(entered)
 	try{
 	  if (Typing.leave() != level)

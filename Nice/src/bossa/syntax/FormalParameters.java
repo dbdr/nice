@@ -39,6 +39,8 @@ public class FormalParameters extends Node
     {
     }
 
+    Expression value() { return null; }
+
     public String toString()
     {
       return type.toString();
@@ -91,6 +93,8 @@ public class FormalParameters extends Node
       (Monotype type, LocatedString name, boolean nameRequired, Expression value)
     { this(type, name, value); this.nameRequired = nameRequired; }
 
+    Expression value() { return defaultValue; }
+
     Expression defaultValue;
 
     void resolve()
@@ -116,7 +120,17 @@ public class FormalParameters extends Node
       return type + " " + name + " = " + defaultValue;
     }
   }
-  
+
+  static class ThisParameter extends Parameter
+  {
+    ThisParameter(Monotype type)
+    {
+      super(type);
+    }
+
+    Expression value() { return Node.thisExp; }
+  }
+
   /****************************************************************
    * Main class
    ****************************************************************/
@@ -160,7 +174,12 @@ public class FormalParameters extends Node
     parameters[0] = new NamedParameter(type, thisName);
     addChild(parameters[0]);
   }
-  
+
+  boolean hasThis()
+  {
+    return parameters != null && parameters[0].match("this");
+  }
+
   private LocatedString thisName = 
     new LocatedString("this", Location.nowhere());
 
@@ -258,10 +277,11 @@ public class FormalParameters extends Node
     Expression[] exps = new Expression[size];
     for (int i = 0; i < size; i++)
       if (map[i] == 0)
-	if (parameters[i] instanceof OptionalParameter)
-	  exps[i] = ((OptionalParameter) parameters[i]).defaultValue;
-	else
-	  return false;
+	{
+	  exps[i] = parameters[i].value();
+	  if (exps[i] == null)
+	    return false;
+	}
       else
 	exps[i] = args.getExp(map[i] - 1);
     args.applicationExpressions.add(exps);

@@ -241,6 +241,15 @@ abstract public class MethodDeclaration extends Definition
 	    MethodDeclaration.this.arity);
     }
 
+
+    FieldAccess getFieldAccessMethod()
+    {
+      if(getDefinition() instanceof FieldAccess)
+	return (FieldAccess) getDefinition();
+      else
+	return null;
+    }
+
     void resolve()
     {
       super.resolve();

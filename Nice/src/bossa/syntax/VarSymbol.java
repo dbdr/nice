@@ -43,6 +43,16 @@ abstract class VarSymbol extends Node implements Located
     return true;
   }
 
+  final boolean isFieldAccess()
+  {
+    return getFieldAccessMethod() != null;
+  }
+
+  FieldAccess getFieldAccessMethod()
+  {
+    return null;
+  }
+
   abstract Polytype getType();
 
   /**

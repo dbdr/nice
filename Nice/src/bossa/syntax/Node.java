@@ -314,6 +314,9 @@ abstract public class Node
   static Function getCurrentFunction() { return currentFunction; }
   static void setCurrentFunction(Function f) { currentFunction = f; }
   
+  /** The this parameter of the current function, or null. */
+  static Expression thisExp;
+
   /** override this when typechecking is needed. */
   void typecheck() { }
 

@@ -84,7 +84,10 @@ public class OverloadedSymbolExp extends Expression
     Arguments arguments = callExp.arguments;
     // It's better to do this know. OR is oriented, arguments first.
     arguments.computeTypes();
-    
+    // The same (empty) arguments object can be reused. Reset it.
+    // XXX This is not so clean.
+    arguments.applicationExpressions.clear();
+
     if (Debug.overloading) 
       Debug.println("Overloading resolution for " + this +
 		    "\nwith parameters " + arguments);

@@ -38,16 +38,16 @@ public class NiceFieldAccess extends FieldAccess
     (NiceClass classDef, NiceClass.Field field)
   {
     super(field.sym.name, new Constraint(classDef.typeParameters,null),
-	  makeList(Monotype.create(Monotype.sure(classDef.lowlevelMonotype()))),
+	  makeList(Monotype.sure(classDef.lowlevelMonotype())),
 	  field.sym.syntacticType);
     this.definition = classDef;
     this.field = field;
   }
   
-  private static FormalParameters makeList(Monotype t)
+  private static FormalParameters makeList(mlsub.typing.Monotype t)
   {
     List res = new LinkedList();
-    res.add(new FormalParameters.Parameter(t));
+    res.add(new FormalParameters.ThisParameter(Monotype.create(t)));
     return new FormalParameters(res);
   }
   

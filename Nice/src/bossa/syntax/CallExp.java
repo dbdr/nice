@@ -283,7 +283,7 @@ public class CallExp extends Expression
     
     gnu.expr.Expression res;
     if (function.isFieldAccess())
-      res = function.getFieldAccessMethod().compileAccess(arguments);
+      res = function.getFieldAccessMethod().compileAccess(params);
     else
       res = new gnu.expr.ApplyExp(function.generateCode(), params);
 

@@ -16,7 +16,7 @@ class Point
   toString() = "Point";
 
   Point sum(alike);
-  sum(other@Point) = new Point();
+  sum(other@Point) = new Point(this.x + other.x, this.y + other.y);
 }
 
 // check that a constructor is also available from functions
@@ -35,7 +35,7 @@ class ColoredPoint extends Point
   // override a native method
   toString() = "Colored Point: color=" + this.c;
 
-  sum(other@ColoredPoint) = new ColoredPoint();
+  sum(other@ColoredPoint) = new ColoredPoint(this.x + other.x, this.y + other.y, (this.c + other.c) / 2);
 }
 
 /*

@@ -22,7 +22,7 @@ package nice.lang;
    @version: $Date$
    @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
 */
-public final class rawArray implements nice.lang$Sequence
+public final class rawArray implements nice.lang.Sequence
 {
   private rawArray(Object value)
   {

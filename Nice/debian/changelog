@@ -5,12 +5,13 @@ nice (0.7.3) unstable; urgency=low
     just the first, not-named arguments of the automatic constructor.
   * The 'main(args) { ... }' syntax for the main function is deprecated.
     Please use instead: 'void main(String[] args) { ... }'
-  * Fixed implicit access to fields of the current class in ambiguous
-    situations, and when overriding native methods.
   * Improved compilation speed, especially for programs using many classes
     (up to 2x faster).
+  * Fixed implicit access to fields of the current class in ambiguous
+    situations, and when overriding native methods.
+  * Other fixes (issue with recompilation of up-to-date packages, ...)
 
- --
+ -- Daniel Bonniot <bonniot@users.sourceforge.net>  Wed,  4 Sep 2002 08:04:47 +0200
 
 nice (0.7.2) unstable; urgency=low
 

@@ -77,7 +77,7 @@ public class runJar
       mainMethod = main.getMethod("main", sv);
     }
     catch(NoSuchMethodException e){
-      System.err.println(mainClass+" has no main method");
+      System.err.println(mainClass+" has no public main method");
       System.exit(1);
     } 
      

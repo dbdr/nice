@@ -356,9 +356,10 @@ public abstract class TestCase {
 					&&  ! _dontCompilePackages.contains(sourceFile.getPackage()))
 				{
 					try {
-						Class c = Class.forName(sourceFile.getPackage() + ".fun",
-									true,
-									new TestSuiteClassLoader(this.getClass().getClassLoader()));
+						Class c = Class.forName
+							(sourceFile.getPackage() + ".fun",
+							 true,
+							 TestNice.getClassLoader());
 						Class[] parameterTypes = new Class[] {String[].class};
 						Method m = c.getMethod("main", parameterTypes);
 						Object[] arguments = new Object[] {new String[0]};

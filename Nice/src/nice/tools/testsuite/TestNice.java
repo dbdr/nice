@@ -15,6 +15,7 @@ package nice.tools.testsuite;
 
 import java.io.*;
 import java.util.*;
+import java.net.URL;
 
 import nice.tools.testsuite.output.*;
 
@@ -492,6 +493,30 @@ public class TestNice {
 		return _runtime;
 	}
 
+
+	/**
+		 @return the classloader used to run generated code.
+	*/
+	static ClassLoader getClassLoader() {
+		ClassLoader classLoader = null;
+
+		try {
+			// This is normally where the compiled classes are in the dev tree.
+			if (_runtime == null)
+				_runtime = "classes";
+
+			URL[] urls = { 
+				new URL("file://" + getTempFolder().getAbsolutePath() + "/"),
+				new URL("file://" + new File(getRuntime()).getAbsolutePath() + "/") 
+			};
+			classLoader = new java.net.URLClassLoader(urls, null);
+		}
+		catch(java.net.MalformedURLException ex) {
+			throw new Error(ex.toString());
+		}
+
+		return classLoader;
+	}
 
 	/**
 	 * Returns the total number of testcases.

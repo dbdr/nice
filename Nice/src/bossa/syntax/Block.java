@@ -180,8 +180,12 @@ public class Block extends Statement
 	Object o = statements.get(statements.size()-1);
 	if (o instanceof ReturnStmt)
 	  {
-	    ((ReturnStmt)o).value.noOverloading();
-	    return ((ReturnStmt)o).value.getType();
+	    ReturnStmt r = (ReturnStmt) o;
+	    if (r.value != null)
+	      {
+		r.value.noOverloading();
+		return r.value.getType();
+	      }
 	  }
       }
     return ConstantExp.voidPolytype;

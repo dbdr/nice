@@ -10,12 +10,7 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : OutputMessages.java
-// Created : Wed Oct 04 11:30:44 2000 by Daniel Bonniot
-
 package nice.tools.compiler;
-
-import bossa.util.*;
 
 /**
    Keep track of messages reported to the user.

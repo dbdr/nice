@@ -106,7 +106,7 @@ class HTMLWriter {
     writer.write(htmlSafe(gv.toString()));
   
     writer.write("<p>");
-    writer.write();
+    writer.write("");
     writer.write("</p>");
  
     writer.write(getFooter());

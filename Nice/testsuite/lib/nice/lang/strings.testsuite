@@ -1,15 +1,9 @@
 /// PASS
-  List<String> splits = split("foo,bar,baz", ",");
+  List<String> splits = split("foo,bar,baz", ',');
   assert splits.size == 3;
   assert splits[0].equals("foo");		
   assert splits[1].equals("bar");		
   assert splits[2].equals("baz");		
-
-/// PASS
-  List<String> splits = split("foo,bar,foo,baz", "foo,");
-  assert splits.size == 2;
-  assert splits[0].equals("bar,");		
-  assert splits[1].equals("baz");		
 
 /// PASS
   String joined = ["1", "2", "3"].join(",");

@@ -64,7 +64,7 @@ public class Alternative
     this.definitionClass = c;
     this.primProcedure = new PrimProcedure(method);
     
-    //Debug.println(s);
+    bossa.util.Debug.println("From bytecode " + c + ": " + s);
     
     int numCode = s.indexOf('$');
     if (numCode == -1)

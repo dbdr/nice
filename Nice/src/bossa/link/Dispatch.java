@@ -174,25 +174,34 @@ public final class Dispatch
     
     List multitags = Typing.enumerate(domain);
 
+    int nb_errors = 0;
     for(Iterator i = multitags.iterator(); i.hasNext();)
       {
 	TypeConstructor[] tags = (TypeConstructor[]) i.next();
 	
-	test(method,tags,sortedAlternatives);
+	if (test(method,tags,sortedAlternatives))
+	  if (++nb_errors > 9)
+	    break;
       }
+    if (nb_errors > 0)
+      System.exit(2);
   }
   
   /**
-   * Tests that the 'tags' tuple has a best-match in alternatives
-   *
-   * @param method the method being tested
-   * @param tags a tuple of TypeConstructors
-   * @param alternatives a list of Alternatives
+     Tests that the 'tags' tuple has a best-match in alternatives
+     
+     @param method the method being tested
+     @param tags a tuple of TypeConstructors
+     @param alternatives a list of Alternatives
+     
+     @return true if the test failed
    */
-  private static void test(MethodDeclaration method, 
-			   TypeConstructor[] tags, 
-			   final Stack sortedAlternatives)
+  private static boolean test(MethodDeclaration method, 
+			      TypeConstructor[] tags, 
+			      final Stack sortedAlternatives)
   {
+    boolean failed = false;
+
     if(Debug.linkTests)
       Debug.println(Util.map("Multitag: ",", ","",tags));
 
@@ -207,23 +216,28 @@ public final class Dispatch
 	if(a.matches(tags))
 	  if(first==null)
 	    first = a;
-	  else
-	    if(!Alternative.leq(first,a))
-	      User.error(method,
-			 "Ambiguity for method "+method+
-			 "For parameters of type "+Util.map("(",", ",")",tags)+
-			 "\nboth "+first+" and "+a+" match");
+	  else if(!Alternative.leq(first,a))
+	    {
+	      failed = true;
+	      User.warning
+		(method,
+		 "Ambiguity for method "+method+
+		 "For parameters of type "+Util.map("(",", ",")",tags)+
+		 "\nboth "+first+" and "+a+" match");
+	    }
       }
     if(first==null)
       {
+	failed = true;
 	if(sortedAlternatives.size()==0)
-	  User.error(method,
-		     "Method "+method+" is declared but never defined");
+	  User.warning
+	    (method, "Method "+method+" is declared but never defined");
 	else
-	  User.error(method,
-		     "Method "+method+" is not exhaustive:\n"+
-		     "no alternative matches "+Util.map("(",", ",")",tags));
+	  User.warning(method,
+		       "Method "+method+" is not exhaustive:\n"+
+		       "no alternative matches "+Util.map("(",", ",")",tags));
       }
+    return failed;
   }
 
   /****************************************************************

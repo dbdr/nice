@@ -528,8 +528,16 @@ public class ClassType extends ObjectType implements AttrContainer {
 
   public Method getDeclaredMethod(String name, Type[] arg_types)
   {
-    if ((flags & (ADD_METHODS_DONE|EXISTING_CLASS)) == EXISTING_CLASS)
-      addMethods(getReflectClass());
+    if ((flags & (ADD_METHODS_DONE|EXISTING_CLASS)) == EXISTING_CLASS) {
+      try {
+        addMethods(getReflectClass());
+      } catch (NoClassDefFoundError e) {
+        String className = e.getMessage();
+ 	bossa.util.User.error("Could not load class: " + 
+ 		   (className == null ? "<unknown>" : className.replace('/', '.')) + 
+ 		   " which is required by " + this_name);
+      }
+    }	
     Method method;
     
     for (method = methods;  method != null;  method = method.next)

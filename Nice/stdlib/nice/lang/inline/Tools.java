@@ -24,7 +24,7 @@ import gnu.expr.*;
 
 class Tools
 {
-  static StackTarget intTarget = new StackTarget(Type.int_type);
+  static StackTarget intTarget = StackTarget.intTarget;
 
   static Type type(char typeChar)
   {

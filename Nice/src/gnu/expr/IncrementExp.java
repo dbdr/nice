@@ -43,7 +43,23 @@ public class IncrementExp extends Expression
 
 	if (!pre && needValue)
 	  code.emitLoad(var);
-	code.emitInc(var, increment);
+
+	if (var.getType().promote() == Type.int_type)
+	  code.emitInc(var, increment);
+	else
+	  // The variable has a non-int type, but we know it must be 
+	  // convertible to int.
+	  {
+	    PrimType type = Type.int_type;
+
+	    code.emitLoad(var);
+	    StackTarget.intTarget.compileFromStack(comp, var.getType());
+	    code.emitPushInt(increment);
+	    code.emitAdd(type);
+	    StackTarget.getInstance(var.getType()).compileFromStack(comp, type);
+	    code.emitStore(var);
+	  }
+
 	if (pre && needValue)
 	  code.emitLoad(var);
       }

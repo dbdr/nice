@@ -14,9 +14,12 @@ public class StackTarget extends Target
 
   public static Target getInstance(Type type)
   {
-    return (type == Type.pointer_type ? Target.pushObject
-            : new StackTarget(type));
+    return (type == Type.pointer_type ? Target.pushObject :
+            type == Type.int_type ? intTarget : 
+	    new StackTarget(type));
   }
+
+  public static final StackTarget intTarget = new StackTarget(Type.int_type);
 
   protected boolean compileFromStack0(Compilation comp, Type stackType)
   {

@@ -1,0 +1,11 @@
+/// PASS
+  String s = "ABC";
+  assert s.equals("ABC");
+
+  int x = 5;
+  s = "x="x;
+  assert s.equals("x=5");
+
+  List<int> l = new LinkedList();
+  s = "l has length " l.size;
+  assert s.equals("l has length 0");

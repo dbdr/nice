@@ -1,3 +1,12 @@
+nice (0.9.5) unstable; urgency=low
+
+  * String concatenation can be performed by mere juxtaposition of string
+    literals and simple expressions, which are converted into strings. For
+    instance:
+      println("x has value "x" and y has value "y);
+
+ --
+
 nice (0.9.4) unstable; urgency=low
 
   * The compiler now knows that the statement 'assert false' never terminates. 

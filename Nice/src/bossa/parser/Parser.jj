@@ -47,6 +47,10 @@ class Parser
   {
     return symb(t.image,t);
   }
+  private static IdentExp symb(String name, Location loc)
+  {
+    return new IdentExp(new LocatedString(name, loc));
+  }
   static List globalDefinitions;
 }
 PARSER_END(Parser)
@@ -2098,6 +2102,15 @@ Expression PrimarySuffix(Expression start) :
   { return new CallExp(start, args); }
 }
 
+// The expressions that can follow a string literal, to be concatenated with it
+Expression StringLiteralSuffixExpression() :
+{ Expression res; }
+{
+  res=identExp()
+  ( LOOKAHEAD(2) res=PrimarySuffix(res) )*
+{ return res; }
+}
+
 Expression Literal() :
 {
   Expression res;
@@ -2110,6 +2123,12 @@ Expression Literal() :
 | res=floatConstantExp()
 | res=charConstantExp()
 | res=stringConstantExp()
+  ( {Expression e;} e=StringLiteralSuffixExpression() 
+    { res = CallExp.create(symb("+", e.location()), res, e); }
+    [ e=stringConstantExp() 
+      { res = CallExp.create(symb("+", e.location()), res, e); }
+    ]
+  )*
 | res=multiLineStringExp()
 )
 { return res; }

@@ -50,6 +50,7 @@ public class EnumDefinition extends Definition
       impl.setFields(null);
 
     impl.setOverrides(null);
+    impl.setValueOverrides(null);
 
     if (! inInterfaceFile())
       {

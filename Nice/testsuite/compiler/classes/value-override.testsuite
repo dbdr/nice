@@ -1,0 +1,101 @@
+/// PASS
+  assert new B().x == 3;
+  /// Toplevel
+class A {
+  int x;
+}
+class B extends A {
+  override x = 3;
+}
+
+/// PASS
+  assert new A().x.equals("abc");
+  assert new B().x.equals("xyz");
+  /// Toplevel
+class A {
+  final String x = "abc";
+}
+class B extends A {
+  override x = "xyz";
+}
+
+/// FAIL
+  /// Toplevel
+class A {
+  int x;
+}
+class B extends A {
+  override /* /// FAIL HERE */ x = "abc";
+}
+
+/// PASS
+  assert new C().x == 5;
+  /// Toplevel
+class A {
+  final int x;
+}
+class B extends A {
+  override byte x = 0;
+}
+class C extends B {
+  override x = 5;
+}
+
+/// FAIL
+  /// Toplevel
+class A {
+  final int x;
+}
+class B extends A {
+  override byte x = 0;
+}
+class C extends B {
+  override /* /// FAIL HERE */ x = 1000;
+}
+
+/// PASS
+  assert new A().x == 1;
+  assert new B().x == 3;
+  assert new C().x == 5;
+  /// Toplevel
+class A {
+  int x = 1;
+}
+class B extends A {
+  override x = 3;
+}
+class C extends B {
+  override x = 5;
+}
+
+/// FAIL
+  /// Toplevel
+class A {
+  final int x;
+}
+class B extends A {
+  override x = 3;
+  override /* /// FAIL HERE */ x = 5;
+}
+
+/// FAIL
+  /// Toplevel
+class A {
+  final int x;
+}
+class B extends A {
+  override int x = 3;
+  override /* /// FAIL HERE */ x = 5;
+}
+
+/// FAIL bug
+  /// Toplevel
+class A {
+  final int x = 1;
+}
+class B extends A {
+  override x = 1000;
+}
+class C extends B {
+  override /* /// FAIL HERE */ byte x;
+}

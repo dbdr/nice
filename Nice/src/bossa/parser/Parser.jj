@@ -1053,12 +1053,18 @@ ClassDefinition classDefinition(Constraint cst, List definitions, boolean storeD
    { NiceClass impl = new NiceClass(res); }
    // internal fields and methods
    { List fields = new LinkedList(), overrides = new LinkedList(),
-          methods = new ArrayList(5), initializers = new LinkedList(); }
+          methods = new ArrayList(5), initializers = new LinkedList(),
+          valueOverrides = new LinkedList(); }
    (
       // Initializer
       { Statement init; }
       init = Block()
       { initializers.add(init); }
+    |
+      LOOKAHEAD ( "override" ident() "=" )
+      { LocatedString fname; Expression value;}
+      "override" fname=ident() "=" value=Expression() ";"
+      { valueOverrides.add(impl.makeValueOverride(fname, value)); }
     |
       LOOKAHEAD( fieldLookahead() )
       overrides = getField(impl, fields, overrides, storeDocString)
@@ -1081,6 +1087,7 @@ ClassDefinition classDefinition(Constraint cst, List definitions, boolean storeD
    {
      impl.setFields(fields);
      impl.setOverrides(overrides);
+     impl.setValueOverrides(valueOverrides);
      impl.setInitializers(initializers);
      res.setImplementation(impl);
      definitions.addAll(methods);

@@ -79,6 +79,14 @@ public class NiceClass extends ClassDefinition.ClassImplementation
       }
   }
 
+  public void setValueOverrides(List valueOverrides)
+  {
+    if (valueOverrides == null)
+      this.valueOverrides = new LinkedList();
+    else
+      this.valueOverrides = valueOverrides;
+  }
+
   ClassDefinition definition;
 
   public boolean isInterface()
@@ -144,6 +152,14 @@ public class NiceClass extends ClassDefinition.ClassImplementation
       User.error(sym, "An interface cannot have a field.");
 
     return new OverridenField(sym, value);
+  }
+
+  public ValueOverride makeValueOverride(LocatedString fname, Expression value)
+  {
+    if (isInterface())
+      User.error(fname, "An interface cannot have a field.");
+
+    return new ValueOverride(fname, value);
   }
 
   abstract class Field
@@ -407,6 +423,50 @@ public class NiceClass extends ClassDefinition.ClassImplementation
     }
   }
 
+  public final class ValueOverride 
+  {
+    ValueOverride(LocatedString name, Expression value)
+    {
+      this.name = name;
+      this.value = value;
+    }
+
+    void updateConstructorParameter(List inherited)
+    {
+      for (int i = 1; i < inherited.size(); i++) {
+        FormalParameters.Parameter param = (FormalParameters.Parameter)
+          inherited.get(i);
+        if (param.match(name.toString()))
+          {
+            inherited.set(i, new FormalParameters.OptionalParameter
+                            (param.type, name, true, value, 
+                             param.value() == null || param.isOverriden()));
+          }
+      }
+    }
+
+    void resolve(VarScope scope, TypeScope typeScope)
+    {
+      value = dispatch.analyse(value, scope, typeScope);
+    }
+
+
+    void typecheck()
+    {
+      boolean exists = false;
+
+      NiceClass parent = getParent();
+      if (parent != null)
+        exists = parent.checkValueOverride(name, value);
+
+      if (! exists)
+        throw User.error(name, "No field with this name exists in a super-class");
+    }
+
+    LocatedString name;
+    Expression value;
+  }
+
   // Used to resolve fields, and constructor constraint.
   private TypeScope localScope;
 
@@ -428,6 +488,10 @@ public class NiceClass extends ClassDefinition.ClassImplementation
 
     for (int i = 0; i < overrides.length; i++)
       overrides[i].resolve(definition.scope, localScope);
+ 
+    for (Iterator it = valueOverrides.iterator(); it.hasNext(); )
+      ((ValueOverride)it.next()).resolve(definition.scope, localScope);
+
   }
 
   private void createFields()
@@ -463,6 +527,45 @@ public class NiceClass extends ClassDefinition.ClassImplementation
     else
       return null;
   }
+
+  private boolean checkValueOverride(LocatedString name, Expression value)
+  {
+   
+    Field original = null;
+
+    for (int i = 0; i < fields.length; i++)
+      if (fields[i].sym.getName().toString().equals(name.toString()))
+        original = fields[i];
+
+    for (int i = 0; i < overrides.length; i++)
+      if (overrides[i].sym.getName().toString().equals(name.toString()))
+        original = overrides[i];
+
+    if (original != null)
+      {
+        NiceClass.this.enterTypingContext();
+
+	mlsub.typing.Polytype declaredType = original.sym.getType();
+	value = value.resolveOverloading(declaredType);
+
+	dispatch.typecheck(value);
+
+	try {
+	  Typing.leq(value.getType(), declaredType);
+	} 
+	catch (mlsub.typing.TypingEx ex) {
+	  User.error(name, "Value does not fit in the overriden field of type " + declaredType);
+	}
+        
+        return true;
+      }
+
+    NiceClass parent = getParent();
+    if (parent != null)
+      return parent.checkValueOverride(name, value);
+    else
+      return false;
+   }
 
   /****************************************************************
    * Initializers
@@ -567,6 +670,9 @@ public class NiceClass extends ClassDefinition.ClassImplementation
 
       for (int i = 0; i < overrides.length; i++)
 	overrides[i].typecheck();
+
+      for (Iterator it = valueOverrides.iterator(); it.hasNext(); )
+        ((ValueOverride)it.next()).typecheck();
 
       if (initializers.length != 0)
         {
@@ -817,7 +923,7 @@ public class NiceClass extends ClassDefinition.ClassImplementation
     else
       res = sup.getParentConstructorParameters(constraints, typeParameters);
 
-    if (overrides.length > 0)
+    if (overrides.length > 0 || (! valueOverrides.isEmpty()))
       for (Iterator i = res.iterator(); i.hasNext();)
         updateConstructorParameters((List) i.next());
 
@@ -843,6 +949,9 @@ public class NiceClass extends ClassDefinition.ClassImplementation
   {
     for (int f = 0; f < overrides.length; f++)
       overrides[f].updateConstructorParameter(inherited);
+
+    for (Iterator it = valueOverrides.iterator(); it.hasNext();)
+      ((ValueOverride)it.next()).updateConstructorParameter(inherited);
   }
 
   /**
@@ -858,6 +967,19 @@ public class NiceClass extends ClassDefinition.ClassImplementation
         if (overrides[i].sym.hasName(overrides[k].sym.getName()))
           User.error(overrides[k].sym, 
              "A field override of the same field exists in this class");
+
+    for (int i = 0; i < valueOverrides.size(); i++)
+      for (int k = i+1; k < valueOverrides.size(); k++)
+        if (((ValueOverride)valueOverrides.get(i)).name.equals(((ValueOverride)valueOverrides.get(k)).name))
+          User.error(((ValueOverride)valueOverrides.get(k)).name, 
+             "A field override of the same field exists in this class");
+
+    for (int i = 0; i < overrides.length; i++)
+      for (int k = 0; k < valueOverrides.size(); k++)
+        if (overrides[i].sym.hasName(((ValueOverride)valueOverrides.get(k)).name))
+          User.error(((ValueOverride)valueOverrides.get(k)).name, 
+             "A field override of the same field exists in this class");
+
 
   }
 
@@ -1075,5 +1197,6 @@ public class NiceClass extends ClassDefinition.ClassImplementation
 
   private NewField[] fields;
   private OverridenField[] overrides;
+  private List valueOverrides;
   private Long serialVersionUIDValue;
 }

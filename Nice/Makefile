@@ -162,6 +162,7 @@ core-bootstrap:
 	-cd src/bossa/syntax && mv -f dispatch.java.bootstrap dispatch.java
 	${JAVAC} src/nice/tools/util/System.java
 	${NICEC} -R nice.tools.repository
+	${NICEC} -r nice.tools.visibility
 	${JAVAC} \
 		src/bossa/syntax/dispatch.java \
 		src/mlsub/typing/*.java \

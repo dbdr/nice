@@ -1,0 +1,103 @@
+package nice.ui.common;
+
+
+  
+/**
+ * functions to remove all nice.ui.beans.NiceListener from all nice.ui.beans.NiceListenerHandler
+ */ 
+ 
+public <PropertyChangeListenerHandler H> void removeNPropertyChangeListener
+  (H this,
+   PropertyChangeEvent ?-> void propertyChange
+   )
+{
+  NPropertyChangeListener[?] listeners = this.getNicePropertyChangeListeners(); 
+  if(listeners == null) return;
+  listeners.foreach
+    (NPropertyChangeListener l =>
+     {
+       if(propertyChange != null && l.propertyChange == propertyChange) l.propertyChange = null;
+     }
+     ); 
+}
+ 
+public <VetoableChangeListenerHandler H> void removeNVetoableChangeListener
+  (H this,
+   PropertyChangeEvent ?-> void vetoableChange
+   )
+{
+  NVetoableChangeListener[?] listeners = this.getNiceVetoableChangeListeners();
+  if(listeners == null) return;
+  listeners.foreach
+    (NVetoableChangeListener l =>
+     {
+       if(vetoableChange != null && l.vetoableChange == vetoableChange) l.vetoableChange = null;
+     }
+     );
+} 
+
+  
+//JDK1.4   public <BeanContextMembershipListenerHandler H> void removeBeanContextMembershipListener
+//JDK1.4     (H this,
+//JDK1.4      BeanContextMembershipEvent ?-> void childrenAdded = null,
+//JDK1.4      BeanContextMembershipEvent ?-> void childrenRemoved = null
+//JDK1.4      )
+//JDK1.4   {
+//JDK1.4     NBeanContextMembershipListener[?] listeners = this.geNiceBeanContextMembershipListeners():
+//JDK1.4     if(listeners == null) return;
+//JDK1.4     listeners.foreach
+//JDK1.4       (NBeanContextMembershipListener l =>
+//JDK1.4        {
+//JDK1.4          if(childrenAdded != null && l.childrenAdded == childrenAdded) l.childrenAdded = null;
+//JDK1.4          if(childrenRemoved != null && l.childrenRemoved == childrenRemoved) l.childrenRemoved = null;
+//JDK1.4        }
+//JDK1.4        );
+//JDK1.4   }
+  
+  
+//JDK1.4   public <BeanContextServicesListenerHandler H> void removeBeanContextServicesListener
+//JDK1.4     (H this,
+//JDK1.4      BeanContextServiceAvailableEvent ?-> void serviceAvailable = null
+//JDK1.4      )
+//JDK1.4   {
+//JDK1.4     NBeanContextServicesListener[?] listeners = this.getNiceBeanContextServicesListeners();
+//JDK1.4     if(listeners == null) return;
+//JDK1.4     listeners.foreach
+//JDK1.4       (NBeanContextServicesListener l =>
+//JDK1.4        {
+//JDK1.4          if(serviceAvailable != null && l.serviceAvailable == serviceAvailable) l.serviceAvailable = null;
+//JDK1.4        }
+//JDK1.4        );
+//JDK1.4   }
+
+  
+//JDK1.4   public <BeanContextServiceRevokedListenerHandler H> void removeBeanContextServiceRevokedListener
+//JDK1.4     (H this,
+//JDK1.4      BeanContextServiceRevokedEvent ?-> void serviceRevoked = null
+//JDK1.4      )
+//JDK1.4   {
+//JDK1.4     NBeanContextServiceRevokedListener[?] listeners = this.getNiceBeanContextServiceRevokedListeners();
+//JDK1.4     if(listeners == null) return;
+//JDK1.4     listeners.foreach
+//JDK1.4       (NBeanContextServiceRevokedListener l =>
+//JDK1.4        {
+//JDK1.4          if(serviceRevoked != null && l.serviceRevoked == serviceRevoked) l.serviceRevoked = null;
+//JDK1.4        }
+//JDK1.4        );
+//JDK1.4   }
+
+  
+//JDK1.4   public <ExceptionListenerHandler H> void removeExceptionListener
+//JDK1.4     (H this,
+//JDK1.4      Exception ?-> void exceptionThrown = null
+//JDK1.4      )
+//JDK1.4   {
+//JDK1.4     NExceptionListener[?] listeners = this.getNiceExceptionListeners();
+//JDK1.4     if(listeners == null) return;
+//JDK1.4     listeners.foreach
+//JDK1.4       (NExceptionListener l =>
+//JDK1.4        {
+//JDK1.4          if(exceptionThrown != null && l.exceptionThrown == exceptionThrown) l.exceptionThrown = null;
+//JDK1.4        }
+//JDK1.4        );
+//JDK1.4   }

@@ -71,10 +71,11 @@ Instance field is: 3
 ### Testing exceptions ###
 finally
 NullPointerException
-MyEx
+MyEx: info=woula
 ID
 LAMBDA
 LAMBDA
+Using native methods as first class values
 ### Testing local functions
 2
 4

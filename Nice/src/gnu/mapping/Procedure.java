@@ -95,6 +95,12 @@ public abstract class Procedure implements Named, Printable
   }
   */
 
+  public void apply (Runnable ctx) throws Throwable {}
+  public Procedure getSetter() { return null; }
+  public void set0(Object result) throws Throwable {}
+  public void set1(Object arg1, Object value) throws Throwable {}
+  public void setN (Object[] args) throws Throwable {}
+
   /** Call this Procedure using the explicit-CallContext-convention.
    * The input arguments are (by default) in stack.args;
    * the result is (by default) left in stack.value. */

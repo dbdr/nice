@@ -14,6 +14,8 @@
  * Comparison operators
  ****************************************************************/
 
+package nice.lang;
+
 /**
    For a class to implement Comparable, 
    it is sufficient to implement the `<` method,

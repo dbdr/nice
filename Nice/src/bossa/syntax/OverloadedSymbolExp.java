@@ -315,7 +315,9 @@ public class OverloadedSymbolExp extends Expression
 	  globalvars.add(sym);
       }
 
-    if (globalvars.size() > 0)
+    // If there are global variables, give them the priority
+    // (but not when there are *only* global variables, or it would loop).
+    if (globalvars.size() > 0 && globalvars.size() < symbols.size())
       return new OverloadedSymbolExp(globalvars, ident).noOverloading();
 
     if (symbols.size() != 0)

@@ -45,65 +45,68 @@ main(args)
   boolean doLink = true;
   boolean staticLink = false;
 
-  List<Option> opts = makeVector(10);
- 
-  opts.add(option('r', "recompile",
-		  "Force recompilation of package",
-		  "none/command-line/all",
-  		  fun()=>{ recompileCL=true; },
-  		  fun(String arg)=>{
-		    if("all".equals(arg))
-		      recAll=true;
-		    else if("command-line".equals(arg))
-		      recompileCL=true;
-		    else if("none".equals(arg))
-		      {
-		        recompileCL=false;
-		        recAll=false;
-		      }
-		    else println("Unkown argument to \'recompile\': " + arg);
-		    }));
+  Sequence<Option> opts;
+  opts = 
+  [
+   option('r', "recompile",
+	  "Force recompilation of package",
+	  "none/command-line/all",
+	  fun()=>{ recompileCL=true; },
+	  fun(String arg)=>
+          {
+	    if ("all".equals(arg))
+	      recAll=true;
+	    else if ("command-line".equals(arg))
+	      recompileCL=true;
+	    else if ("none".equals(arg))
+	      {
+		recompileCL=false;
+		recAll=false;
+	      }
+	    else println("Unkown argument to \'recompile\': " + arg);
+	  }),
 
-  opts.add(option('R', "recompileAll",
-		  "Force recompilation of all dependant packages",
-                  fun()=>{ recAll = true; }));
+   option('R', "recompileAll",
+	  "Force recompilation of all dependant packages",
+	  fun()=>{ recAll = true; }),
 
-  opts.add(option('c', "compile",
-		  "Compile packages, do not link them",
-  		  fun()=>{ doLink=false; }));
+   option('c', "compile",
+	  "Compile packages, do not link them",
+	  fun()=>{ doLink=false; }),
 
-  opts.add(option('?', "classpath",
-		  "Set path for searching external classes",
-		  ": separated list of directories and jar archives",
-		  fun() => nice.tools.code.Types.setClasspath(null),
-  		  fun(String path)=> nice.tools.code.Types.setClasspath(path) ));
+   option('?', "classpath",
+	  "Set path for searching external classes",
+	  ": separated list of directories and jar archives",
+	  fun() => nice.tools.code.Types.setClasspath(null),
+	  fun(String path) => nice.tools.code.Types.setClasspath(path)),
 
-  opts.add(option('s', "static",
-		  "Store compiled packages in the jar file",
-  		  fun()=>{ staticLink=true; }));
+   option('s', "static",
+	  "Store compiled packages in the jar file",
+	  fun()=>{ staticLink=true; }),
 
-  opts.add(option('?', "dynamic",
-		  "Store compiled packages in their directory (default)",
-  		  fun()=>{ staticLink=false; }));
+   option('?', "dynamic",
+	  "Store compiled packages in their directory (default)",
+	  fun()=>{ staticLink=false; }),
 
-  opts.add(option('h', "help", "Print help message and exit",
-		  fun()=>
-                  {
-		    println(printOptions(opts));
-		    System.exit(1);
-		  }));
+   option('h', "help", "Print help message and exit",
+	  fun()=>
+            {
+	      println(printOptions(opts));
+	      System.exit(1);
+	    }),
 
-  opts.add(option('?', "version",
-		  "Print version info and exit",
-		  fun()=>version()));
+   option('?', "version",
+	  "Print version info and exit",
+	  fun()=>version()),
 
-  opts.add(option('?', "usage",
-		  "Print usage information and exit",
-		  fun()=>usage()));
+   option('?', "usage",
+	  "Print usage information and exit",
+	  fun()=>usage()),
 
-  opts.add(option('?', "memory",
-		  "Print memory usage information after compilation",
-		  fun()=>{ memInfo = true; }));
+   option('?', "memory",
+	  "Print memory usage information after compilation",
+	  fun()=>{ memInfo = true; })
+  ];
 
   Sequence<String> rest = parse("nicec", args, opts);
   if (rest.size() != 1 || rest[0].length() == 0)

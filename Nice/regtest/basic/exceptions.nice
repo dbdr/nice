@@ -34,4 +34,24 @@ test_exceptions()
   catch(Exception e){
     println("Exception");
   }
+
+  try{
+    exnRaiser(false);
+
+    boolean b = s == null;
+    if (b) 
+      throw new MyEx();
+    else
+      return;
+  }
+  catch (MyEx e) {
+  }
+}
+
+int exnRaiser(boolean b) 
+{
+  if (b)
+    throw new MyEx();
+  else
+    return 1;
 }

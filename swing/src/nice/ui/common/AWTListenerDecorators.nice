@@ -1,124 +1,131 @@
+
+/**************************************************************************/
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+
 package nice.ui.common;
  
 
 /**
  * DECLARATION of methods to add nice.ui.awt.NiceListener to nice.ui.awt.NiceListenerHandler
  */
-
-
-public <ActionListenerHandler H> void addNActionListener(H,NActionListener);
-public <ItemListenerHandler H> void addNItemListener(H,NItemListener);
-public <TextListenerHandler H> void addNTextListener(H,NTextListener);
-public <AdjustmentListenerHandler H> void addNAdjustmentListener(H,NAdjustmentListener);
-public <ContainerListenerHandler H> void addNContainerListener(H,NContainerListener);
-public <WindowListenerHandler H> void addNWindowListener(H,NWindowListener);
-public <ComponentListenerHandler H> void addNComponentListener(H,NComponentListener);
-public <FocusListenerHandler H> void addNFocusListener(H,NFocusListener);
-public <HierarchyBoundsListenerHandler H> void addNHierarchyBoundsListener(H,NHierarchyBoundsListener);
-public <HierarchyListenerHandler H> void addNHierarchyListener(H,NHierarchyListener);
-public <InputMethodListenerHandler H> void addNInputMethodListener(H,NInputMethodListener);
-public <KeyListenerHandler H> void addNKeyListener(H,NKeyListener);
-public <MouseListenerHandler H> void addNMouseListener(H,NMouseListener);
-public <MouseMotionListenerHandler H> void addNMouseMotionListener(H,NMouseMotionListener);
-public <DragSourceListenerHandler H> void addNDragSourceListener(H,NDragSourceListener);
-public <DropTargetListenerHandler H> void addNDropTargetListener(H,NDropTargetListener);
-public <DragGestureListenerHandler H> void addNDragGestureListener(H,NDragGestureListener);
-//JDK1.4  public <AWTEventListenerHandler H, AWTEventKey K> void addNAWTEventListener(H,K,NAWTEventListener);
-//JDK1.4  public <WindowFocusListenerHandler H> void addNWindowFocusListener(H,NWindowFocusListener);
-//JDK1.4  public <WindowStateListenerHandler H> void addNWindowStateListener(H,NWindowStateListener);
-//JDK1.4  public <MouseWheelListenerHandler H> void addNMouseWheelListener(H,NMouseWheelListener);
-//JDK1.4  public <DragSourceListenerHandler H> void addNDragSourceMotionListener(H,NDragSourceMotionListener);
+public <ActionListenerHandler H> void addNiceActionListener(H,NActionListener);
+public <ItemListenerHandler H> void addNiceItemListener(H,NItemListener);
+public <TextListenerHandler H> void addNiceTextListener(H,NTextListener);
+public <AdjustmentListenerHandler H> void addNiceAdjustmentListener(H,NAdjustmentListener);
+public <ContainerListenerHandler H> void addNiceContainerListener(H,NContainerListener);
+public <WindowListenerHandler H> void addNiceWindowListener(H,NWindowListener);
+public <ComponentListenerHandler H> void addNiceComponentListener(H,NComponentListener);
+public <FocusListenerHandler H> void addNiceFocusListener(H,NFocusListener);
+public <HierarchyBoundsListenerHandler H> void addNiceHierarchyBoundsListener(H,NHierarchyBoundsListener);
+public <HierarchyListenerHandler H> void addNiceHierarchyListener(H,NHierarchyListener);
+public <InputMethodListenerHandler H> void addNiceInputMethodListener(H,NInputMethodListener);
+public <KeyListenerHandler H> void addNiceKeyListener(H,NKeyListener);
+public <MouseListenerHandler H> void addNiceMouseListener(H,NMouseListener);
+public <MouseMotionListenerHandler H> void addNiceMouseMotionListener(H,NMouseMotionListener);
+public <DragSourceListenerHandler H> void addNiceDragSourceListener(H,NDragSourceListener);
+public <DropTargetListenerHandler H> void addNiceDropTargetListener(H,NDropTargetListener);
+public <DragGestureListenerHandler H> void addNiceDragGestureListener(H,NDragGestureListener);
+//JDK1.4  public <AWTEventListenerHandler H, AWTEventKey K> void addNiceAWTEventListener(H,K,NAWTEventListener);
+//JDK1.4  public <WindowFocusListenerHandler H> void addNiceWindowFocusListener(H,NWindowFocusListener);
+//JDK1.4  public <WindowStateListenerHandler H> void addNiceWindowStateListener(H,NWindowStateListener);
+//JDK1.4  public <MouseWheelListenerHandler H> void addNiceMouseWheelListener(H,NMouseWheelListener);
+//JDK1.4  public <DragSourceListenerHandler H> void addNiceDragSourceMotionListener(H,NDragSourceMotionListener);
 
 
 
 /**
  * DEFINITION of methods to add nice.ui.awt.NiceListener to nice.ui.awt.NiceListenerHandler
  */
+addNiceActionListener(this@java.awt.Button,listener) = this.addActionListener(listener);
+addNiceActionListener(this@java.awt.List,listener) = this.addActionListener(listener);
+addNiceActionListener(this@java.awt.MenuItem,listener) = this.addActionListener(listener);
+addNiceActionListener(this@java.awt.TextField,listener) = this.addActionListener(listener);
+addNiceItemListener(this@java.awt.Checkbox,listener) = this.addItemListener(listener);
+addNiceItemListener(this@java.awt.CheckboxMenuItem,listener) = this.addItemListener(listener);
+addNiceItemListener(this@java.awt.Choice,listener) = this.addItemListener(listener);
+addNiceItemListener(this@java.awt.List,listener) = this.addItemListener(listener);
+addNiceTextListener(this@java.awt.TextComponent,listener) = this.addTextListener(listener);
+addNiceAdjustmentListener(this@java.awt.Scrollbar,listener) = this.addAdjustmentListener(listener);
+addNiceContainerListener(this@java.awt.Container,listener) = this.addContainerListener(listener);
+addNiceWindowListener(this@java.awt.Window,listener) = this.addWindowListener(listener);
+addNiceComponentListener(this@java.awt.Component,listener) = this.addComponentListener(listener);
+addNiceFocusListener(this@java.awt.Component,listener) = this.addFocusListener(listener);
+addNiceHierarchyBoundsListener(this@java.awt.Component,listener) = this.addHierarchyBoundsListener(listener);
+addNiceHierarchyListener(this@java.awt.Component,listener) = this.addHierarchyListener(listener);
+addNiceInputMethodListener(this@java.awt.Component,listener) = this.addInputMethodListener(listener);
+addNiceKeyListener(this@java.awt.Component,listener) = this.addKeyListener(listener);
+addNiceMouseListener(this@java.awt.Component,listener) = this.addMouseListener(listener);
+addNiceMouseMotionListener(this@java.awt.Component,listener) = this.addMouseMotionListener(listener);
+addNicePropertyChangeListener(this@java.awt.Component,listener) = this.addPropertyChangeListener(listener);
 
-
-addNActionListener(this@java.awt.Button,listener) = this.addActionListener(listener);
-addNActionListener(this@java.awt.List,listener) = this.addActionListener(listener);
-addNActionListener(this@java.awt.MenuItem,listener) = this.addActionListener(listener);
-addNActionListener(this@java.awt.TextField,listener) = this.addActionListener(listener);
-addNItemListener(this@java.awt.Checkbox,listener) = this.addItemListener(listener);
-addNItemListener(this@java.awt.CheckboxMenuItem,listener) = this.addItemListener(listener);
-addNItemListener(this@java.awt.Choice,listener) = this.addItemListener(listener);
-addNItemListener(this@java.awt.List,listener) = this.addItemListener(listener);
-addNTextListener(this@java.awt.TextComponent,listener) = this.addTextListener(listener);
-addNAdjustmentListener(this@java.awt.Scrollbar,listener) = this.addAdjustmentListener(listener);
-addNContainerListener(this@java.awt.Container,listener) = this.addContainerListener(listener);
-addNWindowListener(this@java.awt.Window,listener) = this.addWindowListener(listener);
-addNComponentListener(this@java.awt.Component,listener) = this.addComponentListener(listener);
-addNFocusListener(this@java.awt.Component,listener) = this.addFocusListener(listener);
-addNHierarchyBoundsListener(this@java.awt.Component,listener) = this.addHierarchyBoundsListener(listener);
-addNHierarchyListener(this@java.awt.Component,listener) = this.addHierarchyListener(listener);
-addNInputMethodListener(this@java.awt.Component,listener) = this.addInputMethodListener(listener);
-addNKeyListener(this@java.awt.Component,listener) = this.addKeyListener(listener);
-addNMouseListener(this@java.awt.Component,listener) = this.addMouseListener(listener);
-addNMouseMotionListener(this@java.awt.Component,listener) = this.addMouseMotionListener(listener);
-addNPropertyChangeListener(this@java.awt.Component,listener) = this.addPropertyChangeListener(listener);
-
-addNPropertyChangeListener(this@java.awt.Component,key@String,listener)
+addNicePropertyChangeListener(this@java.awt.Component,key@String,listener)
 {
 	this.addPropertyChangeListener(key,listener);
 	this.addMappableListener(key,listener,mappablePropertyChangeListeners);
 }
 
-//JDK1.4  addNPropertyChangeListeners(this@java.awt.Toolkit,key@String,listener)
-//JDK1.4  {
-//JDK1.4  	this.addPropertyChangeListener(key,listener);
-//JDK1.4  	this.addMappableListener(key,listener,mappableropertyChangeListeners);
-//JDK1.4  }
-
-//JDK1.4  addNAWTEventListeners(this@java.awt.Toolkit,key@long,listener)  
-//JDK1.4  {
-//JDK1.4  	this.addAWTEventListener(listener,key);
-//JDK1.4  	this.addMappableListener(key,listener,mappablePropertyChangeListeners);
-//JDK1.4  }
-
-
-addNDragSourceListener(this@java.awt.dnd.DragSourceContext,listener)
+addNiceDragSourceListener(this@java.awt.dnd.DragSourceContext,listener)
 {
 	this.addDragSourceListener(listener);
 	this.addInAccessibleListener(listener,dragSourceListeners);
 }
 
-addNDropTargetListener(this@java.awt.dnd.DropTarget,listener)
+addNiceDropTargetListener(this@java.awt.dnd.DropTarget,listener)
 {
 	this.addDropTargetListener(listener);
 	this.addInAccessibleListener(listener,dropTargetListeners);
 }
 
-addNDragGestureListener(this@java.awt.dnd.DragGestureRecognizer,listener)
+addNiceDragGestureListener(this@java.awt.dnd.DragGestureRecognizer,listener)
 {
 	this.addDragGestureListener(listener);
 	this.addInAccessibleListener(listener,dragGestureListeners);
 }
 
-//JDK1.4  addNDragSourceListener(this@java.awt.dnd.DragSource,listener)
+//JDK1.4  addNicePropertyChangeListeners(this@java.awt.Toolkit,key@String,listener)
+//JDK1.4  {
+//JDK1.4  	this.addPropertyChangeListener(key,listener);
+//JDK1.4  	this.addMappableListener(key,listener,mappableropertyChangeListeners);
+//JDK1.4  }
+
+//JDK1.4  addNiceAWTEventListeners(this@java.awt.Toolkit,key@long,listener)  
+//JDK1.4  {
+//JDK1.4  	this.addAWTEventListener(listener,key);
+//JDK1.4  	this.addMappableListener(key,listener,mappablePropertyChangeListeners);
+//JDK1.4  }
+
+//JDK1.4  addNiceDragSourceListener(this@java.awt.dnd.DragSource,listener)
 //JDK1.4  {
 //JDK1.4  	this.addDragSourceListener(listener);
 //JDK1.4  	this.addInAccessibleListener(listener,dragSourceListeners);
 //JDK1.4  }
 
-//JDK1.4  addNAdjustmentListener(this@java.awt.ScrollPaneAdjustable,listener) = this.addAdjustmentListener(listener);
-//JDK1.4  addNWindowFocusListener(this@java.awt.Window,listener) = this.addWindowFocusListener(listener);
-//JDK1.4  addNWindowStateListener(this@java.awt.Window,listener) = this.addWindowStateListener(listener);
-//JDK1.4  addNMouseWheelListener(this@java.awt.Component,listener) = this.addMouseWheelListener(listener);
-//JDK1.4  addNDragSourceMotionListener(this@java.awt.dnd.DragSource,listener) = this.addDragSourceMotionListener(listener);
+//JDK1.4  addNiceAdjustmentListener(this@java.awt.ScrollPaneAdjustable,listener) = this.addAdjustmentListener(listener);
+//JDK1.4  addNiceWindowFocusListener(this@java.awt.Window,listener) = this.addWindowFocusListener(listener);
+//JDK1.4  addNiceWindowStateListener(this@java.awt.Window,listener) = this.addWindowStateListener(listener);
+//JDK1.4  addNiceMouseWheelListener(this@java.awt.Component,listener) = this.addMouseWheelListener(listener);
+//JDK1.4  addNiceDragSourceMotionListener(this@java.awt.dnd.DragSource,listener) = this.addDragSourceMotionListener(listener);
+
+
 
 
 /**
  * DEFINITION of functions to add nice.ui.awt.NiceListeners to nice.ui.awt.NiceListenerHandler
  */
 
-
 public <TextListenerHandler H> void addTextListener
   (H this,
    TextEvent -> void textValueChanged       
    )
 {
-  this.addNTextListener
+  this.addNiceTextListener
     (new NTextListener
       (textValueChanged: textValueChanged
       ));
@@ -130,7 +137,7 @@ public <ContainerListenerHandler H> void addContainerListener
    ContainerEvent ?-> void componentRemoved = null
    )
 {
-  this.addNContainerListener
+  this.addNiceContainerListener
     (new NContainerListener
       (componentAdded: componentAdded, 
        componentRemoved: componentRemoved 
@@ -143,7 +150,7 @@ public <ActionListenerHandler H> void addActionListener
    ActionEvent -> void actionPerformed       
    )
 {
-  this.addNActionListener
+  this.addNiceActionListener
     (new NActionListener
       (actionPerformed: actionPerformed
       ));
@@ -155,7 +162,7 @@ public <AdjustmentListenerHandler H> void addAdjustmentListener
    AdjustmentEvent -> void adjustmentValueChanged       
    )
 {
-  this.addNAdjustmentListener
+  this.addNiceAdjustmentListener
     (new NAdjustmentListener
       (adjustmentValueChanged: adjustmentValueChanged
        ));
@@ -172,7 +179,7 @@ public <WindowListenerHandler H> void addWindowListener
    WindowEvent ?-> void windowOpened = null
    )
 {        
-   this.addNWindowListener
+   this.addNiceWindowListener
      (new NWindowListener
        (windowActivated: windowActivated,
         windowClosed: windowClosed,
@@ -190,7 +197,7 @@ public <ItemListenerHandler H> void addItemListener
    ItemEvent -> void itemStateChanged          
    )
 {
-  this.addNItemListener
+  this.addNiceItemListener
     (new NItemListener
       (itemStateChanged: itemStateChanged
       ));
@@ -206,7 +213,7 @@ public <DragSourceListenerHandler H> void addDragSourceListener
    DragSourceEvent ?-> void dsDragExit = null
    )
 { 
-  this.addNDragSourceListener
+  this.addNiceDragSourceListener
     (new NDragSourceListener
       (dsDragDropEnd: dsDragDropEnd,
        dsDragEnter: dsDragEnter,
@@ -226,7 +233,7 @@ public <DropTargetListenerHandler H> void addDropTargetListener
    DropTargetEvent ?-> void dtDragExit = null
    )
 { 
-  this.addNDropTargetListener
+  this.addNiceDropTargetListener
     (new NDropTargetListener
       (dtDrop: dtDrop,
        dtDragEnter: dtDragEnter,
@@ -243,7 +250,7 @@ public <InputMethodListenerHandler H> void addInputMethodListener
    InputMethodEvent ?-> void inputMethodTextChanged = null
    ) 
 {     
-  this.addNInputMethodListener
+  this.addNiceInputMethodListener
     (new NInputMethodListener
       (caretPositionChanged: caretPositionChanged, 
        inputMethodTextChanged: inputMethodTextChanged
@@ -256,7 +263,7 @@ public <MouseMotionListenerHandler H> void addMouseMotionListener
    MouseEvent ?-> void mouseMoved = null          
    ) 
 {                                                   
-  this.addNMouseMotionListener
+  this.addNiceMouseMotionListener
     (new NMouseMotionListener
       (mouseDragged: mouseDragged, 
        mouseMoved: mouseMoved
@@ -272,7 +279,7 @@ public <MouseListenerHandler H> void addMouseListener
    MouseEvent ?-> void mouseReleased = null          
    ) 
 {                                             
-  this.addNMouseListener
+  this.addNiceMouseListener
     (new NMouseListener
       (mouseClicked: mouseClicked, 
        mouseEntered: mouseEntered, 
@@ -289,7 +296,7 @@ public <KeyListenerHandler H> void addKeyListener
    KeyEvent ?-> void keyTyped = null          
    ) 
 {                                                               
-  this.addNKeyListener
+  this.addNiceKeyListener
     (new NKeyListener
       (keyPressed: keyPressed, 
        keyReleased: keyReleased, 
@@ -303,7 +310,7 @@ public <HierarchyBoundsListenerHandler H> void addHierarchyBoundsListener
    HierarchyEvent ?-> void hierarchyAncestorResized = null         
    ) 
 {                                                       
-   this.addNHierarchyBoundsListener
+   this.addNiceHierarchyBoundsListener
      (new NHierarchyBoundsListener
        (hierarchyAncestorMoved: hierarchyAncestorMoved, 
         hierarchyAncestorResized: hierarchyAncestorResized
@@ -315,7 +322,7 @@ public <HierarchyListenerHandler H> void addHierarchyListener
    HierarchyEvent -> void hierarchyChanged           
    ) 
 {                                                                          
-   this.addNHierarchyListener
+   this.addNiceHierarchyListener
      (new NHierarchyListener
        (hierarchyChanged: hierarchyChanged
        ));	                                         
@@ -327,7 +334,7 @@ public <FocusListenerHandler H> void addFocusListener
    FocusEvent ?-> void focusLost = null         
    ) 
 {                                                               
-  this.addNFocusListener
+  this.addNiceFocusListener
     (new NFocusListener
        (focusGained: focusGained, 
         focusLost: focusLost
@@ -342,7 +349,7 @@ public <ComponentListenerHandler H> void addComponentListener
    ComponentEvent ?-> void componentShown = null         
    ) 
 {
-  this.addNComponentListener
+  this.addNiceComponentListener
     (new NComponentListener
        (componentHidden: componentHidden, 
         componentMoved: componentMoved, 
@@ -356,7 +363,7 @@ public <DragGestureListenerHandler H> void addDragGestureListener
    DragGestureEvent -> void dragGestureRecognized
    )
 { 
-  this.addNDragGestureListener
+  this.addNiceDragGestureListener
     (new NDragGestureListener
       (dragGestureRecognized: dragGestureRecognized
        ));
@@ -368,7 +375,7 @@ public <DragGestureListenerHandler H> void addDragGestureListener
 //JDK1.4     DragSourceDragEvent -> void dragMouseMoved
 //JDK1.4     )
 //JDK1.4  { 
-//JDK1.4    this.addNDragSourceMotionListener
+//JDK1.4    this.addNiceDragSourceMotionListener
 //JDK1.4      (new NDragSourceListener
 //JDK1.4        (dragMouseMoved: dragMouseMoved
 //JDK1.4         ));
@@ -380,7 +387,7 @@ public <DragGestureListenerHandler H> void addDragGestureListener
 //JDK1.4     WindowEvent -> void windowStateChanged
 //JDK1.4     )
 //JDK1.4  {     
-//JDK1.4     this.addNWindowStateListener
+//JDK1.4     this.addNiceWindowStateListener
 //JDK1.4       (new NWindowListener
 //JDK1.4         (windowStateChanged: windowStateChanged
 //JDK1.4          ));                            
@@ -393,7 +400,7 @@ public <DragGestureListenerHandler H> void addDragGestureListener
 //JDK1.4     WindowEvent ?-> void windowLostFocus = null,     
 //JDK1.4     )
 //JDK1.4  {     
-//JDK1.4     this.addNWindowFocusListener
+//JDK1.4     this.addNiceWindowFocusListener
 //JDK1.4       (new NWindowFocusListener
 //JDK1.4         (windowGainedFocus: windowGainedFocus,
 //JDK1.4          windowLostFocus: windowLostFocus

@@ -83,7 +83,7 @@ double set(double[], int, double)  = inline nice.lang.inline.ArraySetOp("d");
   return res;
 }
 
-<T> T[] slice(T[] array, int from = 0, int to = array.length - 1) =
+override <T> T[] slice(T[] array, int from = 0, int to = array.length - 1) =
   fill(new T[to - from + 1], int i => array[i + from]);
 
 // Define collection methods

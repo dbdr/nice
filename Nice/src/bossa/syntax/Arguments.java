@@ -21,7 +21,7 @@ import bossa.util.*;
    @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
  */
 
-public class Arguments extends Node
+public class Arguments
 {
   public static class Argument
   {
@@ -47,7 +47,6 @@ public class Arguments extends Node
   
   public Arguments(java.util.List args)
   {
-    super(Node.down);
     this.arguments = (Argument[]) args.toArray(new Argument[args.size()]);
   }
 

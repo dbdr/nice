@@ -17,35 +17,27 @@ import gnu.expr.*;
 import gnu.bytecode.*;
 
 /**
-   Inlining of native boolean operators.
-
-   @author Daniel Bonniot
+   Inlining of native reference operators.
 */
-public class BoolOp extends Procedure2 implements Inlineable
+public class ReferenceOp extends Procedure2 implements Inlineable, Branchable
 {
   private final static int
-    And = 1,
-    Or = 2,
-    Xor = 3,
-    Eq = 4;
+    Eq = 1,
+    Ne = 2;
 
-  public static BoolOp create(String param)
+  public static ReferenceOp create(String param)
   {
     int kind = 0;
-    if ("&".equals(param))
-      kind = And;
-    else if ("|".equals(param))
-      kind = Or;
-    else if ("^".equals(param))
-      kind = Xor;
-    else if ("==".equals(param))
+    if ("==".equals(param))
       kind = Eq;
+    else if ("!=".equals(param))
+      kind = Ne;
     else
       bossa.util.User.error("Unknown inlined boolean operator " + param);
-    return new BoolOp(kind);
+    return new ReferenceOp(kind);
   }
 
-  private BoolOp (int kind)
+  private ReferenceOp (int kind)
   {
     this.kind = kind;
   }
@@ -56,22 +48,54 @@ public class BoolOp extends Procedure2 implements Inlineable
   {
     Expression[] args = exp.getArgs();
     CodeAttr code = comp.getCode();
-    Target stack = new StackTarget(Type.boolean_type);
+    Target stack = new StackTarget(Type.pointer_type);
+    Label _else = new Label(code);
+    Label _end = new Label(code);
 
     args[0].compile(comp, stack);
     args[1].compile(comp, stack);
 
-    switch(kind){
-    case And: code.emitAnd(); break;
-    case Or:  code.emitIOr(); break;
-    case Xor:  code.emitXOr(); break;
-    case Eq:  code.emitXOr();
-      code.emitPushConstant(1, Type.int_type); 
-      code.emitXOr();
-      break;
-    }
-    
+    if (kind == Eq)
+      code.emitGotoIfNE(_else);
+    else
+      code.emitGotoIfEq(_else);
+
+    code.emitPushBoolean(true);
+    code.emitGoto(_end);
+    code.popType(); //simulate 'else' otherwise gnu.bytecode don't like it
+    _else.define(code);
+    code.emitPushBoolean(false);
+    _end.define(code);
+        
     target.compileFromStack(comp, retType);
+  }
+
+  public void compileJump (Compilation comp, Expression[] args, Label to)
+  {
+    CodeAttr code = comp.getCode();
+    Target stack = new StackTarget(Type.pointer_type);
+
+    args[0].compile(comp, stack);
+    args[1].compile(comp, stack);
+
+    if (kind == Eq)
+      code.emitGotoIfEq(to);
+    else
+      code.emitGotoIfNE(to);
+  }
+
+  public void compileJumpNot (Compilation comp, Expression[] args, Label to)
+  {
+    CodeAttr code = comp.getCode();
+    Target stack = new StackTarget(Type.pointer_type);
+
+    args[0].compile(comp, stack);
+    args[1].compile(comp, stack);
+
+    if (kind == Eq)
+      code.emitGotoIfNE(to);
+    else
+      code.emitGotoIfEq(to);
   }
 
   private static final Type retType = Type.boolean_type;

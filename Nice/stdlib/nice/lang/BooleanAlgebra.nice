@@ -10,7 +10,6 @@ abstract interface BooleanAlgebra
   alike `->`(alike, alike); // conditional
 }
 
-`^`(x, y) = (x & !y) | (!x & y);
 `->`(x, y, z) = (x & y) | (!x & z);
 
 <BooleanAlgebra B> B nand(B, B);

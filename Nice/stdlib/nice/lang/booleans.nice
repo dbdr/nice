@@ -8,8 +8,9 @@ final class boolean
   implements BooleanAlgebra, Comparable
 = native;
 
-boolean `==`(boolean, boolean) = native boolean Native.eq(boolean,boolean);
-boolean `!=`(boolean, boolean) = native boolean Native.neq(boolean,boolean);
+boolean `==`(boolean, boolean) = inline nice.lang.inline.BoolOp("==");
+boolean `!=`(boolean, boolean) = inline nice.lang.inline.BoolOp("^");
+
 
 boolean TRUE() = native Boolean.TRUE;
 boolean FALSE() = native Boolean.FALSE;
@@ -23,11 +24,13 @@ var boolean false = FALSE();
 `!`(b@boolean) = b ? false : true;
 `&`(b1@boolean,b2@boolean) = b1 ? b2 : false;
 `|`(b1@boolean,b2@boolean) = b1 ? true : b2;
+`^`(b1@boolean,b2@boolean) = b1 ? !b2 : b2;
 
 // same methods, but overloaded for better efficiency (no dispatch and no boxing).
 boolean `!`(boolean) = inline nice.lang.inline.BoolNotOp();
 boolean `&`(boolean, boolean) = inline nice.lang.inline.BoolOp("&");
 boolean `|`(boolean, boolean) = inline nice.lang.inline.BoolOp("|");
+boolean `^`(boolean, boolean) = inline nice.lang.inline.BoolOp("^");
 
 boolean `&&`(boolean, boolean) = inline nice.lang.inline.ShortCircuitOp("&&");
 boolean `||`(boolean, boolean) = inline nice.lang.inline.ShortCircuitOp("||");

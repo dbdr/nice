@@ -48,6 +48,7 @@ public class BoolNotOp extends Procedure1 implements Inlineable, Branchable
       branchOp.compileJump(comp, ((ApplyExp)args[0]).getArgs(), _else);
       code.emitPushBoolean(true);
       code.emitGoto(_end);
+      code.popType(); //simulate 'else' otherwise gnu.bytecode don't like it
       _else.define(code);
       code.emitPushBoolean(false);
       _end.define(code);

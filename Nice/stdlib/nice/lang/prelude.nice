@@ -86,11 +86,11 @@ class Type = native;
  * Basic functions
  ****************************************************************/
 
-<Any T> boolean `==`(T,T) = native boolean Native.eq(Object,Object);
-<Any T> boolean `!=`(T,T) = native boolean Native.neq(Object, Object);
+<Any T> boolean `==`(T,T) = inline nice.lang.inline.ReferenceOp("==");
+<Any T> boolean `!=`(T,T) = inline nice.lang.inline.ReferenceOp("!=");
 
-boolean `==`(char, char) = native boolean Native.eq (char,char);
-boolean `!=`(char, char) = native boolean Native.neq(char,char);
+boolean `==`(char, char) = inline nice.lang.inline.CompOp("iEq");
+boolean `!=`(char, char) = inline nice.lang.inline.CompOp("iNe");
 
 
 <Any T> boolean equals(T,T) = native boolean Object.equals(Object);

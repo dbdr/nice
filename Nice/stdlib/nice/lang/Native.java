@@ -18,16 +18,7 @@ package nice.lang;
 public final class Native
 {
   public static Object object(Object o) { return o; }  
-    
-  public static boolean eq (Object o1, Object o2) { return o1 == o2; }
-  public static boolean neq(Object o1, Object o2) { return o1 != o2; }
-  
-  public static boolean eq (boolean b1, boolean b2) { return b1 == b2; }
-  public static boolean neq(boolean b1, boolean b2) { return b1 != b2; }
 
-  public static boolean eq (char c1, char c2) { return c1 == c2; }
-  public static boolean neq(char c1, char c2) { return c1 != c2; }
-  
   // Operations on "polymorphic" arrays
   // Arrays of unknown component type are of type Object
   // Methods in java.lang.reflect.Array allow to handle them.

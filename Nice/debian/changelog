@@ -4,8 +4,9 @@ nice (0.7.2) unstable; urgency=low
   * Implemented bitwise complement and "get bit" on long integers.
   * Allow Nice classes and interfaces to implement and extend java interfaces
     without pretending they are classes.
+  * Allow to declare that existing classes implement new abstract interfaces.
 
- --
+ -- Daniel Bonniot <bonniot@users.sourceforge.net>  Fri, 23 Aug 2002 12:51:21 +0200
 
 nice (0.7.1) unstable; urgency=low
 

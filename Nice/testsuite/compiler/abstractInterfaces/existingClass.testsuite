@@ -1,0 +1,35 @@
+/// COMMENT Implementation of an abstract interface by an existing class.
+
+/// PASS
+  /// Toplevel
+  abstract interface I {}
+  class java.lang.Object implements I;
+
+/// FAIL
+  /// package a
+  /// Toplevel
+  abstract interface I {}
+  /// package b
+  /// Toplevel
+  class java.lang.Object implements a.I;
+
+/// FAIL
+  /// package a
+  /// Toplevel
+  abstract interface I {}
+  /// package b import a
+  /// Toplevel
+  class java.lang.Object implements I;
+
+
+/// FAIL
+  /// Toplevel
+  abstract interface I { void f(); }
+  class java.lang.Object implements I;
+
+/// PASS
+  f(new Object());
+  /// Toplevel
+  abstract interface I { void f(); }
+  class java.lang.Object implements I;
+  f(x@Object) {}

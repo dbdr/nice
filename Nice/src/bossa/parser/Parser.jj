@@ -437,6 +437,26 @@ LocatedString doted_string():
   { return new LocatedString(image.toString(), loc); }
 }
 
+/** Contains at least one "." */
+LocatedString fullyQualifiedName():
+{
+  Token t;
+  StringBuffer image;
+  Location loc;
+}
+{
+  t = <IDENT>
+  { image = new StringBuffer(t.image); loc = new Location(t); }
+
+  ( LOOKAHEAD(2) // needed to distinguish with ".class"
+    "." t=doted_string_component() 
+    { image.append(".").append(t.image); 
+      loc.englobe(new Location(t)); } 
+  )+
+
+  { return new LocatedString(image.toString(), loc); }
+}
+
 LocatedString doted_array_string():
 {
   LocatedString res;
@@ -997,7 +1017,9 @@ void getField(NiceClass c, List fields):
 
 void classDefinitionLookahead():
 {}
-{ [ "public" | "private" ] ( "interface" | [ "final" | "abstract" ] "class" ) }
+{ [ "public" | "private" ] 
+  ( "interface" | [ "final" | "abstract" ] "class") 
+}
 
 ClassDefinition classDefinition():
 {
@@ -1109,6 +1131,18 @@ AbstractInterface interfaceDefinition():
   { return res; }
 }
 
+AbstractInterfaceImplementation abstractInterfaceImplementation():
+{
+  LocatedString className, interfaceName;
+}
+{
+  "class" className=fullyQualifiedName()
+  "implements" interfaceName=ident()
+  ";"
+  { return new AbstractInterfaceImplementation
+      (new TypeIdent(className), new TypeIdent(interfaceName)); }
+}
+
 Pattern pattern():
 {
   Pattern res = null;
@@ -1218,8 +1252,7 @@ MethodDeclaration methodDeclaration():
       // Nice method
       ";"
       { res = new NiceMethod(name,cst,returnType,parameters); }
-    | LOOKAHEAD(2)
-      { Statement body; }
+    | LOOKAHEAD(2)      { Statement body; }
       body = code()
       { res = new ToplevelFunction(name, cst, returnType, parameters, body);}
     |
@@ -1328,6 +1361,9 @@ Definition definition():
   | 
     LOOKAHEAD ( "abstract" "interface" )
     res=interfaceDefinition()
+  |
+    LOOKAHEAD( "class" fullyQualifiedName() )
+    res=abstractInterfaceImplementation()
   | 
     LOOKAHEAD ( classDefinitionLookahead() )
     res=classDefinition()

@@ -7,7 +7,7 @@ JAVACC=java -classpath ${HOME}/lib/java/JavaCC/JavaCC.zip COM.sun.labs.javacc.Ma
 JAVADOC=javadoc -linkoffline file:///C%7C/Apps/jdk1.2.1/docs/api file:///usr/opt/java122/docs/api
 
 recompile:
-	cd ${TOP}/src; ${JAVAC} -d ${TOP}/classes bossa/syntax/*.java bossa/modules/*.java bossa/parser/*.java bossa/tools/*.java bossa/test/Front.java mlsub/*/*.java ../lib/*.java
+	cd ${TOP}/src; ${JAVAC} -d ${TOP}/classes bossa/syntax/*.java bossa/modules/*.java bossa/parser/*.java nice/tools/*.java bossa/test/Front.java mlsub/*/*.java ../lib/*.java
 
 recompileGNU:
 	cd ${TOP}/src; ${JAVAC} -d ${TOP}/classes gnu/*/*.java gnu/*/*/*.java kawa/*/*.java
@@ -36,8 +36,8 @@ tags:
 	jtags
 
 jar:
-	cd ${TOP}; cp src/bossa/tools.jar bin/Nice.jar;\
-	jar umf src/mainClass bin/Nice.jar -C classes bossa -C classes gnu -C classes kawa -C classes mlsub ;\
+	cd ${TOP}; cp src/nice/tools/compiler.jar bin/Nice.jar;\
+	jar umf src/mainClass bin/Nice.jar -C classes nice -C classes mlsub -C classes bossa -C classes gnu -C classes kawa ;\
 	cd lib; jar uf ../bin/Nice.jar nice/*/*.nice*; cd .. ;\
 	cd classes; jar uf ../bin/Nice.jar *.class; cd ..
 

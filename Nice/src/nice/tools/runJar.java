@@ -12,9 +12,9 @@
 
 // File    : jarMainClass.java
 // Created : Thu Apr 20 14:48:25 2000 by Daniel Bonniot
-//$Modified: Wed Jul 26 19:48:21 2000 by Daniel Bonniot $
+//$Modified: Thu Jul 27 14:55:45 2000 by Daniel Bonniot $
 
-package bossa.tools;
+package nice.tools;
 
 import java.util.jar.*;
 import java.lang.reflect.*;
@@ -33,7 +33,7 @@ public class runJar
   {
     if(args.length==0)
       {
-	System.err.println("usage: java bossa.tools.runJar file.jar");
+	System.err.println("usage: java nice.tools.runJar file.jar");
 	System.exit(1);
       }
     

@@ -30,6 +30,11 @@ public class Block extends Statement
     this.statements = cutInBlocks(statements);
   }
 
+  Block(Statement[] statements)
+  {
+    this.statements = statements;
+  }
+
   public Statement last()
   {
     return statements[statements.length - 1];

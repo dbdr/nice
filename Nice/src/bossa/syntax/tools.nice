@@ -46,6 +46,9 @@ localVariable(e@SymbolExp)
 mlsub.typing.Monotype makeSure(mlsub.typing.Monotype m) = 
   notNull(bossa.syntax.Monotype.sure(nice.tools.code.Types.rawType(m)));
 
+mlsub.typing.Monotype makeUnsure(mlsub.typing.Monotype m) = 
+  notNull(bossa.syntax.Monotype.maybe(nice.tools.code.Types.rawType(m)));
+
 /****************************************************************
  * Temporary: this should be solved when AST classes are written 
  * in Nice, with precise types for the fields.
@@ -54,6 +57,8 @@ mlsub.typing.Monotype makeSure(mlsub.typing.Monotype m) =
 LocatedString name(VarSymbol) = native VarSymbol.name;
 mlsub.typing.Polytype getType(Expression) = 
   native mlsub.typing.Polytype Expression.getType();
+Statement[] statements(Block) = native Block.statements;
+mlsub.typing.Monotype type(MonoSymbol) = native MonoSymbol.type;
 
 // Local Variables:
 // nice-xprogram: "nicec -d \"$HOME/Nice/classes\" --sourcepath=\"$HOME/Nice/src\" --classpath=\"$HOME/Nice/classes\""

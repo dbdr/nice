@@ -175,7 +175,7 @@ class Info
 
   void addVar(MonoSymbol symbol)
   {
-    symbol.type = notNull(symbol.syntacticType).resolve(this.typeMap);
+    symbol.type = notNull(notNull(symbol.syntacticType).resolve(this.typeMap));
     this.vars[symbol.name.toString()] = symbol;
   }
 
@@ -493,12 +493,54 @@ analyse(b@Block, info)
 {
   info.begin();
   new JavaList(impl: notNull(b.locals)).iter(fun(Block.LocalDeclaration l) => analyse(l, info));
-  notNull(b.statements).iter(fun(?Statement s)=>{
-    if (info.getUnreachable())
-      throw error(s, "This statement is never executed");
-    analyse(s, info);
-  });
+  b.statements = analyse(b.statements, info);
   info.end();
+}
+
+Statement[] analyse(Statement[] statements, Info info)
+{
+  for (int i = 0; i < statements.length; i++)
+    {
+      Statement s = statements[i];
+      if (info.getUnreachable())
+	throw error(s, "This statement is never executed");
+      analyse(s, info);
+      ?IfExp ifExp = ifExp(s);
+      if (ifExp != null)
+	if (ifExp.thenUnreachable)
+	  {
+	    ifExp.elseExp = new StatementExp
+	    (makeBlock(notNull(ifExp.elseExp), 
+		       analyse(statements.split(from: i+1), info)));
+	    return statements.split(to: i);
+	  }
+	else if (ifExp.elseUnreachable)
+	  {
+	    ifExp.thenExp = new StatementExp
+	    (makeBlock(notNull(ifExp.thenExp), 
+		       analyse(statements.split(from: i+1), info)));
+	    return statements.split(to: i);
+	  }
+	}
+  return statements;
+}
+
+?IfExp ifExp(Statement);
+ifExp(s@Statement) = null;
+ifExp(s@ExpressionStmt)
+{
+  if (s.exp instanceof bossa.syntax.IfExp)
+    return cast(s.exp);
+  else
+    return null;
+}
+
+Block makeBlock(Expression first, Statement[] rest)
+{
+  ?Statement[] res = new Statement[rest.length + 1];
+  res[0] = new ExpressionStmt(first);
+  copy(rest, 0, res, 1, rest.length);
+  return new Block(res);
 }
 
 analyse(s@ExpressionStmt, info)

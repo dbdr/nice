@@ -41,11 +41,46 @@ typecheck(e@AssignExp)
     e.value = checkAssignment(to.getType(), notNull(e.value));
   }
   catch(TypingEx t){
+    ?MonoSymbol variable = monoSymbol(to);
+    if (variable != null)
+      if (hasConditionalType(variable) && isNullError(t)) {
+      try
+        {
+	  final unsureType = makeUnsure(variable.type);
+	  e.value = checkAssignment(new mlsub.typing.Polytype(unsureType), notNull(e.value));
+
+	  // It is OK to assign the variable with a null value.
+	  variable.setVarType(now: unsureType,
+			      otherBranch: variable.type,
+			      brothers: unsureType);
+	  return;
+	}
+      catch (TypingEx newError) { t = newError; }
+    }
+
     if (notNullError(t, e, notNull(e.value).toString()))
       throw assignmentError(e, to.toString(), 
 			    to.getType().toString(), 
 			    notNull(e.value));
   }
+}
+
+?MonoSymbol monoSymbol(Expression);
+monoSymbol(e) = null;
+monoSymbol(e@SymbolExp)
+{
+  if (e.getSymbol() instanceof bossa.syntax.MonoSymbol)
+    return cast(e.getSymbol());
+  else
+    return null;
+}
+
+boolean hasConditionalType(MonoSymbol v)
+{
+  return conditionalTypes.has(fun(<MonoSymbol, mlsub.typing.Monotype> couple) => {
+    (MonoSymbol other, mlsub.typing.Monotype t) = couple;
+    return v == other;
+  });
 }
 
 void typecheckExps(?Expression[] exps)
@@ -139,26 +174,41 @@ nullnessInfo(test@CallExp)
 
 var int ifLevel;
 var Stack<int> levels = makeVector(10);
-var Stack<<MonoSymbol, mlsub.typing.Monotype>> conditionalTypes = 
+var Vector<<MonoSymbol, mlsub.typing.Monotype>> conditionalTypes = 
   makeVector(10);
 
 void enterIf() { ifLevel++; }
-void exitIf()
-{ 
-  ifLevel--;
-  while (levels.size() > 0 && levels.top() == ifLevel)
+
+void enterElse()
+{
+  while (levels.size() > 0 && levels.top() == ifLevel * 2)
     {
       levels.pop();
-      MonoSymbol variable; 
-      mlsub.typing.Monotype baseType;
-      (variable, baseType) = conditionalTypes.pop();
+      (MonoSymbol variable, mlsub.typing.Monotype baseType) = conditionalTypes.pop();
       variable.type = baseType;
     }
 }
 
-void pushConditionalType(MonoSymbol variable, mlsub.typing.Monotype baseType)
+void exitIf()
+{ 
+  while (levels.size() > 0 && levels.top() == ifLevel * 2 + 1)
+    {
+      levels.pop();
+      (MonoSymbol variable, mlsub.typing.Monotype baseType) = conditionalTypes.pop();
+      variable.type = baseType;
+    }
+  ifLevel--;
+}
+
+void pushBranchType(MonoSymbol variable, mlsub.typing.Monotype baseType)
 {
-  levels.push(ifLevel);
+  levels.push(2 * ifLevel);
+  conditionalTypes.push((variable, baseType));
+}
+
+void pushBrotherType(MonoSymbol variable, mlsub.typing.Monotype baseType)
+{
+  levels.push(2 * ifLevel + 1);
   conditionalTypes.push((variable, baseType));
 }
 
@@ -183,13 +233,12 @@ typecheck(e@IfExp)
   enterIf();
 
   try{
-    ?MonoSymbol variable;
-    boolean isAlwaysNull;
-    (variable, isAlwaysNull) = nullnessInfo(condition);
+    (?MonoSymbol variable, boolean isAlwaysNull) = nullnessInfo(condition);
 
     if (variable == null)
       {
 	typecheck(thenExp);
+	enterElse();
 	typecheck(elseExp);
 	return;
       }
@@ -200,44 +249,58 @@ typecheck(e@IfExp)
       // variable is non-null in the 'then' part
       {
 	mlsub.typing.Monotype type = notNull(variable.type);
-	variable.type = makeSure(type);
+	mlsub.typing.Monotype sureType = makeSure(type);
+
+	setVarType(variable, now: sureType, brothers: type);
+
 	typecheck(thenExp);
 	// since the type of the variable is destructively changed,
 	// it is important to compute the branch's type and to store it now.
 	thenExp.computeType();
 
-	variable.type = type;
-	typecheck(elseExp);
+	enterElse();
 
-	// If else never returns, the variable is known to be non-null
-	// up-to the end of this conditional block
-	if (e.elseUnreachable)
-	  {
-	    variable.type = makeSure(type);
-	    pushConditionalType(variable, type);
-	  }
+	typecheck(elseExp);
       }
     else
       // variable is non-null in the 'else' part
       {
-	mlsub.typing.Monotype type = notNull(variable.type);
+	mlsub.typing.Monotype type = variable.type;
+	mlsub.typing.Monotype sureType = makeSure(type);
 	typecheck(thenExp);
 
-	variable.type = makeSure(type);
+	enterElse();
+
+	setVarType(variable, now: sureType, brothers: type);
+
 	typecheck(elseExp);
 	// since the type of the variable is destructively changed,
 	// it is important to compute the branch's type and to store it now.
 	elseExp.computeType();
-
-	if (e.thenUnreachable)
-	  pushConditionalType(variable, type);
-	else
-	  variable.type = type;
       }
   }
   finally{
     exitIf();
   }
+}
+
+/**
+   Describe changes to make to the type of a variable in conditional branches.
+
+   @param now type to be used in the next branch.
+   @param otherBranch type to be used in the other branches
+   @param brothers type to be used in the block containing the conditional
+   @param later type to be used when returning to the parent block
+*/
+private void setVarType(MonoSymbol variable, 
+			mlsub.typing.Monotype now, 
+			?mlsub.typing.Monotype otherBranch = null,
+			mlsub.typing.Monotype brothers)
+{
+  variable.type = now;
+  pushBrotherType(variable, brothers);
+  if (otherBranch != null)
+    pushBranchType(variable, otherBranch);
 }
 
 typecheck(e@IncrementExp)
@@ -247,7 +310,7 @@ typecheck(e@IncrementExp)
 				 notNull(e.variable));
   }
   catch(TypingEx t){
-    if (notNullError(t, e, e.toString()))
+    if (notNullError(t, e, String.valueOf(e.variable)))
       throw new bossa.util.UserError
       (e, 
        notNull(e.description()) + " is only valid on integers.\n" + 
@@ -362,8 +425,27 @@ typecheck(s@ExpressionStmt)
 typecheck(l@LoopStmt)
 {
   typecheck(l.whileExp);
+
+  enterIf();
+
+  ?Expression whileExp = l.whileExp;
+  if (whileExp != null)
+    if (l.isTestFirst)
+      {
+	(?MonoSymbol variable, boolean isAlwaysNull) = nullnessInfo(whileExp);
+	if (variable != null)
+	  if (isAlwaysNull == false)
+	    setVarType(variable, 
+		       now: makeSure(variable.type), brothers: variable.type);
+      }
+
   typecheck(l.loopBody);
   typecheck(l.iterationStatements);
+
+  // There is no else part in a loop, but this call is necessary to pop off
+  // conditional type information (from assignments) from the stack.
+  enterElse();
+  exitIf();
 }
 
 typecheck(b@BreakStmt) {}
@@ -424,14 +506,9 @@ Expression checkAssignment(mlsub.typing.Polytype left, Expression right)
   return val;
 }
 
-/**
-   Throws a UserError with an explicit message if 
-     the error is that value might be null.
-   Returns true iff there is another type error.
-*/
-boolean notNullError(TypingEx ex, bossa.util.Located resp, ?String value);
-notNullError(@TypingEx, resp, value) = true;
-notNullError(ex@MonotypeLeqEx, resp, value)
+boolean isNullError(TypingEx ex);
+isNullError(@TypingEx) = true;
+isNullError(ex@MonotypeLeqEx)
 {
   /*
     This is an approximation.
@@ -441,13 +518,25 @@ notNullError(ex@MonotypeLeqEx, resp, value)
   ?TypeConstructor tc1 = notNull(ex.getM1()).head();
   ?TypeConstructor tc2 = notNull(ex.getM2()).head();
 
-  if (tc1 == tc2) return true;
+  if (tc1 == tc2) return false;
 
   if (tc1 == ConstantExp.maybeTC &&
       (tc2 != ConstantExp.maybeTC || tc2 != null))
-    throw new bossa.util.UserError(resp, "" + value + " might be null");
+    return true;
 
-  return true;
+  return false;
+}
+
+/**
+   Throws a UserError with an explicit message if 
+     the error is that value might be null.
+   Returns true the error is not related to null types.
+*/
+boolean notNullError(TypingEx ex, bossa.util.Located resp, ?String value) {
+  if (isNullError(ex))
+    throw new bossa.util.UserError(resp, "" + value + " might be null");
+  else
+    return true;
 }
 
 void wrongReturnType(bossa.util.Located responsible, 

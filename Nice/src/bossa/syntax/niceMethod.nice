@@ -371,8 +371,8 @@ public gnu.expr.Expression getDispatchMethod(NiceMethod def, Module module)
         receiver = null;
     }
 
-  res = nice.tools.code.Gen.createMethod
-    (name, argTypes, retType, cast(def.getSymbols()), true, receiver != null);
+  res = generateMethod
+    (name, argTypes, retType, def.getSymbols(), toplevel: true, member: receiver != null);
   res.parameterCopies = cast(notNull(def.formalParameters()).getParameterCopies());
 
   // add unique information to disambiguate which method this represents

@@ -97,7 +97,7 @@ class DefaultConstructor extends Constructor
     let argTypesArray = argTypes.toArray();
     let argsArray = args.toArray();
 
-    let lambda = nice.tools.code.Gen.createConstructor
+    let lambda = generateConstructor
       (thisDecl, argTypesArray, argsArray);
     lambda.setSuperCall(this.callSuper(thisExp, fullArgs, omitDefaults));
 

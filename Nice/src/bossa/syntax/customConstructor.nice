@@ -98,8 +98,8 @@ public class CustomConstructor extends UserOperator
 
     generatingCode = true;
 
-    let lambda = nice.tools.code.Gen.createCustomConstructor
-      (cast(this.javaReturnType()), this.javaArgTypes(), cast(this.getSymbols()));
+    let lambda = generateCustomConstructor
+      (cast(this.javaReturnType()), this.javaArgTypes(), this.getSymbols());
 
     nice.tools.code.Gen.setMethodBody(lambda, body.generateCode());
     notNull(classe).getClassExp().addMethod(lambda);

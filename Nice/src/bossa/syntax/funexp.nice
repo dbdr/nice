@@ -115,11 +115,11 @@ public class FunExp extends Expression implements Function
 
   compile()
   {
-    gnu.expr.LambdaExp res = nice.tools.code.Gen.createMethod
-      (null, 
+    gnu.expr.LambdaExp res = generateMethod
+      (bytecodeName: null, 
        nice.tools.code.Types.javaType(getMonotypes(formals)), 
        nice.tools.code.Types.javaType(this.inferredReturnType()), 
-       cast(formals), false);
+       formals, toplevel: false);
     nice.tools.code.Gen.setMethodBody(res, body.generateCode());
     return res;
   }

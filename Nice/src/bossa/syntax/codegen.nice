@@ -1,0 +1,109 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2004                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package bossa.syntax;
+
+/**
+   Create a lambda expression to generate code for the method.
+
+   @param args can be null if there are no arguments
+   @param member true iff this method is a non-static member of
+                   the class in argTypes[0]
+   @param toplevel If the method can be called from foreign code.
+                     This forces its generation even if it is 
+		     apparently never called.
+*/
+public gnu.expr.LambdaExp generateMethod(?String bytecodeName,
+				       gnu.bytecode.Type[] argTypes,
+				       gnu.bytecode.Type retType,
+				       MonoSymbol[?] args,
+				       boolean toplevel,
+				       boolean member = false)
+{
+  let res = new gnu.expr.LambdaExp();
+  generateMethod(res, bytecodeName, argTypes, retType, args, toplevel, member, false);
+  return res;
+}
+
+public gnu.expr.ConstructorExp generateConstructor
+    (gnu.expr.Declaration thisDecl, gnu.bytecode.Type[] argTypes, MonoSymbol[?] args)
+{
+  let res = new gnu.expr.ConstructorExp(thisDecl);
+  generateMethod(res, "<init>", argTypes, gnu.bytecode.Type.void_type, args, 
+                 true, false, true);
+  return res;
+}
+
+public gnu.expr.ConstructorExp generateCustomConstructor
+    (gnu.bytecode.ClassType classType, gnu.bytecode.Type[] argTypes, MonoSymbol[?] args)
+{
+  let res = new gnu.expr.ConstructorExp(classType);
+  generateMethod(res, "<init>", argTypes, gnu.bytecode.Type.void_type, args, 
+                 true, false, true);
+  return res;
+}
+
+/**
+   Create a lambda expression to generate code for the method.
+
+   @param args can be null if there are no arguments
+   @param member true iff this method is a non-static member of
+                 the class in argTypes[0]
+   @param toplevel If the method can be called from foreign code.
+                   This forces its generation even if it is 
+                   apparently never called.
+*/
+void generateMethod
+    (gnu.expr.LambdaExp lexp, 
+     ?String bytecodeName,
+     gnu.bytecode.Type[] argTypes,
+     gnu.bytecode.Type retType,
+     MonoSymbol[?] args,
+     boolean toplevel,
+     boolean member,
+     boolean constructor)
+{
+  bytecodeName = nice.tools.code.Strings.escape(bytecodeName);
+  int arity = args == null ? 0 : args.length;
+
+  lexp.setReturnType(retType);
+  lexp.setName(bytecodeName);
+  lexp.min_args = lexp.max_args = member ? arity - 1 : arity;
+  lexp.forceGeneration();
+  if (toplevel)
+    lexp.setCanCall(true);
+  if (member)
+    lexp.setClassMethod(true);
+
+  // Parameters
+  for (int n = 0; n < arity; n++)
+    {
+      boolean isThis = member && n == 0;
+      String parameterName = notNull(args)[n].getName() == null 
+	  ? "anonymous_" + n 
+	  : notNull(notNull(args)[n].getName()).toString();
+
+      gnu.expr.Declaration d;
+      if (isThis)
+        {
+          d = new gnu.expr.Declaration(parameterName);
+          d.context = lexp;
+        }
+      else
+        d = lexp.addDeclaration(parameterName);
+
+      if (argTypes != null)
+        d.setType(argTypes[n]);
+      d.noteValue(null);
+      notNull(args)[n].setDeclaration(d, isThis);
+    }
+}

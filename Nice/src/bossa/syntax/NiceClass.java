@@ -144,9 +144,10 @@ public class NiceClass extends ClassDefinition
     if (fields.length == 0)
       return;
     
-    TypeScope localScope = new TypeScope(typeScope);
+    TypeScope localScope = typeScope;
     if (typeParameters != null)
       try{
+	localScope = new TypeScope(localScope);
 	localScope.addSymbols(typeParameters);
       }
       catch(TypeScope.DuplicateName e){

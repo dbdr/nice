@@ -90,3 +90,20 @@ class C extends B implements I {
   // Another option would be to accept the foo(B) implementation
   // as implementing the foo(I) method for C.
 }
+
+/// PASS
+  /// package a
+  /// Toplevel
+interface A { boolean foo(); }
+
+  /// package b import a
+  assert new D().foo();
+  assert test(new D());
+  /// Toplevel
+abstract interface I { boolean foo(); }
+<I T> boolean test(T x) = x.foo();
+
+interface a.A implements I;
+
+// New implementation, which should satisfy both methods.
+class D implements A { foo() = true; }

@@ -100,6 +100,7 @@ public abstract class TestCase {
 
 	boolean isKnownBug;
 	boolean skip;
+	boolean noLocation;
 
 
 

@@ -180,6 +180,13 @@ public class TestSuite {
 				type = type.substring(0, type.length() - "bug".length()).trim();
 			}
 
+		boolean noLocation = false;
+		if (type.endsWith(" no-location"))
+			{
+				noLocation = true;
+				type = type.substring(0, type.length() - "no-location".length()).trim();
+			}
+
 		TestCase res;
 		if (TESTCASE_TYPE_PASS.equalsIgnoreCase(type))
 			res = new PassTestCase(this);
@@ -190,6 +197,7 @@ public class TestSuite {
 
 		res.skip = skip;
 		res.isKnownBug = isKnownBug;
+		res.noLocation = noLocation;
 		return res;
 	}
 

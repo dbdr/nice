@@ -42,7 +42,7 @@ public class FailTestCase extends TestCase {
 		try {
 			compilePackages();
 		} catch(TestSuiteException e) {
-      if (getFailPositions().isEmpty()) {
+      if (! noLocation && getFailPositions().isEmpty()) {
         TestNice.getOutput().log("warning", "Failure position not checked");
         warning();
         return;

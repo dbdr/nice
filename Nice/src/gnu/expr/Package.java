@@ -29,9 +29,14 @@ import java.io.FileOutputStream;
 
 public class Package extends Expression
 {
+  /** Create a Bytecode Package.
+
+      @param name qualified name of the package (e.g. "my.package")
+  */
   public Package (String name)
   {
     this.name = name;
+    this.prefix = name.replace('.', '/') + "/";
   }
 
   public void print (gnu.mapping.OutPort ps)
@@ -56,16 +61,7 @@ public class Package extends Expression
     firstClass = classe;
   }
   
-  public void addMainClass(ClassExp classe)
-  {
-    addClass(classe);
-    mainClass = classe;
-  }
-  
   ClassExp firstClass;
-
-  /** A special class... */
-  ClassExp mainClass;
 
   public void addClass(ClassType c)
   {
@@ -77,7 +73,10 @@ public class Package extends Expression
   public Package next;
 
   /** Qualified name, e.g. "my.package". */
-  public String name; 
+  public final String name; 
+
+  /** "my/package/" */
+  public final String prefix;
 
   public File directory;
 

@@ -33,28 +33,6 @@ public abstract class Expression extends Node
     super(Node.down);
   }
 
-  /**
-     Returns an equivalent expression with scoping resolved.
-     Expressions that resolve to a new expression should override this method.
-     Others (that resolve by side effects) should override Node.resolve().
-   */
-  Expression resolveExp()
-  {
-    doResolve();
-    return this;
-  }
-
-  /** iterates resolveExp on the collection of Expression */
-  static List resolveExp(Collection c)
-  //TODO: imperative version ?
-  {
-    List res=new ArrayList();
-    Iterator i=c.iterator();
-    while(i.hasNext())
-      res.add(((Expression)i.next()).resolveExp());
-    return res;
-  }
-
   /** @return true iff this expression can be assigned a value. */
   boolean isAssignable()
   {
@@ -279,12 +257,6 @@ public abstract class Expression extends Node
     return toString();
   }
 
-  // For ExpressionRef. Should be removed yhen ExpressionRef disappears
-  Expression content()
-  {
-    return this;
-  }  
-  
   private Location location = Location.nowhere();
   protected Polytype type;
 }

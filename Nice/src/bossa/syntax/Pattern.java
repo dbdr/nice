@@ -12,7 +12,7 @@
 
 // File    : Pattern.java
 // Created : Mon Jul 05 14:36:52 1999 by bonniot
-//$Modified: Wed Sep 15 15:42:32 1999 by bonniot $
+//$Modified: Fri Nov 05 14:52:37 1999 by bonniot $
 // Description : Syntactic pattern for method bodies declaration
 
 package bossa.syntax;
@@ -124,6 +124,32 @@ public class Pattern
     return res;
   }
 
+  /**
+   * Returns a string used to recognize this pattern in the bytecode.
+   *
+   * This is usefull to distinguish alternatives of a method.
+   */
+  public String bytecodeRepresentation()
+  {
+    if(typeConstructor==null)
+      return "@_";
+    else
+      return "@"+typeConstructor.name;
+  }
+  
+  public static String bytecodeRepresentation(List patterns)
+  {
+    String res="";
+    for(Iterator i=patterns.iterator();
+	i.hasNext();)
+      res+=((Pattern)i.next()).bytecodeRepresentation();
+    return res;
+  }
+  
+  /****************************************************************
+   * Misc.
+   ****************************************************************/
+  
   /** expresses that this pattern was a fake one.
    *  @see MethodBodyDefinition
    */

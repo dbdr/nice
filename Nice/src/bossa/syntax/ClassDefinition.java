@@ -12,13 +12,15 @@
 
 // File    : ClassDefinition.java
 // Created : Thu Jul 01 11:25:14 1999 by bonniot
-//$Modified: Wed Nov 03 17:47:02 1999 by bonniot $
+//$Modified: Fri Nov 05 16:16:44 1999 by bonniot $
 
 package bossa.syntax;
 
-import java.util.*;
 import bossa.util.*;
 import bossa.typing.*;
+
+import gnu.bytecode.*;
+import java.util.*;
 
 /**
  * Abstract syntax for a class definition.
@@ -45,7 +47,8 @@ public class ClassDefinition extends Node
     else
       this.typeParameters=typeParameters;
     this.extensions=extensions;
-    this.fields=fields;
+
+    this.fields=keepFields(fields,isSharp);
 
     this.tc=new TypeConstructor(this);
     addTypeSymbol(this.tc);
@@ -58,14 +61,14 @@ public class ClassDefinition extends Node
 	this.implementations=implementations;
 	this.abstractions=abstractions;
 	this.methods=methods;
-	addChildren(computeAccessMethods(fields));
+	addChildren(computeAccessMethods(this.fields));
       }
     else
       {
 	this.implementations=addChildren(implementations);
 	this.abstractions=addChildren(abstractions);
 	this.methods=addChildren(methods);
-	addChildren(computeAccessMethods(fields));
+	addChildren(computeAccessMethods(this.fields));
       }
     
     // if this class is final, 
@@ -98,6 +101,18 @@ public class ClassDefinition extends Node
    * Fields
    ****************************************************************/
 
+  private List keepFields(List fields, boolean local)
+  {
+    List result=new ArrayList(fields.size());
+    for(Iterator i=fields.iterator();i.hasNext();)
+      {
+	Field f=(Field)i.next();
+	if(f.isLocal==local)
+	  result.add(f);
+      }
+    return result;
+  }
+  
   public static class Field
   {
     public Field(MonoSymbol sym, boolean isFinal, boolean isLocal)
@@ -119,13 +134,6 @@ public class ClassDefinition extends Node
       {
 	Field f=(Field)i.next();
 
-	// Local fields only appear in the #class
-	// and vice-versa
-	if(this.isSharp && !f.isLocal
-	   || 
-	   !this.isSharp && f.isLocal)
-	  continue;
-	
 	MonoSymbol s=f.sym;
 	List params=new LinkedList();
 	params.add(getMonotype());
@@ -213,6 +221,37 @@ public class ClassDefinition extends Node
   }
   
   /****************************************************************
+   * Code generation
+   ****************************************************************/
+
+  public void compile(bossa.modules.Module module)
+  {
+    if(!isSharp)
+      return;
+    
+    ClassType c=new ClassType(module.className(name.toString().substring(1)));
+    addFields(c);    
+    module.addClass(c);
+  }
+
+  private void addFields(ClassType c)
+  {
+    for(Iterator i=fields.iterator();
+	i.hasNext();)
+      {
+	Field f=(Field)i.next();
+	gnu.bytecode.Field field=
+	  c.addField(f.sym.name.toString(),
+		     Type.pointer_type,
+		     Access.PUBLIC);
+	c.setSuper(Type.pointer_type);
+      }
+    for(Iterator i=extensions.iterator();
+	i.hasNext();)
+      ((TypeConstructor)i.next()).definition.addFields(c);
+  }
+  
+  /****************************************************************
    * Printing
    ****************************************************************/
 
@@ -243,7 +282,7 @@ public class ClassDefinition extends Node
   private List /* of TypeConstructor */ extensions;
   private List /* of Interface */ implementations;
   private List /* of Interface */ abstractions;
-  private List /* of MonoSymbol */ fields;
+  private List /* of ClassDefinition.Field */ fields;
   private List methods;
   private boolean isFinal;
   boolean isAbstract;

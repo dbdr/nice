@@ -12,7 +12,7 @@
 
 // File    : MonotypeVar.java
 // Created : Fri Jul 23 15:36:39 1999 by bonniot
-//$Modified: Thu Oct 28 15:29:25 1999 by bonniot $
+//$Modified: Fri Nov 05 15:43:38 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -158,7 +158,7 @@ public class MonotypeVar extends Monotype
     else
       res="";
     
-    if(User.dbg)
+    if(Debug.IDs)
       return "\""+res+name+"(id="+id+","+super.toString().substring(getClass().getName().length())+")\"";
     else
       return res+name;

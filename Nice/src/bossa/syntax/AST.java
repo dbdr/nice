@@ -12,7 +12,7 @@
 
 // File    : AST.java
 // Created : Thu Jul 01 11:01:56 1999 by bonniot
-//$Modified: Thu Nov 04 14:52:51 1999 by bonniot $
+//$Modified: Fri Nov 05 15:21:24 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -58,6 +58,12 @@ public class AST extends Node
   {
     for(Iterator i=definitions.iterator();i.hasNext();)
       ((Definition)i.next()).printInterface(s);
+  }
+
+  public void compile(bossa.modules.Module module)
+  {
+    for(Iterator i=definitions.iterator();i.hasNext();)
+      ((Definition)i.next()).compile(module);
   }
   
   public String toString()

@@ -12,7 +12,7 @@
 
 // File    : Debug.java
 // Created : Thu Jul 22 15:37:02 1999 by bonniot
-//$Modified: Thu Nov 04 14:58:24 1999 by bonniot $
+//$Modified: Fri Nov 05 15:43:54 1999 by bonniot $
 
 package bossa.util;
 
@@ -43,8 +43,13 @@ public abstract class Debug
                                      ".bossa.conf"));
       props.load(new BufferedInputStream(in));
       in.close();
+      //props.list(System.out);
     }
-    catch (Exception e) {}
+    catch (Exception e) {
+      println("Can't read "+
+	      System.getProperty("user.home")+
+	      "/.bossa.conf");
+    }
   }
 
   public static boolean getBoolean(boolean defaultValue, String name)
@@ -61,5 +66,7 @@ public abstract class Debug
     typing	= getBoolean(false,"debug.typing"),
     engine	= getBoolean(false,"debug.engine"),
     modules	= getBoolean(false,"debug.modules"),
-    overloading = getBoolean(false,"debug.overloading");
+    IDs		= getBoolean(false,"debug.IDs"),
+    overloading = getBoolean(false,"debug.overloading"),
+    errorMsg	= getBoolean(false,"debug.errorMsg");
 }

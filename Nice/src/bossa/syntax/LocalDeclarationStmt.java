@@ -12,12 +12,14 @@
 
 // File    : LocalDeclarationStmt.java
 // Created : Tue Jul 06 12:06:20 1999 by bonniot
-//$Modified: Wed Oct 27 16:22:22 1999 by bonniot $
+//$Modified: Fri Nov 05 15:22:52 1999 by bonniot $
 
 package bossa.syntax;
 
 import bossa.util.*;
 import bossa.typing.*;
+
+import gnu.bytecode.*;
 import java.util.*;
 
 /**
@@ -81,6 +83,17 @@ public class LocalDeclarationStmt extends Statement
     s.print("variable "+left+";\n");
   }
   
+  /****************************************************************
+   * Code generation
+   ****************************************************************/
+
+  public void compile(bossa.modules.Module module)
+  {
+    Field f=module.bytecode.addField(left.name.toString(),
+				 Type.pointer_type,
+				 Access.PUBLIC|Access.STATIC);
+  }
+
   /****************************************************************
    * Printing
    ****************************************************************/

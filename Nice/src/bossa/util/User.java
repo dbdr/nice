@@ -12,7 +12,7 @@
 
 // File    : User.java
 // Created : Wed Jul 07 18:20:58 1999 by bonniot
-//$Modified: Wed Nov 03 18:39:08 1999 by bonniot $
+//$Modified: Fri Nov 05 15:41:57 1999 by bonniot $
 
 package bossa.util;
 
@@ -34,7 +34,7 @@ public class User
   
   public static void error(Located responsible, String message, String dbgMsg)
   {
-    if(dbg)
+    if(Debug.errorMsg)
       error(responsible.location()+message+dbgMsg);
     else
       error(responsible.location()+message);
@@ -73,11 +73,4 @@ public class User
       warning(message);
   }
 
-  public static void debug(String msg)
-  {
-    if(dbg)
-      System.out.println(msg);
-  }
-  
-  public static boolean dbg = true;
 }

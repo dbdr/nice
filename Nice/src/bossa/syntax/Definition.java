@@ -12,7 +12,7 @@
 
 // File    : Definition.java
 // Created : Thu Jul 01 11:17:28 1999 by bonniot
-//$Modified: Wed Oct 27 16:20:34 1999 by bonniot $
+//$Modified: Fri Nov 05 15:26:09 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -49,4 +49,12 @@ public interface Definition
    * @param s a PrintWriter
    */
   void printInterface(java.io.PrintWriter s);
+
+  /**
+   * Generates bytecode for this definition.
+   *
+   * @param moduleClass the class for static elements
+   of the module (alternatives, toplevel variables, ...).
+   */
+  void compile(bossa.modules.Module module);
 }

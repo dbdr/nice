@@ -12,12 +12,13 @@
 
 // File    : MethodDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Wed Oct 27 16:06:10 1999 by bonniot $
+//$Modified: Fri Nov 05 15:33:31 1999 by bonniot $
 
 package bossa.syntax;
 
 import java.util.*;
 import bossa.util.*;
+import gnu.bytecode.*;
 
 /**
  * Abstract syntax for a global method declaration.
@@ -106,6 +107,15 @@ public class MethodDefinition extends PolySymbol implements Definition
     s.print(toString());
   }
   
+  /****************************************************************
+   * Code generation
+   ****************************************************************/
+
+  public void compile(bossa.modules.Module module)
+  {
+    // Nothing
+  }
+
   /************************************************************
    * Printing
    ************************************************************/

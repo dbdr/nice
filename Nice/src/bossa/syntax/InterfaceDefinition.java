@@ -12,7 +12,7 @@
 
 // File    : InterfaceDefinition.java
 // Created : Thu Jul 01 17:00:14 1999 by bonniot
-//$Modified: Thu Nov 04 13:43:04 1999 by bonniot $
+//$Modified: Fri Nov 05 15:22:40 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -106,6 +106,15 @@ public class InterfaceDefinition extends Node
 	    +";\n");
   }
   
+  /****************************************************************
+   * Code generation
+   ****************************************************************/
+
+  public void compile(bossa.modules.Module module)
+  {
+    // Nothing
+  }
+
   /****************************************************************
    * Printing
    ****************************************************************/

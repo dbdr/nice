@@ -12,13 +12,15 @@
 
 // File    : MethodBodyDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Fri Oct 29 14:22:37 1999 by bonniot $
+//$Modified: Fri Nov 05 15:23:01 1999 by bonniot $
 
 package bossa.syntax;
 
-import java.util.*;
 import bossa.util.*;
 import bossa.typing.*;
+
+import gnu.bytecode.*;
+import java.util.*;
 
 /**
  * Definition of an alternative for a method.
@@ -71,7 +73,7 @@ public class MethodBodyDefinition extends Node
   {
     User.error(d==null,this,"Method \""+name+"\" has not been declared");
     this.definition=d;
-
+    
     // if the method is not a class member,
     // the "this" formal is useless
     if(!d.isMember())
@@ -251,10 +253,30 @@ public class MethodBodyDefinition extends Node
   }
   
   /****************************************************************
+   * Code generation
+   ****************************************************************/
+
+  private static final ClassType object=ClassType.make("java.lang.Object");
+  
+  public void compile(bossa.modules.Module module)
+  {
+    int nArgs=formals.size();
+    ClassType[] arg_types=new ClassType[nArgs];
+    for(int i=0;i<nArgs;i++)
+      arg_types[i]=object;
+
+    Method m=module.bytecode.addMethod
+      (name.toString()+Pattern.bytecodeRepresentation(formals),
+       arg_types,object,
+       Access.PUBLIC|Access.STATIC|Access.FINAL);
+    m.initCode();
+  }
+
+  /****************************************************************
    * Printing
    ****************************************************************/
 
-  public Location location()
+  public bossa.util.Location location()
   {
     return name.location();
   }

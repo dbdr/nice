@@ -42,3 +42,7 @@
   int i = 0;
   [1,2,3].foreach(int j => i += j);
   assert (i == 6);
+
+/// PASS
+  int k; k = 2;
+  [0].foreach(int a => println(k));

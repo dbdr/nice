@@ -87,11 +87,9 @@ class Info
 
   Stack<long> flagsStack = new Stack();
 
-  void beginInner(boolean reset)
+  void beginInner()
   {
     this.flagsStack.push(this.flags);
-    if (reset)
-      this.flags = 0;
   }
 
   void endInner()
@@ -319,7 +317,7 @@ analyse(e@CallExp, info)
 
 analyse(e@FunExp, info)
 {
-  info.beginInner(true);
+  info.beginInner();
   info.begin();
 
   if (e.constraint != Constraint.True && e.constraint != null)
@@ -539,7 +537,7 @@ analyse(s@ExpressionStmt, info)
 
 analyse(l@LoopStmt, info)
 {
-  info.beginInner(false);
+  info.beginInner();
   if (l.isTestFirst())
     l.whileExp = analyse(l.whileExp, info);
   ?LoopStmt save = info.currentLoop;

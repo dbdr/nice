@@ -42,3 +42,10 @@
 
   // A double value too small for float underflows to zero:
   assert float(1e-50) == 0;
+
+/// PASS
+  int i = 0;
+  foo(double(i));
+  /// Toplevel
+void foo(int) {}
+void foo(double) {}

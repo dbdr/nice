@@ -1358,7 +1358,7 @@ public final class K0 {
         this.savedC = new BitMatrix(K0.this.C);
 
       this.savedGarbage = new BitVector(K0.this.garbage);
-      this.savedDomains = (DomainVector)K0.this.domains.clone();
+      this.savedDomains = new DomainVector(K0.this.domains);
       /*
       this.savedImplementors = new BitVector[K0.this.nInterfaces()];
       for (int iid = 0; iid < savedImplementors.length; iid++) {
@@ -1791,7 +1791,7 @@ public final class K0 {
       while (excludedA >= initN) {
         if (!garbage.get(excludedA) && simplified.get(excludedA)) {
           int x;
-          DomainVector savedDomains = (DomainVector)Sdomains.clone();
+          DomainVector savedDomains = new DomainVector(Sdomains);
           try {
             if (S.debugSimpl) {
               System.err.println("Try excluding " + excludedA);

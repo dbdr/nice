@@ -48,7 +48,7 @@ final class Satisfier {
     for (int a = dx.getLowestSetBit();
          a >= 0;
          a = dx.getNextBit(a)) {
-      DomainVector domainsCopy = (DomainVector)domains.clone();
+      DomainVector domainsCopy = new DomainVector(domains);
       try {
         domainsCopy.getDomain(x).instantiate(a);
         enumerate(strategy, domainsCopy, C, Ct, R, Rt, m, n,
@@ -93,7 +93,7 @@ final class Satisfier {
     for (int a = dx.getLowestSetBit();
          a >= 0;
          a = dx.getNextBit(a)) {
-      DomainVector domainsCopy = (DomainVector)domains.clone();
+      DomainVector domainsCopy = new DomainVector(domains);
       try {
         domainsCopy.getDomain(x).instantiate(a);
         enumerate(strategy, domainsCopy, C, Ct, R, Rt, m, n, handler);

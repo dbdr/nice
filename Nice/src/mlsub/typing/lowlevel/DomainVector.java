@@ -14,6 +14,19 @@ final class DomainVector extends java.util.ArrayList {
   int offset;                 // offset
   int width;                  // size of domains
   
+  public DomainVector(DomainVector old) {
+    super(old.size());
+    this.offset = old.offset;
+    this.width = old.width;
+    for (int i = 0; i < old.size(); i++) {
+      Domain d = ((Domain)old.get(i));
+      if (d != null)
+        add(new Domain(d));
+      else
+        add(null);
+    }
+  }
+
   public DomainVector(int offset, int width) {
     this.offset = offset;
     this.width = width;
@@ -94,17 +107,6 @@ final class DomainVector extends java.util.ArrayList {
     //} else {
     //addElement(null);
     //}
-  }
-
-  public Object clone() {
-    DomainVector result = (DomainVector)super.clone();
-    for (int i = 0; i < size(); i++) {
-      Domain d = ((Domain)get(i));
-      if (d != null) {
-        result.set(i, new Domain(d));
-      }
-    }
-    return result;
   }
 
   /***********************************************************************

@@ -2709,7 +2709,8 @@ Expression PostfixStatementExpression(Expression e1, Token first) :
     e2=Expression()
     {
       if(op.image.length()!=1)
-        e2=bossa.syntax.dispatch.createCallExp(symb(op.image.substring(0, 1),op),e1,e2);
+        e2=bossa.syntax.dispatch.createCallExp
+          (symb(op.image.substring(0, op.image.length()-1),op),e1,e2);
 
       e1=bossa.syntax.dispatch.createAssignExp(e1,e2);
     }

@@ -41,10 +41,11 @@ public class LiteralArrayProc extends gnu.mapping.ProcedureN
   private ArrayType arrayType;
   private int nbElements;
   private boolean wrapAsCollection;
-  
+
   public void compile (ApplyExp exp, Compilation comp, Target target)
   {
-    arrayType = MultiArrayNewProc.creationType(arrayType, target);
+    // The type was not specified explicitely, so we allow promotion.
+    arrayType = MultiArrayNewProc.creationType(arrayType, target, true);
 
     Expression[] args = exp.getArgs();
     CodeAttr code = comp.getCode();

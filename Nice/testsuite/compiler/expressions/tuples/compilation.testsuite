@@ -47,7 +47,19 @@
 /// PASS
   (String fst, String snd) = foo("abc","xyz");
   /// Toplevel
-  <T,U> (T,U) foo(T x, U y) = (x,y); 
+  <T,U> (T,U) foo(T x, U y) = (x,y);
 
 /// PASS
   (?int,?int) tup = (null, 3);
+
+/// PASS
+  List<(int,int)> l = new ArrayList();
+  l.add((1,2));
+  (int i1, int i2) = l.get(0);
+  assert i1 == 1 && i2 == 2;
+
+/// PASS bug
+  List<((int,int),String)> l = new ArrayList();
+  l.add(((1,2), ""));
+  ((int i1, int i2), String s) = l.get(0);
+  assert i1 == 1 && i2 == 2;

@@ -2,7 +2,7 @@
   int[] arr = [ 0 ];
 
 /// PASS
-  assert("[B".equals([1,2,3].getClass().getName()));
+  assert("[I".equals([1,2,3].getClass().getName()));
 
 /// PASS
   [ new A2(), new A3() ].println();

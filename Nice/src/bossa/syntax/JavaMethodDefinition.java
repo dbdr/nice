@@ -12,7 +12,7 @@
 
 // File    : JavaMethodDefinition.java
 // Created : Tue Nov 09 11:49:47 1999 by bonniot
-//$Modified: Fri Jun 16 16:22:56 2000 by Daniel Bonniot $
+//$Modified: Tue Jun 20 14:35:08 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -232,7 +232,7 @@ public class JavaMethodDefinition extends MethodDefinition
       {
 	LocatedString t = (LocatedString) javaTypes.get(i);
 	
-	javaArgType[i-1]=type(t);
+	javaArgType[i-1] = type(t);
 	
 	// set the fully qualified name back
 	javaTypes.set(i,new LocatedString(javaArgType[i-1].getName(),
@@ -252,15 +252,16 @@ public class JavaMethodDefinition extends MethodDefinition
     
     if(!(holder instanceof ClassType))
       {
-	if (className.toString().equals("_Array"))
-	  holder = bossa.SpecialArray._ArrayType;
+	if (className.toString().equals("ObjectArray"))
+	  holder = bossa.SpecialArray.objectArrayType;
 	else
-	  User.error(this, className+" is a primitive type");
+	  User.error(this, className + " is a primitive type");
       }
     
-    className = new LocatedString(holder.getName(),className.location());
+    className = new LocatedString(holder.getName(), className.location());
     
-    reflectMethod = ((ClassType) holder).getDeclaredMethod(methodName,javaArgType);
+    reflectMethod = ((ClassType) holder).getDeclaredMethod
+      (methodName,javaArgType);
     // use the following, or the Type.flushTypeChanges() in SpecialTypes
     //reflectMethod.arg_types = javaArgType;
     //if(!methodName.equals("<init>"))

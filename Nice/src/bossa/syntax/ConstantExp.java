@@ -12,7 +12,7 @@
 
 // File    : ConstantExp.java
 // Created : Thu Jul 08 15:36:40 1999 by bonniot
-//$Modified: Tue Jun 06 14:56:27 2000 by Daniel Bonniot $
+//$Modified: Tue Jun 20 11:12:26 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -101,7 +101,7 @@ public class ConstantExp extends Expression
       User.error(value, "Invalid character constant: "+value);
 
     char c = value.toString().charAt(0);
-    return new ConstantExp(primChar, gnu.kawa.util.Char.make(c), "'"+c+"'",
+    return new ConstantExp(primChar, gnu.text.Char.make(c), "'"+c+"'",
 			   value.location());
   }
 

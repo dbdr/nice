@@ -12,7 +12,7 @@
 
 // File    : Dispatch.java
 // Created : Mon Nov 15 10:36:41 1999 by bonniot
-//$Modified: Tue Jun 13 19:07:44 2000 by Daniel Bonniot $
+//$Modified: Tue Jun 20 15:48:26 2000 by Daniel Bonniot $
 
 package bossa.link;
 
@@ -232,7 +232,7 @@ public final class Dispatch
        )
       return;
 
-    BlockExp block = new BlockExp();
+    BlockExp block = new BlockExp(m.javaReturnType());
     LambdaExp lexp = new LambdaExp(block);
     
     // parameters of the alternative function are the same in each case, so we compute them just once
@@ -248,7 +248,7 @@ public final class Dispatch
       }
     
     if(m instanceof FieldAccessMethod)
-      block.setBody(compileFieldAccess((FieldAccessMethod) m,params[0]));
+      block.setBody(compileFieldAccess((FieldAccessMethod) m, params[0]));
     else if(m instanceof SetFieldMethod)
       block.setBody(compileSetField((SetFieldMethod) m,params[0],params[1]));
     else
@@ -269,12 +269,12 @@ public final class Dispatch
     gnu.bytecode.ClassType type = (gnu.bytecode.ClassType) 
       bossa.CodeGen.javaType(method.classTC);
     
-    gnu.expr.Expression[] param = new gnu.expr.Expression[1];
-    param[0] = value;
+    gnu.expr.Expression[] param = { value };
     
     gnu.expr.Expression res =
       new ApplyExp(new kawa.lang.GetFieldProc(type,method.fieldName, method.javaReturnType(), gnu.bytecode.Access.PUBLIC),
 		   param);
+    
     /*
     while(types.hasNext())
       {
@@ -293,9 +293,7 @@ public final class Dispatch
     gnu.bytecode.ClassType type = (gnu.bytecode.ClassType) 
       bossa.CodeGen.javaType(method.classTC);
     
-    gnu.expr.Expression[] params = new gnu.expr.Expression[2];
-    params[0] = obj;
-    params[1] = value;
+    gnu.expr.Expression[] params = { obj, value };
     
     gnu.expr.Expression res =
       new ApplyExp(new QuoteExp(new kawa.lang.SetFieldProc(type,method.fieldName, method.javaArgTypes()[1], gnu.bytecode.Access.PUBLIC)),
@@ -327,8 +325,8 @@ public final class Dispatch
   {
     if(!sortedAlternatives.hasNext())
       {
-	gnu.expr.Expression[] exn = new gnu.expr.Expression[1];
-	exn[0] = new QuoteExp(new Error("Message not understood"));
+	gnu.expr.Expression[] exn = 
+	{ new QuoteExp(new Error("Message not understood")) };
 	return new ApplyExp(throwProc,exn);
       }
     

@@ -12,7 +12,7 @@
 
 // File    : MethodBodyDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Sat Jun 17 15:09:28 2000 by Daniel Bonniot $
+//$Modified: Tue Jun 20 15:08:42 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -417,7 +417,7 @@ public class MethodBodyDefinition extends Definition
     if(definition==null)
       Internal.error(this, this+" has no definition");
     
-    blockExp = new gnu.expr.BlockExp();
+    blockExp = new gnu.expr.BlockExp(definition.javaReturnType());
 
     gnu.expr.LambdaExp lexp = new gnu.expr.LambdaExp(blockExp);
     Statement.currentScopeExp = lexp;
@@ -479,7 +479,7 @@ public class MethodBodyDefinition extends Definition
     if(Debug.codeGeneration)
       Debug.println("Compiling MAIN method");
     
-    gnu.expr.BlockExp block = new gnu.expr.BlockExp();
+    gnu.expr.BlockExp block = new gnu.expr.BlockExp(Type.void_type);
     gnu.expr.LambdaExp lexp = new gnu.expr.LambdaExp(block);
     
     // Main arguments
@@ -490,8 +490,13 @@ public class MethodBodyDefinition extends Definition
     args.setType(gnu.bytecode.ArrayType.make(Type.string_type));
 
     // Call arguments
-    gnu.expr.Expression[] eVal = new gnu.expr.Expression[1];
-    eVal[0]= new gnu.expr.ReferenceExp("args",args);
+    gnu.expr.Expression[] eVal = new gnu.expr.Expression[] {
+      new gnu.expr.ApplyExp
+	(new gnu.expr.QuoteExp(new gnu.expr.PrimProcedure(bossa.SpecialArray.specialObjectArray().makeMethod)), new gnu.expr.Expression[]{
+	    new gnu.expr.ReferenceExp("args",args)
+	    }
+	 )
+    };
 
     block.setBody
       (new gnu.expr.ApplyExp(new gnu.expr.QuoteExp(new gnu.expr.PrimProcedure(mainAlternative)),eVal));

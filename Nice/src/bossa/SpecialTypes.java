@@ -12,7 +12,7 @@
 
 // File    : SpecialTypes.java
 // Created : Mon Jan 17 14:19:30 2000 by bonniot
-//$Modified: Tue Jun 13 11:37:38 2000 by Daniel Bonniot $
+//$Modified: Tue Jun 20 14:35:50 2000 by Daniel Bonniot $
 
 package bossa;
 
@@ -49,13 +49,13 @@ public class SpecialTypes
     booleanType = Scheme.booleanType;
     voidType = gnu.bytecode.Type.void_type;
 
-    arrayType = new SpecialArray(Type.pointer_type);
+    arrayType = SpecialArray.create(Type.pointer_type);
 
     Type.flushTypeChanges();
   }
 
   static public Type makeArrayType(Type elements)
   {
-    return new SpecialArray(elements);
+    return SpecialArray.create(elements);
   }
 }

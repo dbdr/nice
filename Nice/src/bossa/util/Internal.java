@@ -12,7 +12,7 @@
 
 // File    : Internal.java
 // Created : Wed Jul 07 18:23:19 1999 by bonniot
-//$Modified: Wed Jun 07 13:48:01 2000 by Daniel Bonniot $
+//$Modified: Mon Jun 19 14:39:09 2000 by Daniel Bonniot $
 // Description : Internal errors...
 
 package bossa.util;
@@ -83,6 +83,13 @@ public final class Internal
   
   public static void error(Throwable e)
   {
+    if(e instanceof ExceptionInInitializerError)
+      {
+	System.out.println("Exception in initializer");
+	e.printStackTrace();
+	e = ((ExceptionInInitializerError) e).getException();
+      }
+    
     String msg = e.getMessage();
     if (msg == null)
       msg = "";

@@ -12,7 +12,7 @@
 
 // File    : JavaClass.java
 // Created : Wed Feb 02 16:20:12 2000 by Daniel Bonniot
-//$Modified: Wed Jun 14 19:31:09 2000 by Daniel Bonniot $
+//$Modified: Mon Jun 19 17:50:43 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -62,7 +62,7 @@ public class JavaClass extends ClassDefinition
     if(name.toString().equals("nice.lang.Array"))
       {
 	ConstantExp.arrayTC = this.tc;
-	javaType = bossa.SpecialTypes.arrayType;
+	javaType = bossa.SpecialArray.arrayType;
 	bossa.CodeGen.set(tc, javaType);
       }
     

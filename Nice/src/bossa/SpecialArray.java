@@ -5,37 +5,71 @@ import gnu.math.DFloNum;
 import gnu.expr.*;
 import kawa.lang.*;
 
-import _Array;
-
 /**
- * Use to implement some special types that convert differently. 
- * Based on kawa.lang.SpecialType
+   Arrays that are wrapped into objects implementing Sequence when needed.
  */
 
 public final class SpecialArray extends gnu.bytecode.ArrayType
 {
-  public SpecialArray (Type elements)
+  private SpecialArray (Type elements, String prefix)
   {
     super (elements);
-    setSignature("L_Array;");
+
+    if(elements == Type.pointer_type)
+      specialObjectArray = this;
+    
+    className = prefix+"Array";
+    setSignature("L"+className+";");
+    //setSignature("["+elements.getSignature());
+
+    classType = ClassType.make(className);
+    
+    ClassType sequence = ClassType.make("nice.lang.Sequence");
+    sequence.access_flags = Access.PUBLIC|Access.INTERFACE;
+    classType.setInterfaces(new ClassType[]{sequence});
+    
+    field = new Field(classType);
+    field.setName("value");
+    field.setType(ArrayType.make(elements));
 
     try{
-      Type.registerTypeForClass(Class.forName("_Array"), this);
+      Type.registerTypeForClass(Class.forName(className), this);
     }
     catch(ClassNotFoundException e){
-      bossa.util.Internal.warning("Nice class for arrays not found");
+      bossa.util.Internal.error("Nice class for " + 
+				elements + " arrays not found");
     }
-    Type.registerTypeForName("_Array", this);
+    Type.registerTypeForName(className, this);
+  }
+  
+  /**
+     Return a SpecialArray holding elements of type <tt>elements</tt>.
+   */
+  public static Type create(Type elements)
+  {
+    String prefix;
+    if(elements instanceof PrimType)
+      prefix = elements.getName();
+    else
+      {
+	prefix = "Object";
+	elements = Type.pointer_type;
+      }
+    Type res = Type.lookupType(prefix + "Array");
+    if(res!=null && res instanceof SpecialArray)
+      return res;
+    
+    return new SpecialArray(elements, prefix);
   }
   
   public String getNameOrSignature()
   {
-    return "_Array";
+    return className;
   }
   
   public String getName()
   {
-    return "_Array";
+    return className;
   }
   
   public Object coerceFromObject (Object obj)
@@ -45,14 +79,16 @@ public final class SpecialArray extends gnu.bytecode.ArrayType
 
   public void emitCoerceFromObject (CodeAttr code)
   {
-    if(_ArrayMakeMethod == null)
+    if(makeMethod == null)
       {
-	Type[] args = new Type[1];
-	args[0] = ArrayType.make(Type.pointer_type);
-	_ArrayMakeMethod = _ArrayType.getDeclaredMethod("make", args, this);
+	Type[] args = new Type[] { ArrayType.make(elements) };
+	makeMethod = classType.getDeclaredMethod("make", args, this);
+	
+	if(makeMethod == null)
+	  bossa.util.Internal.error(this + " does not have a make method");
       }
     
-    code.emitInvokeStatic(_ArrayMakeMethod);
+    code.emitInvokeStatic(makeMethod);
   }
 
   public Object coerceToObject (Object obj)
@@ -62,35 +98,34 @@ public final class SpecialArray extends gnu.bytecode.ArrayType
 
   public void emitCoerceToObject (CodeAttr code)
   {
-    code.emitCheckcast(_ArrayType);
-    code.emitGetField(_ArrayField);
+    code.emitCheckcast(classType);
+    code.emitGetField(field);
   }
 
   public boolean isSubtype (Type other)
   {
-    return other instanceof SpecialArray || _ArrayType.isSubtype(other);
+    return other instanceof SpecialArray || classType.isSubtype(other);
   }
   
   /****************************************************************
-   * _Array components
+   * Fields
    ****************************************************************/
 
-  public static ClassType _ArrayType;
-  private static Field _ArrayField;
-  public static Method _ArrayMakeMethod;
-
-  static
+  private ClassType classType;
+  public static ClassType objectArrayType = ClassType.make("ObjectArray");
+  public static ClassType arrayType = ClassType.make("Array");
+  private static SpecialArray specialObjectArray;
+  public static SpecialArray specialObjectArray()
   {
-    _ArrayType = ClassType.make("_Array");
+    if(specialObjectArray == null)
+      specialObjectArray = (SpecialArray) create(Type.pointer_type);
     
-    ClassType sequence = ClassType.make("nice.lang.Sequence");
-    sequence.access_flags = Access.PUBLIC|Access.INTERFACE;
-    _ArrayType.setInterfaces(new ClassType[]{sequence});
-    
-    _ArrayField = new Field(_ArrayType);
-    _ArrayField.setName("value");
-    _ArrayField.setType(ArrayType.make(Type.pointer_type));
+    return specialObjectArray;
   }
+  
+  private Field field;
+  public Method makeMethod;
+  private String className;
   
   public String toString()
   {

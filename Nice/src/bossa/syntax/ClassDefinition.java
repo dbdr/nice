@@ -12,7 +12,7 @@
 
 // File    : ClassDefinition.java
 // Created : Thu Jul 01 11:25:14 1999 by bonniot
-//$Modified: Tue Jun 13 16:39:37 2000 by Daniel Bonniot $
+//$Modified: Mon Jun 19 11:02:03 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -338,7 +338,7 @@ abstract public class ClassDefinition extends Definition
       res = bossa.CodeGen.javaType(abs.superClass[0]);
     
     if(!(res instanceof ClassType))
-      Internal.error("Java type="+res+"\nOnly _Array is not a class type, and it must be final");
+      Internal.error("Java type="+res+"\nOnly special arrays are not a class type, and they must be final");
     
     return (ClassType) res;
   }

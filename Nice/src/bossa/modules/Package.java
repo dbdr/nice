@@ -12,7 +12,7 @@
 
 // File    : Package.java
 // Created : Wed Oct 13 16:09:47 1999 by bonniot
-//$Modified: Wed Jun 14 20:28:38 2000 by Daniel Bonniot $
+//$Modified: Tue Jun 20 11:31:28 2000 by Daniel Bonniot $
 
 package bossa.modules;
 
@@ -282,7 +282,7 @@ public class Package implements mlsub.compilation.Module
       ast.resolveScoping();
       ast.createContext();
     }
-    catch(Exception e){
+    catch(Throwable e){
       Internal.error(e);
     }
   }
@@ -432,7 +432,7 @@ public class Package implements mlsub.compilation.Module
   }
   static
   {
-    // pkg is shared ny all packages for now
+    // pkg is shared by all packages for now
     // if we change this, there should be a "super-ModuleExp"
     // (or change FindCapturedVars, and maybe others...)
     pkg = new ModuleExp();
@@ -539,7 +539,7 @@ public class Package implements mlsub.compilation.Module
     }
     catch(IOException e){
       User.error(this.name,"Could not write code for "+this,": "+e);
-    }    
+    }
   }
 
   public gnu.bytecode.Method addDispatchMethod(MethodDefinition def)
@@ -566,8 +566,8 @@ public class Package implements mlsub.compilation.Module
   {
     pkg.addMethod(meth);
     
-    //FIXME
-    gnu.expr.ChainLambdas.chainLambdas(meth);
+    //FIXME: a bit lowlevel
+    gnu.expr.ChainLambdas.chainLambdas(meth, comp);
     gnu.expr.PushApply.pushApply(meth);
     gnu.expr.FindTailCalls.findTailCalls(meth);
     meth.setCanRead(true);

@@ -12,7 +12,7 @@
 
 // File    : FunExp.java
 // Created : Mon Jul 12 15:09:50 1999 by bonniot
-//$Modified: Fri Jun 09 17:21:34 2000 by Daniel Bonniot $
+//$Modified: Tue Jun 20 15:07:32 2000 by Daniel Bonniot $
 // Description : A functional expression
 
 package bossa.syntax;
@@ -98,7 +98,7 @@ public class FunExp extends Expression implements Function
     
     gnu.expr.LambdaExp res = new gnu.expr.LambdaExp();
 
-    blockExp = new gnu.expr.BlockExp();
+    blockExp = new gnu.expr.BlockExp(bossa.CodeGen.javaType(getType()));
 
     res.min_args = res.max_args = formals.size();
     

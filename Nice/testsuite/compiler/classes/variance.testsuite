@@ -1,4 +1,4 @@
-/// FAIL bug
+/// FAIL
   /// Toplevel
 interface X{}
 interface Y extends X{

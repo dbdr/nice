@@ -49,7 +49,8 @@ public class BitVector implements java.io.Serializable {
    * Creates an empty set.
    */
   public BitVector() {
-    this(1 << BITS_PER_UNIT);
+    bits0 = 0L;
+    bits1 = null;
   }
 
   /**

@@ -30,7 +30,7 @@ public class StatementExp extends Expression
 
   public String toString()
   {
-    return statement.toString();
+    return String.valueOf(statement);
   }
 
   public gnu.expr.Expression compile()

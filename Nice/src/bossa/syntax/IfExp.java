@@ -83,11 +83,11 @@ public class IfExp extends Expression
   {
     return 
       "if(" +
-      condition +
+      String.valueOf(condition) +
       ")\n" +
-      thenExp +
+      String.valueOf(thenExp) +
       "\nelse\n" +
-      elseExp +
+      String.valueOf(elseExp) +
       "\nendif"
       ;
   }

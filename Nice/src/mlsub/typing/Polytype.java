@@ -48,24 +48,12 @@ public final class Polytype
 
   public Polytype cloneType()
   {
-    Map map = getCloningMap();
-    if (map == null)
-      return this;
-    else
-      return cloneType(map);
-  }
-
-  public Map getCloningMap()
-  {
     //Optimization
     if (isMonomorphic())
-      return null;
+      return this;
 
-    return new java.util.HashMap();
-  }
+    Map map = new java.util.HashMap();
 
-  public Polytype cloneType(Map map)
-  {
     TypeSymbol[] binders = constraint.binders();
     TypeSymbol[] newBinders = new TypeSymbol[binders.length];
     
@@ -78,15 +66,6 @@ public final class Polytype
     return new Polytype
       (new Constraint(newBinders, 
 		      AtomicConstraint.substitute(map, constraint.atoms())), 
-       monotype.substitute(map));
-  }
-
-  public Polytype applyMap(Map map)
-  {
-    return new Polytype
-      (isMonomorphic() ? Constraint.True
-       : new Constraint(constraint.binders(), 
-			AtomicConstraint.substitute(map, constraint.atoms())),
        monotype.substitute(map));
   }
 

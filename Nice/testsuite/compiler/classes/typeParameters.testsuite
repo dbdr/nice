@@ -223,3 +223,43 @@ class A<T>
   class Foo<T> {
     Impl<int> w = new Impl();
   }
+
+/// PASS
+  /// Toplevel
+class Bar<U> {
+    U e;
+}
+class II<T> {
+    private Bar<T> lp;
+    void foo(T element) {
+	this.lp = new Bar(e: element);
+    }
+}
+
+/// PASS
+  /// Toplevel
+interface A<T> {}
+interface C<T> {}
+class CImpl<T> extends Impl<T> implements C<T> {}
+class Impl<T> {
+    T -> int bar = T t1 => 0;
+}
+class Foo<T> {
+    Impl<int> w = new Impl();     // works
+    Impl<A<int>> s = new Impl();  // works
+    C<A<T>> t = new CImpl();       // does not work!
+}
+
+/// PASS
+  new B();
+  /// Toplevel
+class A<T> { T->T f = T x => { T tmp = x; return tmp; }; }
+class B<T> extends A<T> {}
+
+/// PASS
+  /// Toplevel
+class Foo<T> {
+  T t;
+
+  { t = t; this.t = t; t = this.t; this.t = this.t; }
+}

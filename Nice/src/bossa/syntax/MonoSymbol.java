@@ -140,7 +140,7 @@ public class MonoSymbol extends VarSymbol
 
   // explained in OverloadedSymbolExp
 
-  final void makeClonedType(Polytype[] argTypes) {}
+  final void makeClonedType(Polytype[] argTypes, int[] used) {}
   
   final void releaseClonedType() {}
 

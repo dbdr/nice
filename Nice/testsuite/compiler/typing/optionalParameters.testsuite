@@ -5,3 +5,7 @@
 {
   int->int f = foo();
 }
+
+/// PASS
+  /// Toplevel
+<X> boolean f(X x, X->boolean c = X y => x == y) = c(x);

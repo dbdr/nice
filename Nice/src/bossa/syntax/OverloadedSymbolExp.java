@@ -142,7 +142,7 @@ public class OverloadedSymbolExp extends Expression
 	// the cloned type is stored in the VarSymbol
 	// and we check that cloneType() is not called twice
 	// before the clone type is released
-	s.makeClonedType(argsType);
+	s.makeClonedType(argsType, arguments.getUsedArguments(s));
 	Polytype t = CallExp.wellTyped(s.getClonedType(), argsType);
 
 	if (t == null)
@@ -201,7 +201,7 @@ public class OverloadedSymbolExp extends Expression
     for (Iterator i = symbols.iterator(); i.hasNext();)
       {
 	VarSymbol s = (VarSymbol) i.next();
-	s.makeClonedType(null);
+	s.makeClonedType(null, null);
 	try{
 	  Typing.leq(s.getClonedType(), expectedType);
 	  if(Debug.overloading)

@@ -170,7 +170,14 @@ public final class Dispatch
       }
     
 
-    Domain domain = method.getType().getDomain();
+    mlsub.typing.Polytype type = method.getType();
+    if (type == null)
+      {
+	User.warning(method + " is not in a proper state. Ignoring.");
+	return;
+      }
+    
+    Domain domain = type.getDomain();
     
     List multitags = Typing.enumerate(domain);
 

@@ -1,0 +1,59 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2002                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package nice.tools.util.classStripper;
+
+import org.apache.bcel.*;
+import org.apache.bcel.classfile.*;
+import org.apache.bcel.generic.*;
+
+/**
+   Removes method code from class files.
+
+   @version $Date$
+   @author Daniel Bonniot (bonniot@users.sourceforge.net)
+ */
+
+void main(String[] args)
+{
+  for (int i = 0; i < args.length; i++)
+    stripClass(args[i]);
+}
+
+void stripClass(String name)
+{
+  JavaClass c = notNull(Repository.lookupClass(name));
+  String className = notNull(c.getClassName());
+
+  ConstantPoolGen cp = new ConstantPoolGen(c.getConstantPool());
+
+  ?Method[] methods = notNull(c.getMethods());
+  for (int i = 0; i < methods.length; i++)
+    methods[i] = stripMethod(methods[i], className, cp);
+
+  c.setConstantPool(cp.getFinalConstantPool());
+  c.dump("dest/" + className.replace('.', '/') + ".class");
+}
+
+?Method stripMethod(?Method m, String className, ?ConstantPoolGen cp)
+{
+  MethodGen gen = new MethodGen(m, className, cp);
+  gen.removeCodeAttributes();
+  gen.stripAttributes(true);
+  gen.isAbstract(true);
+  gen.setInstructionList(null);
+  return gen.getMethod();
+}
+
+// Local Variables:
+// nice-xprogram: "nicec -d ../classes --classpath=/usr/share/java/bcel.jar:. -a classStripper.jar"
+// End:

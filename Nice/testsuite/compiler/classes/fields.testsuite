@@ -121,3 +121,8 @@ int f(A a) = a.x++;
   int x = ObjectInputStream.TC_NULL;
   /// Toplevel
   import java.io.*;
+
+/// PASS
+  /// Toplevel
+  import javax.swing.*;
+  let int x = JFrame.EXIT_ON_CLOSE;

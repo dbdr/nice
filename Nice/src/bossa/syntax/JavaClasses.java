@@ -334,7 +334,11 @@ public final class JavaClasses
 	if (md != null)
 	  {
             if (! possibilities.contains(md.getSymbol()))
-	      possibilities.add(md.getSymbol());
+	      {
+	        possibilities.add(md.getSymbol());
+		//don't search in superclasses/interfaces to avoid ambiguities
+		return;
+              }
           }
 	else
 	  if(Debug.javaTypes)

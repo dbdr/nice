@@ -34,6 +34,11 @@ public class FormalParameters
 
     boolean match(String id) { return false; }
 
+    void typecheck(VarScope scope, TypeScope typeScope, 
+		   mlsub.typing.Monotype domain)
+    {
+    }
+
     public String toString()
     {
       return type.toString();
@@ -60,6 +65,22 @@ public class FormalParameters
     { super(type, name); this.defaultValue = defaultValue; }
 
     Expression defaultValue;
+
+    void typecheck(VarScope scope, TypeScope typeScope, 
+		   mlsub.typing.Monotype domain)
+    {
+      defaultValue.buildScope(scope, typeScope);
+      defaultValue = defaultValue.resolveExp();
+      defaultValue = defaultValue.resolveOverloading
+	(new mlsub.typing.Polytype(domain));
+
+      try {
+	mlsub.typing.Typing.leq(defaultValue.getType(), domain);
+      }
+      catch(mlsub.typing.TypingEx e){
+	User.error(name, defaultValue + " is not a value of type " + type);
+      }
+    }
 
     public String toString()
     {
@@ -117,7 +138,14 @@ public class FormalParameters
       res.add(parameters[i].type);
     return res;
   }
-  
+
+  void typecheck(VarScope scope, TypeScope typeScope, 
+		 mlsub.typing.Monotype[] domain)
+  {
+    for (int i = 0; i<size; i++)
+      parameters[i].typecheck(scope, typeScope, domain[i]);
+  }
+    
   /****************************************************************
    * Resolving overloading
    ****************************************************************/

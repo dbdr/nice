@@ -133,13 +133,19 @@ abstract public class MethodDeclaration extends Definition
     mlsub.typing.Polytype type = getType();
     
     if (!mlsub.typing.Constraint.hasBinders(type.getConstraint()))
-      return;
+      {
+	parameters.typecheck(scope, typeScope, getType().domain());
+	return;
+      }
     
     try{
       Typing.enter();
     
       try{
 	type.getConstraint().assert(false);
+
+	parameters.typecheck(scope, typeScope, getType().domain());
+
 	innerTypecheck();
       }
       finally{

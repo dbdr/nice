@@ -10,11 +10,16 @@ o1(a, x, z, t) = a + 2*x + 3*z;
 int o1(int, int x, int y = 10);
 o1(a, x, y) = a + x + y/2;
 
-void oP(int, int b, int c = 3, int d, int e);
-oP(a,b,c,d,e)
+void oP(int, int b, int c = 3, int d, int e, boolean skip = false);
+oP(a,b,c,d,e, skip)
 {
+  if (skip)
+    return;
   println("a=" + a + " b=" + b + " c=" + c + " d=" + d + " e=" + e);
 }
+
+<Any T> void printAny(T what = "Nothing");
+printAny(what) = println(what);
 
 void test_optional();
 test_optional()
@@ -24,5 +29,9 @@ test_optional()
 
   oP(1, 2, 3, 4, 5);
   oP(d:1, b:2, 3, 4, 5);
-  oP(1, 2, b:3, d:3, e:4);
+  oP(1, b:3, d:3, e:4, skip);
+  oP(1, b:3, d:3, e:4, skip:true);
+
+  printAny(3);
+  printAny();
 }

@@ -139,8 +139,7 @@ public class NiceMethod extends MethodDeclaration
   void innerTypecheck()
   {
     // set bytecode types for type variables
-    mlsub.typing.FunType ft = 
-      (mlsub.typing.FunType) getType().getMonotype();
+    mlsub.typing.FunType ft = (mlsub.typing.FunType) getType().getMonotype();
     
     Types.setBytecodeType(ft.domain());
     Types.setBytecodeType(ft.codomain());

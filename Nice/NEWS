@@ -34,6 +34,8 @@ nice (0.9.6)
     printStackTraceWithSourceInfo(e) (defined in nice.lang) instead of 
     e.printStackTrace(), and similarly for versions that specify a stream
     or writer to print into.  
+  * A super call can have types to resolve ambiguities. Example of usage:
+      foo(BarSub b, s) = super(Bar, String);
   * Fixed the file locations in the RPM package, and added automatic
     registration of the emacs mode for the SuSE Linux distribution.
   * Bug fixes (checking of local variables in a call position, make it possible

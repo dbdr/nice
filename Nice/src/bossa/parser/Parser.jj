@@ -207,6 +207,7 @@ TOKEN: /* Keywords */
 | < TRUE:       "true"       	>
 | < FALSE:      "false"      	>
 | < ALIKE:      "alike"      	> /* Nice specific */
+| < UNKNOWN:	"unknown"       > /* Nice specific */
 //| < THIS:       "this"       	>
 | < SUPER:      "super"         >
 | < INSTANCEOF: "instanceof" 	>
@@ -810,7 +811,7 @@ Monotype simpleMonotype():
   }
   { return res; }
 |
-  "?"
+  ("unknown"  | "?")
   { return Monotype.create(mlsub.typing.UnknownMonotype.instance); }
 }
 

@@ -1,3 +1,12 @@
+nice (0.9.4) unstable; urgency=low
+
+  * The compiler now knows that the statement 'assert false' never terminates. 
+    Therefore that statement can be used in a branch that is known to be 
+    unused, without needing to return a dummy value when the method does not
+    return void.
+
+ --
+
 nice (0.9.3) unstable; urgency=low
 
   * Improved type inference by instanceof tests.

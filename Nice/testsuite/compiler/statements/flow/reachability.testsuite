@@ -30,3 +30,14 @@
     break label;
   }
   assert true;
+
+/// FAIL
+  assert false;
+  /*/// FAIL HERE */ ; // Unreachable
+
+/// FAIL
+  `assert`();
+
+/// PASS
+  assert true;
+  ; // Reachable

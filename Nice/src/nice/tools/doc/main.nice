@@ -41,7 +41,7 @@ void main(String[] args)
 	  "path",
 	  String path => { compilation.packagePath = path; }),
    
-   option("outdir",
+   option(letter: 'd', "outdir",
        "Output files to this directory",
        "path",
        String path => {outdir = new File(path); }),

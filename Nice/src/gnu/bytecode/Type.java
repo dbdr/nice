@@ -196,7 +196,6 @@ public abstract class Type {
       }
     type.reflectClass = reflectClass;
     registerTypeForClass(reflectClass, type);
-    type.collectable = true;
     return type;
   }
 

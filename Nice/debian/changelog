@@ -42,6 +42,9 @@ nice (0.9.0) unstable; urgency=low
       name(Green) = "green";
     The compiler knows now that the method "name" is completely covered.
   * Added operator ** to calculate powers of longs, doubles and BigIntegers.
+  * Added implies operator `->` "a -> b" is the same as "!a || b".
+    This is useful in assertions:
+    assert condition -> condition_that_only_needs_to_be_true_when_the_first_is;
   * The 'char' type is no longer a subtype of int. The integer unicode 
     representation of a character c can be obtained by int(c).
   * Interfaces can now implement (finally or not) abstract interfaces.

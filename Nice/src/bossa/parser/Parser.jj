@@ -1797,13 +1797,22 @@ Token AssignmentOperator() :
 Expression ConditionalExpression() :
 { Expression res,e1,e2; Token start; }
 {
-  res=ConditionalOrExpression() 
+  res=ImpliesExpression() 
     [
       "?" e1=Expression() start=":" e2=ConditionalExpression() 
       { e2.setLocation(Location.make(start, getToken(0))); 
         res=new IfExp(res,e1,e2); }
     ]
   { return res; }
+}
+
+Expression ImpliesExpression() :
+{ Expression e1,e2; Token t; }
+{
+  e1=ConditionalOrExpression() 
+    ( t="->" e2=ConditionalOrExpression() 
+      { e1=CallExp.create(symb(t), e1, e2); } )?
+  { return e1; }
 }
 
 Expression ConditionalOrExpression() :

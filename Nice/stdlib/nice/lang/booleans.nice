@@ -8,6 +8,8 @@ boolean `==`(boolean, boolean) = inline nice.lang.inline.BoolOp("==");
 //for booleans is '!=' equal to '^'
 boolean `!=`(boolean, boolean) = inline nice.lang.inline.BoolOp("^");
 
+boolean `->`(boolean a, boolean b) = !a || b;
+
 /**
   Booleans form a boolean algebra.
 */

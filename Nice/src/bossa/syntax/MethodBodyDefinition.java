@@ -61,7 +61,10 @@ public class MethodBodyDefinition extends Definition
     this.body = body;
     this.declaration = null;
 
-    this.insideClass = container != null;
+    this.insideClass = container != null || 
+      this.formals != null &&
+      this.formals.length >= 1 && 
+      String.valueOf(this.formals[0].name).equals("this");
   }
 
   private static Pattern[] makeFormals(List formals, NiceClass container,

@@ -101,3 +101,14 @@ class A {
 
    getX() = x;
 }
+
+/// PASS
+  /// Toplevel
+// Use implicit this in an external implementation of an external method.
+int getX(A);
+
+class A {
+  int x;
+}
+
+getX(this@A) = x;

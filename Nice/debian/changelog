@@ -27,6 +27,7 @@ nice (0.9.1) unstable; urgency=low
     the type is inferable.
       int[] array = [1,2,3,4,5];
       for (elem : array) println(elem);
+  * The compiler now warns about non-existing sourcepath entries.
   * Bugfixes (parameter's default value refering to previous parameters, ...)
 
  -- Daniel Bonniot <bonniot@users.sourceforge.net>  Sat,  9 Aug 2003 23:19:41 +0200

@@ -3,7 +3,8 @@
   <pomVersion>3</pomVersion>
   <name>Swing adapter for Nice</name>
   <id>nice-swing</id>
-  <currentVersion>0.1</currentVersion>
+  <currentVersion>SNAPSHOT</currentVersion>
+  <groupId>nice</groupId>
   <organization>
     <name>The Nice project</name>
     <url>http://nice.sf.net/</url>

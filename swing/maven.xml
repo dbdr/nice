@@ -1,0 +1,20 @@
+<project
+  default="all"
+  xmlns:j="jelly:core"
+  xmlns:u="jelly:util">
+
+  <goal name="all">
+
+    <attainGoal name="jar:install-snapshot" />
+
+<!--
+    <j:set var="maven.jar.override" value="on" />
+    <j:set var="maven.jar.${pom.id}" 
+      value="${maven.build.dir}/${maven.final.name}.jar" />
+-->
+    <j:set var="goal" value="nice" />
+    <attainGoal name="multiproject:goal" />
+
+  </goal>
+
+</project>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="latin1" ?>
+<project>
+  <extend>../project-template.xml</extend>
+  <name>Nice-swing event example</name>
+  <id>nice-swing-event-example</id>
+  <package>examples.events</package>
+
+  <shortDescription>
+    Example programs using the Swing adapter for Nice
+  </shortDescription>
+
+  <description>
+    This project contains four small example programs that use Nice-swing
+    to display a user-interface.
+  </description>
+
+</project>

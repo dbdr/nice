@@ -37,6 +37,11 @@ public class AST extends Node
     findElements();
   }
 
+  public List definitions()
+  {
+    return children;
+  }
+
   private void findElements()
   {
     ArrayList classes = new ArrayList(children.size());

@@ -822,6 +822,11 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     return "package " + name;
   }
   
+  public AST getDefinitions()
+  {
+    return ast;
+  }
+
   public LocatedString name;
   
   /** True if this package was specified on the command line. */

@@ -256,7 +256,7 @@ static void main(String[] args)
 <font color="#0000EE">extends</font> <font color="#B7860B">Collection</font>&lt;T>&nbsp;
 { ... }
 
-<font color="#CD0000">main</font>(args)
+<font color="#CD0000">void main</font>(String[] args)
 {
 &nbsp; <font color="#B7860B">List</font>&lt;<font color="#B7860B">int</font>> <font color="#CD0000">l1</font>;
 &nbsp; <font color="#B7860B">int</font>-><font color="#B7860B">boolean</font> f;
@@ -314,7 +314,7 @@ void main(String[] args)
 <blockquote>
 <pre>&lt;<font color="#B7860B">Any</font> T> T <font color="#CD0000">clone</font>(T);
 
-<font color="#CD0000">main</font>(args)
+<font color="#CD0000">void main</font>(String[] args)
 {
 &nbsp; java.util.Date d1;
 &nbsp; ...
@@ -353,13 +353,13 @@ to add visibility modifiers. This is future work to handle them.</li>
 <ul>
 <li>
 <b>Closures</b> (functions written inside expressions). The expression
-<tt>fun(T1
+<tt>(T1
 p1, T2 p2)=>e</tt> is the two parameters function that returns
 <tt>e</tt>.
 The return type of the function is computed, so you don't have to write
 it. Parameters <tt>p1</tt> and <tt>p2 </tt>can of course occur in <tt>e</tt>.
 Outside variables can also safely occur in e, in which case their <b>reference</b>
-is captured (not their value). An alternate syntax is <tt>fun(T1 p1, T2
+is captured (not their value). An alternate syntax is <tt>(T1 p1, T2
 p2)=>{ inst1; ...; instn; }</tt>. Every execution of the body should lead
 to a return statement. The return type of the function is the lowest common
 type of the returned expressions.</li>
@@ -446,7 +446,10 @@ is a more sophisticated example for the <tt>java.util.Map</tt> interface:
 <p><tt>&lt;Any Key, Any Element> Element get(Map&lt;Key,Element>, Key)
 =</tt>
 <br><tt>&nbsp; native Object java.util.Map.get(Object);</tt>
-<br>&nbsp;
+<br><br>
+Retyping can be more complex in practice but the java.util package is 
+already retyped in the compiler so you don't have to worry about it.
+<br>
 <p>Calling Nice code from Java is also possible.
 When calling a Nice method <tt>m</tt> declared in package
 <tt>my.package</tt>, the call in Java must be

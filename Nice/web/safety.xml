@@ -333,7 +333,7 @@ null if the argument is not a container:
 
 <para>
 <programlisting lang="nice">
-private List&lt;Component> children(Component);
+private ?List&lt;Component> children(Component);
 
 children(c@Component) = null;
 children(c@ContainerComponent) = c.getChildren();
@@ -345,7 +345,7 @@ We can now write our example with only:
 <programlisting lang="nice">
 Component c = ...;
 
-List&lt;Component> children = children(c);
+?List&lt;Component> children = children(c);
 </programlisting>
 </para>
 
@@ -369,7 +369,7 @@ it. Therefore, it is perfectly legal in &nice; to write:
 <programlisting lang="nice">
 Component c = ...;
 
-List&lt;Component> children;
+?List&lt;Component> children;
 if (c instanceof ContainerComponent)
   children = c.getChildren();
 else
@@ -510,7 +510,7 @@ for (int i = 0; i &lt; a.length; i++)
 </programlisting>
 can also be written in &nice;
 <programlisting lang="nice">
-a.iter( fun(int i) => doSomething );
+a.foreach( int i => doSomething );
 </programlisting>
 Using these functions makes the code somewhat clearer by avoiding the
 repetition of the loop code over and over. Moreover, it removes the

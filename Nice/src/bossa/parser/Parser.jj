@@ -2066,9 +2066,17 @@ Expression InstanceOfExpression() :
 { Expression res; }
 {
   res=RelationalExpression()
-  [ { Token t; TypeConstantExp type; }
-    t="instanceof" type=typeExpression()
-    { type.isLiteral = true; return bossa.syntax.dispatch.createCallExp(symb(t), res, type); }
+  [ { Token t; TypeConstantExp type; boolean option = false;}
+    t="instanceof" 
+    [ "?" {option = true;} ]
+    type=typeExpression()
+    { type.isLiteral = true;
+      Expression sym;
+      if (option)
+        sym = symb("optionInstanceof", t, true);
+      else
+        sym = symb(t);
+      return bossa.syntax.dispatch.createCallExp(symb(t), res, type); }
   ]
   { return res; }
 }

@@ -39,4 +39,10 @@ void `throw`(java.lang.Throwable exception) = inline nice.lang.inline.Throw();
            or one of its subclasses.
 */
 <T,U> boolean `instanceof`(T value, Class<U>) =
-  inline nice.lang.inline.Instanceof();
+  inline nice.lang.inline.Instanceof("sure");
+
+/**
+   Tests whether a value is either null or an instance of a given class.
+*/
+<T,U> boolean `optionInstanceof`(?T value, Class<U>) =
+  inline nice.lang.inline.Instanceof("option");

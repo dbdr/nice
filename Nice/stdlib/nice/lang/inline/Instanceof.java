@@ -28,12 +28,23 @@ import gnu.expr.*;
 
 public class Instanceof extends Procedure2 implements Inlineable
 {
+  private final boolean option;
+
   public static Instanceof create(String param)
   {
+    if ("option".equals(param))
+      return optionInstance;
+    
     return instance;
   }
 
-  public final static Instanceof instance = new Instanceof();
+  private Instanceof(boolean option)
+  {
+    this.option = option;
+  }
+
+  public final static Instanceof instance = new Instanceof(false);
+  public final static Instanceof optionInstance = new Instanceof(true);
   
   public void compile (ApplyExp exp, Compilation comp, Target target)
   {
@@ -72,24 +83,55 @@ public class Instanceof extends Procedure2 implements Inlineable
            we know statically that it is an array, we just need to make
            sure it is not null.
         */
-        code.emitIfNull();
-        code.emitPushBoolean(false);
-        code.emitElse();
-        code.emitPushBoolean(true);
-        code.emitFi();
+        if (option)
+          code.emitPushBoolean(true);
+        else
+          {
+            code.emitIfNull();
+            code.emitPushBoolean(false);
+            code.emitElse();
+            code.emitPushBoolean(true);
+            code.emitFi();
+          }
       }
     else
-      code.emitInstanceof(type);
+      {
+        if (option)
+          {
+            code.emitDup();
+            code.emitIfNull();
+            code.emitPop(1);
+            code.emitPushBoolean(true);
+            code.emitElse();
+           }   
+ 
+        code.emitInstanceof(type);
+
+        if (option)
+          code.emitFi();
+      }
   }
 
   private void compile(Expression value, Expression type, Compilation comp)
   {
     gnu.bytecode.CodeAttr code = comp.getCode();
 
+    if (option)
+      {
+        code.emitDup();
+        code.emitIfNull();
+        code.emitPop(1);
+        code.emitPushBoolean(true);
+        code.emitElse();
+      }   
+
     type.compile(comp, Target.pushObject);
     value.compile(comp, Target.pushObject);
     code.emitInvoke
       (ClassType.make("java.lang.Class").getDeclaredMethod("isInstance", 1));
+
+    if (option)
+      code.emitFi();
   }
 
   public Type getReturnType (Expression[] args)

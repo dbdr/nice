@@ -45,3 +45,11 @@
 
 /// PASS
   int[] i = [1,2] || [3,4];
+
+/// PASS
+  ?String x = null;
+  assert x instanceof ?String;
+ 
+/// PASS
+  ?String x = "abc";
+  assert x instanceof ?String;

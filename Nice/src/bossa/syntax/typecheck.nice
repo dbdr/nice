@@ -53,7 +53,6 @@ typecheck(AssignExp e)
     checkAssignment(to.getType(), e.value);
     
     // RFE 681385
-    // To debug in jdb use "stop at bossa.syntax.fun:LINE".
     if( variable != null ){
       let valueType = e.value.type, toType = to.type, varType = variable.type;
       if( valueType != null && toType != null && varType != null ){
@@ -533,6 +532,27 @@ void exitClosure()
   (levels, conditionalTypes) = closureEnvironments.pop();
 }
 
+/**
+ * Collect inference information from branches,
+ * so that it can be propagated outwards.
+ */
+class DeepMemoryRec {
+  MonoSymbol variable;
+  mlsub.typing.Monotype type;
+  toString() = "(" variable "," type ")";
+}
+var Stack<Stack<DeepMemoryRec>> deepMemory = new Stack();
+equals( DeepMemoryRec a, DeepMemoryRec b ) = a.variable == b.variable;
+
+void populateDeepMemory(MonoSymbol variable, mlsub.typing.Monotype type)
+{
+  if(deepMemory.size() == 0) return;
+  let branch = deepMemory.peek();
+  let rec = new DeepMemoryRec(variable: variable, type: type);
+  while( branch.removeElement( rec ) ){}
+  branch.push(rec);
+}
+
 typecheck(IfExp e)
 {
   Expression condition = e.condition;
@@ -545,10 +565,16 @@ typecheck(IfExp e)
 
   enterBlock();
 
+  let Stack<DeepMemoryRec> ifBranchInference = new Stack();
+  let Stack<DeepMemoryRec> elseBranchInference = new Stack();
+  deepMemory.push( elseBranchInference );
+
   try{
     ?List<MonoSymbol> notNullInThen, notNullInElse;
     ?List<(MonoSymbol, mlsub.typing.Monotype)> instanceofInThen; 
     ?List<(MonoSymbol, mlsub.typing.Monotype)> instanceofInElse;
+
+    deepMemory.push( ifBranchInference );
 
     try {
       (notNullInThen, notNullInElse) = nullnessInfo(condition);
@@ -575,6 +601,7 @@ typecheck(IfExp e)
       // Calling this is important for clearning the conditional types stack,
       // which is good when calling the compiler repeatedly from the same JVM.
       enterElse();
+      let got = deepMemory.pop(); assert got == ifBranchInference;
     }
 
     if (notNullInElse != null)
@@ -597,6 +624,7 @@ typecheck(IfExp e)
   }
   finally{
     exitIf();
+    let got = deepMemory.pop(); assert got == elseBranchInference;
   }
 
   if (! e.getType().trySimplify())
@@ -604,6 +632,26 @@ typecheck(IfExp e)
       (e, "The two branches have incompatible types:" +
        "\nthen: " + thenExp.getType() +
        "\nelse: " + elseExp.getType());
+
+  // Check if we can propagate some of the type inference information outwards.
+  if(ifBranchInference.size() != 0 || elseBranchInference.size() != 0)
+    ifPropagation(e, ifBranchInference, elseBranchInference);
+}
+
+void ifPropagation(IfExp e, Stack<DeepMemoryRec> ifBranchInference, Stack<DeepMemoryRec> elseBranchInference){
+  let condition = e.condition;
+  if(! (condition instanceof bossa.syntax.CallExp) || ! condition.isCallTo("==")) return;
+  if(condition.arguments.size() != 2) return;
+  let argle = condition.arguments.get(0); let leNull = argle.value.isNull();
+  let argri = condition.arguments.get(1); let riNull = argri.value.isNull();
+  if((leNull || riNull) && leNull != riNull){
+    if(e.elseExp instanceof bossa.syntax.VoidConstantExp && ifBranchInference.size() != 0){
+      let arg = leNull ? argri.value : argle.value;
+      let variable = localVariable( arg ); if( null == variable ) return;
+      for(rec : ifBranchInference) if(variable == rec.variable)
+        variable.setVarType( rec.type, otherBranch: variable.type, out: variable.type );
+    }
+  }
 }
 
 /**
@@ -621,6 +669,7 @@ private void setVarType(MonoSymbol variable,
 			?mlsub.typing.Monotype overrideOut = null)
 {
   variable.type = now;
+  populateDeepMemory( variable, now );
   if (overrideOut != null)
     {
       overrideOuterType(variable, overrideOut);

@@ -4,14 +4,14 @@ let ()->?String maybeStringGenerator = (int x => ()=> x++ > 10 ? "abc" : null)(0
 void maybeThrow() = throw new Exception();
 boolean maybeTrue() = true;
 
-/// PASS bug
+/// PASS
   ?String s = maybeString();
   if (s == null)
     s = "abc";
 
   s.substring(1);
 
-/// PASS bug
+/// PASS
   // Nullness analysis on assignments. RFE# 681385
   func( null ).append( "123" );
   /// Toplevel

@@ -801,15 +801,15 @@ Monotype simpleMonotype():
 {
   Monotype res;
   List p=null;
-  Token start, end;
+  Token start = null, end;
   boolean maybe = false, sure = false;
 }
 {
   [
     // Consume "?" only if it does not appear by itself
     LOOKAHEAD( "?", { getToken(2).kind != COMMA && getToken(2).kind != GT})
-    "?" { maybe = true; }
-  | "!" { sure = true; }
+    start="?" { maybe = true; }
+  | start="!" { sure = true; }
   ]
 
   (
@@ -830,7 +830,7 @@ Monotype simpleMonotype():
     if ((maybe || sure) &&
         (res.nullness != /*absent*/3))
       throw bossa.util.User.error
-        (res, "Nullness is specified in two ways for " + res);
+        (makeLocation(start), "Nullness is specified in two ways for " + res);
     if (maybe)
       res.nullness = /*maybe*/1;
     else if (sure)

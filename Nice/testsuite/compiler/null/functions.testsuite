@@ -2,10 +2,12 @@
   int?->int f = null;
 
 /// PASS
-  /// COMMENT: Maybe this should not be allowed.
-  ?(int)->int f = null;
+  ?(int->int) f = null;
+
+/// PASS
+  ?int?->int f = null;
+  f = ?int x => 0;
 
 /// FAIL
-  /// COMMENT: Redondant nullness qualifier.
-  ?(int)?->int f;
-
+  // Redundant nullness qualifier.
+  /*/// FAIL HERE */ ?(int?->int) f;

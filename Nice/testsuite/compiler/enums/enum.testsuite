@@ -98,3 +98,17 @@
   assert nickel.value == 5;
   assert dime.value == 10;
   assert quarter.value == 25;
+
+/// PASS
+  /// package a 
+  /// Toplevel
+  enum Coin(int value) implements Bar
+    {penny(1), nickel(5), dime(10), quarter(25)}
+  interface Bar {}
+  int foo(Bar x);
+  foo(Coin x) = x.value;
+  /// package b import a
+  assert penny.value == penny.foo();
+  assert nickel.value == nickel.foo();
+  assert dime.value == dime.foo();
+  assert quarter.value == quarter.foo();

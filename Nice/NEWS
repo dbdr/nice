@@ -1,7 +1,9 @@
 nice (0.9.6)
 
-  * Additional fields can be defined for enums, example:
-      enum Coin(int value) {penny(1), nickel(5), dime(10), quarter(25)}
+  * Additional fields can be defined for enums and enums can implement 
+    interfaces, example:
+      enum Coin(int value) implements Currency
+	{penny(1), nickel(5), dime(10), quarter(25)}
   * Alternative syntax for calling methods that takes an closure with no 
     arguments. For example 'loop(5) { doSomeThing(); }' is shorthand for
     'loop(5, () => { doSomeThing(); });'

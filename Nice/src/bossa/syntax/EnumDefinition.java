@@ -27,14 +27,14 @@ public class EnumDefinition extends Definition
 {
   public EnumDefinition(LocatedString name, List/*LocatedString*/ elements,
 		List/*MonoSymbol*/ fields, List/*List<Expression>*/ argsList,
-		List globalDefs)
+		List globalDefs, List/*TypeIdent*/ interfaces)
   {
     super(name, Node.global);
     shortName = name.toString();
     classDef = ClassDefinition.makeClass
 	(name,true,false, null, new ArrayList(0),
 	new TypeIdent(new LocatedString("nice.lang.Enum",name.location())),
-	null,null);
+	interfaces,null);
     NiceClass impl = new NiceClass(classDef);
     int fieldsCount = fields.size();
     if (fieldsCount > 0)
@@ -72,7 +72,8 @@ public class EnumDefinition extends Definition
     this.elements = elements;
     this.fields = fields;
     this.elementsArgs = argsList;
-    
+    this.interfaces = interfaces;    
+
     symbols = new LinkedList();
     for (int ord = 0; ord<elements.size(); ord++ )
       {
@@ -202,7 +203,11 @@ public class EnumDefinition extends Definition
     if (fields.isEmpty())
       return "enum " + shortName + Util.map(" {", " , ", " }", elements);
 
-    String res = "enum " + shortName + Util.map("(", ", ", ")", fields) + " {";
+    String res = "enum " + shortName + Util.map("(", ", ", ")", fields);
+    if (interfaces != null)
+      res += " implements " + Util.map(""," , ","", interfaces);
+
+    res += " {";
     for (int i = 0; i < elements.size(); i++)
       {
 	if (i != 0)
@@ -220,4 +225,5 @@ public class EnumDefinition extends Definition
   List symbols;
   List fields;
   List elementsArgs;
+  List interfaces;
 }

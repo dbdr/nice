@@ -1195,6 +1195,7 @@ EnumDefinition enumDefinition(List definitions):
   List fields = new LinkedList();
   MonoSymbol field;
   List argsList = new LinkedList();
+  List imp = null;
 }
 {
   "enum" name=ident()
@@ -1202,10 +1203,13 @@ EnumDefinition enumDefinition(List definitions):
     "(" field=monoSymbol() { fields.add(field); }
      ( "," field=monoSymbol() { fields.add(field); } )* ")"
   ]
+  [
+    "implements" imp=interfaces()
+  ]
   "{" enumElement(elements, argsList)
    ( "," enumElement(elements, argsList) )+
   "}"
-  { return new EnumDefinition(name, elements, fields, argsList, definitions); }
+  { return new EnumDefinition(name, elements, fields, argsList, definitions, imp); }
 }
 
 void enumElement(List elements, List argsList):

@@ -12,3 +12,14 @@
   /// Toplevel
   class MyEx extends Exception { int i = 0; }
 
+/// PASS
+  /// package a
+  /// toplevel
+abstract class StatusCodeListener
+{
+  public String statusCode = "1";
+}
+  /// package b import a
+  assert new NicecListener().statusCode.equals("1");
+  /// toplevel
+class NicecListener extends StatusCodeListener {}

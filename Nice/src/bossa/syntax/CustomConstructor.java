@@ -16,6 +16,7 @@ import bossa.util.*;
 import java.util.*;
 import mlsub.typing.*;
 import gnu.expr.*;
+import gnu.bytecode.Type;
 import gnu.bytecode.ClassType;
 import gnu.bytecode.Method;
 import gnu.bytecode.Attribute;
@@ -283,7 +284,8 @@ public abstract class CustomConstructor extends UserOperator
     gnu.expr.Expression getConstructorInvocation(boolean omitDefaults)
     {
       int dummyArgs = method.arg_types.length - arity;
-      return new QuoteExp(new InitializeProc(method, false, dummyArgs));
+      Method calledMethod = omitDefaults ? getMethodUsingDefaults() : method;
+      return new QuoteExp(new InitializeProc(calledMethod, false, dummyArgs));
     }
 
     gnu.expr.Expression getInitializationCode(boolean implicitThis)
@@ -293,5 +295,29 @@ public abstract class CustomConstructor extends UserOperator
     }
 
     private Method method;
+
+    /** 
+       Return the Method for this constructor with the optional parameters
+       left out.
+    */
+    private Method getMethodUsingDefaults()
+    {
+      Type[] fullArgTypes = method.arg_types;
+      List argTypes = new LinkedList();
+
+      for (int i = 0; i < parameters.size; i++)
+        {
+          if (parameters.hasDefaultValue(i))
+            continue;
+
+          argTypes.add(fullArgTypes[i]);
+        }
+
+      Type[] argTypesArray = (Type[]) argTypes.toArray
+        (new Type[argTypes.size()]);
+
+      return method.getDeclaringClass().getDeclaredMethod
+        ("<init>", argTypesArray);
+    }
   }
 }

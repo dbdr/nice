@@ -5,6 +5,13 @@
 # Stop on errors
 set -e
 
+if [ "$1" != "updated" ]; then
+    # We first update the tester code, then start a new copy of this file
+    # (since it might have been updated).
+    cvs update
+    exec "$0" updated
+fi
+
 # Set up variables, that can be overriden in the setup file.
 machine="`hostname -f`"
 system="`uname -a`"
@@ -43,7 +50,7 @@ for conffile in ../config.*; do
     exec 2>&1
     
     if ../Project; then
-	echo "Bootstrap SUCCESS"  > $config.res
+	echo "Bootstrap OK"  > $config.res
     else
 	echo "Bootstrap FAILURE"  > $config.res
     fi
@@ -75,3 +82,9 @@ if [ -r $results_dir ]; then
 else
   scp -p ./*.id ./*.res ./*.log $user@shell.sourceforge.net:$results_dir
 fi
+
+echo ""
+echo "======================"
+echo "End of testing"
+echo "======================"
+echo ""

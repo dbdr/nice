@@ -38,12 +38,12 @@ typecheck(e@AssignExp)
     bossa.util.User.error(e, "" + to + " cannot be assigned a value");
   
   try{
-    e.value = checkAssignment(notNull(to.getType()), notNull(e.value));
+    e.value = checkAssignment(to.getType(), notNull(e.value));
   }
   catch(TypingEx t){
     if (notNullError(t, e, notNull(e.value).toString()))
       throw assignmentError(e, to.toString(), 
-			    notNull(to.getType()).toString(), 
+			    to.getType().toString(), 
 			    notNull(e.value));
   }
 }
@@ -86,7 +86,7 @@ typecheck(e@CallExp)
 
 typecheck(e@FunExp)
 {
-  Function saved = Node.getCurrentFunction();
+  Function saved = notNull(Node.getCurrentFunction());
   Node.setCurrentFunction(e);
   typecheck(e.body);
   Node.setCurrentFunction(saved);
@@ -199,7 +199,7 @@ typecheck(e@IfExp)
     if (! isAlwaysNull)
       // variable is non-null in the 'then' part
       {
-	mlsub.typing.Monotype type = variable.type;
+	mlsub.typing.Monotype type = notNull(variable.type);
 	variable.type = makeSure(type);
 	typecheck(thenExp);
 	// since the type of the variable is destructively changed,
@@ -220,7 +220,7 @@ typecheck(e@IfExp)
     else
       // variable is non-null in the 'else' part
       {
-	mlsub.typing.Monotype type = variable.type;
+	mlsub.typing.Monotype type = notNull(variable.type);
 	typecheck(thenExp);
 
 	variable.type = makeSure(type);
@@ -317,11 +317,11 @@ typecheck(b@Block)
 
 typecheck(decl@Block.LocalVariable)
 {
-  Expression value = decl.value;
+  ?Expression value = decl.value;
   if (value == null)
     return;
 
-  MonoSymbol target = decl.left();
+  MonoSymbol target = notNull(decl.left());
 
   try{
     decl.value = checkAssignment(notNull(target.getType()), value);
@@ -385,7 +385,7 @@ typecheck(r@ReturnStmt)
       typecheck(r.value);
     }
   
-  mlsub.typing.Monotype declaredRetType = notNull(r.includingFunction).getReturnType();
+  ?mlsub.typing.Monotype declaredRetType = notNull(r.includingFunction).getReturnType();
   if (declaredRetType == null)
     return;
   
@@ -418,7 +418,7 @@ typecheck(t@TryStmt)
 */
 Expression checkAssignment(mlsub.typing.Polytype left, Expression right)
 {
-  Expression val = right.resolveOverloading(left);
+  Expression val = notNull(right.resolveOverloading(left));
   typecheck(val);
   Typing.leq(val.getType(), left);
   return val;
@@ -438,8 +438,8 @@ notNullError(ex@MonotypeLeqEx, resp, value)
     An exact report of nullness errors would probably need
     to keep track of the lowlevel exception.
   */
-  TypeConstructor tc1 = notNull(ex.getM1()).head();
-  TypeConstructor tc2 = notNull(ex.getM2()).head();
+  ?TypeConstructor tc1 = notNull(ex.getM1()).head();
+  ?TypeConstructor tc2 = notNull(ex.getM2()).head();
 
   if (tc1 == tc2) return true;
 

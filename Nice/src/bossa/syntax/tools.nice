@@ -26,7 +26,7 @@ identString(e@SymbolExp) = e.getName();
 
 boolean isCallTo(CallExp e, String name) 
 {
-  LocatedString f = identString(e.function);
+  ?LocatedString f = identString(e.function);
   return f != null && f.toString().equals(name);
 }
 
@@ -44,7 +44,7 @@ localVariable(e@SymbolExp)
 }
 
 mlsub.typing.Monotype makeSure(mlsub.typing.Monotype m) = 
-  bossa.syntax.Monotype.sure(nice.tools.code.Types.rawType(m));
+  notNull(bossa.syntax.Monotype.sure(nice.tools.code.Types.rawType(m)));
 
 /****************************************************************
  * Temporary: this should be solved when AST classes are written 
@@ -52,6 +52,8 @@ mlsub.typing.Monotype makeSure(mlsub.typing.Monotype m) =
  ****************************************************************/
 
 LocatedString name(VarSymbol) = native VarSymbol.name;
+mlsub.typing.Polytype getType(Expression) = 
+  native mlsub.typing.Polytype Expression.getType();
 
 // Local Variables:
 // nice-xprogram: "nicec -d \"$HOME/Nice/classes\" --sourcepath=\"$HOME/Nice/src\" --classpath=\"$HOME/Nice/classes\""

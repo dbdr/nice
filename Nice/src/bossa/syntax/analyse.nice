@@ -220,7 +220,7 @@ void setInitialized (Block.LocalVariable.Symbol v, Info info)
 }
 
 Expression analyseAssigned(?Expression, Info);
-analyseAssigned(e, i) = analyse(e, i);
+analyseAssigned(e, i) = notNull(analyse(e, i));
 analyseAssigned(e@IdentExp, info) = analyseIdent(e, info, true);
 analyseAssigned(e@TupleExp, info)
 {
@@ -285,8 +285,8 @@ analyse(e@CallExp, info)
 	    throw notNull(bossa.util.Internal.error
 			  (e.function, "This is not a valid class member"));
 	  
-	  java.util.List possibilities = JavaClasses.findJavaMethods
-	    (e.declaringClass, funName.toString(), args.size());
+	  java.util.List possibilities = notNull(JavaClasses.findJavaMethods
+	    (e.declaringClass, funName.toString(), args.size()));
 
 	  if (possibilities.size() == 0)
 	    throw error(e, "class " + notNull(e.declaringClass).getName() +
@@ -297,10 +297,10 @@ analyse(e@CallExp, info)
 	  return e;
 	}
       
-      PackageExp pkg = args.packageExp();
+      ?PackageExp pkg = args.packageExp();
       if (pkg != null)
 	{
-	  LocatedString nextComponent = identString(e.function);
+	  ?LocatedString nextComponent = identString(e.function);
 
 	  if (nextComponent == null)
 	    throw unknownIdent(notNull(pkg.locatedName()));
@@ -381,7 +381,7 @@ Expression analyseIdent(IdentExp e, Info info, boolean assigned)
     else
       return new OverloadedSymbolExp(symbols.impl, e.ident);
   if (e.enableClassExp)
-    return ClassExp.create(e.ident);
+    return notNull(ClassExp.create(e.ident));
 
   //if (e.infix)
     //return e;

@@ -55,9 +55,19 @@ public abstract class Expression
   }
 
   /**
-   * @return the FieldAccessMethod behind this expression, or null
+   * @return the FieldAccess behind this expression, or null
    */
   FieldAccess getFieldAccessMethod()
+  {
+    return null;
+  }  
+
+  /**
+     @return the FieldAccess if this expression resolves to a field, 
+     which is true if it is the application a of FieldAccess to an object 
+     value. Returns null otherwise.
+   */
+  FieldAccess getField()
   {
     return null;
   }  

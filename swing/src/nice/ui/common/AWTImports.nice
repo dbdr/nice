@@ -1,0 +1,25 @@
+package nice.ui.common;
+
+/**
+ * all imports for this package 
+ * are defined in this file
+ */
+
+//import nice.ui.common;
+import nice.ui.common.types.beans;
+import nice.ui.common.types.awt;
+
+//import nice.ui.beans;
+
+import java.io.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.awt.dnd.*;
+import java.awt.font.*;
+import java.awt.geom.*;
+import java.awt.datatransfer.*;
+import java.awt.image.*;
+import java.beans.*;
+import java.beans.beancontext.*;
+import javax.accessibility.*;
+import java.text.*;

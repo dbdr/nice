@@ -36,4 +36,8 @@ test_tuples()
   (int z, y) = (y,x);
 
   println("x,y,z = " + x + y + z);
+
+  // create a tuple without using it
+  // This is not parsed correctly now, but do we care?
+  //(1, 2, 3);
 }

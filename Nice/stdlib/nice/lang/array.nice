@@ -90,12 +90,12 @@ double set(double[], int, double)  = inline nice.lang.inline.ArraySetOp("d");
 
 <C,T,U> map(a@Array, func) = fill(new U[a.length], int i => func(a[i]));
 
-<C,T> filter(a@Array, test)
+<C,T,U> filter(a@Array, test)
 {
   int l = a.length;
   int found = 0;
 
-  T[] res = cast(new T[l]);
+  U[] res = cast(new U[l]);
 
   a.foreach(T elem =>
 	{ if(test(elem)) res.set(found++, elem); } );
@@ -109,13 +109,14 @@ double set(double[], int, double)  = inline nice.lang.inline.ArraySetOp("d");
     f(a[i]);
 }
 */
-<T> ?T search(!T[] a, (!T)->boolean test)
+/*<T> ?T search(!T[] a, (!T)->boolean test)
 {
   for (int i = 0; i < a.length; i++)
     if (test(a[i]))
       return a[i];
   return null;
 }
+*/
 
 /**
    Fills a newly created array with non-null values.
@@ -168,5 +169,5 @@ double set(double[], int, double)  = inline nice.lang.inline.ArraySetOp("d");
   return res;
 }
 
-<T, T1, T2 | T1 <: T, T2 <: T>  T[] `+`(T1[] a1, T2[] a2) = concat(a1,a2);
+override <T, T1, T2 | T1 <: T, T2 <: T>  T[] `+`(T1[] a1, T2[] a2) = concat(a1,a2);
 

@@ -69,18 +69,14 @@ public class ConstructorExp extends LambdaExp
       args[itype++] = var.getType().getImplementationType();
 
     // Make sure the signature is unique
-    if (! primary)
+    while (ctype.getDeclaredMethod("<init>", args) != null)
       {
-        do
-          {
-            Type[] newArgs = new Type[args.length + 1];
-            System.arraycopy(args, 0, newArgs, 0, args.length);
-            newArgs[args.length] = Type.int_type;
-            args = newArgs;
-            dummyArgs++;
-            addDeclaration("dummy");
-          }
-        while (ctype.getDeclaredMethod("<init>", args) != null);
+        Type[] newArgs = new Type[args.length + 1];
+        System.arraycopy(args, 0, newArgs, 0, args.length);
+        newArgs[args.length] = Type.int_type;
+        args = newArgs;
+        dummyArgs++;
+        addDeclaration("dummy");
       }
 
     Method method = ctype.addMethod

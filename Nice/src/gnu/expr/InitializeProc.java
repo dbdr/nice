@@ -89,11 +89,10 @@ public class InitializeProc extends ProcedureN implements Inlineable
       args[arg].compile(comp, types[type++]);
 
     // Add dummy arguments to match the bytecode constructor.
-    if (method !=null)
-      dummyArgs = method.dummyArgs;
     if (method != null)
-      for (int i = 0; i < dummyArgs; i++)
-        code.emitPushInt(0);
+      dummyArgs = method.dummyArgs;
+    for (int i = 0; i < dummyArgs; i++)
+      code.emitPushInt(0);
 
     code.emitInvokeSpecial(constructor);
   }
@@ -101,6 +100,18 @@ public class InitializeProc extends ProcedureN implements Inlineable
   public Type getReturnType (Expression[] args)
   {
     return Type.void_type;
+  }
+
+  public String toString()
+  {
+    String res;
+    if (constructor != null)
+      res = constructor.toString();
+    else if (method != null)
+      res = method.toString();
+    else
+      res = "?";
+    return "Initialization: " + res;
   }
 
   /****************************************************************

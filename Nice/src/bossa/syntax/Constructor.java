@@ -34,7 +34,8 @@ import gnu.expr.Expression;
 
 class Constructor extends MethodDeclaration
 {
-  Constructor(NiceClass classe, NiceClass.Field[] fields, int index,
+  Constructor(NiceClass classe, NiceClass.Field[] fields, 
+              MethodDeclaration parent,
 	      Location location, 
 	      FormalParameters formals,
 	      Constraint cst,
@@ -46,7 +47,7 @@ class Constructor extends MethodDeclaration
 
     this.classe = classe;
     this.fields = fields;
-    this.index = index;
+    this.parent = parent;
 
     mlsub.typing.Polytype type = new mlsub.typing.Polytype
       (getType().getConstraint(), 
@@ -63,7 +64,7 @@ class Constructor extends MethodDeclaration
 
   private NiceClass classe;
   private NiceClass.Field[] fields;
-  private int index;
+  private MethodDeclaration parent;
 
   Expression getConstructorInvocation(boolean omitDefaults)
   {
@@ -128,22 +129,7 @@ class Constructor extends MethodDeclaration
     MonoSymbol[] argsArray = (MonoSymbol[]) args.toArray(new MonoSymbol[args.size()]);
 
     if (classe.definition.inInterfaceFile())
-      {
-        Method m = classe.getClassExp().getClassType().getDeclaredMethod
-          ("<init>", argTypesArray);
-
-        if (omitDefaults)
-          {
-            initializeOmitDefaults = new QuoteExp(new InitializeProc(m));
-          }
-        else
-          {
-            initialize = new QuoteExp(new InitializeProc(m));
-            initializeFromConstructor = new QuoteExp(new InitializeProc(m, true));
-            instantiate = new QuoteExp(new InstantiateProc(m));
-          }
-        return;
-      }
+      throw new Error("Constructors are loaded from the compiled package");
 
     ConstructorExp lambda = Gen.createConstructor
       (thisDecl, argTypesArray, argsArray);
@@ -151,6 +137,8 @@ class Constructor extends MethodDeclaration
 
     Gen.setMethodBody(lambda, body(thisExp, fullArgs, omitDefaults));
     classe.getClassExp().addMethod(lambda);
+    if (! omitDefaults)
+      lambda.addBytecodeAttribute(parameters.asBytecodeAttribute());
 
     if (omitDefaults)
       {
@@ -164,6 +152,11 @@ class Constructor extends MethodDeclaration
       }
   }
 
+  private static gnu.expr.Expression objectConstructor =
+    new gnu.expr.QuoteExp
+    (new gnu.expr.InitializeProc
+     (gnu.bytecode.Type.pointer_type.getDeclaredMethod("<init>", 0)));
+
   private Expression callSuper(Expression thisExp, MonoSymbol[] args,
                                boolean omitDefaults)
   {
@@ -176,7 +169,9 @@ class Constructor extends MethodDeclaration
           superArgs.add(args[i].compile());
       }
 
-    Expression superExp = classe.getSuper(index, omitDefaults);
+    // A null parent means no parent class: call the Object constructor.
+    Expression superExp = parent == null ? 
+      objectConstructor : parent.getConstructorInvocation(omitDefaults);
     return new ApplyExp(superExp, (Expression[])
                         superArgs.toArray(new Expression[superArgs.size()]));
   }

@@ -107,14 +107,15 @@ public class AST extends Node
   {
     Node.setModule(module);
 
-    // Classes are resolved first, since code can depend on them
-    for(int i = 0; i < classes.length; i++)
-      resolve(classes[i]);
-
-    // Custom constructors depend classes, and code can depend on them
+    // Resolve custom constructors early, classes depend on them
     for(int i = 0; i < customConstructors.length; i++)
       resolve(customConstructors[i]);
 
+    // Classes are then resolved, since code can depend on them
+    for(int i = 0; i < classes.length; i++)
+      resolve(classes[i]);
+
+    // Resolve all the rest
     for(Iterator i = children.iterator();i.hasNext();)
       {
 	Node n = (Node) i.next();

@@ -18,6 +18,8 @@ import gnu.bytecode.*;
 
 import nice.tools.code.Types;
 import nice.tools.code.TypeImport;
+import gnu.expr.QuoteExp;
+import gnu.expr.InitializeProc;
 
 import java.util.*;
 
@@ -237,6 +239,11 @@ public class RetypedJavaMethod extends JavaMethod
     ignoredRetyping = true;
   }
  
+  gnu.expr.Expression getConstructorInvocation(boolean omitDefaults)
+  {
+    return new QuoteExp(new InitializeProc(reflectMethod));
+  }
+
   /****************************************************************
    * Module interface
    ****************************************************************/

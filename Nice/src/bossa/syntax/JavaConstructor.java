@@ -38,4 +38,9 @@ class JavaConstructor extends JavaMethod
   {
     return new QuoteExp(new InstantiateProc(reflectMethod));
   }
+
+  gnu.expr.Expression getConstructorInvocation(boolean omitDefaults)
+  {
+    return new QuoteExp(new InitializeProc(reflectMethod));
+  }
 }

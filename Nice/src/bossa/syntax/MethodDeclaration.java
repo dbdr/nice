@@ -57,6 +57,9 @@ public abstract class MethodDeclaration extends Definition
     this.parameters = parameters;
     addChild(parameters);
     
+    if (constraint == null)
+      constraint = bossa.syntax.Constraint.True;
+
     // remember it to print the interface
     syntacticConstraint = constraint.toString();
     
@@ -398,6 +401,14 @@ public abstract class MethodDeclaration extends Definition
   {
     // Default implementation.
     return getCodeInCallPosition();
+  }
+  
+  /** Call to the constructor. This should be overriden by methods
+      that really give access to a constructor.
+  */
+  gnu.expr.Expression getConstructorInvocation(boolean omitDefaults)
+  {
+    throw new Error("Constructor for " + this + " (" + this.getClass() + ")");
   }
   
   final gnu.expr.Expression getCodeInCallPosition() 

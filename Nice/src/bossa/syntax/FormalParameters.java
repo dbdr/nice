@@ -37,6 +37,11 @@ public class FormalParameters extends Node
 
     Monotype type;
 
+    Parameter cloneParam()
+    {
+      return new Parameter(type);
+    }
+
     boolean match(String id) { return false; }
     boolean requiresName() { return false; }
 
@@ -158,6 +163,13 @@ public class FormalParameters extends Node
     boolean nameRequired = false;
     boolean requiresName() { return nameRequired; }
 
+    Parameter cloneParam()
+    {
+      NamedParameter res = new NamedParameter(type, name);
+      res.nameRequired = this.nameRequired;
+      return res;
+    }
+
     boolean match(String id) { return name.toString().equals(id); }
 
     public String toString()
@@ -207,6 +219,11 @@ public class FormalParameters extends Node
     boolean overriden;
 
     boolean isOverriden() { return overriden; }
+
+    Parameter cloneParam()
+    {
+      return new OptionalParameter(type, name, nameRequired, defaultValue, overriden);
+    }
 
     void resolve()
     {
@@ -524,6 +541,18 @@ public class FormalParameters extends Node
           }
       }
 
+    return res;
+  }
+
+  List getParameters(TypeScope scope)
+  {
+    ArrayList res = new ArrayList(size);
+    for (int i = 0; i < size; i++)
+      {
+        Parameter p = parameters[i].cloneParam();
+        p.type = Monotype.create(p.type.resolve(scope));
+        res.add(p);
+      }
     return res;
   }
 

@@ -164,9 +164,9 @@ public class NiceClass extends ClassDefinition.ClassImplementation
       value = dispatch.analyse(value, scope, typeScope);
     }
 
-    FormalParameters.Parameter asParameter(TypeMap map)
+    FormalParameters.Parameter asParameter()
     {
-      Monotype type = Monotype.create(sym.syntacticType.resolve(map));
+      Monotype type = sym.syntacticType;
       if (value == null)
 	return new FormalParameters.NamedParameter(type, sym.getName(), true);
       else
@@ -311,22 +311,24 @@ public class NiceClass extends ClassDefinition.ClassImplementation
        Update the type and default values for the constructor, according
        to this overriding.
     */
-    void updateConstructorParameter
-      (FormalParameters.Parameter[] inherited, int nb, TypeScope scope)
+    void updateConstructorParameter(List inherited)
     {
       String name = sym.getName().toString();
-      Monotype type = Monotype.create(sym.syntacticType.resolve(scope));
+      Monotype type = sym.syntacticType;
 
-      for (int i = 0; i < nb; i++)
-        if (inherited[i].match(name))
+      for (int i = 1; i < inherited.size(); i++) {
+        FormalParameters.Parameter param = (FormalParameters.Parameter)
+          inherited.get(i);
+        if (param.match(name))
           {
             if (value != null)
-              inherited[i] = new FormalParameters.OptionalParameter
-                (type, sym.getName(), true, value, 
-                 inherited[i].value() == null || inherited[i].isOverriden());
+              inherited.set(i, new FormalParameters.OptionalParameter
+                            (type, sym.getName(), true, value, 
+                             param.value() == null || param.isOverriden()));
             else
-              inherited[i].resetType(type);
+              param.resetType(type);
           }
+      }
     }
 
     void typecheck()
@@ -401,7 +403,7 @@ public class NiceClass extends ClassDefinition.ClassImplementation
     definition.setJavaType(classe.getType());
     resolveFields();
     resolveIntitializers();
-    createConstructor();
+    createDefaultConstructors();
     addPublicCloneMethod();
   }
 
@@ -633,38 +635,6 @@ public class NiceClass extends ClassDefinition.ClassImplementation
   }
 
   /**
-     Collect in 'constraints' the constraints set by each class
-     on the type parameters.
-  */
-  private static FormalParameters.Parameter[][] getFieldsAsParameters
-    (TypeConstructor tc, int nbFields, List constraints, 
-     TypeSymbol[] binders)
-  {
-    ClassDefinition sup = ClassDefinition.get(tc);
-    if (sup != null && sup.implementation instanceof NiceClass)
-      return ((NiceClass) sup.implementation).
-	getFieldsAsParameters(nbFields, constraints, binders);
-
-    List constructors = TypeConstructors.getConstructors(tc);
-    if (constructors == null)
-      return new FormalParameters.Parameter[][]
-        { new FormalParameters.Parameter[nbFields] };
-
-    FormalParameters.Parameter[][] res = 
-      new FormalParameters.Parameter[constructors.size()][];
-    int n = 0;
-    for (Iterator i = constructors.iterator(); i.hasNext(); n++)
-      {
-	MethodDeclaration.Symbol m = (MethodDeclaration.Symbol) i.next();
-	res[n] = new FormalParameters.Parameter[nbFields + m.arity];
-	mlsub.typing.Monotype[] args = m.getMethodDeclaration().getArgTypes();
-	for (int j = 0; j < args.length; j++)
-	  res[n][j] = new FormalParameters.Parameter(Monotype.create(args[j]));
-      }
-    return res;
-  }
-
-  /**
       @return the scope that maps the type parameters of the other class
         to the corresponding symbol in the constructor of this class.
   */
@@ -685,25 +655,50 @@ public class NiceClass extends ClassDefinition.ClassImplementation
     return scope;
   }
 
-  private FormalParameters.Parameter[][] getFieldsAsParameters
-    (int nbFields, List constraints, TypeSymbol[] binders)
+  /**
+     Collect in 'constraints' the constraints set by each class
+     on the type parameters.
+  */
+  private static List getNativeConstructorParameters
+    (TypeConstructor tc, List constraints, TypeSymbol[] binders)
   {
-    nbFields += this.fields.length;
-    FormalParameters.Parameter[][] res = getFieldsAsParameters
-      (definition.getSuperClass(), nbFields, constraints, binders);
+    List constructors = TypeConstructors.getConstructors(tc);
+    if (constructors == null)
+      {
+        List res = new ArrayList(10);
+        List params = new ArrayList(10);
+        // null stands for the Object() constructor
+        params.add(null);
+        res.add(params);
+        return res;
+      }
 
-    if (fields.length == 0 && overrides.length == 0 && 
-        definition.classConstraint == null)
-      return res;
+    List res = new ArrayList(constructors.size());
+    int n = 0;
+    for (Iterator i = constructors.iterator(); i.hasNext(); n++)
+      {
+	MethodDeclaration.Symbol m = (MethodDeclaration.Symbol) i.next();
+	List params = new ArrayList(10);
+        params.add(m.getMethodDeclaration());
+        res.add(params);
+	mlsub.typing.Monotype[] args = m.getMethodDeclaration().getArgTypes();
+	for (int j = 0; j < args.length; j++)
+	  params.add(new FormalParameters.Parameter(Monotype.create(args[j])));
+      }
+    return res;
+  }
 
+  private List getParentConstructorParameters
+    (List constraints, TypeSymbol[] binders)
+  {
     TypeScope scope = Node.getGlobalTypeScope();
     Map map = null;
     if (binders != null)
       {
-	// Constructs a type scope that maps the type parameters of this
-	// class to the corresponding symbol in the constructor.
+        // Constructs a type scope that maps the type parameters of this
+        // class to the corresponding symbol in the constructor.
 	scope = new TypeScope(scope);
-	map = new HashMap();
+        map = new HashMap();
         TypeSymbol[] ourBinders = definition.getBinders();
 	for (int i = 0; i < binders.length; i++)
 	  try {
@@ -712,11 +707,18 @@ public class NiceClass extends ClassDefinition.ClassImplementation
 	  } catch(TypeScope.DuplicateName e) {}
       }
 
-    updateConstructorParameters(res[0], res[0].length - nbFields, scope);
+    ArrayList res = new ArrayList(constructors.size());
+    for (Iterator i = constructors.iterator(); i.hasNext();)
+      {
+        MethodDeclaration decl = ((MethodDeclaration.Symbol) i.next()).
+          getMethodDeclaration();
 
-    for (int j = 0; j < res.length; j++)
-      for (int i = fields.length, n = res[j].length - nbFields + i; --i >= 0;)
-	res[j][--n] = fields[i].asParameter(scope);
+        List params = new ArrayList(1 + decl.arity);
+        params.add(decl);
+        if (decl.arity > 0)
+          params.addAll(decl.formalParameters().getParameters(scope));
+        res.add(params);
+      }
 
     if (definition.classConstraint != null)
       {
@@ -731,15 +733,43 @@ public class NiceClass extends ClassDefinition.ClassImplementation
     return res;
   }
 
+  private List getConstructorParameters(List constraints, TypeSymbol[] binders)
+  {
+    TypeConstructor supTC = definition.getSuperClass();
+
+    NiceClass sup = get(supTC);
+    List res;
+    if (sup == null)
+      res = getNativeConstructorParameters(supTC, constraints, binders);
+    else
+      res = sup.getParentConstructorParameters(constraints, binders);
+
+    if (overrides.length > 0)
+      for (Iterator i = res.iterator(); i.hasNext();)
+        updateConstructorParameters((List) i.next());
+
+    if (fields.length > 0)
+      for (int j = 0; j < res.size(); j++)
+        {
+          List params = (List) res.get(j);
+          for (int i = 0; i < fields.length; i++)
+            params.add(fields[i].asParameter());
+        }
+
+    if (definition.resolvedConstraints != null)
+      constraints.addAll(Arrays.asList(definition.resolvedConstraints));
+
+    return res;
+  }
+
   /**
      This must be done in a given class for every subclass, since they
      have different type parameters.
   */
-  private void updateConstructorParameters
-    (FormalParameters.Parameter[] inherited, int nb, TypeScope scope)
+  private void updateConstructorParameters(List inherited)
   {
     for (int f = 0; f < overrides.length; f++)
-      overrides[f].updateConstructorParameter(inherited, nb, scope);
+      overrides[f].updateConstructorParameter(inherited);
   }
 
   /**
@@ -760,8 +790,12 @@ public class NiceClass extends ClassDefinition.ClassImplementation
 
   private Constructor[] constructorMethod;
 
-  private void createConstructor()
+  private void createDefaultConstructors()
   {
+    if (definition.inInterfaceFile())
+      // The constructors are loaded from the compiled package.
+      return;
+
     if (definition instanceof ClassDefinition.Interface)
       return;
 
@@ -772,10 +806,7 @@ public class NiceClass extends ClassDefinition.ClassImplementation
     else 
       constraints = new LinkedList();
 
-    FormalParameters.Parameter[][] params = 
-      getFieldsAsParameters(0, constraints, binders);
-
-    checkFields(params[0]);
+    List allConstructorParams = getConstructorParameters(constraints, binders);
 
     Constraint cst;
     if (binders != null)
@@ -785,43 +816,30 @@ public class NiceClass extends ClassDefinition.ClassImplementation
     else
       cst = Constraint.True;
 
-    constructorMethod = new Constructor[params.length];
-    for (int i = 0; i < params.length; i++)
+    constructorMethod = new Constructor[allConstructorParams.size()];
+    for (int i = 0; i < allConstructorParams.size(); i++)
       {
-	FormalParameters values = new FormalParameters(params[i]);
+        List argList = (List) allConstructorParams.get(i);
+        MethodDeclaration parent = (MethodDeclaration) argList.get(0);
+        argList = argList.subList(1, argList.size());
+        FormalParameters.Parameter[] args = (FormalParameters.Parameter[])
+          argList.toArray(new FormalParameters.Parameter[argList.size()]);
+
+        // Check only once.
+        if (i == 0)
+          checkFields(args);
+
+	FormalParameters values = new FormalParameters(args);
 
 	constructorMethod[i] = new Constructor
-	  (this, fields, i, definition.location(),
+	  (this, fields, parent, definition.location(),
 	   values, 
 	   cst,
-	   Monotype.resolve(definition.typeScope, values.types()),
+	   Monotype.resolve(definition.getLocalScope(), values.types()),
 	   Monotype.sure(new MonotypeConstructor(definition.tc, definition.getTypeParameters())));
 
 	TypeConstructors.addConstructor(definition.tc, constructorMethod[i]);
       }
-  }
-
-  private static gnu.expr.Expression objectConstructor =
-    new gnu.expr.QuoteExp
-    (new gnu.expr.InitializeProc
-     (gnu.bytecode.Type.pointer_type.getDeclaredMethod("<init>", 0)));
-
-  gnu.expr.Expression getSuper(int index, boolean omitDefaults)
-  {
-    TypeConstructor tc = definition.getSuperClass();
-    
-    if (tc == null)
-      return objectConstructor;
-
-    ClassDefinition sup = ClassDefinition.get(tc);
-    if (sup != null && sup.implementation instanceof NiceClass)
-      return ((NiceClass) sup.implementation).
-	constructorMethod[index].getConstructorInvocation(omitDefaults);
-
-    List constructors = TypeConstructors.getConstructors(tc);
-    JavaMethod m = (JavaMethod)
-      ((MethodDeclaration.Symbol) constructors.get(index)).getDefinition();
-    return m.getConstructorInvocation();
   }
 
   public void precompile()

@@ -69,6 +69,7 @@ public class Assert extends ProcedureN implements Inlineable
     code.emitNew(errorClass);
     code.emitDup();
     
+    prepare();
     if (args.length == 1)
       {
 	code.emitInvokeSpecial(errorInit);
@@ -88,11 +89,18 @@ public class Assert extends ProcedureN implements Inlineable
   private static final ClassType 
     errorClass = ClassType.make("nice.lang.AssertionFailed");
 
-  private static final Method 
+  private static Method errorInit, errorInitString;
+
+  private static void prepare()
+  {
+    if (errorInit != null)
+      return;
+
     errorInit = errorClass.addMethod
-      ("<init>", Access.PUBLIC, new Type[]{}, Type.void_type),
+      ("<init>", Access.PUBLIC, new Type[]{}, Type.void_type);
     errorInitString = errorClass.addMethod
       ("<init>", Access.PUBLIC, new Type[]{Type.string_type}, Type.void_type);
+  }
 
   public Type getReturnType (Expression[] args)
   {

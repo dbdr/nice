@@ -101,11 +101,6 @@ public class JavaMethod extends MethodDeclaration
     return nice.tools.code.Gen.wrapInLambda(new PrimProcedure(reflectMethod));
   }
   
-  gnu.expr.Expression getConstructorInvocation()
-  {
-    return new QuoteExp(new InitializeProc(reflectMethod));
-  }
-
   /****************************************************************
    * Module interface
    ****************************************************************/

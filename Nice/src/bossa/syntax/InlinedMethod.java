@@ -64,10 +64,11 @@ public class InlinedMethod extends MethodDeclaration
     }
 
     Method m = null;
-    Object[] params = new Object[]{ parameter };
 
     try{
       m = refClass.getMethod("create", string1);
+      if (! Modifier.isStatic(m.getModifiers()))
+	throw new NoSuchMethodException();
     }
     catch(NoSuchMethodException e){
       User.error(inlineProcedure,
@@ -77,7 +78,7 @@ public class InlinedMethod extends MethodDeclaration
 
     Object o = null;
     try{
-      o = m.invoke(null, params);
+      o = m.invoke(null, new Object[]{ parameter });
     }
     catch(InvocationTargetException e){
       User.error(inlineProcedure,

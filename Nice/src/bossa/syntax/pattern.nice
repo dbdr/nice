@@ -243,9 +243,8 @@ public class EnumPattern extends ReferencePattern
 {
   addValues(values)
   {
-    let EnumDefinition.EnumSymbol esym = cast(atValue.value);
-    let EnumDefinition edef = cast(esym.getDefinition());
-    for (sym : edef.symbols)
+    let EnumSymbol esym = cast(atValue.value);
+    for (sym : esym.getDefinition().symbols)
       values.add(new ConstantExp(null, tc, sym, sym.name.toString(), this.location));
   }
 
@@ -467,7 +466,7 @@ private ?VarSymbol findRefSymbol(LocatedString refName)
 {
   for (sym : Node.getGlobalScope().lookup(refName))
     if (sym instanceof GlobalVarSymbol ||
-	sym instanceof EnumDefinition.EnumSymbol )
+	sym instanceof EnumSymbol )
       return sym;
 
   return null;
@@ -506,7 +505,7 @@ resolveGlobalConstants(VariablePattern pattern)
   if (symbol == null)
     return pattern;
 
-  if (symbol instanceof EnumDefinition.EnumSymbol)
+  if (symbol instanceof EnumSymbol)
     {
       NewExp val = cast(symbol.getValue());
       return new EnumPattern(pattern.name, val.tc, pattern.location, atValue:

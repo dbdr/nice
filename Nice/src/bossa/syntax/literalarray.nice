@@ -19,10 +19,8 @@ import bossa.util.*;
 
    The array type is infered as the minimal possible type.
 */
-
 public class LiteralArrayExp extends Expression
 {
-
   Expression[] elements;
 
   private boolean wrapAsCollection = false;

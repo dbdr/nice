@@ -198,7 +198,6 @@ Map<VarSymbol,mlsub.typing.Polytype> types(Arguments) = native Arguments.types;
 <T> String map(String, String, String, Collection<T>) = native String bossa.util.Util.map(String, String, String, Collection);
 Stack<bossa.link.Alternative> sortedAlternatives(MethodDeclaration) = native Stack bossa.link.Alternative.sortedAlternatives(MethodDeclaration);
 LinkedList<VarSymbol> getConstructors(mlsub.typing.TypeConstructor) = native LinkedList TypeConstructors.getConstructors(mlsub.typing.TypeConstructor);
-List<VarSymbol> symbols(EnumDefinition) = native EnumDefinition.symbols;
 void addValues(Pattern, List<ConstantExp>) = native void Pattern.addValues(List);
 ?mlsub.typing.TypeConstructor getRuntimeTC(Pattern) = native mlsub.typing.TypeConstructor Pattern.getRuntimeTC();
 boolean matchesValue(Pattern, ConstantExp) = native boolean Pattern.matchesValue(ConstantExp);
@@ -237,6 +236,8 @@ void printInterface(Definition, java.io.PrintWriter) = native void Definition.pr
 ?gnu.expr.Declaration getDeclaration(VarSymbol) = native gnu.expr.Declaration VarSymbol.getDeclaration();
 void printInterface(ClassImplementation, java.io.PrintWriter) = native void ClassImplementation.printInterface(java.io.PrintWriter);
 ?gnu.bytecode.Type TypeImport_lookup(LocatedString) = native gnu.bytecode.Type nice.tools.code.TypeImport.lookup(LocatedString);
+ClassDefinition.Class ClassDefinition_makeClass(LocatedString, boolean, boolean, ?MethodContainer.Constraint, List<?boolean>, MonotypeConstructor, ?List<TypeIdent>, ?List<TypeIdent>) = native ClassDefinition.Class ClassDefinition.makeClass(LocatedString, boolean, boolean, MethodContainer.Constraint, List, MonotypeConstructor, List, List);
+MethodBodyDefinition MethodBodyDefinition(NiceClass, LocatedString, ?Collection<LocatedString>, List<Pattern>, Statement) = native new MethodBodyDefinition(NiceClass, LocatedString, Collection, List, Statement);
 
 // Retypings needed since java types are not strict.
 mlsub.typing.Polytype boolPolytype() = native PrimitiveType.boolPolytype;

@@ -82,6 +82,16 @@ public abstract class Definition extends Node implements bossa.util.Located
     return false;
   }
 
+  boolean isEnumDefinition()
+  {
+    return false;
+  }
+  
+  ClassDefinition getEnumClass()
+  {
+    return null;
+  }
+
   /****************************************************************
    * Name and location of the definition
    ****************************************************************/

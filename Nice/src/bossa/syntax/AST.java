@@ -64,8 +64,8 @@ public class AST extends Node
           methods.add(node);
         else if (node instanceof MethodBodyDefinition)
           methodImplementations.add(node);
-        else if (node instanceof EnumDefinition)
-          classes.add(((EnumDefinition)node).classDef);
+        else if (node.isEnumDefinition())
+          classes.add(node.getEnumClass());
         else if (node.isGlobalVarDeclaration())
           globals.add(node);
         else if (node instanceof DefaultMethodImplementation)

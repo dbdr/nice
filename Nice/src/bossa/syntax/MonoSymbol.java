@@ -155,6 +155,9 @@ public class MonoSymbol extends VarSymbol
 
   public String toString()
   {
+    if (type == null)
+      return syntacticType+" "+name;
+
     return type+" "+name;
   }
 

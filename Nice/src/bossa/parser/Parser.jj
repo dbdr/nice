@@ -1237,7 +1237,7 @@ EnumDefinition enumDefinition(List definitions):
   "{" enumElement(elements, argsList)
    ( "," enumElement(elements, argsList) )+
   "}"
-  { return new EnumDefinition(name, elements, fields, argsList, definitions, imp); }
+  { return bossa.syntax.dispatch.createEnumDefinition(name, elements, fields, argsList, definitions, imp); }
 }
 
 void enumElement(List elements, List argsList):

@@ -1,0 +1,193 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2004                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package bossa.syntax;
+
+import bossa.util.*;
+
+/**
+  Definition of an enum
+*/
+public class EnumDefinition extends Definition
+{
+  ClassDefinition classDef;
+  List<EnumSymbol> symbols;
+  String representation;
+
+  {
+    this.addChild(classDef);
+  }
+
+  void addElement(EnumSymbol sym)
+  {
+    symbols.add(sym);
+    bossa.util.Debug.println("adding: "+sym);
+    this.addChild(sym);
+  }
+
+  isEnumDefinition() = true;
+  getEnumClass() = classDef;
+
+  resolve()
+  {
+    for (symbol : symbols)
+      symbol.resolveValue(notNull(scope), notNull(typeScope));
+  }
+  
+  typecheck()
+  {
+    for (symbol : symbols)
+      symbol.typecheckValue();
+  }
+
+  printInterface(s)
+  {
+    s.print(representation+"\n");
+  }
+  
+  compile()
+  {
+    for (symbol : symbols)
+      symbol.compileValue();
+  }
+
+  toString() = representation;
+}
+
+public EnumDefinition createEnumDefinition(LocatedString name, List<LocatedString> elements,
+		List<MonoSymbol> fields, List<List<Expression>> argsList,
+		List<Definition> globalDefs, ?List<TypeIdent> interfaces)
+{
+  let shortName = name.toString();
+  let classDef = ClassDefinition.makeClass
+	(name,true,false, null, new ArrayList(),
+	new MonotypeConstructor(new TypeIdent(new LocatedString("nice.lang.Enum",
+		name.location())), null, name.location()), interfaces, null);
+  let impl = createNiceClass(classDef);
+
+  for (fieldsym : fields)
+    impl.addField(fieldsym, null, true, false, false, null);
+
+  classDef.setImplementation(impl);
+
+  if (! notNull(Definition.currentModule).interfaceFile())
+    // create the method implementation of family()
+    globalDefs.add(new MethodBodyDefinition(impl, new LocatedString("family"),
+	null, new LinkedList(), createReturnStmt(createLiteralArrayExp(
+	elements.map(LocatedString elem => new IdentExp(elem))), true)));
+
+  bossa.util.Debug.println("name: "+shortName);
+  //generate the prettyprint string
+  String repr = "enum " + shortName;
+  if (! fields.isEmpty())
+    repr += Util.map("(", ", ", ")", fields);
+  if (interfaces != null)
+    repr += " implements " + Util.map(""," , ","", interfaces);
+  
+  if (fields.isEmpty())
+    repr += Util.map(" {", " , ", " }", elements);  
+  else
+    {  
+      repr += " {";
+      for (int i = 0; i < elements.size(); i++)
+        {
+	  if (i != 0)
+	    repr += ", ";
+
+	  repr += elements[i] + Util.map("(", ", ", ")", argsList[i]);
+        }
+      repr += "}";
+    }
+
+  let res = new EnumDefinition(name, Node.global, classDef: classDef,
+		symbols: new ArrayList(), representation: repr);
+
+  for (int ord = 0; ord<elements.size(); ord++)
+    {
+      if (argsList[ord].size() != fields.size())
+        User.error(elements[ord], "the number of arguments doesn't match the number of enum fields");
+
+      res.addElement(createEnumSymbol(res, name, elements[ord], ord, fields, argsList[ord]));
+    }
+
+  return res;
+}
+
+class EnumSymbol extends MonoSymbol
+{
+  EnumDefinition definition;
+  Expression value;
+     
+  isAssignable() = false;
+
+  getDeclaration()
+  {
+    ?gnu.expr.Declaration res = super;
+    if (res == null)
+      {
+          res = new gnu.expr.Declaration(name.toString(), nice.tools.code.Types.javaType(type));
+          this.setDeclaration(res);
+          definition.module.addGlobalVar(res, true);
+      }
+    
+    return res;
+  }
+
+  void resolveValue(VarScope scope, TypeScope typeScope)
+  {
+    value = analyse(value, scope, typeScope);
+  }
+ 
+  void typecheckValue()
+  {
+     try {
+       value = value.resolveOverloading(this.getType());
+       typecheck(value);
+       mlsub.typing.Typing.leq(value.getType(), this.getType());
+     } catch(TypingEx e) {
+        Internal.error(this,"Typing error in enum:");
+     }
+  }
+
+  void compileValue()
+  {
+    let declaration = this.getDeclaration();
+    notNull(declaration).setFlag(gnu.expr.Declaration.IS_CONSTANT);
+    notNull(declaration).noteValue(value.compile());
+  }
+
+  Expression getValue()
+  {
+    return value;
+  }
+
+  override EnumDefinition getDefinition() = definition;
+}
+
+EnumSymbol createEnumSymbol(EnumDefinition def, LocatedString enumName,
+		LocatedString name, int ordinal, List<MonoSymbol> fields,
+		List<Expression> argExps)
+{
+  Monotype type = new TypeIdent(enumName);
+  type.nullness = Monotype.absent;
+  List<Arguments.Argument> args = new ArrayList(2 + fields.size());
+  args.add(new Arguments.Argument(createStringConstantExp(name.toString()),
+		new LocatedString("name",name.location)));
+  args.add(new Arguments.Argument(new ConstantExp(PrimitiveType.intTC, ordinal,
+		ordinal.toString(), name.location()),
+		new LocatedString("ordinal", name.location)));
+  for (int i = 0; i < fields.size(); i++)
+    args.add(new Arguments.Argument(argExps[i], fields[i].getName()));
+
+  return new EnumSymbol(name, type, definition: def, value: 
+	createNewExp(new TypeIdent(enumName), new Arguments(args)));
+}

@@ -32,9 +32,9 @@ class NPropertyChangeListener implements PropertyChangeListener,MappableProperty
 {
   private PropertyChangeEvent ?-> void propertyChange;
 
-  public PropertyChangeEvent ?-> void getPropertyChange() = this.propertyChange;
-  
+  public PropertyChangeEvent ?-> void getPropertyChange() = this.propertyChange;  
   public void setPropertyChange(PropertyChangeEvent ?-> void value) { this.propertyChange = value; }
+
 
   propertyChange(e)
   {
@@ -44,17 +44,13 @@ class NPropertyChangeListener implements PropertyChangeListener,MappableProperty
 }
 
 
-/** 
- * class that implements the javax.swing.event.VetoableChangeListener interface
- * and delegates the action to an optional anonymous function.
- */
 class NVetoableChangeListener implements VetoableChangeListener,MappableVetoableChangeListener
 {
-  private PropertyChangeEvent ?-> void vetoableChange = null;
+  private PropertyChangeEvent ?-> void vetoableChange;
 
-  public PropertyChangeEvent ?-> void getVetoableChange() = this.vetoableChange;
-  
+  public PropertyChangeEvent ?-> void getVetoableChange() = this.vetoableChange;  
   public void setVetoableChange(PropertyChangeEvent ?-> void value) { this.vetoableChange = value; }
+  
   
   vetoableChange(e)
   {
@@ -64,10 +60,6 @@ class NVetoableChangeListener implements VetoableChangeListener,MappableVetoable
 }
 
 
-/** 
- * class that implements the java.beans.beancontext.BeanContextMembershipListener interface
- * and delegates the actions to optional anonymous functions.
- */
 class NBeanContextMembershipListener implements BeanContextMembershipListener, NiceListener
 {
   private BeanContextMembershipEvent ?-> void childrenAdded = null;
@@ -78,7 +70,8 @@ class NBeanContextMembershipListener implements BeanContextMembershipListener, N
 
   public void setChildrenAdded(BeanContextMembershipEvent ?-> void value) { this.childrenAdded = value; }
   public void setChildrenRemoved(BeanContextMembershipEvent ?-> void value) { this.childrenRemoved = value; }
-    
+  
+  
   childrenAdded(e)
   {
     BeanContextMembershipEvent ?-> void childrenAdded = this.childrenAdded;
@@ -93,17 +86,13 @@ class NBeanContextMembershipListener implements BeanContextMembershipListener, N
 }
 
 
-/** 
- * class that implements the java.beans.beancontext.BeanContextServicesListener interface
- * and delegates the actions to optional anonymous functions.
- */
 class NBeanContextServicesListener implements BeanContextServicesListener, NiceListener
 {
-  private BeanContextServiceAvailableEvent ?-> void serviceAvailable = null;
+  private BeanContextServiceAvailableEvent ?-> void serviceAvailable;
 
-  public BeanContextServiceAvailableEvent ?-> void getServiceAvailable() = this.serviceAvailable;
-  
+  public BeanContextServiceAvailableEvent ?-> void getServiceAvailable() = this.serviceAvailable; 
   public void setServiceAvailable(BeanContextServiceAvailableEvent ?-> void value) { this.serviceAvailable = value; }
+  
   
   serviceAvailable(e)
   {
@@ -113,18 +102,14 @@ class NBeanContextServicesListener implements BeanContextServicesListener, NiceL
 }
 
 
-/** 
- * class that implements the java.beans.beancontext.BeanContextServiceRevokedListener interface
- * and delegates the actions to optional anonymous functions.
- */
 class NBeanContextServiceRevokedListener implements BeanContextServiceRevokedListener, NiceListener
 {
-  private BeanContextServiceRevokedEvent ?-> void serviceRevoked = null;
+  private BeanContextServiceRevokedEvent ?-> void serviceRevoked;
   
-  public BeanContextServiceRevokedEvent ?-> void getServiceRevoked() = this.serviceRevoked;
-  
+  public BeanContextServiceRevokedEvent ?-> void getServiceRevoked() = this.serviceRevoked;  
   public void setServiceRevoked(BeanContextServiceRevokedEvent ?-> void value) { this.serviceRevoked = value; }
-  
+
+
   serviceRevoked(e)
   {
     BeanContextServiceRevokedEvent ?-> void serviceRevoked = this.serviceRevoked;
@@ -133,16 +118,11 @@ class NBeanContextServiceRevokedListener implements BeanContextServiceRevokedLis
 }
 
 
-//JDK1.4  /** 
-//JDK1.4   * class that implements the java.beans.ExceptionListener interface
-//JDK1.4   * and delegates the actions to optional anonymous functions.
-//JDK1.4   */
 //JDK1.4   class NExceptionListener implements ExceptionListener, NiceListener
 //JDK1.4   {
-//JDK1.4     private Exception ?-> void exceptionThrown = null;
+//JDK1.4     private Exception ?-> void exceptionThrown;
 //JDK1.4      
 //JDK1.4     public Exception ?-> void getExceptionThrown() = this.exceptionThrown;
-//JDK1.4     
 //JDK1.4     public void setExceptionThrown(Exception ?-> void value) { this.exceptionThrown = value; }
 //JDK1.4     
 //JDK1.4     exceptionThrown(e)

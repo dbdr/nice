@@ -66,7 +66,7 @@ class NAdjustmentListener implements AdjustmentListener , NiceListener
 
 class NAWTEventListener implements AWTEventListener , MappableAWTEventListener
 {
-  private AWTEvent ?-> void eventDispatched = null;
+  private AWTEvent ?-> void eventDispatched;
 
   public AWTEvent ?-> void getEventDispatched() = this.eventDispatched;  
   public void setEventDispatched(AWTEvent ?-> void value) { this.eventDispatched = value; }
@@ -204,7 +204,7 @@ class NHierarchyBoundsListener implements HierarchyBoundsListener , NiceListener
 
 class NHierarchyListener implements HierarchyListener , NiceListener
 {
-  private HierarchyEvent ?-> void hierarchyChanged = null;
+  private HierarchyEvent ?-> void hierarchyChanged;
   
   public HierarchyEvent ?-> void getHierarchyChanged() = this.hierarchyChanged;
   public void setHierarchyChanged(HierarchyEvent ?-> void value) { this.hierarchyChanged = value; }
@@ -246,7 +246,7 @@ class NInputMethodListener implements InputMethodListener , NiceListener
 
 class NItemListener implements ItemListener , NiceListener
 {
-  private ItemEvent ?-> void itemStateChanged = null;
+  private ItemEvent ?-> void itemStateChanged;
   
   public ItemEvent ?-> void getItemStateChanged() = this.itemStateChanged;
   public void setItemStateChanged(ItemEvent ?-> void value) { this.itemStateChanged = value; }
@@ -376,7 +376,7 @@ class NMouseMotionListener implements MouseMotionListener , NiceListener
 
 class NTextListener implements TextListener , NiceListener
 {
-  private TextEvent ?-> void textValueChanged = null;
+  private TextEvent ?-> void textValueChanged;
   
   public TextEvent ?-> void getTextValueChanged() = this.textValueChanged;
   public void setTextValueChanged(TextEvent ?-> void value) { this.textValueChanged = value; }
@@ -463,7 +463,7 @@ class NWindowListener implements WindowListener , NiceListener
 
 class NDragGestureListener implements DragGestureListener , NiceListener
 {
-  private DragGestureEvent ?-> void dragGestureRecognized = null;
+  private DragGestureEvent ?-> void dragGestureRecognized;
   
   public DragGestureEvent ?-> void getDragGestureRecognized() = this.dragGestureRecognized;
   public void setDragGestureRecognized(DragGestureEvent ?-> void value) { this.dragGestureRecognized = value; }
@@ -585,7 +585,7 @@ class NDropTargetListener implements DropTargetListener , NiceListener
 
 //JDK1.4  class NDragSourceMotionListener implements DragSourceMotionListener , NiceListener
 //JDK1.4  {
-//JDK1.4    private DragSourceDragEvent ?-> void dragMouseMoved = null;
+//JDK1.4    private DragSourceDragEvent ?-> void dragMouseMoved;
 //JDK1.4  
 //JDK1.4    public DragSourceDragEvent ?-> void getDragMouseMoved() = this.dragMouseMoved;
 //JDK1.4    public void setDragMouseMoved(DragSourceDragEvent ?-> void value) { this.dragMouseMoved = value; }
@@ -601,7 +601,7 @@ class NDropTargetListener implements DropTargetListener , NiceListener
 
 //JDK1.4  class NMouseWheelListener implements MouseWheelListener , NiceListener
 //JDK1.4  {
-//JDK1.4    private MouseWheelEvent ?-> void mouseWheelMoved = null;
+//JDK1.4    private MouseWheelEvent ?-> void mouseWheelMoved;
 //JDK1.4
 //JDK1.4    public MouseWheelEvent ?-> void getMouseWheelMoved() = this.mouseWheelMoved;
 //JDK1.4    public void setMouseWheelMoved(MouseWheelEvent ?-> void value) { this.mouseWheelMoved = value; }
@@ -643,7 +643,7 @@ class NDropTargetListener implements DropTargetListener , NiceListener
 
 //JDK1.4  class NWindowStateListener implements WindowStateListener , NiceListener
 //JDK1.4  {
-//JDK1.4    private WindowEvent ?-> void windowStateChanged = null;
+//JDK1.4    private WindowEvent ?-> void windowStateChanged;
 //JDK1.4  
 //JDK1.4    public WindowEvent ?-> void getWindowStateChanged() = this.windowStateChanged;
 //JDK1.4    public void setWindowStateChanged(WindowEvent ?-> void value) { this.windowStateChanged = value; }

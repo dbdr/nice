@@ -368,7 +368,7 @@ class Vector<T> extends AbstractList<T> implements List<T> = native java.util.Ve
 <T> !T min(Collection<!T>) = native Object Collections.min(Collection);
 <T> !T max(Collection<!T>) = native Object Collections.max(Collection);
 
-<T,U,V | U <: T, V <: T> boolean Arrays_equals(U[], V[]) = 
+<T,U,V | U <: T, V <: T> boolean Arrays_equals(U[?], V[?]) =
   native boolean Arrays.equals(Object[],Object[]);
 
 <T> List<T> asList(T[]) = native List Arrays.asList(Object[]);

@@ -81,13 +81,14 @@ public class InlinedMethod extends MethodDeclaration
     }
     catch(InvocationTargetException e){
       User.error(inlineProcedure,
-		 "Inlined emthod " + inlineProcedure +
-		 ": could not call create method");
+		 "Inlined method " + inlineProcedure +
+		 ": " + e.getLocalizedMessage());
     }
     catch(IllegalAccessException e){
       User.error(inlineProcedure,
-		 "Inlined emthod " + inlineProcedure +
-		 ": could not call create method");
+		 "Inlined method " + inlineProcedure +
+		 ": could not call create method",
+		 e.getMessage());
     }
     
     if (!(o instanceof gnu.mapping.Procedure))

@@ -135,7 +135,7 @@ public class RetypedJavaMethod extends JavaMethod
           ?mlsub.typing.TypeConstructor tc = nice.tools.code.Types.typeConstructor(holder);
 	  if (tc != null)
             {
-              TypeConstructors.addConstructor(tc, this);
+              addConstructor(tc, this);
               registerNativeConstructor(this, reflectMethod, tc);
             }
 	}
@@ -268,7 +268,7 @@ void registerNativeConstructor(RetypedJavaMethod m, gnu.bytecode.Method reflectM
     in favor of the new explicit one.
   */
   if (auto != null && ! (auto instanceof RetypedJavaMethod))
-    TypeConstructors.removeConstructor(classe, auto);
+    removeConstructor(classe, auto);
 }
 
 void registerNativeField(JavaFieldAccess f, gnu.bytecode.Field reflectField)

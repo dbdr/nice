@@ -100,7 +100,7 @@ public abstract class Pattern implements Located
           throw User.error(this, typeConstructor + 
                            " is not a declared class or interface");
 
-        if (exactlyAtType() && !TypeConstructors.instantiable(tc))
+        if (exactlyAtType() && !dispatch.instantiableTC(tc))
           User.error
 	    (typeConstructor.location(), 
 	     "Pattern #" + typeConstructor +

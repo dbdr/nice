@@ -241,7 +241,7 @@ void fetchMethod(gnu.bytecode.Method m, TypeConstructor tc, gnu.bytecode.ClassTy
     {
       let res = makeJavaMethod(m, true);
       assert res != null;
-      TypeConstructors.addConstructor(tc, res);
+      addConstructor(tc, res);
       retyped.put(m, res);
     }
   else

@@ -42,12 +42,12 @@ public class NewExp extends CallExp
   {
     this.tc = tc;
 
-    if (! TypeConstructors.instantiable(tc))
+    if (! instantiableTC(tc))
       {
 	String message;
-	if (TypeConstructors.isInterface(tc))
+	if (isInterfaceTC(tc))
 	  message = tc + " is an interface, it can't be instantiated";
-	else if (TypeConstructors.isClass(tc))
+	else if (isClassTC(tc))
 	  message = tc + " is an abstract class, it can't be instantiated";
 	else
 	  message = tc + " is a type variable, it can't be instantiated";
@@ -59,7 +59,7 @@ public class NewExp extends CallExp
     if (definition != null)
       definition.resolve();
     
-    let constructors = TypeConstructors.getConstructors(tc);
+    let constructors = getConstructors(tc);
     if (constructors == null)
       {
 	if (tc.arity() > 0)
@@ -72,7 +72,7 @@ public class NewExp extends CallExp
 
     // the list of constructors must be cloned, as
     // OverloadedSymbolExp removes elements from it
-    function = createOverloadedSymbolExp(new LinkedList(notNull(constructors)), new LocatedString("new " + tc, this.location()));
+    function = createOverloadedSymbolExp(new LinkedList(cast(constructors)), new LocatedString("new " + tc, this.location()));
   }
   
   private void setObject()

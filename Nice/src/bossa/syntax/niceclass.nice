@@ -376,7 +376,7 @@ public class CNiceClass extends NiceClass
   private List<(?MethodDeclaration, List<FormalParameters.Parameter>)>
 	getNativeConstructorParameters(TypeConstructor tc)
   {
-    let constructors = TypeConstructors.getConstructors(tc);
+    let constructors = getConstructors(tc);
     if (constructors == null)
       {
         // null stands for the Object() constructor
@@ -554,7 +554,7 @@ public class CNiceClass extends NiceClass
 	   Monotype.resolve(definition.getLocalScope(), values.types()),
 	   Monotype.sure(new mlsub.typing.MonotypeConstructor(definition.getTC(), definition.getTypeParameters())),
            classe: this, isDefault: true, fields: fields, parent: parent);
-	TypeConstructors.addConstructor(definition.getTC(), notNull(constructorMethod)[i]);
+	addConstructor(definition.getTC(), notNull(constructorMethod)[i]);
       }
   }
 

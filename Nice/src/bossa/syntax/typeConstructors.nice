@@ -1,0 +1,83 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2004                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package bossa.syntax;
+
+import bossa.util.*;
+
+/**
+   Tools for classes and type constructors.
+
+*/
+var HashMap<mlsub.typing.TypeConstructor,?LinkedList<VarSymbol>> constructorsMap = new HashMap();
+public void resetConstructorsMap() { constructorsMap = new HashMap(); }
+ 
+/**
+   The list can be modified by the caller. It should thus be cloned 
+   each time.
+     
+   @return a list of the MethodDefinition.Symbols of each constructor of
+   this class.
+ */
+?LinkedList<VarSymbol> getConstructors(mlsub.typing.TypeConstructor tc)
+{
+  return constructorsMap.get(tc);
+}
+
+void addConstructor(mlsub.typing.TypeConstructor tc, MethodDeclaration m)
+{
+  ?LinkedList<VarSymbol> l =  constructorsMap.get(tc);
+  if (l==null)
+    {
+      l = new LinkedList();
+      constructorsMap.put(tc, notNull(l));
+    }
+  notNull(l).add(m.getSymbol());
+}
+
+void removeConstructor(TypeConstructor tc, MethodDeclaration m)
+{
+  ?LinkedList<VarSymbol> l =  constructorsMap.get(tc);
+  if (l == null)
+    return;
+
+  l.remove(m.getSymbol());
+}
+
+/**
+   Test if a type constructor can be instantiated.
+   That is, if <code>new</code> is valid on this tc.
+ */
+boolean instantiableTC(mlsub.typing.TypeConstructor tc)
+{
+  if(tc.isConcrete())
+    return true;
+
+  let definition = getTypeDefinition(tc);
+  return definition != null && definition.isConcrete();
+}
+
+boolean isInterfaceTC(mlsub.typing.TypeConstructor tc)
+{
+  let def = getTypeDefinition(tc);
+
+  if (def != null)
+    return def.getAssociatedInterface() != null;
+
+  ?gnu.bytecode.ClassType c = cast(nice.tools.code.Types.get(tc));
+  return c != null && c.isInterface();
+}
+
+boolean isClassTC(mlsub.typing.TypeConstructor tc)
+{
+  return nice.tools.code.Types.get(tc) != null;
+}  

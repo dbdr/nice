@@ -102,7 +102,7 @@ public class AbstractInterfaceImplementation extends Definition
   {
     classTC = new TypeIdent(name: className).resolveToTC(notNull(typeScope));
 
-    if (TypeConstructors.isInterface(classTC))
+    if (isInterfaceTC(notNull(classTC)))
       {
         if (!_interface) User.error(this, ""+classTC+" is not a class");
       }

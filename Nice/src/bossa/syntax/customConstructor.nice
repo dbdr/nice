@@ -43,7 +43,7 @@ public class CustomConstructor extends UserOperator
     super;
 
     let tc = Node.getGlobalTypeScope().globalLookup(className);
-    TypeConstructors.addConstructor(tc, this);
+    addConstructor(tc, this);
     classe = NiceClass.get(tc);
 
     if (classe == null)

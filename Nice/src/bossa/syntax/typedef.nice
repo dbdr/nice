@@ -207,7 +207,7 @@ public abstract class CTypeDefinition extends TypeDefinition
       {
         // We found a cycle.
         String message;
-        if (TypeConstructors.isInterface(tc))
+        if (isInterfaceTC(tc))
           message = "Interface " + this.getName() + " extends itself";
         else
           message = "Class " + this.getName() + " extends itself";
@@ -311,7 +311,7 @@ public abstract class CTypeDefinition extends TypeDefinition
         else if (s instanceof mlsub.typing.TypeConstructor)
 	  {
             let tc = s;
-            if (!TypeConstructors.isInterface(tc))
+            if (!isInterfaceTC(tc))
               throw User.error(name, tc + " is not an interface");
 
             if (javaInterfaces == null)
@@ -491,7 +491,7 @@ class ClassDefinition extends CTypeDefinition
         if (superClass.isMinimal())
           User.error(superClassIdent,
 		     superClass + " is a final class. It cannot be extended");
-        if (TypeConstructors.isInterface(superClass))
+        if (isInterfaceTC(superClass))
           User.error(superClassIdent,
 		     superClass + " is an interface, so " + name +
 		     " may only implement it");

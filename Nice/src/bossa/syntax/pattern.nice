@@ -374,7 +374,7 @@ disjoint(TypePattern this, TypePattern that)
   if (this.exactlyAt && that.exactlyAt)
     return this.tc != that.tc;
 
-  if (TypeConstructors.isClass(this.tc) && TypeConstructors.isClass(that.tc))
+  if (isClassTC(notNull(this.tc)) && isClassTC(notNull(that.tc)))
     return (! Typing.testRigidLeq(this.tc, that.tc)) &&
 	   (! Typing.testRigidLeq(that.tc, this.tc));
 
@@ -384,7 +384,7 @@ disjoint(TypePattern this, TypePattern that)
 }
 disjoint(Pattern this, Pattern that)
 {
-  if (TypeConstructors.isClass(this.tc) && TypeConstructors.isClass(that.tc))
+  if (isClassTC(notNull(this.tc)) && isClassTC(notNull(that.tc)))
     return (! Typing.testRigidLeq(this.tc, that.tc)) &&
 	   (! Typing.testRigidLeq(that.tc, this.tc));
 

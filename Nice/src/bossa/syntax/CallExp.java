@@ -229,11 +229,6 @@ public class CallExp extends Expression
     function = function.resolveOverloading(this);
   }
 
-  /** Hold real parameter, after default parameters
-      and parameter reordering has been done.
-  */
-  Expression[] computedExpressions;
-  
   void computeType()
   {
     resolveOverloading();
@@ -243,7 +238,7 @@ public class CallExp extends Expression
       {
 	type = getTypeAndReportErrors(location(), function, 
 				      arguments.inOrder());
-	computedExpressions = arguments.inOrder();
+	arguments.computedExpressions = arguments.inOrder();
       }
 
     /* 
@@ -268,7 +263,8 @@ public class CallExp extends Expression
 
   protected gnu.expr.Expression compile()
   {
-    gnu.expr.Expression[] params = Expression.compile(computedExpressions);
+    gnu.expr.Expression[] params = 
+      Expression.compile(arguments.computedExpressions);
 
     // wraps the arguments that reference methods into LambdaExps
     for(int i=0; i<params.length; i++)

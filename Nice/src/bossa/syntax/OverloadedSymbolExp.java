@@ -84,9 +84,6 @@ public class OverloadedSymbolExp extends Expression
     Arguments arguments = callExp.arguments;
     // It's better to do this know. OR is oriented, arguments first.
     arguments.computeTypes();
-    // The same (empty) arguments object can be reused. Reset it.
-    // XXX This is not so clean.
-    arguments.applicationExpressions.clear();
 
     if (Debug.overloading) 
       Debug.println("Overloading resolution for " + this +
@@ -142,7 +139,8 @@ public class OverloadedSymbolExp extends Expression
 	// and we check that cloneType() is not called twice
 	// before the clone type is released
 	s.makeClonedType();
-	Polytype[] argsType = Expression.getType(arguments.getExpressions(sym));
+	Polytype[] argsType = 
+	  Expression.getType(arguments.getExpressions(sym));
 	Polytype t = CallExp.wellTyped(s.getClonedType(), argsType);
 
 	if (t == null)
@@ -182,7 +180,7 @@ public class OverloadedSymbolExp extends Expression
 	    {
 	      callExp.type = types[i];
 	      // store the expression (including default arguments)
-	      callExp.computedExpressions = arguments.getExpressions(i);
+	      callExp.arguments.computedExpressions = arguments.getExpressions(i);
 	      //callExp.arguments = null; // free memory
 	      return uniqueExpression();
 	    }

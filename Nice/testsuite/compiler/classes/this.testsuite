@@ -1,0 +1,51 @@
+/// PASS
+  assert(new A(x: 42).getX() == 42);
+  /// Toplevel
+class A
+{
+  int x;
+  int getX() = this.x;
+}
+
+/// PASS
+  A a = new A(x: 0);
+  a.setX();
+  assert(a.getX() == 11);
+  /// Toplevel
+class A
+{
+  int x;
+  int getX() = this.x;
+  void setX() { x = 10; x++; }
+}
+
+/// PASS
+  assert(new A(x: 42).getX() == 42);
+  /// Toplevel
+class A
+{
+  int x;
+  int getX() = x;
+}
+
+/// PASS
+  assert(new A(x: 42).getX() == 42);
+  /// Toplevel
+class A
+{
+  int x;
+  int getX();
+  getX() = x;
+}
+
+/// FAIL
+  /// Toplevel
+class A
+{
+  int x;
+}
+
+class B
+{
+  int getX() = x;
+}

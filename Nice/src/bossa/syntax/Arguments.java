@@ -55,7 +55,10 @@ public class Arguments
     this.arguments = arguments;
   }
 
-  public static Arguments noArguments = new Arguments(new Argument[0]);
+  public static Arguments noArguments() 
+  {
+    return new Arguments(new Argument[0]);
+  }
 
   public void addReceiver(Expression value)
   {
@@ -73,9 +76,17 @@ public class Arguments
     arguments = newArgs;
   }
 
+  /** Hold real parameter, after default parameters
+      and parameter reordering has been done.
+  */
+  Expression[] computedExpressions;
+  
   int size()
   {
-    return arguments.length;
+    if (computedExpressions != null)
+      return computedExpressions.length;
+    else
+      return arguments.length;
   }
   
   Argument get(int num)
@@ -85,11 +96,17 @@ public class Arguments
   
   Expression getExp(int num)
   {
-    return arguments[num].value;
+    if (computedExpressions != null)
+      return computedExpressions[num];
+    else
+      return arguments[num].value;
   }
 
   void setExp(int num, Expression value)
   {
+    if (computedExpressions != null)
+      Internal.error("Late setExp");
+
     arguments[num].value = value;
   }
 

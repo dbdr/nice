@@ -78,6 +78,14 @@ abstract class VarSymbol extends Node implements Located
     return 1;
   }
 
+  /** This returns a generic explanation.
+      A more precise message should be returned if possible in subclasses.
+  */
+  String explainWhyMatchFails(Arguments arguments)
+  {
+    return "Incorrect call to " + name;
+  }
+
   /****************************************************************
    * Cloning types
    ****************************************************************/

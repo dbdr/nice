@@ -122,6 +122,23 @@ public class MonoSymbol extends VarSymbol
       return 1;
   }
 
+  String explainWhyMatchFails(Arguments arguments)
+  {
+    mlsub.typing.lowlevel.Kind k = Types.rawType(type).getKind();
+    if(k instanceof mlsub.typing.FunTypeKind)
+      { 
+	int arity = ((mlsub.typing.FunTypeKind) k).domainArity;
+	if (arguments.size() != arity)
+	  return name + Util.has(arity, "parameter", arguments.size());
+	else
+	  // If the number of arguments is correct, it must be that
+	  // some arguments are named.
+	  return name + " does not have named parameters";
+      }
+    else 
+      return name + " is not a function";
+  }
+
   /****************************************************************
    * Cloning types
    ****************************************************************/

@@ -360,26 +360,7 @@ public class OverloadedSymbolExp extends Expression
 
       case 1:
 	VarSymbol sym = (VarSymbol) removed.get(0);
-
-	if (! (sym instanceof FunSymbol))
-	  return "Incorrect call to " + ident;
-
-	FunSymbol f = (FunSymbol) sym;
-
-	// If f.parameters == null, 
-	// f is a native method or a native constructor.
-	boolean isConstructor = f.parameters != null && 
-	  "<init>".equals(f.getName().toString());
-	if (! isConstructor)
-	  return "Method " + ident + " expects parameters (" + 
-	    f.describeParameters() + ")";
-
-	// Here we assume that ident for constructors is formatted as
-	// "new ClassName". We might want something more robust.
-	return "Class " + ident.toString().substring(4) + 
-	  " has the following fields:\n" +
-	  f.parameters + "\n" +
-	  "Please provide values for the fields, at least for those with no default value.\nThe syntax is:\n  " + ident + "(field1: value1, ..., fieldN: valueN)";
+	return sym.explainWhyMatchFails(arguments);
 
       default:
 	return "No method with name " + ident + arguments.explainNoMatch();

@@ -1,0 +1,91 @@
+/****************************************************************************
+ *                                 N I C E                                  *
+ *              A high-level object-oriented research language              *
+ *                         (c) Daniel Bonniot 2003                          *
+ *                                                                          *
+ *  This package is free software; you can redistribute it and/or modify    *
+ *  it under the terms of the GNU General Public License as published by    *
+ *  Free Software Foundation; either version 2 of the License, or (at your  *
+ *  option) any later version.                                              *
+ *                                                                          *
+ *  As a special exception, the copyright holders of this library give you  *
+ *  permission to link this library with independent modules to produce an  *
+ *  executable, regardless of the license terms of these independent        *
+ *  modules, and to copy and distribute the resulting executable under      *
+ *  terms of your choice.                                                   *
+ ****************************************************************************/
+
+package nice.lang;
+
+public class Index
+{
+  final boolean relativeToEnd;
+  final int index = 0;
+  <U> int normalize(List<U> list) 
+    {
+      if (relativeToEnd)
+	return (list.size() - 1) + index;
+      else
+	return index;
+    }
+  boolean isInfinite() = relativeToEnd && index == 0;
+}
+
+
+
+
+
+Index `@`() = new Index(index: 0, relativeToEnd: true);
+
+public Index `-`(Index index, int offset)
+  requires index.relativeToEnd
+{ 
+  return new Index(index: index.index - offset, relativeToEnd: true); 
+}
+
+public class Slice<T | T <: int, int <: T> {
+  private final Index begin;
+  private final Index end;
+
+  <U> (int,int) normalize(List<U> list) 
+    {
+      let normalBegin = begin.normalize(list);
+      let normalEnd = end.normalize(list);
+      assert normalEnd >= normalBegin : 
+         "Beginning index cannot be greater than ending index";
+      return (normalBegin, normalEnd);
+    }
+}
+
+public OpenRange<int> `..`(int begin, ?int end) 
+  requires end == null || end >= 0,
+           begin >= 0  
+{
+  let beginIndex = new Index(index: begin, relativeToEnd: false);
+  let endIndex = end == null ? 
+                          new Index(index: 0, relativeToEnd: true)
+                         :new Index(index: end, relativeToEnd: false);
+  if (end == null)
+    return new OpenRange(begin: beginIndex, end: endIndex);
+  else
+    return new Range(begin: beginIndex, end: endIndex);
+}
+
+public Slice<int> `..` (int begin, Index end)
+  requires begin >= 0  
+{
+  let beginIndex = new Index(index: begin, relativeToEnd: false);
+  return new Slice(begin: beginIndex, end: end);
+}
+
+public Slice<int> `..` (Index begin, ?int end)
+{
+  let endIndex = new Index(index: end == null ? 0 : end, 
+			   relativeToEnd: end == null);
+  return new Slice(begin: begin, end: endIndex);
+}
+
+public Slice<int> `..` (Index begin, Index end)
+{
+    return new Slice(begin: begin, end: end);
+}

@@ -1,0 +1,278 @@
+/****************************************************************************
+ *                                 N I C E                                  *
+ *              A high-level object-oriented research language              *
+ *                         (c) Daniel Bonniot 2003                          *
+ *                                                                          *
+ *  This package is free software; you can redistribute it and/or modify    *
+ *  it under the terms of the GNU General Public License as published by    *
+ *  Free Software Foundation; either version 2 of the License, or (at your  *
+ *  option) any later version.                                              *
+ *                                                                          *
+ *  As a special exception, the copyright holders of this library give you  *
+ *  permission to link this library with independent modules to produce an  *
+ *  executable, regardless of the license terms of these independent        *
+ *  modules, and to copy and distribute the resulting executable under      *
+ *  terms of your choice.                                                   *
+ ****************************************************************************/
+
+/**
+ * Overloaded [] operators for lists
+ *
+ * @author Bryn Keller <xoltar@xoltar.org>
+ */
+
+/**
+ * Support negative indexes, by using the <code>@</code> operator,
+ * which represents the last index in the list. So the next-to-last
+ * element in the list can be addressed as <code>@-1</code>, for
+ * instance.
+ */
+package nice.functional;
+
+<T> T get(List<T> list, Index index) =
+  list[index.normalize(list)];
+
+/**
+ * Returns a sub-list of the original, starting from the index
+ * specified in the first part of the slice, and continuing
+ * up to (and including) the index specified in the second
+ * part of the slice.
+ */
+<T> List<T> get(List<T> list, Slice<int> slice) 
+{
+  (int lbound, int ubound) = slice.normalize(list);
+  let newList = list.similarEmptyCollection();  
+  for(int i = lbound; i <= ubound; i++)
+    newList.add(list[i]);
+  return newList;
+}
+
+/**
+ * Assigns a sub-list into a list, starting from the index
+ * specified in the first part of the slice tuple, and continuing
+ * up to (and including) the index specified in the second
+ * part of the slice. 
+ * If null is supplied for the first part of the slice, it's the
+ * same as supplying zero. If null is supplied for the last
+ * part of the slice, it's the same as specifying list.size().
+ * To use negative indexes, use the <code>@</code> operator,
+ * which means "the size of the current list -1", or perhaps
+ * "negative zero", the position of the last element in the list.
+ * . So for instance, <code>someList[(1..@-1)]</code> would give
+ * all the elements of <code>someList</code> except the first and the
+ * last.
+ *
+ * The items in <code>values</code> will replace those in <code>list</code>
+ * according to the <code>slice</code> argument. 
+ */
+<T> void set(List<T> list, Slice<int> slice, List<T> values)  
+{
+  (int lbound, int ubound) = slice.normalize(list);
+  if (ubound - lbound >= values.size())
+    throw new IllegalArgumentException(
+	"Not enough values for a slice this size");
+  int counter = lbound;
+  for(item : values) 
+    list[counter++] = item;
+}
+
+<T> void removeAt(List<T> list, Slice<int> slice) {
+  (int lbound, int ubound) = slice.normalize(list);
+  for(int i = lbound; i <= ubound; i++) {
+    list.removeAt(lbound);
+  }
+}
+
+
+/**
+ * Helper.
+ */
+private <T> T illegalArgument(String msg) = 
+  throw new IllegalArgumentException(msg);
+
+
+/**
+ * Returns the sub-list of <code>list</code> for which <code>func</code>
+ * returns true, i.e., <code>list.filter(func)</code>.
+ */
+<T> List<T> get(List<T> list, T->boolean func) = list.filter(func);
+
+// Too cryptic, skipped.
+// /**
+//  * Returns the sub-list of <code>list</code> for which <code>func</code>
+//  * returns non-null, i.e., <code>list.filter(func)</code>. Note that
+//  * This is really a combination of map and filter.
+//  */
+// <List C, T,U> C<!U> get(C<T> source, T->?U converter) = source.filter(
+// 							converter: converter);
+
+/**
+ * Returns a list of all the items of <code>list</code> at all the 
+ * given <code>indexes</code>.
+ */
+<T> List<T> get(List<T> list, List<int> indexes) 
+{
+  let newList = list.similarEmptyCollection();
+  for(i : indexes)
+    {
+      newList.add(list[i]);
+    }
+  return newList;
+}
+
+<T> Iterator<T> get(Iterator<T> iterator, T->boolean func) = 
+  iterator.filter(func);
+
+/**
+ * Helper.
+ */
+private <T> void->T cycle(List<T> list)
+{
+  var int counter = 0;
+  return () => 
+  {
+    let val = list[counter];
+    counter++;
+    counter = counter % list.size();
+    return val;
+  };
+}
+
+/**
+ * Sets multiple values.
+ */
+<T> void set(List<T> list, List<int> indexes, List<T> values)
+        requires values.size() >= indexes.size()
+{
+  let valueGen = values.generator();
+  for(i:indexes)
+    list[i] = valueGen();
+}
+
+/**
+ * Replaces values of list with <code>value</code> wherever 
+ * <code>func</code> returns true for the original value.
+ */
+<T> void set(List<T> list, T->boolean func, T value) 
+{
+  let size = list.size();
+  for(int i = 0; i < size; i++) 
+    {
+      if (func(list[i]))
+	list[i] = value;
+    }
+}
+
+
+/**
+ * Replaces values of list with the next value of <code>gen</code> wherever 
+ * <code>func</code> returns true for the original value.
+ */
+<T> void set(List<T> list, T->boolean func, void->T gen) 
+{
+  let size = list.size();
+  for(int i = 0; i < size; i++) 
+    {
+      if (func(list[i]))
+	list[i] = gen();
+    }
+}
+
+/**
+ * Helper.
+ */
+private <T> ArrayList<T> toArrayList(List<T> src) {
+  let newList = new ArrayList();
+  newList.addAll(src);
+  return newList;
+}
+
+//Uncomment after dev compiler supports slice expressions
+// private void _testCollectionFunctions() 
+// {
+//   let List<int> ints = [0, 1, 2, 3, 4, 5, 6].toArrayList();
+//   assert ints[@] == 6;
+//   assert ints[@-2] ==4;
+//   let evens = ints[int i => i % 2 == 0];  
+//   println(evens);
+//   assert evens[0] == 0;
+//   assert evens[1] == 2;
+//   assert evens[2] == 4;
+//   assert evens[3] == 6;
+//   assert evens.size == 4;
+// //   let evenNames = ints[int i => i % 2 == 0 ? 
+// // 		       new java.math.BigInteger((i + 10).toString()).toString(16) 
+// // 		       : null];  
+// //   assert evenNames[0].equals("a");
+// //   assert evenNames[1].equals("c");
+// //   assert evenNames.size == evens.size;
+// //   println(evenNames);
+//   var mutables = ints.toArrayList();
+//   mutables[int i => i % 2 == 0] = 27; 
+//   println(mutables);
+//   assert mutables[0] == 27;
+//   assert mutables[1] == 1;
+//   assert mutables[2] == 27;
+//   assert mutables[3] == 3;
+//   assert mutables[4] == 27;
+//   assert mutables[5] == 5;
+//   assert mutables[6] == 27;
+//   var counter = 0;
+//   mutables[int i => i == 27] = ()=> counter++;
+//   println(mutables);  
+//   assert mutables[0] == 0;
+//   assert mutables[6] == 3;
+//   mutables = ints.toArrayList();
+//   let sl1 = mutables[1..4];
+//   assert sl1.size == 4 : sl1.size.toString;
+//   assert sl1[0] == 1;
+//   assert sl1[3] == 4;
+//   let sl2 = mutables[1..@-1];
+//   assert sl2.size == mutables.size - 2;
+//   assert sl2[0] == 1;
+//   assert sl2[sl2.size - 1] == mutables[mutables.size - 2];
+//   let sl3 = mutables[@-1..@-1];
+//   assert sl3.size == 1: "sl3 wrong size";
+//   assert sl3[0] == mutables[mutables.size - 2]: "sl3 wrong elem 0";
+//   let sl4 = mutables[..2];
+//   assert sl4.size == 3;
+//   assert sl4[0] == 0;
+//   assert sl4[2] == 2;
+//   let sl5 = mutables[3..];
+//   assert sl5.size == mutables.size - 3;
+//   assert sl5[0] == mutables[3];
+//   assert sl5[sl5.size - 1] == mutables[mutables.size - 1];
+//   let sl6 = mutables[@-1..];
+//   assert sl6.size == 2;
+//   assert sl6[0] == mutables[mutables.size - 2];
+//   assert sl6[1] == mutables[mutables.size - 1];
+//   let len = mutables.size;
+//   mutables[1..2] = [9,8];
+//   try 
+//   {
+//     mutables[1..3] = [9,8];
+//     assert false : "Failed";
+//   } 
+//   catch (Exception e) 
+//   { 
+//     //Pass 
+//   }
+//   assert mutables.size == len;
+//   let sl7 = mutables[1..2];
+//   assert sl7[0] == 9;
+//   assert sl7[1] == 8;
+//   mutables = ints.toArrayList();
+//   mutables.removeAt(2..@-1);
+//   assert mutables.size() == 3: mutables.size().toString();
+//   assert mutables[0] == 0;
+//   assert mutables[1] == 1;
+//   assert mutables[2] == 6;
+//   mutables = ints.toArrayList();
+//   let sl8 = mutables[..];
+//   for(int i = 0; i < mutables.size(); i++) {
+//     assert mutables[i] == sl8[i];
+//   }
+  
+// }
+
+

@@ -1365,7 +1365,7 @@ Statement code():
     // An expression
     { Expression exp; }
     "=" 
-    ( ".." "." { return null; } // toplevel function in interface file
+    ( "..." { return null; } // toplevel function in interface file
     |
     exp=Expression() ";" { code = bossa.syntax.dispatch.createReturnStmt(exp, /* fake */ true); }
     |
@@ -2105,15 +2105,26 @@ Expression RelationalExpression() :
 }
 
 Expression RangeExpression() :
-{ Expression e1,e2; Token t; }
+{ Expression e1 = null,e2 = null; Token t = null; }
 {
-  e1=ShiftExpression() 
-    ( t=".." e2=ShiftExpression() 
-      { e1=bossa.syntax.dispatch.createCallExp(symb(t),e1,e2); }
-      )*
+   ((e1=ShiftExpression()
+	   [(t=<RANGE>) [e2=ShiftExpression()]])
+|  
+    ((t = <RANGE>) [e2 = ShiftExpression()]))
+     {
+	if (t != null)
+	{
+  		if (e1 == null)
+		  e1 = ConstantExp.makeNumber(
+			new LocatedString("0", makeLocation(t)));
+		if (e2 == null)
+		  e2 = NullExp.create(makeLocation(t));
+		e1=bossa.syntax.dispatch.createCallExp(symb(t),e1,e2); 
+	}
+     }
+      
   { return e1; }
 }
-
 
 Expression ShiftExpression() :
 { Expression e1,e2; Token t,t1=null; boolean left=false; }
@@ -2244,6 +2255,7 @@ Expression PrimaryPrefix() :
   { return res; }
 }
 
+
 Expression PrimarySuffix(Expression start) :
 { 
   Expression res;
@@ -2303,9 +2315,20 @@ Expression Literal() :
     ]
   )*
 | res=multiLineStringExp()
+| res=atExpression()
 )
 { return res; }
 }
+
+Expression atExpression() :
+{
+  Token t;
+}
+{
+  (t = <AT>)
+  { return bossa.syntax.dispatch.createCallExp(symb(t), Arguments.noArguments()); }
+}
+
 
 ConstantExp patternLiteral() :
 //restricted literal for use in dispatch patterns

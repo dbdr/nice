@@ -17,50 +17,70 @@
 
 package nice.lang;
 
-public class Range<T | T <: int, int <: T> extends AbstractList<T> {
 
-  private final int begin;
-  private final int end;
+public class OpenRange<T | T <: int, int <: T> extends Slice<T> 
+{
+    { 
+      assert !begin.relativeToEnd:
+         "OpenRange objects cannot be relative to a list end";
+      assert !end.relativeToEnd || end.index == 0:
+         "OpenRange objects cannot be relative to a list end";
+    }
+  Iterator<T> openIterator() = new OpenRangeIterator(range: this, 
+						     pos: begin.index-1);
+}
+
+public class Range<T | T <: int, int <: T>  extends OpenRange<T>
+                                           implements List<T> {
+
+    { 
+      assert !end.relativeToEnd:
+           "Range objects must have fixed dimensions";       
+    }
 
   isEmpty() = false;
 
-  size() = 1+end-begin;
+  size() = 1+end.index-begin.index;
 
   get(index) {
-    if (index < 0 || index >= 1+end-begin) throw new IndexOutOfBoundsException();
-    return begin + index;
+    if (index < 0 || index >= 1+end.index-begin.index) 
+      throw new IndexOutOfBoundsException();    
+    return int(begin.index) + int(index);
   }
   
   add(elem) =  throw new UnsupportedOperationException();
 
-  contains(elem) = begin <= cast(elem) <= end;
+  contains(elem) = begin.index <= cast(elem) <= end.index;
 
-  iterator() = new RangeIterator(range: this, pos: begin-1);
 
-  listIterator() = new RangeIterator(range: this, pos: begin-1);
+  iterator() = new RangeIterator(range: this, pos: begin.index - 1);
+  listIterator() = new RangeIterator(range: this, pos: begin.index-1);
 
-  listIterator(index) = new RangeIterator(range: this, pos: begin + index-1);	
+  listIterator(index) = new RangeIterator(range: this, pos: begin.index + index-1);	
 
 }
 
-public class RangeIterator<T | T <: int, int <: T> implements ListIterator<T> {
+public class OpenRangeIterator<T | T <: int, int <: T> implements Iterator<T> {
 
-  final Range<int> range;
+  final OpenRange<T> range;
   int pos;
 
-  hasNext() = pos+1 <= range.end;
+  hasNext() = pos+1 <= range.end.index || (range.end.isInfinite);
   next() = ++pos;
-  hasPrevious() = pos-1 >= range.begin;
+  remove() = throw new UnsupportedOperationException();
+}
+
+public class RangeIterator<T | T <: int, int <: T> extends OpenRangeIterator
+  implements ListIterator<T> {
+
+  hasNext() = pos+1 <= range.end.index;
+  hasPrevious() = pos-1 >= range.begin.index;
   previous() = --pos;
-  nextIndex() = (pos-range.begin) + 1;
-  previousIndex() = pos - range.begin;
+  nextIndex() = (pos-range.begin.index) + 1;
+  previousIndex() = pos - range.begin.index;
 
   remove() = throw new UnsupportedOperationException();
   set(elem) = throw new UnsupportedOperationException();
   add(elem) = throw new UnsupportedOperationException();
 }
 
-public Range<int> `..`(int begin, int end) requires begin <= end 
-{
-  return new Range(begin: begin, end: end);
-}

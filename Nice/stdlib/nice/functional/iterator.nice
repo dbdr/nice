@@ -24,6 +24,10 @@ package nice.functional;
    @author Bryn Keller (xoltar@users.sourceforge.net)
  */
 
+/** 
+ * Allow iterators in for() statements
+ */
+<E> Iterator<E> forIterator(Iterator<E> iter) = iter;
 
 /**
  * Creates an <code>Iterator</code> from a function.

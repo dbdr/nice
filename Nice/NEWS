@@ -22,6 +22,25 @@ nice (0.9.9)
 
   * Improved speed of coverage tests for some methods.
   * Removed the '--strict' compiler option.
+  * Lists now support a wide array of slicing and indexing
+    operations. There is a new bit of syntax, '@', which indicates
+    the index of the last item in a list, which can be used for working
+    with indexes relative to the end of the list, instead of the beginning.
+    
+    For instance, given a list of ints from 0 to 6 called 
+    'intList':
+	intList[@] is 6,
+	intList[@-1] is 5,
+	intList[1..2] is the list [1,2].
+	intList[1..@-1] is a list of all but the first and last
+		elements of ints, i.e., [1,2,3,4,5]
+	intList[1..] is a list of all but the first element of intList
+	intList[..] is a complete copy of intList
+	intList[..@-1] is a list of all but the last element of intList
+	intList[int i => i % 2 == 0] is a list of all the even ints
+		in intList: [0,2,4,6]
+	Several more options are available, an update to the manual will
+	reflect this.
 
  --
 

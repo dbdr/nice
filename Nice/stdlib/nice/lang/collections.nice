@@ -171,6 +171,7 @@ similarEmptyCollection(#Stack c) = new Stack();
 
 similarEmptyCollection(#HashSet c) = new HashSet(c.size());
 
+
 /****************************************************************
  * Sort
  ****************************************************************/

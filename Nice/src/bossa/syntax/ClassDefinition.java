@@ -466,7 +466,7 @@ abstract public class ClassDefinition extends Definition
   
   mlsub.typing.TypeConstructor tc;
 
-  private final MonotypeVar[] typeParameters;
+  final MonotypeVar[] typeParameters;
   protected List
     /* of TypeConstructor */ extensions,
     /* of Interface */ implementations,

@@ -222,7 +222,7 @@ public class CallExp extends Expression
 			  Util.map("",", ","\n",dom));
 	  }
 	
-	Typing.in(parameters, Domain.fromMonotypes(dom));
+	Typing.in(parameters, dom);
       }
     finally{
       if(doEnter)

@@ -519,7 +519,7 @@ public class OverloadedSymbolExp extends Expression
 
       }
 
-    return new Domain(t.getConstraint(), new TupleType(dom));
+    return new Domain(t.getConstraint(), dom);
   }
 
   void computeType()

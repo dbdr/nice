@@ -327,6 +327,13 @@ public final class Typing
     leq(m2,m1);
   }
   
+  public static void leq(Monotype[] ms1, Monotype[] ms2)
+    throws TypingEx
+  {
+    for(int i = 0; i < ms1.length; i++)
+      leq(ms1[i], ms2[i]);
+  }
+
   /****************************************************************
    * Type constructors
    ****************************************************************/
@@ -388,7 +395,7 @@ public final class Typing
     if (!(Constraint.hasBinders(d1.getConstraint()) || 
 	  Constraint.hasBinders(d2.getConstraint())))
       {
-	leq(d1.getMonotype(), d2.getMonotype());
+	leq(d1.getMonotypes(), d2.getMonotypes());
 	return;
       }
     
@@ -399,7 +406,7 @@ public final class Typing
       Typing.implies();
 
       Constraint.enter(d2.getConstraint());
-      leq(d1.getMonotype(), d2.getMonotype());
+      leq(d1.getMonotypes(), d2.getMonotypes());
     }
     finally{
       leave();
@@ -407,62 +414,24 @@ public final class Typing
   }
   
   /** Test if a polytype is in a domain. */
-  public static void in(Polytype type, Domain domain)
+  public static void in(Polytype type, Monotype domain)
     throws TypingEx
   {
-    if(dbg) Debug.println(type+" in "+domain);
-    
-    if(domain == Domain.bot)
-      return;
+    if(dbg) Debug.println(type + " in " + domain);
     
     Constraint.enter(type.getConstraint());
-    Constraint.enter(domain.getConstraint());
-    leq(type.getMonotype(),domain.getMonotype());
-  }
-  
-  /** Test if a monotype is in a domain. */
-  public static void in(Monotype type, Domain domain)
-    throws TypingEx
-  {
-    if(dbg) Debug.println(type+" in "+domain);
-    
-    if(domain == Domain.bot)
-      return;
-    
-    Constraint.enter(domain.getConstraint());
-    leq(type, domain.getMonotype());
+    leq(type.getMonotype(), domain);
   }
   
   /**
    * Checks wether types belong to domains
    *
    * @param types a collection of Polytypes
-   * @param domains a collection of Domains
+   * @param domains a collection of domains
    * @exception TypingEx
    */  
   public static void in(Polytype[] types,
-			Domain[] domains)
-    throws TypingEx
-  {
-    int expected = domains.length;
-    int actual = types.length;
-    if(expected != actual)
-      throw new BadSizeEx(expected, actual);
-
-    for(int i = 0; i<actual; i++)
-      in(types[i], domains[i]);
-  }
-
-  /**
-   * Checks wether monotypes belong to domains.
-   * This is just the special case where all polytypes are monomorphic.
-   *
-   * @param types a collection of Monotypes
-   * @param domains a collection of Domains
-   * @exception TypingEx
-   */
-  public static void in(Monotype[] types,
-			Domain[] domains)
+			Monotype[] domains)
     throws TypingEx
   {
     int expected = domains.length;

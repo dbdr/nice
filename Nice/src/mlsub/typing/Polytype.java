@@ -10,10 +10,6 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : Domain.java
-// Created : Fri Jun 02 16:59:06 2000 by Daniel Bonniot
-//$Modified: Thu Aug 31 18:17:47 2000 by Daniel Bonniot $
-
 package mlsub.typing;
 
 import mlsub.typing.lowlevel.Engine;
@@ -236,7 +232,7 @@ public final class Polytype
     if(domains == null)
       throw new InternalError("getDomain on non functional polytype "+this);
     
-    return new Domain(constraint, new TupleType(domains));
+    return new Domain(constraint, domains);
   }
   
   /****************************************************************

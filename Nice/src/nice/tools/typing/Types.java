@@ -171,6 +171,6 @@ public final class Types
     // remove nullness marker
     Monotype[] m = parameters(t.getMonotype());
 
-    return new Domain(t.getConstraint(), new TupleType(m));
+    return new Domain(t.getConstraint(), m);
   }
 }

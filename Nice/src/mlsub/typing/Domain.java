@@ -23,10 +23,10 @@ package mlsub.typing;
  */
 public class Domain
 {
-  public Domain(Constraint constraint, Monotype monotype)
+  public Domain(Constraint constraint, Monotype[] monotypes)
   {
     this.constraint = constraint;
-    this.monotype = monotype;
+    this.monotypes = monotypes;
   }
 
   /**
@@ -39,28 +39,21 @@ public class Domain
     return constraint;
   }
   
-  public Monotype getMonotype()
+  public Monotype[] getMonotypes()
   {
-    return monotype;
+    return monotypes;
   }
-  
-  public static Domain[] fromMonotypes(Monotype[] monotypes)
-  {
-    Domain[] res = new Domain[monotypes.length];
-    for(int i=0; i<monotypes.length; i++)
-      res[i] = new Domain(Constraint.True, monotypes[i]);
-    return res;
-  }
-  
+
   /****************************************************************
    * Misc
    ****************************************************************/
 
   public String toString()
   {
-    return (constraint==null ? "" : "Ex "+constraint) + monotype.toString();
+    return (constraint == null ? "" : "Ex " + constraint) +
+      java.util.Arrays.asList(monotypes).toString();
   }
 
   private Constraint constraint;
-  private Monotype monotype;  
+  private Monotype[] monotypes;
 }

@@ -45,6 +45,13 @@ public class KindingEx extends TypingEx
     this.t2=t2;
   }
 
+  KindingEx(TypeConstructor t, Interface i)
+  {
+    super(t + " cannot implement " + i);
+    this.t1=t;
+    this.t2=i;
+  }
+
   KindingEx(Interface t1, Interface t2)
   {
     super(t1+" cannot extend "+t2);

@@ -207,21 +207,28 @@ abstract public class ClassDefinition extends MethodContainer
   public void createContext()
   {
     try{
-      try{
-	if(superClass!=null)
+      if (superClass != null)
+	try{
 	  Typing.initialLeq(tc, superClass);
-      }
-      catch(KindingEx e){
-	User.error(name,
-		   "Class "+name+" cannot extend "+e.t2+
-		   ": they do not have the same number or kind of type parameters");
-      }
+	}
+	catch(KindingEx e){
+	  User.error(name,
+		     "Class " + name + " cannot extend " + e.t2 +
+		     ": they do not have the same number or kind of type parameters");
+	}
       
       if (isFinal)
 	Typing.assertMinimal(tc);
 
       if (impl != null)
-	Typing.assertImp(tc, impl, true);
+	try{
+	  Typing.assertImp(tc, impl, true);
+	}
+	catch(KindingEx e){
+	  User.error(name,
+		     "Class " + name + " cannot implement " + e.t2 +
+		     ": they do not have the same number or kind of type parameters");
+	}
 
       if (associatedInterface != null)
 	Typing.assertImp(tc, associatedInterface, true);

@@ -481,10 +481,7 @@ public final class Typing
       Engine.setKind(t,i.variance.getConstraint());
     }
     catch(Unsatisfiable e){
-      throw new TypingEx
-	(t+" cannot implement "+i
-	 +":\n"+t+" has variance "+t.getKind()+", "
-	 +i+" has variance "+i.variance.getConstraint());
+      throw new KindingEx(t, i);
     }
 
     try{

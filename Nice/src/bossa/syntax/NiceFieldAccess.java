@@ -56,12 +56,6 @@ public class NiceFieldAccess extends FieldAccess
   /** The class this field belongs to. */
   NiceClass definition;
 
-  public void createContext()
-  {
-    super.createContext();
-    createField();
-  }
-
   /****************************************************************
    * Module interface
    ****************************************************************/
@@ -80,11 +74,4 @@ public class NiceFieldAccess extends FieldAccess
     return javaReturnType();
   }
 
-  private void createField()
-  {
-    fieldDecl = definition.classe.addField(field.sym.name.toString(), 
-					   fieldType());
-    fieldDecl.setFlag(field.isTransient, Declaration.TRANSIENT);
-    fieldDecl.setFlag(field.isVolatile , Declaration.VOLATILE);
-  }
 }

@@ -248,7 +248,6 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
   public void load()
   {
     ast.resolveScoping();
-    ast.createContext();
 
     // this must be done before freezing
     if (!compiling())
@@ -256,7 +255,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
   }
 
   public void compile()
-  {    
+  {
     typecheck();
     nice.tools.compiler.OutputMessages.exitIfErrors();
     generateCode();

@@ -70,17 +70,6 @@ public class AST extends Node
     nice.tools.compiler.OutputMessages.exitIfErrors();
   }
   
-  public void createContext()
-  {
-    try{
-      for(Iterator i = definitions.iterator();i.hasNext();)
-	((Definition) i.next()).createContext();
-    }
-    catch(UserError ex){
-      nice.tools.compiler.OutputMessages.fatal(ex.getMessage());
-    }
-  }
-  
   public void typechecking()
   {
     for(Iterator i = definitions.iterator(); i.hasNext();)

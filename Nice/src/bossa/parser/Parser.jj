@@ -979,7 +979,7 @@ List interfaces():
     { return res; }
 }
 
-void getField(List fields):
+void getField(NiceClass c, List fields):
 {
   MonoSymbol field;
   boolean isFinal=false, isTransient = false, isVolatile = false;
@@ -994,7 +994,7 @@ void getField(List fields):
   field=monoSymbol() 
   [ "=" value=Expression() ]
   ";" 
-  { fields.add(new NiceClass.Field(field, value, isFinal, isTransient, isVolatile)); }
+  { fields.add(c.makeField(field, value, isFinal, isTransient, isVolatile)); }
 }
 
 void classDefinitionLookahead():
@@ -1041,8 +1041,8 @@ ClassDefinition classDefinition():
    }
    // internal fields and methods
    (
-      LOOKAHEAD( getField(null) )
-      getField(fields)
+      LOOKAHEAD( getField(null, null) )
+      getField(res, fields)
     |
       [ "public" | "private" ]
       (

@@ -214,13 +214,15 @@ abstract public class ClassDefinition extends MethodContainer
 	}
 
     createAssociatedInterface();
+
+    createContext();
   }
 
   /****************************************************************
    * Initial Context
    ****************************************************************/
 
-  public void createContext()
+  private void createContext()
   {
     try{
       if (superClass != null)

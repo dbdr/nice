@@ -44,11 +44,6 @@ public abstract class Definition extends Node implements bossa.util.Located
   }
   
   /**
-   * Creates the initial rigid context.
-   */
-  abstract void createContext();
-
-  /**
      Resolve local entities, that do not influence the global context.
 
      Toplevel entities have already been resolved and declared earlier,

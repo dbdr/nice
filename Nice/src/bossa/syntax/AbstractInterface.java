@@ -64,6 +64,8 @@ public class AbstractInterface extends MethodContainer
   {
     surinterfaces = TypeIdent.resolveToItf(typeScope, extensions);
     extensions = null;
+
+    createContext();
   }
 
   void resolveBody()
@@ -81,7 +83,7 @@ public class AbstractInterface extends MethodContainer
    * Initial Context
    ****************************************************************/
 
-  public void createContext()
+  private void createContext()
   {
     if (surinterfaces != null)
       try{
@@ -92,14 +94,6 @@ public class AbstractInterface extends MethodContainer
 		   " because they don't have the same number or kind of " +
 		   " type parameters");
       }
-
-    if (children != null)
-      for(Iterator i = children.iterator(); i.hasNext(); )
-	{
-	  Object o = i.next();
-	  if (o instanceof Definition)
-	    ((Definition) o).createContext();
-	}
   }
    
   /****************************************************************

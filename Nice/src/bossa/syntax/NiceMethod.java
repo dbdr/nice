@@ -132,17 +132,9 @@ public class NiceMethod extends MethodDeclaration
 		    FormalParameters parameters)
   {
     super(name, constraint, returnType, parameters);
-  }
-
-  /****************************************************************
-   * Initial Context
-   ****************************************************************/
-
-  public void createContext()
-  {
     bossa.link.Dispatch.register(this);
   }
-  
+
   /****************************************************************
    * Typechecking
    ****************************************************************/

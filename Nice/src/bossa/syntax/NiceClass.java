@@ -76,7 +76,11 @@ public class NiceClass extends ClassDefinition
 	  this.fields[i].sym.propagate = Node.none; 
 
 	for (int i = 0; i < this.fields.length; i++)
-	  addChild(new NiceFieldAccess(this, this.fields[i]));
+	  {
+	    NiceFieldAccess f = new NiceFieldAccess(this, this.fields[i]);
+	    this.fields[i].method = f;
+	    addChild(f);
+	  }
       }
     else
       this.fields = noFields;
@@ -88,8 +92,15 @@ public class NiceClass extends ClassDefinition
   /****************************************************************
    * Fields
    ****************************************************************/
+  
+  public Field makeField
+    (MonoSymbol sym, Expression value, 
+     boolean isFinal, boolean isTransient, boolean isVolatile)
+  {
+    return new Field(sym, value, isFinal, isTransient, isVolatile);
+  }
 
-  public static class Field
+  public class Field
   {
     public Field(MonoSymbol sym, Expression value, 
 		 boolean isFinal, boolean isTransient, boolean isVolatile)
@@ -112,6 +123,14 @@ public class NiceClass extends ClassDefinition
 	User.error(sym, "A field cannot have void type");
 
       value = dispatch.analyse(value, scope, typeScope);
+    }
+
+    void createField()
+    {
+      method.fieldDecl = classe.addField
+	(sym.name.toString(), Types.javaType(sym.type));
+      method.fieldDecl.setFlag(isTransient, gnu.expr.Declaration.TRANSIENT);
+      method.fieldDecl.setFlag(isVolatile , gnu.expr.Declaration.VOLATILE);
     }
 
     void typecheck(NiceClass c)
@@ -153,6 +172,8 @@ public class NiceClass extends ClassDefinition
     boolean isFinal;
     boolean isTransient;
     boolean isVolatile;
+
+    NiceFieldAccess method;
   }
   
   void resolve()
@@ -161,6 +182,8 @@ public class NiceClass extends ClassDefinition
     classe.supers = computeSupers();
     resolveFields();
     createConstructor();
+    createFields();
+    setJavaType(classe.getType());
   }
 
   private void resolveFields()
@@ -182,6 +205,15 @@ public class NiceClass extends ClassDefinition
       fields[i].resolve(scope, localScope);
   }
 
+  private void createFields()
+  {
+    if (fields.length == 0)
+      return;
+
+    for (int i = 0; i < fields.length; i++)
+      fields[i].createField();
+  }
+
   void resolveBody()
   {
     if (children != null)
@@ -191,21 +223,6 @@ public class NiceClass extends ClassDefinition
 	  if (child instanceof ToplevelFunction)
 	    ((ToplevelFunction) child).resolveBody();
 	}
-  }
-
-  public void createContext()
-  {
-    super.createContext();
-    
-    if (children != null)
-      for (Iterator i = children.iterator(); i.hasNext();)
-	{
-	  Object child = i.next();
-	  if (child instanceof MethodDeclaration)
-	    ((MethodDeclaration) child).createContext();
-	}
-
-    setJavaType(classe.getType());
   }
 
   /****************************************************************

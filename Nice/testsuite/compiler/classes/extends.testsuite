@@ -1,0 +1,4 @@
+/// FAIL
+  /// Toplevel
+  class A<T> { T x;}
+  class B<T,U> extends A<T> { U y; }

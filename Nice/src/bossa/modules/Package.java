@@ -195,7 +195,7 @@ public class Package implements mlsub.compilation.Module, Located
   
   private void read(PackageSource.Unit unit, List definitions)
   {
-    bossa.util.Location.currentFile = unit.name;
+    bossa.util.Location.setCurrentFile(unit.name);
 
     LocatedString pkgName = 
       bossa.parser.Loader.open(unit.reader,

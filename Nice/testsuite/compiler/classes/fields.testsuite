@@ -67,3 +67,22 @@
     int i = id(1);
   }
   int id(int x) = x;
+
+/// PASS
+  /// Toplevel
+
+  void doSomething(String s) { new Martin(); }
+
+  class Martin
+  {
+    String -> void f = String s => doSomething(s);
+  }
+
+/// PASS
+  /// Toplevel
+  void g() { new Martin(); }
+
+  class Martin
+  {
+    () -> String f = () => "";
+  }

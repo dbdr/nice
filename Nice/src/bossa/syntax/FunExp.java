@@ -61,8 +61,11 @@ public class FunExp extends Expression implements Function
     else
       inferredReturnType = Polytype.union(inferredReturnType, returned);
 
+    /* This is disabled, since currently default values of class fields are
+       typechecked twice.
     if (type != null)
       Internal.error("Return statement discovered after computation of the type");
+    */
   }
 
   private boolean alwaysReturns;

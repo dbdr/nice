@@ -123,6 +123,39 @@ abstract public class MethodDeclaration extends Definition
    * Typechecking
    ****************************************************************/
 
+  /** 
+      This is called in a pass before typechecking itself.
+      This is important, to typecheck and disambiguate the default values
+      of optional parameters, that will be used to typecheck code.
+  */
+  void typedResolve()
+  {
+    Polytype type = getType();
+    
+    if (!Constraint.hasBinders(type.getConstraint()))
+      {
+	parameters.typecheck(type.domain());
+	return;
+      }
+    
+    try{
+      Typing.enter();
+    
+      try{
+	type.getConstraint().enter();
+	parameters.typecheck(type.domain());
+      }
+      finally{
+	Typing.leave();
+      }
+    }
+    catch(TypingEx e){
+      User.error(this,
+		 "The type of method " + symbol.name +
+		 " is not well formed: " + type + "\n" + e);
+    }
+  }
+
   /**
      Do further typechecking, once the context of the method is entered.
   */
@@ -142,7 +175,6 @@ abstract public class MethodDeclaration extends Definition
     
     if (!Constraint.hasBinders(type.getConstraint()))
       {
-	parameters.typecheck(type.domain());
 	try{
 	  innerTypecheck();
 	}
@@ -157,7 +189,6 @@ abstract public class MethodDeclaration extends Definition
     
       try{
 	type.getConstraint().enter();
-	parameters.typecheck(type.domain());
 	innerTypecheck();
       }
       finally{

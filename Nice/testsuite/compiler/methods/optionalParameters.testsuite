@@ -57,3 +57,66 @@ void f(int x, int y = x) {}
   /// Toplevel
 // Bytecode has to be emited to convert the copied argument to what Java expects.
 void foo(int[] x, int y = x.size()) {}
+
+/// PASS
+  /// Toplevel
+  class A {
+  int aint;
+  alike f() {
+    return this.adjust();
+  }
+}
+
+<A T> T adjust(T this, int aint = this.aint)  = this;
+
+/// PASS
+  /// Toplevel
+  class A {
+  int aint;
+  alike f() {
+    return this.adjust();
+  }
+}
+
+<A T> T adjust(T this, int aint = this.aint);
+adjust(this, aint) = this;
+
+/// PASS
+  /// Toplevel
+<A T> T adjust(T this, int aint = this.aint);
+adjust(this, aint) = this;
+
+  class A {
+  int aint;
+  alike f() {
+    return this.adjust();
+  }
+}
+
+/// PASS
+  /// package a import b
+  /// Toplevel
+  class A {
+  int aint;
+  alike f() {
+    return this.adjust();
+  }
+}
+
+  /// package b import a
+  /// Toplevel
+<A T> T adjust(T this, int aint = this.aint)  = this;
+
+/// PASS
+  /// package b import a
+  /// Toplevel
+<A T> T adjust(T this, int aint = this.aint)  = this;
+
+  /// package a import b
+  /// Toplevel
+  class A {
+  int aint;
+  alike f() {
+    return this.adjust();
+  }
+}

@@ -33,19 +33,29 @@ public class AST extends Node
       children = new LinkedList();
 
     this.module = module;
-    findClasses();
+
+    findElements();
   }
 
-  private void findClasses()
+  private void findElements()
   {
-    ArrayList c = new ArrayList(children.size());
+    ArrayList classes = new ArrayList(children.size());
+    ArrayList methods = new ArrayList(children.size());
+
     for(Iterator i = children.iterator(); i.hasNext();)
       {
 	Object node = i.next();
 	if (node instanceof ClassDefinition)
-	  c.add((ClassDefinition) node);
+	  classes.add(node);
+        else if (node instanceof MethodDeclaration)
+          methods.add(node);
       }
-    classes = (ClassDefinition[]) c.toArray(new ClassDefinition[c.size()]);
+
+    this.classes = (ClassDefinition[]) 
+      classes.toArray(new ClassDefinition[classes.size()]);
+
+    this.methods = (MethodDeclaration[]) 
+      methods.toArray(new MethodDeclaration[methods.size()]);
   }
   
   public void buildScope()
@@ -98,6 +108,15 @@ public class AST extends Node
 	    nice.tools.compiler.OutputMessages.error(ex.getMessage());
 	  }
       }
+
+    for (int i = 0; i < methods.length; i++)
+      try{
+        methods[i].typedResolve();
+      }
+      catch(UserError ex){
+        nice.tools.compiler.OutputMessages.error(ex.getMessage());
+      }
+
     nice.tools.compiler.OutputMessages.exitIfErrors();
   }
 
@@ -164,5 +183,6 @@ public class AST extends Node
 
   private Module module;
   private ClassDefinition[] classes;
+  private MethodDeclaration[] methods;
 }
 

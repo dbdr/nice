@@ -24,15 +24,16 @@ import gnu.expr.*;
 
 public class GetFieldProc extends Procedure1 implements Inlineable
 {
-  public GetFieldProc (Field field)
+  public GetFieldProc (Declaration fieldDecl)
   {
-    this.field = field;
+    this.fieldDecl = fieldDecl;
   }
 
-  private Field field;
+  private Declaration fieldDecl;
 
   public void compile (ApplyExp exp, Compilation comp, Target target)
   {
+    Field field = fieldDecl.field;
     boolean isStatic = field.getStaticFlag();
     CodeAttr code = comp.getCode();
 
@@ -50,13 +51,14 @@ public class GetFieldProc extends Procedure1 implements Inlineable
 
   public gnu.bytecode.Type getReturnType (Expression[] args)
   {
-    return field.getType();
+    return fieldDecl.getType();
   }
 
   // Interpretation
 
   public Object apply1 (Object arg1)
   {
+    Field field = fieldDecl.field;
     try
       {
 	java.lang.reflect.Field reflectField = field.getReflectField();

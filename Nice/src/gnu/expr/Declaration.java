@@ -507,7 +507,7 @@ public class Declaration
       fflags |= Access.STATIC;
     if (getFlag(IS_UNKNOWN))
       {
-	// This is a kludge.  We really should set STATIC only of the module
+	// This is a kludge.  We really should set STATIC only if the module
 	// is static, in which case it should be safe to make it always FINAL.
 	// But for now we don't support non-static UNKNOWNs.  FIXME.
 	fflags |= Access.STATIC;

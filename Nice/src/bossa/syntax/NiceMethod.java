@@ -138,22 +138,9 @@ public class NiceMethod extends MethodDeclaration
    * Initial Context
    ****************************************************************/
 
-  private void register()
-  {
-    /* 
-       This must not be done in constructor:
-       in case both the interface file and the source files are read, 
-       both should not be mangled and registered.
-    */
-    boolean isConstructor = name.toString().equals("<init>");
-    
-    if(!isConstructor)
-      bossa.link.Dispatch.register(this);
-  }
-
   public void createContext()
   {
-    register();
+    bossa.link.Dispatch.register(this);
   }
   
   /****************************************************************

@@ -9,6 +9,19 @@ public class ClassExp extends LambdaExp
   public boolean isSimple() { return simple; }
   public void setSimple(boolean value) { simple = value; }
 
+  int accessFlags;
+  public void setAccessFlags(int value) 
+  { 
+    accessFlags = value;
+    // Access.SUPER mut be set on all non-interface classes
+    if (! isInterface())
+      accessFlags |= Access.SUPER;
+  }
+  public boolean isInterface() 
+  { 
+    return (accessFlags & Access.INTERFACE) != 0; 
+  }
+
   /** The class of instances of this class.
    * Same as super.type unless isMakingClassPair(), in which case super.type
    * is an interface, and instanceType is a class implementing the interface.
@@ -38,6 +51,35 @@ public class ClassExp extends LambdaExp
     type = null;
     // Make sure we actually generate a class.
     setCanRead(true);
+  }
+
+  public Declaration addField(String name, Type type)
+  {
+    Declaration res = addDeclaration(name, type);
+    res.setSimple(false);
+    res.setFlag(Declaration.NONSTATIC_SPECIFIED);
+    res.setCanRead(true);
+    res.setCanWrite(true);
+    res.noteValue(null);
+    return res;
+  }
+
+  /**
+     Add a method to this class.
+     @return the expression that should be used to call that method.
+  */
+  public ReferenceExp addMethod(LambdaExp method)
+  {
+    Declaration decl = new Declaration(method.getName());
+    decl.noteValue(method);
+    decl.setFlag(Declaration.IS_CONSTANT|Declaration.STATIC_SPECIFIED);
+    decl.setProcedureDecl(true);
+    method.nameDecl.context = this;
+
+    method.nextSibling = this.firstChild;
+    this.firstChild = method;
+
+    return new ReferenceExp(decl);
   }
 
   /*
@@ -126,10 +168,14 @@ public class ClassExp extends LambdaExp
 	    name = comp.mangleNameIfNeeded(name);
 	type.setName(name);
       }
+    if (filename != null)
+      type.setSourceFile(filename);
+    if (! isInterface())
+      comp.generateConstructor(getClassType(), this);
     return type;
   }
 
-  void setTypes()
+  private void setTypes()
   {
     int len = supers == null ? 0 : supers.length;
     ClassType[] superTypes = new ClassType[len];
@@ -166,15 +212,15 @@ public class ClassExp extends LambdaExp
 	    ptype.instanceType = instanceType;
 	  }
 	else
-	  instanceType = type = new ClassType();
+	  instanceType = type = new ClassType(getName());
 	type.setSuper(Type.pointer_type);
       }
     else
       {
-	instanceType = type = new ClassType();
+	instanceType = type = new ClassType(getName());
 	type.setSuper(superType);
       }
-    instanceType.setModifiers(Access.SUPER);
+    instanceType.setModifiers(accessFlags);
 
     if (j > 0)
       {
@@ -195,6 +241,11 @@ public class ClassExp extends LambdaExp
     if (type == null)
       setTypes();
     return type;
+  }
+
+  public ClassType getClassType()
+  {
+    return (ClassType) getType();
   }
 
   boolean partsDeclared;
@@ -234,7 +285,6 @@ public class ClassExp extends LambdaExp
 	  }
       }
 
-    /*
     for (LambdaExp child = firstChild;  child != null;
 	 child = child.nextSibling)
       {
@@ -243,7 +293,6 @@ public class ClassExp extends LambdaExp
 	if (isMakingClassPair())
 	  child.addMethodFor(instanceType, null, type);
       }
-    */
   }
 
   /** Return implementation method matching name and param types.
@@ -423,6 +472,21 @@ public class ClassExp extends LambdaExp
 	comp.curClass = saveClass;
 	comp.method = saveMethod;
       }
+  }
+
+  /**
+     Return code to create an instance of this class.
+     The instance is initialized by calling the default constructor.
+  */
+  public final Expression instantiate ()
+  {
+    return new QuoteExp(new PrimProcedure(getDefaultConstructor()));
+  }
+
+  private Method getDefaultConstructor()
+  {
+    ClassType clas = getClassType();
+    return Compilation.getConstructor(clas, this);
   }
 
   void compileChildMethods (Compilation comp)

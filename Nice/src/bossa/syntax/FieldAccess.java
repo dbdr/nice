@@ -1,7 +1,7 @@
 /**************************************************************************/
 /*                                N I C E                                 */
 /*             A high-level object-oriented research language             */
-/*                        (c) Daniel Bonniot 2000                         */
+/*                        (c) Daniel Bonniot 2002                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -13,14 +13,9 @@
 package bossa.syntax;
 
 import bossa.util.*;
+
 import nice.tools.code.*;
-
-import mlsub.typing.TypeConstructor;
-
-import gnu.bytecode.*;
 import gnu.expr.*;
-
-import java.util.*;
 
 /**
    A field access.
@@ -35,13 +30,21 @@ import java.util.*;
 abstract class FieldAccess extends MethodDeclaration
 {
   public FieldAccess(LocatedString name, 
-		     Constraint constraint,
-		     Monotype returnType,
-		     FormalParameters parameters)
+		     bossa.syntax.Constraint constraint,
+		     FormalParameters parameters,
+		     bossa.syntax.Monotype returnType)
   {
     super(name, constraint, returnType, parameters);
   }
   
+  FieldAccess(LocatedString name,
+	      mlsub.typing.Constraint cst,
+	      mlsub.typing.Monotype[] parameters, 
+	      mlsub.typing.Monotype returnType)
+  {
+    super(name, cst, parameters, returnType);
+  }
+
   /** 
    * true if this method represent the access to the field of an object.
    */
@@ -57,28 +60,28 @@ abstract class FieldAccess extends MethodDeclaration
     return null;
   }
 
-  protected Field field;
+  protected Declaration fieldDecl;
   
   public gnu.expr.Expression compileAccess(Arguments arguments)
   {
     if (arguments.size() == 0)
-      return Inline.inline(new GetFieldProc(field));
+      return Inline.inline(new GetFieldProc(fieldDecl));
     else
-      return Inline.inline(new GetFieldProc(field), 
+      return Inline.inline(new GetFieldProc(fieldDecl), 
 			   arguments.getExp(0).generateCode());
   }
   
   public gnu.expr.Expression compileAssign(gnu.expr.Expression value)
   {
     return Inline.inline
-      (new SetStaticFieldProc(field), value);
+      (new SetStaticFieldProc(fieldDecl), value);
   }
 
-  public gnu.expr.Expression compileAssign(Expression parameter, 
+  public gnu.expr.Expression compileAssign(bossa.syntax.Expression parameter, 
 					   gnu.expr.Expression value)
   {
     return Inline.inline
-      (new SetFieldProc(field), parameter.generateCode(), value);
+      (new SetFieldProc(fieldDecl), parameter.generateCode(), value);
   }
 }
 

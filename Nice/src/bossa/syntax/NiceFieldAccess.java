@@ -1,7 +1,7 @@
 /**************************************************************************/
 /*                                N I C E                                 */
 /*             A high-level object-oriented research language             */
-/*                        (c) Daniel Bonniot 2000                         */
+/*                        (c) Daniel Bonniot 2002                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -30,19 +30,18 @@ import java.util.*;
    either a 'get' or a 'set'.
 
    @version $Date$
-   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
+   @author Daniel Bonniot (bonniot@users.sourceforge.net)
  */
 public class NiceFieldAccess extends FieldAccess
 {
   public NiceFieldAccess
-    (ClassDefinition classDef, 
-     LocatedString fieldName, Monotype fieldType,
-     mlsub.typing.MonotypeVar[] classTypeParameters)
+    (NiceClass classDef, 
+     LocatedString fieldName, Monotype fieldType)
   {
-    super(fieldName, new Constraint(classTypeParameters,null),
-	  fieldType, makeList(Monotype.create(Monotype.sure(classDef.lowlevelMonotype()))));
+    super(fieldName, new Constraint(classDef.typeParameters,null),
+	  makeList(Monotype.create(Monotype.sure(classDef.lowlevelMonotype()))),
+	  fieldType);
     this.definition = classDef;
-    this.classTC = classDef.tc;
     this.fieldName = fieldName.toString();
   }
   
@@ -53,17 +52,15 @@ public class NiceFieldAccess extends FieldAccess
     return new FormalParameters(res);
   }
   
-  public final TypeConstructor classTC;
-
   public final String fieldName;
   
-  /** The java class this method is defined in */
-  ClassDefinition definition;
+  /** The class this field belongs to. */
+  NiceClass definition;
 
   public void createContext()
   {
     super.createContext();
-    findField();
+    createField();
   }
 
   /****************************************************************
@@ -79,16 +76,13 @@ public class NiceFieldAccess extends FieldAccess
    * Code generation
    ****************************************************************/
 
-  private void findField()
-  {
-    ClassType owner = (ClassType) nice.tools.code.Types.javaType(classTC);
-    field = owner.getDeclaredField(fieldName);
-    if (field == null)
-      field = owner.addField(fieldName, fieldType(), Access.PUBLIC);
-  }
-
   private Type fieldType()
   {
     return javaReturnType();
   }  
+
+  private void createField()
+  {
+    fieldDecl = definition.classe.addField(fieldName, fieldType());
+  }
 }

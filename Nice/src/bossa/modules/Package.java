@@ -544,7 +544,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
    * Code generation
    ****************************************************************/
 
-  public void addImplementationClass(gnu.bytecode.ClassType classe)
+  public void addImplementationClass(gnu.expr.ClassExp classe)
   {
     thisPkg.addClass(classe);
   }
@@ -741,18 +741,8 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
   /** Add a method to this package and return an expression to refer it. */
   public ReferenceExp addMethod(LambdaExp method, boolean packageMethod)
   {
-    ReferenceExp res = nice.tools.code.Gen.referenceTo(method);
-
     ClassExp classe = packageMethod ? implementationClass : dispatchClass;
-    method.nextSibling = classe.firstChild;
-    classe.firstChild = method;
-    method.outer = classe;
-
-    // method.nameDecl should be set by Gen.referenceTo
-    if (method.nameDecl != null && method.nameDecl.context == null)
-      method.nameDecl.context = classe;
-
-    return res;
+    return classe.addMethod(method);
   }
 
   public String bytecodeName()

@@ -881,6 +881,7 @@ public class Compilation
     curClass = clas;
     Method constructor_method = getConstructor(clas, lexp);
     clas.constructor = constructor_method;
+    constructor_method.eraseCode();
 
     Method superConstructor
       = clas.getSuperclass().addMethod("<init>", Access.PUBLIC,
@@ -1523,9 +1524,6 @@ public class Compilation
     ChainLambdas.chainLambdas(pkg, this);
     FindTailCalls.findTailCalls(pkg);
     FindCapturedVars.findCapturedVars(pkg);
-
-    for (LambdaExp c = pkg.firstClass; c != null; c = c.nextSibling)
-      c.allocChildClasses(this);
   }
 
   /** Create a new Compilation environment.
@@ -1581,6 +1579,6 @@ public class Compilation
   public void addClass (ClassType new_class)
   {
     currentPackage.addClass(new_class);
-    new_class.access_flags |= Access.PUBLIC|Access.SUPER;
+    new_class.access_flags |= Access.PUBLIC;
   }
 }

@@ -12,8 +12,6 @@
 
 package bossa.syntax;
 
-import java.util.Iterator;
-
 /**
    A Nice module.
 
@@ -34,5 +32,5 @@ public interface Module extends mlsub.compilation.Module
   gnu.expr.Expression getDispatchMethod(NiceMethod def);
   gnu.expr.Expression lookupPackageMethod(String methodName, String type);
   gnu.expr.ReferenceExp addMethod(gnu.expr.LambdaExp method, boolean packageMethod);
-  void addImplementationClass(gnu.bytecode.ClassType classe);
+  void addImplementationClass(gnu.expr.ClassExp classe);
 }

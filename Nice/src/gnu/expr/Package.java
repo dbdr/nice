@@ -63,7 +63,7 @@ public class Package extends Expression
   
   ClassExp firstClass;
 
-  public void addClass(ClassType c)
+  void addClass(ClassType c)
   {
     classes.add(c);
   }
@@ -114,13 +114,14 @@ public class Package extends Expression
 	if (lastDot != -1)
 	  {
 	    if (!name.substring(0, lastDot).equals(this.name))
-	      throw new Error("Class generate in the wrong package: " + 
+	      throw new Error("Class generated in the wrong package: " + 
 			      name + 
 			      " was found in package " + 
 			      this.name);
 
 	    name = name.substring(lastDot + 1);
 	  }
+
 	File out = new File(directory, name + ".class");
 	out.getParentFile().mkdirs();
 	clas.writeToFile(out);

@@ -25,17 +25,16 @@ import gnu.bytecode.*;
 public class SetStaticFieldProc extends gnu.mapping.Procedure1
 implements Inlineable
 {
-  private Field field;
+  private Declaration fieldDecl;
 
-  public SetStaticFieldProc (Field field)
+  public SetStaticFieldProc (Declaration fieldDecl)
   {
-    this.field = field;
-    if (!field.getStaticFlag())
-      throw new Error("Field " + field + " should be static");
+    this.fieldDecl = fieldDecl;
   }
 
   public Object apply1 (Object arg)
   {
+    Field field = fieldDecl.field;
     try
       {
 	java.lang.reflect.Field reflectField = field.getReflectField();
@@ -57,6 +56,7 @@ implements Inlineable
   
   public void compile (ApplyExp exp, Compilation comp, Target target)
   {
+    Field field = fieldDecl.field;
     Type fieldType = field.getType();
     
     Expression arg = exp.getArgs()[0];
@@ -79,6 +79,6 @@ implements Inlineable
 
   public gnu.bytecode.Type getReturnType (Expression[] args)
   {
-    return field.getType();
+    return fieldDecl.getType();
   }
 }

@@ -1,7 +1,7 @@
 /**************************************************************************/
-/*                             N I C E                                    */
-/*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 2000                             */
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2002                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -15,11 +15,12 @@ package bossa.syntax;
 import bossa.util.*;
 import mlsub.typing.*;
 
-import gnu.bytecode.*;
+import gnu.bytecode.Access;
 import java.util.*;
 
 import bossa.util.Debug;
 import nice.tools.code.Types;
+import nice.tools.code.Gen;
 
 /**
    Abstract syntax for a class definition.
@@ -59,7 +60,7 @@ public class NiceClass extends ClassDefinition
     // must be called when bytecode types are set, 
     // but before compilation, so that constructors are known
     // even in package variable initializers.
-    prepareClassType();
+    prepareCodeGeneration();
   }
 
   private static Field[] noFields = new Field[0];
@@ -111,8 +112,7 @@ public class NiceClass extends ClassDefinition
     for (int i = 0; i < fields.length; i++)
       {
 	MonoSymbol s = fields[i].sym;
-	addChild(new NiceFieldAccess
-	  (this, s.name, s.syntacticType, typeParameters));
+	addChild(new NiceFieldAccess(this, s.name, s.syntacticType));
       }
   }
 
@@ -120,8 +120,7 @@ public class NiceClass extends ClassDefinition
   {
     super.resolve();
 
-    if (!isInterface)
-      compileConstructor();
+    classe.supers = computeSupers();
 
     //optim
     if (fields.length == 0)
@@ -158,6 +157,9 @@ public class NiceClass extends ClassDefinition
 	  if (child instanceof MethodDeclaration)
 	    ((MethodDeclaration) child).createContext();
 	}
+
+    setJavaType(classe.getType());
+    classe.declareParts();
   }
 
   /****************************************************************
@@ -180,13 +182,24 @@ public class NiceClass extends ClassDefinition
    * Code generation
    ****************************************************************/
 
-  private void prepareClassType()
+  private void prepareCodeGeneration()
   {
-    setJavaType(module.createClass(simpleName.toString()));
+    createClass();
     createConstructor();
   }
 
-  private MethodDeclaration constructorMethod;
+  gnu.expr.ClassExp classe;
+
+  private void createClass()
+  {
+    classe = new gnu.expr.ClassExp();
+    classe.setName(name.toString());
+    classe.setFile(location().getFile());
+    classe.setSimple(true);
+    classe.setAccessFlags((isInterface ? Access.INTERFACE : 0) |
+			  (isAbstract ? Access.ABSTRACT : 0) |
+			  (isFinal ? Access.FINAL : 0));
+  }
 
   private void createConstructor()
   {
@@ -194,13 +207,20 @@ public class NiceClass extends ClassDefinition
       return;
 
     mlsub.typing.MonotypeVar[] params = createSameTypeParameters();
-    constructorMethod = new NiceMethod
+    MethodDeclaration constructorMethod = new MethodDeclaration
       (new LocatedString("<init>", location()),
-       null, null, null);
-    constructorMethod.setLowlevelTypes
-      (mlsub.typing.Constraint.create(params, null),
+       mlsub.typing.Constraint.create(params, null),
        null, 
-       Monotype.sure(new mlsub.typing.MonotypeConstructor(this.tc, params)));
+       Monotype.sure(new mlsub.typing.MonotypeConstructor(this.tc, params)))
+      {
+	protected gnu.expr.Expression computeCode()
+	{
+	  return classe.instantiate();
+	}
+
+	public void printInterface(java.io.PrintWriter s)
+	{ throw new Error("Should not be called"); }
+      };
 
     TypeConstructors.addConstructor(tc, constructorMethod);
   }
@@ -215,112 +235,54 @@ public class NiceClass extends ClassDefinition
 	    ((ToplevelFunction) child).compile();
 	}
 
-    if(Debug.codeGeneration)
-      Debug.println("Compiling class "+name);
-    
-    ClassType classType = javaClass();
-
-    classType.setModifiers(Access.PUBLIC 
-			   | (isAbstract  ? Access.ABSTRACT  : 0)
-			   | (isFinal     ? Access.FINAL     : 0)
-			   | (isInterface ? Access.INTERFACE : 0)
-			   );
-
-    if(isInterface)
-      classType.setSuper(gnu.bytecode.Type.pointer_type);
-    else
-      classType.setSuper(javaSuperClass());
-    
-    classType.setInterfaces(computeImplementedInterfaces());
-    addFields(classType);
-
-    classType.sourcefile = location().getFile();
-    module.addImplementationClass(classType);
+    module.addImplementationClass(classe);
   }
 
-  private ClassType[] computeImplementedInterfaces()
+  private gnu.expr.Expression typeExpression(TypeConstructor tc)
   {
-    if(!isInterface)
+    ClassDefinition c = ClassDefinition.get(tc);
+    if (c instanceof NiceClass)
+      return ((NiceClass) c).classe;
+    else
+      return new gnu.expr.QuoteExp(nice.tools.code.Types.javaType(tc));
+  }
+
+  private gnu.expr.Expression[] computeSupers()
+  {
+    if (!isInterface)
       {
-	if (impl == null) 
-	  return null;
-	
-	ArrayList imp = new ArrayList(impl.length);
-	for(int i=0; i<impl.length; i++)
+	if (impl == null)
+	  if (superClass == null)
+	    return null;
+	  else
+	    return new gnu.expr.Expression[]{ typeExpression(superClass[0]) };
+	  
+	ArrayList imp = new ArrayList(impl.length + 1);
+	if (superClass != null)
+	  imp.add(typeExpression(superClass[0]));
+	for (int i = 0; i < impl.length; i++)
 	  {
 	    TypeConstructor assocTC = impl[i].associatedTC();
 	    
 	    if (assocTC == null)
+	      // This interface is abstract: ignore it.
 	      continue;
 	    
-	    imp.add(nice.tools.code.Types.javaType(assocTC));
+	    imp.add(typeExpression(assocTC));
 	  }
-	return (ClassType[]) imp.toArray(new ClassType[imp.size()]);
+	return (gnu.expr.Expression[]) 
+	  imp.toArray(new gnu.expr.Expression[imp.size()]);
       }
     else 
       {
 	if (superClass == null)
 	  return null;
 	
-	ClassType[] itfs = new ClassType[superClass.length];
-	for (int i=0; i<superClass.length; i++)
-	  {
-	    Interface itf = get(superClass[i]).getAssociatedInterface();
-	    if (itf == null)
-	      {
-		Internal.warning("Should not happen");
-		continue;
-	      }
-	    itfs[i] = (ClassType) 
-	      nice.tools.code.Types.javaType(itf.associatedTC());
-	  }
+	gnu.expr.Expression[] itfs = new gnu.expr.Expression[superClass.length];
+	for (int i = 0; i < superClass.length; i++)
+	  itfs[i] = typeExpression(superClass[i]);
+
 	return itfs;
-      }
-  }
-
-  private void compileConstructor()
-  {
-    ClassType classType = javaClass();
-    gnu.bytecode.Method constructor = constructor(classType);
-
-    constructor.initCode();
-    gnu.bytecode.CodeAttr code = constructor.getCode();
-    gnu.bytecode.Variable thisVar = new gnu.bytecode.Variable();
-    thisVar.setName("this");
-    thisVar.setType(classType);
-    thisVar.setParameter(true);
-    thisVar.allocateLocal(code);
-
-    code.emitLoad(thisVar);
-    code.emitInvokeSpecial(constructor(javaSuperClass()));
-    code.emitReturn();
-
-    constructorMethod.setCode( new gnu.expr.QuoteExp
-      (new gnu.expr.PrimProcedure(constructor)));
-  }
-
-  private static gnu.bytecode.Method constructor(ClassType ct)
-  {
-    if(ct == null)
-      ct = gnu.bytecode.Type.pointer_type;
-
-    return ct.addMethod
-      ("<init>", Access.PUBLIC, gnu.bytecode.Type.typeArray0, 
-       gnu.bytecode.Type.void_type);
-  }
-  
-  void addFields(ClassType c)
-  {
-    for (int i = 0; i < fields.length; i++)
-      {
-	Field f = fields[i];
-	String name = f.sym.name.toString();
-	
-	// The field might have been created by a NiceFieldAccess.compile*()
-	if(c.getDeclaredField(name) == null)
-	  c.addField(name,
-		     nice.tools.code.Types.javaType(f.sym.type),
-		     Access.PUBLIC);
       }
   }
 

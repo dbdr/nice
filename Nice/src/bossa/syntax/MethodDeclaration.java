@@ -56,40 +56,30 @@ abstract public class MethodDeclaration extends Definition
   {
     super(name, Node.down);
 
-    if(returnType != null)
-      // otherwise, symbol and arity are supposed to be set by someone else
-      // a child class for instance
-      // This should them be done through setLowlevelTypes(...)
-      {
-	this.parameters = parameters;
-	addChild(parameters);
-	
-	// remember it to print the interface
-	syntacticConstraint = constraint.toString();
-	
-	symbol = new MethodDeclaration.Symbol
-	  (name, constraint, returnType);
-	
-	symbol.propagate = Node.global;
-	addChild(symbol);
-
-	this.arity = parameters.size;
-      }
+    this.parameters = parameters;
+    addChild(parameters);
+    
+    // remember it to print the interface
+    syntacticConstraint = constraint.toString();
+    
+    symbol = new MethodDeclaration.Symbol(name, constraint, returnType);    
+    symbol.propagate = Node.global;
+    addChild(symbol);
+    
+    this.arity = parameters.size;
   }
 
   /** 
       Does not specify the type of the method.
       Used in JavaMethod to lazyfy the lookup of java types.
   */
-  MethodDeclaration(LocatedString name)
+  MethodDeclaration(LocatedString name,
+		    Constraint cst,
+		    Monotype[] parameters, 
+		    Monotype returnType)
   {
     super(name, Node.global);
-  }
-  
-  void setLowlevelTypes(Constraint cst,
-			Monotype[] parameters, 
-			Monotype returnType)
-  {
+
     arity = (parameters == null ? 0 : parameters.length);
     type = new Polytype(cst, new FunType(parameters, returnType));
     symbol = new MethodDeclaration.Symbol(name, type);

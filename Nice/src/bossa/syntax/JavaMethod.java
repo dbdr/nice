@@ -73,13 +73,11 @@ public class JavaMethod extends MethodDeclaration
      mlsub.typing.Monotype[] parameters
     )
   {
-    super(name, null, null , null);
+    super(name, constraint, parameters, returnType);
     
     this.className = className;
     this.methodName = methodName;
     this.javaTypes = javaTypes;
-
-    setLowlevelTypes(constraint, parameters, returnType);
   }
 
   static JavaMethod make(Method m, boolean constructor)

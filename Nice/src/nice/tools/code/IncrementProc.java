@@ -34,19 +34,20 @@ public class IncrementProc extends gnu.mapping.Procedure1 implements Inlineable
      @param returnOld if true, return value before modification,
      otherwise value after modification
    */
-  public IncrementProc (Field field, boolean returnOld, boolean increment)
+  public IncrementProc(Declaration field, boolean returnOld, boolean increment)
   {
-    this.field = field;
+    this.fieldDecl = field;
     this.returnOld = returnOld;
     this.increment = increment;
   }
 
-  private Field field;
+  private Declaration fieldDecl;
   private boolean increment;
   private boolean returnOld;
 
   public void compile (ApplyExp exp, Compilation comp, Target target)
   {
+    Field field = this.fieldDecl.field;
     CodeAttr code = comp.getCode();
     ClassType ctype = field.getDeclaringClass();
     Expression[] args = exp.getArgs();
@@ -86,7 +87,7 @@ public class IncrementProc extends gnu.mapping.Procedure1 implements Inlineable
 
   public gnu.bytecode.Type getReturnType (Expression[] args)
   {
-    return field.getType();
+    return fieldDecl.getType();
   }
 
   public Object apply1 (Object arg1)

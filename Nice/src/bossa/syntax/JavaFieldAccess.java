@@ -35,7 +35,7 @@ public class JavaFieldAccess extends FieldAccess
      LocatedString name,Constraint cst,
      Monotype returnType, FormalParameters parameters)
   {
-    super(name, cst, returnType, parameters);
+    super(name, cst, parameters, returnType);
     this.className = className;
     this.fieldName = fieldName;
     
@@ -49,11 +49,9 @@ public class JavaFieldAccess extends FieldAccess
 			  mlsub.typing.Monotype returnType, 
 			  mlsub.typing.Monotype[] parameters)
   {
-    super(name, null, null, null);
+    super(name, cst, parameters, returnType);
     this.className = className;
     this.fieldName = fieldName;
-    
-    setLowlevelTypes(cst, parameters, returnType);
   }
   
   static MethodDeclaration make(Field f)
@@ -85,6 +83,7 @@ public class JavaFieldAccess extends FieldAccess
 	 params);
 
       res.field = f;
+      res.fieldDecl = new Declaration(f.getName(), f);
 
       if (Debug.javaTypes)
 	Debug.println("Loaded field " + res);
@@ -116,11 +115,14 @@ public class JavaFieldAccess extends FieldAccess
 
 	JavaClasses.registerNativeField(this, field);
       }
+    fieldDecl = new Declaration(fieldName, field);
   }
   
   /****************************************************************
    * Reflection
    ****************************************************************/
+
+  private Field field;
 
   Field getField(LocatedString javaClass, String name)
   {

@@ -19,14 +19,14 @@ class B extends A { int life = 42; }
   if (a instanceof B)
     assert false;
   else
-    assert a.life == 42;
+    assert a. /* ///FAIL HERE */ life == 42;
 
 /// FAIL
   A a;
   a = new B();
   if (a instanceof B)
-    ;
-  assert a.life == 42;
+    {}
+  assert a. /* ///FAIL HERE */ life == 42;
 
 /// PASS
   A a;
@@ -56,7 +56,7 @@ class B extends A { int life = 42; }
       int i = a.life;
       if (i == 42)
         a = new A();
-      i = a.life;
+      i = a. /* ///FAIL HERE */ life;
     }
 
 /// PASS
@@ -90,19 +90,24 @@ class B extends A { int life = 42; }
       int i = a.life;
       if (i == 42)
         a = new A();
-      i = a.life;
+      i = a. /* ///FAIL HERE */ life;
       break;
     }
 
 /// FAIL
   B b = new B();
   if (b instanceof A)
-    b = new A();
+     /* ///FAIL HERE */ b = new A();
+     /* XXX Check error message. Last time checked it was
+      [nicec] Incorrect type in assignment to b
+      [nicec] Found   : global.A
+      [nicec] Expected: global.A
+     */
 
 /// FAIL
   Y y = new D();
   if (y instanceof X)
-    y = new C();
+     /* ///FAIL HERE */ y = new C();
   /// Toplevel
   interface X {}
   interface Y {}
@@ -201,7 +206,7 @@ void f() {
 /// FAIL
   X<String> foo = new X();
   if (foo instanceof Y)
-    foo.bar();
+    foo. /* ///FAIL HERE */ bar();
 
   /// Toplevel
   class X<T> {}
@@ -309,7 +314,7 @@ void f() {
   if (x instanceof B) {
     if (f != null)
       f();
-    assert x.life == 42;
+    assert x. /* ///FAIL HERE */ life == 42;
   }
 
 /// PASS
@@ -367,5 +372,5 @@ void f() {
   Object o = new String[3];
   if (o instanceof String[])
    {
-     ?java.io.File[] s = o;
+     ?java.io.File[]  /* ///FAIL HERE */ s = o;
    }

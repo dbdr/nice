@@ -47,19 +47,19 @@ void foo(int i) {}
 void goo() = foo(3);
 
 /// FAIL
-  void x;
+  void /*///FAIL HERE*/ x;
 
 /// FAIL
   /// Toplevel
-var void x;
+var void /*///FAIL HERE*/ x = println("");
 
 /// FAIL
   /// Toplevel
-void f(void x) {}
+void f(/*///FAIL HERE*/ void x) {}
 
 /// FAIL
   /// Toplevel
-void f(void) {}
+void f(/*///FAIL HERE*/ void) {}
 
 /// PASS
   /// Toplevel
@@ -90,11 +90,11 @@ void f() = doSomethingAndReturnAStatusBoolean();
   ?String bar() = "abc";
 
 /// FAIL
-  let x = foo();
+  let /*///FAIL HERE*/ x = foo();
   /// Toplevel
   void foo() {}
 
 /// FAIL
-  var x = foo();
+  var /*///FAIL HERE*/ x = foo();
   /// Toplevel
   void foo() {}

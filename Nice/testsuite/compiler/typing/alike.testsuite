@@ -37,4 +37,4 @@ abstract class A
 
 /// FAIL
   /// TOPLEVEL
-alike f3(alike);
+alike f3(/*///FAIL HERE*/ alike);

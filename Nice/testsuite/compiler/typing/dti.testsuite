@@ -158,7 +158,7 @@ StringBuffer func( ?StringBuffer foo ) {
   void foo() { t=s; s = null; }
   foo();
   foo();
-  t.substring(1);
+  t. /*/// FAIL HERE*/ substring(1);
 
 /// PASS bug
   ?String s = maybeString();

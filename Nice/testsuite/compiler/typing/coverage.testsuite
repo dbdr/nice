@@ -11,7 +11,7 @@ abstract interface Abstract {}
 
 /// FAIL
   /// TOPLEVEL
-void method3(String->String);
+void /* ///FAIL HERE */ method3(String->String);
 
 /// PASS
   /// TOPLEVEL

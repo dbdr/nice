@@ -36,7 +36,7 @@ public <WindowListenerHandler HH> void addNiceWindowListener
     alike f();
   }
   class A implements I {}
-  f(A x) = new A();
+  f(A x) = /* ///FAIL HERE */ new A();
 
 /// PASS
   /// Toplevel
@@ -62,7 +62,7 @@ class X implements A,B {}
 /// FAIL
   /// Toplevel
 // We now accept that there are two incomparable nodes that implement
-// an abstract interface, abive a node that could approximate for that 
+// an abstract interface, above a node that could approximate for that
 // interface. There is just no approximation in that case.
 abstract interface I { alike foo(); }
 
@@ -73,7 +73,7 @@ class X implements A,B {}
 
 var B b = new X();
 
-foo(X x) = b;
+/* ///FAIL HERE */ foo(X x) = b;
 
 /// PASS
   /// Toplevel

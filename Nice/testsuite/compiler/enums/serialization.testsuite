@@ -1,4 +1,4 @@
-/// PASS
+/// PASS bug
   let filename = "color.ser";
 
   let outf = new FileOutputStream(filename);

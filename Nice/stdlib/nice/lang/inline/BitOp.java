@@ -39,7 +39,7 @@ public class BitOp
   private static BitOp.Get get = new BitOp.Get();
 
   // Getting a bit
-  private static class Get extends Procedure2 implements Inlineable
+  private static class Get extends Procedure2 implements Branchable
   {
     public void compile (ApplyExp exp, Compilation comp, Target target)
     {
@@ -77,17 +77,81 @@ public class BitOp
           code.emitPushBoolean(true);
           code.emitFi();
         }
-      else
-        {
-          code.emitIfIntNotZero();
-          code.emitPushBoolean(true);
-          code.emitElse();
-          code.emitPushBoolean(false);
-          code.emitFi();
-        }
 
       target.compileFromStack(comp, Type.boolean_type);
     }
+
+    public void compileJump (Compilation comp, Expression[] args, Label to)
+    {
+      CodeAttr code = comp.getCode();
+
+      Type type0 = args[0].getType();
+      boolean isLong = type0 == Type.long_type;
+
+      Target t0 = Target.pushValue(type0);
+      args[0].compile(comp, t0);
+
+      if (isLong)
+        code.emitPushLong(1);
+      else
+        code.emitPushInt(1);
+
+      Target t1 = Target.pushValue(Type.int_type);
+      args[1].compile(comp, t1);
+    
+      code.emitShl();
+
+      // This is needed for types shorter than int.
+      if (!isLong) 
+        t0.compileFromStack(comp, Type.int_type);
+
+      code.emitAnd();
+      if (isLong)
+        {
+          code.emitPushLong(0);
+	  code.emitGotoIfNE(to);
+        }
+      else
+	{
+	  code.emitGotoIfIntNeZero(to);
+	}
+      }
+
+    public void compileJumpNot (Compilation comp, Expression[] args, Label to)
+    {
+      CodeAttr code = comp.getCode();
+
+      Type type0 = args[0].getType();
+      boolean isLong = type0 == Type.long_type;
+
+      Target t0 = Target.pushValue(type0);
+      args[0].compile(comp, t0);
+
+      if (isLong)
+        code.emitPushLong(1);
+      else
+        code.emitPushInt(1);
+
+      Target t1 = Target.pushValue(Type.int_type);
+      args[1].compile(comp, t1);
+    
+      code.emitShl();
+
+      // This is needed for types shorter than int.
+      if (!isLong) 
+        t0.compileFromStack(comp, Type.int_type);
+
+      code.emitAnd();
+      if (isLong)
+        {
+          code.emitPushLong(0);
+	  code.emitGotoIfEq(to);
+        }
+      else
+	{
+	  code.emitGotoIfIntEqZero(to);
+	}
+      }
 
     public Type getReturnType (Expression[] args)
     {

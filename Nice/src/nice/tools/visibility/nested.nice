@@ -1,0 +1,63 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2005                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package nice.tools.visibility;
+
+/**
+   Nested lookup mode.
+
+   In this mode, symbols in the current scope shadow symbols with the same
+   name in imported scopes.
+
+   @author Daniel Bonniot (bonniot@users.sf.net)
+ */
+
+<Sym> get(Scope this, root, key) = this.getScope(root).maybeGet(key) || empty;
+
+<Sym> get(Scope this, key) = this.maybeGet(key) || empty;
+
+private <Sym> ?List<Sym> maybeGet(?Scope<Sym> s, String key) =
+  s == null ? null : (s.map[key] || s.publicMap[key] || s.opens[key] || s.parent.maybeGet(key));
+
+<Sym> ?List<Sym> get(List<Scope<Sym>> scopes, String key)
+{
+  ?List<Sym> res = null;
+
+  for (Scope<Sym> scope : scopes)
+    {
+      let partial = scope.publicMap[key];
+      if (partial != null)
+	{
+	  if (res == null)
+	    res = new LinkedList();
+	  notNull(res).addAll(partial);
+	}
+    }
+
+  return res;
+}
+
+private <Sym> ?Scope<Sym> getScope(Scope<Sym> this, String root)
+{
+  if (this.name.equals(root))
+    return this;
+
+  if (parent != null)
+    {
+      let res = notNull(parent).getScope(root);
+      if (res != null)
+	return res;
+    }
+
+  ?Scope<Sym> s = opens.search(Scope<Sym> s => s.name.equals(root));
+  return s;
+}

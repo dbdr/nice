@@ -18,9 +18,6 @@ package nice.tools.visibility;
    @author Daniel Bonniot (bonniot@users.sf.net)
  */
 
-private <Sym> ?List<Sym> maybeGet(?Scope<Sym> s, String key) =
-  s == null ? null : (s.map[key] || s.opens[key] || s.parent.maybeGet(key));
-
 add(Scope this, key, value, visibility) = map.add(key, value);
 add(Scope this, key, value, familial)
 {
@@ -49,41 +46,3 @@ remove(Scope this, key, value)
 }
 
 addImplicitOpen(Scope this, Scope scope) = opens.add(scope);
-
-<Sym> get(Scope this, root, key) = this.getScope(root).maybeGet(key) || empty;
-
-<Sym> get(Scope this, key) = this.maybeGet(key) || empty;
-
-<Sym> ?List<Sym> get(List<Scope<Sym>> scopes, String key)
-{
-  ?List<Sym> res = null;
-
-  for (Scope<Sym> scope : scopes)
-    {
-      let partial = scope.publicMap[key];
-      if (partial != null)
-	{
-	  if (res == null)
-	    res = new LinkedList();
-	  notNull(res).addAll(partial);
-	}
-    }
-
-  return res;
-}
-
-private <Sym> ?Scope<Sym> getScope(Scope<Sym> this, String root)
-{
-  if (this.name.equals(root))
-    return this;
-
-  if (parent != null)
-    {
-      let res = notNull(parent).getScope(root);
-      if (res != null)
-	return res;
-    }
-
-  ?Scope<Sym> s = opens.search(Scope<Sym> s => s.name.equals(root));
-  return s;
-}

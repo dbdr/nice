@@ -587,8 +587,9 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     if (!compiling())
       // The code is already there
       {
+	declaration.setSimple(false);
 	declaration.field = source.getBytecode().getField(name);
-	
+
 	if (declaration.field == null)
 	  Internal.error(this,
 			 "The compiled file is not consistant with the interface file for global variable " + name);

@@ -18,3 +18,13 @@
   x = 1;
   /// TOPLEVEL
   var int x = 0;
+
+/// PASS
+  /// package a 
+  /// TOPLEVEL
+  var int x = 0;
+  int getAX() = x;
+  /// package b import a
+  /* Modifying a global var from a different package. */
+  x = 1; 
+  assert(getAX() == 1);

@@ -138,8 +138,9 @@ main(args)
     {
       System.out.println
       ("\nAn exception has occured in the compiler\n" +
-       "please report a simple case showing this behaviour to d.bonniot@mail.dotcom.fr\n\n" +
-       "Exception: " + uncaughtException.toString() +
+       "Please fill-in a bug report at the following webpage:\n" +
+       "http://sourceforge.net/tracker/?func=add&group_id=12788&atid=112788" +
+       "\n\nException: " + uncaughtException.toString() +
        "\n\nStack trace:\n");
       uncaughtException.printStackTrace();
       System.exit(1);
@@ -161,8 +162,8 @@ usage()
 void version();
 version()
 {
-  println("Nice compiler alpha version (" + buildDate + ")");
-  println("Copyright (C) 2000 Daniel Bonniot");
+  println("Nice compiler beta version (" + buildDate + ")");
+  println("Copyright (C) 2001 Daniel Bonniot");
   println("Visit the Nice homepage: http://purl.org/net/nice");
   println("Report bugs to d.bonniot@mail.dotcom.fr");
   System.exit(0);

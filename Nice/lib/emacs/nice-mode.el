@@ -424,10 +424,6 @@ Mode for editing/compiling Nice programs.
       (inher-cont . c-lineup-java-inher)
       (func-decl-cont . c-lineup-java-throws))) t)
 
-  ;(make-local-variable 'compilation-exit-message-function)
-  (setq compilation-exit-message-function 'nice-compilation-exit)
-  (setq compilation-finish-function 'nice-compilation-finish-function)
-
   (local-set-key "\C-c\C-b" 'nice-compile-buffer)
   (local-set-key "\C-c\C-c" 'nice-comment-region-or-line)
   (local-set-key "\C-c\C-u" 'nice-uncomment-region-or-line)
@@ -522,6 +518,14 @@ Mode for editing/compiling Nice programs.
     (setq default-directory nice-directory)
 
     (setq nice-compilation-buffer (compile-internal cmd "No more errors"))
+
+    (save-excursion
+      (set-buffer nice-compilation-buffer)
+      (set (make-local-variable 'compilation-finish-function)
+	   'nice-compilation-finish-function)
+      (set (make-local-variable 'compilation-exit-message-function)
+	   'nice-compilation-exit)
+    )
 
     ;; Start process
     ;(setq nice-process (nice-start-process nice-directory cmd))

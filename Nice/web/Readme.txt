@@ -6,7 +6,7 @@ This file explains how to install and use the Nice compiler on Windows
 
 INSTALLATION STEPS
 
-1. You should have downloaded a file Nice-X.Y.zip, where X.Y is the version
+1. You should have downloaded a file Nice-X.Y-windows.zip, where X.Y is the version
    of the compiler. The latest version of this file is always available at
    http://nice.sourceforge.net/Nice.zip
 
@@ -31,8 +31,10 @@ USING THE COMPILER
 You can call the compiler from a command prompt with "nicec".
 The file nicec.html lists the command-line options of the compiler.
 
-It is recommended to use Emacs for windows to edit and compile programs.
-There are blends, both freely available:
+It is recommended to use an IDE to edit and compile programs. 
+A plugin for Eclipse is being worked on.
+For the moment, the best solution is to use Emacs for windows 
+There are two blends, both freely available:
   * NT Emacs http://www.gnu.org/software/emacs/windows/
   * X Emacs  http://www.xemacs.org/Download/win32/
 
@@ -61,7 +63,6 @@ You have to place the following code in this emacs startup file:
 
 CONTACT
 
-If you experience any problem with Nice, in particular with the
-Windows installation, or if you can contribute information for this document,
-you should visit http://nice.sourceforge.net or email 
-Daniel Bonniot: bonniot@users.sourceforge.net
+For further information about Nice, visit http://nice.sourceforge.net
+In particular, if you need assistance with the Windows installation, or if you can contribute information for this document, you can use the nice-info mailing list,
+the forums, or email directly the main author Daniel Bonniot: bonniot@users.sourceforge.net

@@ -28,6 +28,9 @@
   assert 0.000_012 == 0.000012;
   assert 1_000.000_1d == 1000.0001d;
 
+  assert 0xFF == 0b11111111;
+  assert 0xF000 == 0B1111_0000_0000_0000;
+
 /// PASS
   let a = new A(_b: 0);
   let x = a._b;

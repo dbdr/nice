@@ -49,8 +49,3 @@
   /// Toplevel
 void foo(int) {}
 void foo(double) {}
-
-/// PASS
-  assert 0xFF == 0b11111111;
-  assert 0xF000 == 0B1111_0000_0000_0000;
-

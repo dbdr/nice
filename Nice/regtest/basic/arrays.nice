@@ -26,13 +26,64 @@ test_arrays()
 {
   println("\n### Testing native arrays ###\n");
 
-  int[] a = new int[10];
-  for(int i=0; i<10; i++)
-    a[i] = i;
+  int[] a = test_native_arrays();
   p(a);
   p(reverse(a));
-  
-  // using collection functions on arrays
+  test_collection_arrays(a);
+  test_polymorphism();
+}
+
+
+int[] test_native_arrays();
+test_native_arrays()
+{
+  int[] aI = new int[10];
+  aI[0] = 0;
+  for(int i=1; i<aI.length; i++)
+    aI[i] = aI[i-1]+1;
+
+  long[] aL = new long[10];
+  aL[0] = 0L;
+  for(int i=1; i<aL.length; i++)
+    aL[i] = aL[i-1]+1;
+
+  float[] aF = new float[10];
+  aF[0] = 2;
+  for(int i=1; i<aF.length; i++)
+    aF[i] = aF[i-1]*1.5;
+
+  double[] aD = new double[10];
+  aD[0] = 2;
+  for(int i=1; i<aD.length; i++)
+    aD[i] = aD[i-1]*1.5;
+
+  char[] aC = new char[10];
+  aC[0] = 'A';
+  for(int i=1; i<aC.length; i++)
+    aC[i] = aC[i-1];
+
+  short[] aS = new short[10];
+  aS[0] = 0;
+  for(int i=1; i<aS.length; i++)
+    aS[i] = aS[i-1];
+
+  byte[] aB = new byte[10];
+  aB[0] = 0;
+  for(int i=1; i<aB.length; i++)
+    aB[i] = aB[i-1];
+
+  boolean[] aZ = new boolean[10];
+  aZ[0] = true;
+  for(int i=1; i<aZ.length; i++)
+    aZ[i] = !aZ[i-1];
+
+  return aI;
+}
+
+// using collection functions on arrays
+void test_collection_arrays(int[] a);
+test_collection_arrays(a) 
+{
   println(a.size());
   int[] b = map(a, fun(int i) => i+4);
   p(b);
@@ -84,4 +135,33 @@ test_arrays()
 
   float[] tf = [ 1.5, 2, 3.7 ];
   tf.iter(fun(float f)=>println(f+1));
+}
+
+// We test how functions on polymorphic arrays deal with native type components
+<Any T> T getFirst(T[] a) = a[0];
+
+void test_polymorphism()
+{
+  // Test that different array creation code is generated
+  // according to the context
+  byte[] b   = [ 14, 17 ];
+  short[] s  = [ 14, 17 ];
+  int[] i    = [ 14, 17 ];
+  long[] l   = [ 14, 17 ];
+  float[] f  = [ 14, 17 ];
+  double[] d = [ 14, 17 ];
+  String[] S = [ "Quatorze", "Dix-sept" ];
+
+  byte bb   = getFirst(b);
+  short ss  = getFirst(s);
+  int ii    = getFirst(i);
+  long ll   = getFirst(l);
+  float ff  = getFirst(f);
+  double dd = getFirst(d);
+  String SS = getFirst(S);
+
+  int[][] ddim = new int[1][1];
+  int iii = getFirst(getFirst(ddim));
+
+  println("Polymorphic arrays: " + bb + ss + ii + ll + ff + dd + SS + iii);
 }

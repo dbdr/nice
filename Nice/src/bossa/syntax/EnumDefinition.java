@@ -34,7 +34,7 @@ public class EnumDefinition extends Definition
 	new TypeIdent(new LocatedString("nice.lang.Enum",name.location())),
 	null,null);
     NiceClass impl = new NiceClass(classDef);
-    impl.setFields(new ArrayList(0));
+    impl.setFields(null);
     classDef.setImplementation(impl);
 
     addChild(classDef);    

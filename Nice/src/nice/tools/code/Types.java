@@ -366,16 +366,19 @@ public final class Types
   {
     if(stringToReflectClass.containsKey(className))
       return (Class) stringToReflectClass.get(className);
-    
+
     Class c = null;
 
+    if (classLoader == null)
+      setClasspath(null);
+    
     try{ c = classLoader.loadClass(className); }
     catch(ClassNotFoundException e)
       // when the class does not exist
       { }
     catch(NoClassDefFoundError e) 
       // when a class with similar name but with different case exists
-      // can occur in Windows
+      // can occur on case-insensitive file-systems (e.g. FAT)
       { }
       
     stringToReflectClass.put(className, c);
@@ -385,6 +388,11 @@ public final class Types
 
   private static ClassLoader classLoader;
 
+  static 
+  {
+    setClasspath(null);
+  }
+  
   public static void setClasspath(String classpath)
   {
     if (classpath == null)
@@ -410,7 +418,7 @@ public final class Types
 	String pathComponent = classpath.substring(start, end);
 	if (pathComponent.length() > 0)
 	  try{
-	    File f = new File(pathComponent);
+	    File f = nice.tools.util.System.getFile(pathComponent);
 	    if (f.canRead())
 	      components.add(f.toURL());
 	    else

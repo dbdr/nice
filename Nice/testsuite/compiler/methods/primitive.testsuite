@@ -18,3 +18,10 @@ foo(/*/// FAIL HERE */ i@int) {}
   <T> void foo(T t);
   foo(t) {}
   foo(/*/// FAIL HERE */n<3) {}
+
+/// PASS bug
+  assert foo(['a']);
+  /// Toplevel
+  boolean foo(char[?] cbuf);
+  foo(Array cbuf) = true;
+  foo(null) = false;

@@ -6,19 +6,19 @@ void syntaxTest()
 {
   // While with empty body
   while(false)
-    ;
+    {}
 
   // For with empty body
   for (;false;)
-    ;
+    {}
 
   // If with empty body
   if (true)
-    ;
+    {}
 
   // Anonymous functions with empty body
   ()->void f = ()=> {};
-  f = ()=> { ; };
+  f = ()=> { {} };
 
   // [] is the empty array
   if ([] == null)

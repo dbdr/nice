@@ -45,3 +45,12 @@
     }
   /// package b import a
   ;
+
+/// PASS bug
+  /// package a
+  /// toplevel
+  class X {  
+    int i = Integer.MAX_VALUE;
+  }
+  /// package b import a
+  ;

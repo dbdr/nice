@@ -29,10 +29,21 @@ You can call the compiler from a command prompt with "nicec".
 The file nicec.html lists the command-line options of the compiler.
 
 It is recommended to use Emacs for windows to edit and compile programs.
-It is freely available at http://www.gnu.org/software/emacs/windows/
-To enable the Nice mode for Emacs, you have to place the following
-code in the emacs startup file (can someone remind me where this file 
-is on Windows?):
+There are blends, both freely available:
+  * NT Emacs http://www.gnu.org/software/emacs/windows/
+  * X Emacs  http://www.xemacs.org/Download/win32/
+
+You have to enable the Nice mode for Emacs in the startup file. 
+Here is where you can find this file:
+
+Windows 2000
+NT Emacs: \WINNT\Profiles\<username>\.emacs (??)
+XEmacs:   \Documents and Settings\<username>\.xemacs\init.el
+
+If you know about other versions of windows, please share this information
+with the others by writing to the author.
+
+You have to place the following code in this emacs startup file:
 
 ;; Nice mode for Emacs
 

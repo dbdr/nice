@@ -9,8 +9,8 @@ final class boolean
 = native;
 
 boolean `==`(boolean, boolean) = inline nice.lang.inline.BoolOp("==");
+//for booleans is '!=' equal to '^'
 boolean `!=`(boolean, boolean) = inline nice.lang.inline.BoolOp("^");
-
 
 boolean TRUE() = native Boolean.TRUE;
 boolean FALSE() = native Boolean.FALSE;

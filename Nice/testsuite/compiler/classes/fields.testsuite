@@ -194,3 +194,67 @@ class B extends A
 {
   String foo = "";
 }
+
+/// PASS
+  let m = new B("file", name: 0);
+  /// Toplevel
+class A extends java.io.File
+{
+}
+class B extends A
+{
+  int name;
+
+  getName() = "";
+}
+
+String foo(B m) = m.getName();
+
+/// PASS
+  /// package a
+  let f = new FunctionClass(x: 0);
+  /// Toplevel
+class FunctionClass
+{
+  int x;
+  void setX(int value) { this.x = 2*value; }
+}
+  /// package b import a
+  let f = new FunctionClass(x: 0);
+  f.setX(2);
+  assert f.x == 4;
+
+/// PASS
+  assert foo().equals("bar") : foo();
+  /// Toplevel
+class MyFile extends java.io.File
+{
+  int name;
+}
+
+String foo()
+{
+  java.io.File f = new MyFile("foo", name: 0);
+  String s = f.getName();
+  return s;
+}
+getName(MyFile this) = "bar";
+
+/// PASS
+  /// package a
+  /// Toplevel
+class MyFile extends java.io.File
+{
+  int name;
+}
+
+String foo()
+{
+  java.io.File f = new MyFile("foo", name: 0);
+  String s = f.getName();
+  return s;
+}
+getName(MyFile this) = "bar";
+  /// package b import a
+  assert foo().equals("bar") : foo();
+  /// Toplevel

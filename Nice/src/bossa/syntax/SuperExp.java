@@ -141,13 +141,11 @@ public class SuperExp extends Expression
                  new Pattern[]{new Pattern(superTC, false)}, 
                  monotype.domain());
             else
-	      {
-		// Our safe bet is to assert that the argument is Object.
-                Monotype[] domain = (Monotype[]) monotype.domain().clone();
-                domain[0] = bossa.syntax.Monotype.sure(TopMonotype.instance);
-                monotype = new FunType(domain, monotype.codomain());
-                constraint = type.getConstraint();
-	      }
+              // Our safe bet is to assert that the argument is Object.
+              constraint = addLeqFirstArg
+                (type.getConstraint(), 
+                 bossa.syntax.Monotype.sure(TopMonotype.instance), 
+                 monotype.domain());
 	  }
       }
     else
@@ -177,6 +175,24 @@ public class SuperExp extends Expression
 
     AtomicConstraint[] atoms = (AtomicConstraint[]) 
       newAtoms.toArray(new AtomicConstraint[newAtoms.size()]);
+
+    return new Constraint(c.binders(), atoms);
+  }
+
+  private static Constraint addLeqFirstArg(Constraint c, Monotype first, 
+                                           Monotype[] m)
+  {
+    AtomicConstraint[] oldAtoms = c.atoms();
+
+    AtomicConstraint[] atoms;
+    if (oldAtoms == null)
+      atoms = new AtomicConstraint[1];
+    else
+      {
+        atoms = new AtomicConstraint[oldAtoms.length + 1];
+        System.arraycopy(oldAtoms, 0, atoms, 1, oldAtoms.length);
+      }
+    atoms[0] = new mlsub.typing.MonotypeLeqCst(first, m[0]);
 
     return new Constraint(c.binders(), atoms);
   }

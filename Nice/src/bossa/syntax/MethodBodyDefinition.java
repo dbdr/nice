@@ -12,7 +12,7 @@
 
 // File    : MethodBodyDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Thu Jan 20 12:36:11 2000 by bonniot $
+//$Modified: Mon Jan 24 13:56:48 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -325,6 +325,8 @@ public class MethodBodyDefinition extends Node
 
     block.setBody(body.generateCode());
 
+    gnu.expr.FindCapturedVars.findCapturedVars(lexp);
+    
     lexp.compileAsMethod(module.compilation);
 
     //Register this alternative for the link test

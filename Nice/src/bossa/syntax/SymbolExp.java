@@ -12,7 +12,7 @@
 
 // File    : SymbolExpr.java
 // Created : Thu Jul 08 12:20:59 1999 by bonniot
-//$Modified: Mon Dec 06 17:43:04 1999 by bonniot $
+//$Modified: Mon Jan 24 16:23:31 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 

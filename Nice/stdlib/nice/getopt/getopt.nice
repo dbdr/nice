@@ -52,7 +52,7 @@ parse(progName@String, args, options)
   g.initGetopt();
   // Parsing loop
   char c = g.getopt();
-  while (c != '\1')
+  while (c != noOptionsLeft)
     {
       ?Option chosen = options.find(Option o => o.optval == c);
       if (chosen != null)

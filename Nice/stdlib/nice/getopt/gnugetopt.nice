@@ -24,6 +24,9 @@ package nice.getopt;
 
 import java.text.*;
 
+let char noOptionsLeft = '\1';
+let char undefinedOption = '\0';
+
 public class Getopt {
 
 private final int REQUIRE_ORDER = 1;
@@ -162,16 +165,16 @@ private char checkLongOption()
   ambig = false;
   exact = false;
   longind = -1;
-  nameend = (nextchar || "").indexOf("=");
+  nameend = notNull(nextchar).indexOf("=");
   if (nameend == -1)
-    nameend = (nextchar || "").length();
+    nameend = notNull(nextchar).length();
   
   // Test all lnog options for either exact match or abbreviated matches
   for (int i = 0; i < long_options.length; i++)
     {
-      if (long_options[i].getName().startsWith((nextchar || "").substring(0, nameend)))
+      if (long_options[i].getName().startsWith(notNull(nextchar).substring(0, nameend)))
         {
-          if (long_options[i].getName().equals((nextchar || "").substring(0, nameend)))
+          if (long_options[i].getName().equals(notNull(nextchar).substring(0, nameend)))
             {
               // Exact match found
               pfound = long_options[i];
@@ -200,7 +203,7 @@ private char checkLongOption()
           System.err.println(progname+": option '"+argv[optind]+ "' is ambiguous");
 
        nextchar = "";
-       optopt = '\0';
+       optopt = undefinedOption;
        ++optind;
        return '?';
     }
@@ -209,12 +212,12 @@ private char checkLongOption()
     {
       ++optind;
  
-      if (nameend != (nextchar || "").length())
+      if (nameend != notNull(nextchar).length())
         {
           if (pfound.has_arg != NO_ARGUMENT)
             {
-              if ((nextchar || "").substring(nameend).length() > 1)
-                optarg = (nextchar || "").substring(nameend+1);
+              if (notNull(nextchar).substring(nameend).length() > 1)
+                optarg = notNull(nextchar).substring(nameend+1);
               else
                 optarg = "";
             }
@@ -259,7 +262,7 @@ private char checkLongOption()
         {
           sb.setLength(0);
           sb.append(pfound.val);
-          return '\0';
+          return undefinedOption;
         }
 
       return(pfound.val);
@@ -267,7 +270,7 @@ private char checkLongOption()
   
   longopt_handled = false;
 
-  return '\0';
+  return undefinedOption;
 }
 
 public char getopt()
@@ -275,7 +278,7 @@ public char getopt()
   optarg = null;
 
   if (endparse == true)
-    return '\1';
+    return noOptionsLeft;
 
   if ((nextchar == null) || (nextchar.equals("")))
     {
@@ -332,7 +335,7 @@ public char getopt()
           if (first_nonopt != last_nonopt)
             optind = first_nonopt;
 
-          return '\1';
+          return noOptionsLeft;
         }
 
       // If we have come to a non-option and did not permute it,
@@ -341,7 +344,7 @@ public char getopt()
           argv[optind].equals("-"))
         {
           if (ordering == REQUIRE_ORDER)
-            return  '\1';
+            return  noOptionsLeft;
 
             optarg = argv[optind++];
             return '\2';
@@ -383,7 +386,7 @@ public char getopt()
       // option, then it's an error.
       // Otherwise interpret it as a short option.
       if (!long_only || argv[optind].startsWith("--")
-        || (optstring.indexOf((nextchar || "").charAt(0)) == -1))
+        || (optstring.indexOf(notNull(nextchar).charAt(0)) == -1))
         {
           if (opterr)
             {
@@ -395,15 +398,15 @@ public char getopt()
 
           nextchar = "";
           ++optind;
-          optopt = '\0';
+          optopt = undefinedOption;
           return '?';
         }
     } // if (longopts)
 
   // Look at and handle the next short option-character */
-  char c = notNull(nextchar).charAt(0); //**** Do we need to check for empty str?
-  if ((nextchar || "").length() > 1)
-    nextchar = (nextchar || "").substring(1);
+  char c = notNull(nextchar).charAt(0);
+  if (notNull(nextchar).length() > 1)
+    nextchar = notNull(nextchar).substring(1);
   else
     nextchar = "";
   

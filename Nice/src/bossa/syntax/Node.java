@@ -117,21 +117,15 @@ abstract public class Node
    * Scopes shared by all modules.
    */
 
-  private static VarScope globalScope;
-  public static final VarScope getGlobalScope()
-  {
-    return globalScope;
-  }
-  
   private static TypeScope globalTypeScope;
   public static final TypeScope getGlobalTypeScope()
   {
     return globalTypeScope;
   }
 
-  public static final Module getGlobalTypeScopeModule()
+  public static final bossa.modules.Package getGlobalTypeScopeModule()
   {
-    return globalTypeScope.getModule();
+    return globalTypeScope.getPackage();
   }
 
   public static mlsub.typing.TypeConstructor globalTypeScopeLookup(String name, Location loc)
@@ -141,23 +135,22 @@ abstract public class Node
 
   public static bossa.modules.Compilation compilation = null;
 
-  public static void setModule(Module module)
+  public static void setPackage(bossa.modules.Package pkg)
   {
     // For multiple compilations in the same JVM:
     // If we are starting a new compilation, reset the global scopes.
-    if (compilation != module.compilation())
+    if (compilation != pkg.getCompilation())
       {
-        compilation = module.compilation();
-	globalScope = dispatch.createGlobalVarScope();
+        compilation = pkg.getCompilation();
 	globalTypeScope = dispatch.createGlobalTypeScope();
       }
-    globalTypeScope.setModule(module);
+    globalTypeScope.setPackage(pkg);
   }
 
-  void buildScope(Module module)
+  void buildScope(bossa.modules.Package pkg)
   {
-    setModule(module);
-    buildScope(globalScope, globalTypeScope);
+    setPackage(pkg);
+    buildScope(null, globalTypeScope);
   }
   
   /** 
@@ -167,6 +160,9 @@ abstract public class Node
   {
     //if (this.scope != null)
     //Internal.error("Scope set twice for " + this + this.getClass());
+
+    if (this instanceof Definition)
+      outer = ((Definition) this).module.scope;
 
     switch(propagate)
       {
@@ -180,9 +176,8 @@ abstract public class Node
 	break;
 
       case global:
-	outer = globalScope;
-	outer.addSymbols(varSymbols);
 	this.scope = outer;
+	this.scope.addSymbols(varSymbols);
 	typeOuter = globalTypeScope;
 	this.typeScope = typeOuter;
 	break;
@@ -309,7 +304,7 @@ abstract public class Node
           ((Node)i.next()).doTypecheck();
         }
         catch(UserError ex){
-          globalTypeScope.getModule().compilation().error(ex);
+          globalTypeScope.getPackage().getCompilation().error(ex);
 	}
   }
 

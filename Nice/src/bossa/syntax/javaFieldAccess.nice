@@ -118,10 +118,7 @@ JavaFieldAccess createJavaFieldAccess(LocatedString className,String fieldName,
 	className : className,
 	fieldName : fieldName );
   res.addChild(parameters);
-  let symbol = new MethodSymbol(res, name, cst, returnType);
-  res.symbol = symbol;
-  symbol.propagate = Node.global;
-  res.addChild(symbol);
+  res.setSymbol(new MethodSymbol(res, name, cst, returnType));
   return res;
 }
 

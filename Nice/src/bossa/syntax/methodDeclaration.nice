@@ -36,6 +36,19 @@ public abstract class MethodDeclaration extends Definition
 
   ?gnu.expr.Expression code = null;
 
+  void setSymbol(MethodSymbol symbol)
+  {
+    this.symbol = symbol;
+    symbol.propagate = Node.none;
+    this.addChild(symbol);
+  }
+
+  buildScope(outer, typeOuter)
+  {
+    module.scope.addSymbol(symbol);
+    super;
+  }
+
   public ?mlsub.typing.Polytype getType()
   {
     return type;
@@ -66,7 +79,7 @@ public abstract class MethodDeclaration extends Definition
   */
   void typedResolve()
   {
-    if (module.interfaceFile() && ! notNull(parameters).hasDefaultValue())
+    if (module.compiled() && ! notNull(parameters).hasDefaultValue())
       return;
 
     if (!mlsub.typing.Constraint.hasBinders(notNull(type).getConstraint()))

@@ -22,7 +22,7 @@ import bossa.util.*;
  */
 public class CAST extends AST
 {
-  private Module module;
+  private bossa.modules.Package pkg;
   private ArrayList<TypeDefinition> classes = new ArrayList();
   private ArrayList<MethodDeclaration> methods = new ArrayList();
   private ArrayList<MethodBodyDefinition> methodImplementations = new ArrayList();
@@ -55,7 +55,7 @@ public class CAST extends AST
 
   buildScope()
   {
-    this.buildScope(module);
+    this.buildScope(pkg);
   }
   
   private void resolve(Node n)
@@ -63,13 +63,13 @@ public class CAST extends AST
     try {
       n.doResolve();
     } catch(UserError ex) {
-      module.compilation().error(ex);
+      pkg.getCompilation().error(ex);
     }
   }
 
   resolveScoping()
   {
-    Node.setModule(module);
+    Node.setPackage(pkg);
 
     // Resolve custom constructors early, classes depend on them
     for (cc : customConstructors)
@@ -83,43 +83,43 @@ public class CAST extends AST
     for (node : children)
       this.resolve(node);
 
-    module.compilation().exitIfErrors();
+    pkg.getCompilation().exitIfErrors();
   }
 
   typedResolve()
   {
-    Node.setModule(module);
+    Node.setPackage(pkg);
 
     for (m : methods)
       try {
         m.typedResolve();
       } catch(UserError ex) {
-        module.compilation().error(ex);
+        pkg.getCompilation().error(ex);
       }
 
     for (mi : methodImplementations)
       try {
         mi.lateBuildScope();
       } catch(UserError ex) {
-        module.compilation().error(ex);
+        pkg.getCompilation().error(ex);
       }
 
-    module.compilation().exitIfErrors();
+    pkg.getCompilation().exitIfErrors();
   }
 
   localResolve()
   {
-    Node.setModule(module);
+    Node.setPackage(pkg);
 
     for (d : children)
       try {
         assert (d instanceof Definition);
         d.resolveBody();
       } catch(UserError ex) {
-        module.compilation().error(ex);
+        pkg.getCompilation().error(ex);
       }
 
-    module.compilation().exitIfErrors();
+    pkg.getCompilation().exitIfErrors();
 
     for (c : classes)
       c.precompile();
@@ -127,7 +127,7 @@ public class CAST extends AST
 
   typechecking(compiling)
   {
-    Node.setModule(module);
+    Node.setPackage(pkg);
 
     // Classes are typechecked first, since code can depend on them.
     for (c : classes)
@@ -143,7 +143,7 @@ public class CAST extends AST
 
     this.doTypecheck();
 
-    module.compilation().exitIfErrors();
+    pkg.getCompilation().exitIfErrors();
   }
 
 
@@ -177,9 +177,9 @@ public class CAST extends AST
 
 }
 
-public AST createAST(Module module, ?List<Definition> defs)
+public AST createAST(bossa.modules.Package pkg, ?List<Definition> defs)
 {
-  let res = new CAST(defs || new ArrayList(), Node.global, module: module);
+  let res = new CAST(defs || new ArrayList(), Node.none, pkg: pkg);
   res.findElements();
   return res;
 }

@@ -43,9 +43,9 @@ public class NiceMethod extends UserOperator
     // In interface files, we can assume that if the method overrides
     // any other known method, there is an explicit override keyword.
     // So we can avoid looking for specializations when there isn't one.
-    if (isOverride || ! module.interfaceFile())
+    if (isOverride || ! module.compiled())
       {
-        homonyms = Node.getGlobalScope().lookup(this.getName());
+        homonyms = module.scope.lookup(this.getName());
         if (notNull(homonyms).size() == 1)
           homonyms = null;
         else
@@ -112,7 +112,7 @@ public class NiceMethod extends UserOperator
           {
             // If the method is imported,
             // check if the reverse relation holds with that method
-            if (d.module != null && d.module.interfaceFile() &&
+            if (d.module != null && d.module.compiled() &&
                 mlsub.typing.Typing.smaller(itsDomain, ourDomain, true) &&
                 ! nice.tools.typing.Types.typeParameterDispatch(s.getType(), this.getType()))
               {
@@ -135,7 +135,7 @@ d + "\ndefined in:\n" +
           }
 
         // In a compiled package, we don't need checking.
-        if (module.interfaceFile())
+        if (module.compiled())
           {
             this.addSpecializedMethod(d);
             continue;
@@ -180,7 +180,7 @@ d + "\ndefined in:\n" +
   }
 
   /** @return a string that uniquely represents this method */
-  getFullName() = module.getName() + '.' + name + ':' + this.getType();
+  getFullName() = module.pkg.getName() + '.' + name + ':' + this.getType();
 
   computeCode() = getDispatchMethod(this, module);
 
@@ -212,11 +212,8 @@ public NiceMethod createNiceMethod(LocatedString name,
 	returnTypeLocation: returnType.location());
 
   res.addChild(parameters);
-  let symbol = new MethodSymbol(res, name, constraint, returnType);
-  res.symbol = symbol;
-  symbol.propagate = Node.global;
-  res.addChild(symbol);
-  return res; 
+  res.setSymbol(new MethodSymbol(res, name, constraint, returnType));
+  return res;
 }
 
 /**
@@ -352,7 +349,7 @@ public gnu.expr.Expression getDispatchMethod(NiceMethod def, Module module)
       This would not be the case if we recomputed it,
       as the precise types are found during typechecking.
   */
-  ?gnu.bytecode.Method meth = module.lookupDispatchClassMethod
+  ?gnu.bytecode.Method meth = module.pkg.lookupDispatchClassMethod
    (receiver == null ? null : receiver.getClassType(),
     name, "id", def.getFullName());
   if (meth != null) // Reuse existing dispatch method header
@@ -388,5 +385,5 @@ public gnu.expr.Expression getDispatchMethod(NiceMethod def, Module module)
   if (receiver != null)
     return receiver.addJavaMethod(res);
   else
-    return module.addMethod(res, false);
+    return module.pkg.addMethod(res, false);
 }

@@ -481,9 +481,9 @@ class ClassDefinition extends TypeDefinition
           User.error(superClassIdent,
 		     superClass + " is an interface, so " + name +
 		     " may only implement it");
-        if (! nice.tools.code.Types.legalAccess(superClass, module.getName()))
-          User.error(superClassIdent, name + " cannot extend " + 
-		     superClass + ".  It is not available to this package.");
+        if (! nice.tools.code.Types.legalAccess(superClass, module.pkg.getName()))
+          User.error(superClassIdent, name + " cannot extend " +
+		     superClass + ".  It is not visible in this package.");
 
         superClassIdent = null;
       }

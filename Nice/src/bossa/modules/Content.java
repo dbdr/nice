@@ -67,7 +67,10 @@ class Content
          lastModification > lastCompilation))
       readers = source.getDefinitions();
     else
-      readers = compiled.getDefinitions();
+      {
+        pkg.compiledModule = new bossa.syntax.Module(pkg, pkg.getName(), pkg.compilation.globalScope);
+        readers = compiled.getDefinitions();
+      }
 
     LinkedList imports = new LinkedList();
 
@@ -108,7 +111,14 @@ class Content
   private void read(Content.Unit unit, List definitions)
   {
     bossa.util.Location.setCurrentFile(unit.file);
+
+    bossa.syntax.Module module = pkg.compiledModule != null ?
+      pkg.compiledModule : new bossa.syntax.Module(pkg, unit.name, pkg.compilation.globalScope);
+    Definition.currentModule = module;
+
     pkg.compilation.parser.read(unit.reader, definitions);
+
+    Definition.currentModule = null;
   }
 
   /**

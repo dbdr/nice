@@ -373,7 +373,7 @@ public class ImportedAlternative extends Alternative
 /**
  * When read from a bytecode file.
  */
-public void readImportedAlternative(gnu.bytecode.ClassType c, gnu.bytecode.Method method, Location location)
+public void readImportedAlternative(gnu.bytecode.ClassType c, gnu.bytecode.Method method, Location location, Module module)
 {
   ?gnu.bytecode.MiscAttr defattr = cast(gnu.bytecode.Attribute.get(method, "definition"));
   if (defattr == null)
@@ -382,7 +382,7 @@ public void readImportedAlternative(gnu.bytecode.ClassType c, gnu.bytecode.Metho
 
   String fullName = new String(defattr.data);
 
-  registerJavaMethod(fullName);
+  registerJavaMethod(fullName, module.scope);
 
   ?gnu.bytecode.MiscAttr attr = cast(gnu.bytecode.Attribute.get(method, "patterns"));
   if (attr == null)
@@ -397,7 +397,7 @@ public void readImportedAlternative(gnu.bytecode.ClassType c, gnu.bytecode.Metho
   try {
     ?Pattern p;
 
-    while ((p = readPattern(rep, at)) != null)
+    while ((p = readPattern(rep, at, module.scope)) != null)
       {
         if (p.getTC() == nice.tools.typing.PrimitiveType.arrayTC)
           /* Special treatment for arrays:
@@ -429,7 +429,7 @@ public void readImportedAlternative(gnu.bytecode.ClassType c, gnu.bytecode.Metho
    If this full name refers to a java method, make sure it participates
    to the link tests and dispatch code generation.
 */
-private void registerJavaMethod(String fullName)
+private void registerJavaMethod(String fullName, VarScope scope)
 {
   if (! fullName.startsWith("JAVA:"))
     return;
@@ -438,7 +438,7 @@ private void registerJavaMethod(String fullName)
   let methodName = new LocatedString(fullName.substring("JAVA:".length(), end),
 	bossa.util.Location.nowhere());
 
-  for (VarSymbol sym : bossa.syntax.Node.getGlobalScope().lookup(methodName))
+  for (VarSymbol sym : scope.lookup(methodName))
     {
       if (sym.getMethodDeclaration() == null)
         continue;

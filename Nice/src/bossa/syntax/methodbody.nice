@@ -252,14 +252,14 @@ public class MethodBodyDefinition extends MethodImplementation
   {
     //Resolution of the body is delayed to enable overloading
 
-    resolvePatterns(notNull(typeScope), Node.getGlobalScope(), formals);
+    resolvePatterns(notNull(typeScope), module.scope, formals);
 
     symbols = notNull(scope).lookup(name);
   }
 
   void lateBuildScope()
   {
-    resolvePatternValues(formals);
+    resolvePatternValues(formals, module.scope);
 
     let s = this.findSymbol(notNull(symbols));
     symbols = null;

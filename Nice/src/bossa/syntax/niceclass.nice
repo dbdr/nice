@@ -66,7 +66,7 @@ public class NiceClass extends ClassImplementation
        However, the ClassExp object refers to the existing ClassType object,
        and only adds or modifies features when needed.
     */
-    classe = notNull(definition.module).getClassExp(this);
+    classe = definition.module.pkg.getClassExp(this);
   }
 
   LocatedString getName() = definition.getName();
@@ -385,7 +385,7 @@ public class NiceClass extends ClassImplementation
     definition.location().write(res);
     res.setSimple(true);
     res.setAccessFlags(definition.getBytecodeFlags());
-    definition.module.addUserClass(res);
+    definition.module.pkg.addUserClass(res);
     return res;
   }
 

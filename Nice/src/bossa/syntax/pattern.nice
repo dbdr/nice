@@ -212,10 +212,10 @@ void resolvePatterns(TypeScope tscope, VarScope vscope, Pattern[] patterns)
     patterns[i].resolveTC(tscope);
 }
  
-void resolvePatternValues(Pattern[] patterns)
+void resolvePatternValues(Pattern[] patterns, VarScope scope)
 {
   for (int i = 0; i < patterns.length; i++)
-    patterns[i] = resolveGlobalConstants(patterns[i]);
+    patterns[i] = resolveGlobalConstants(patterns[i], scope);
 }
  
 /**
@@ -690,9 +690,9 @@ toString(ValuePattern p) = p.atValue.toString();
 toString(IntComparePattern p) = (p.name!=null? notNull(p.name).toString() : "") + p.kind.prefix + p.atValue;
 
 
-private ?VarSymbol findRefSymbol(LocatedString refName)
+private ?VarSymbol findRefSymbol(LocatedString refName, VarScope scope)
 {
-  for (sym : Node.getGlobalScope().lookup(refName))
+  for (sym : scope.lookup(refName))
     if (sym instanceof GlobalVarSymbol ||
 	sym instanceof EnumSymbol )
       return sym;
@@ -700,16 +700,16 @@ private ?VarSymbol findRefSymbol(LocatedString refName)
   return null;
 }
 
-Pattern resolveGlobalConstants(Pattern pattern)
+Pattern resolveGlobalConstants(Pattern pattern, VarScope scope)
 {
   return pattern;
 }
 
-resolveGlobalConstants(IntComparePattern pattern)
+resolveGlobalConstants(IntComparePattern pattern, scope)
 {
   if (pattern.refName != null)
     {
-      let symbol = findRefSymbol(notNull(pattern.refName));
+      let symbol = findRefSymbol(notNull(pattern.refName), scope);
       if (symbol instanceof GlobalVarSymbol)
 	{
 	  if (symbol.getValue() instanceof ConstantExp && !symbol.isAssignable())
@@ -724,12 +724,12 @@ resolveGlobalConstants(IntComparePattern pattern)
   return pattern;
 }
 
-resolveGlobalConstants(VariablePattern pattern)
+resolveGlobalConstants(VariablePattern pattern, scope)
 {
   if (pattern.name == null)
     return pattern;
 
-  let symbol = findRefSymbol(notNull(pattern.name));
+  let symbol = findRefSymbol(notNull(pattern.name), scope);
   if (symbol == null)
     return pattern;
 
@@ -782,7 +782,7 @@ bytecodeRepresentation(IntPattern p) = "@" + (p.atValue.longValue() >= 0 ? "+" :
 bytecodeRepresentation(IntComparePattern p) = "@" + p.kind.prefix + p.atValue;
 bytecodeRepresentation(ReferencePattern p) = "@=" + p.name;
 
-public ?Pattern readPattern(String rep, int[]/*ref*/ pos)
+public ?Pattern readPattern(String rep, int[]/*ref*/ pos, VarScope scope)
 {
   int cpos = pos[0];
 
@@ -844,7 +844,7 @@ public ?Pattern readPattern(String rep, int[]/*ref*/ pos)
         }
 
       if (name[0] == '=')
-        return resolveGlobalConstants(new VariablePattern(name: new LocatedString(name.substring(1)), loc: loc));
+        return resolveGlobalConstants(new VariablePattern(name: new LocatedString(name.substring(1)), loc: loc), scope);
     }
 
   if (name.equals("_"))

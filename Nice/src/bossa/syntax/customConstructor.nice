@@ -154,10 +154,7 @@ public CustomConstructor createCustomConstructor(LocatedString className, Constr
 	body: body);
 
   res.addChild(params);
-  let symbol = new MethodSymbol(res, name, cst, returnType);
-  res.symbol = symbol;
-  symbol.propagate = Node.global;
-  res.addChild(symbol);
+  res.setSymbol(new MethodSymbol(res, name, cst, returnType));
   return res;
 }
 

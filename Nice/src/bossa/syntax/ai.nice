@@ -112,7 +112,7 @@ public class AbstractInterfaceImplementation extends Definition
       }
 
     let ident = new TypeIdent
-      (name: new LocatedString(module.getName() + '.' + interfaceName.content, 
+      (name: new LocatedString(module.pkg.getName() + '.' + interfaceName.content, 
 			 interfaceName.location()));
     interfaceITF = ident.resolveToItf(notNull(typeScope));
 

@@ -237,10 +237,7 @@ RetypedJavaMethod createRetypedJavaMethod(
         javaTypes: javaTypes);
 
   res.addChild(parameters);
-  let symbol = new MethodSymbol(res, name, constraint, returnType);
-  res.symbol = symbol;
-  symbol.propagate = Node.global;
-  res.addChild(symbol);
+  res.setSymbol(new MethodSymbol(res, name, constraint, returnType));
   return res;
 }
 
@@ -253,7 +250,7 @@ RetypedJavaMethod createRetypedJavaMethod(
  */
 let Map<gnu.bytecode.AttrContainer,MethodDeclaration> retyped = new HashMap();
 
-void registerNativeMethod(RetypedJavaMethod m, gnu.bytecode.Method reflectMethod)
+private void registerNativeMethod(RetypedJavaMethod m, gnu.bytecode.Method reflectMethod)
 {
   ?MethodDeclaration auto = retyped.put(reflectMethod, m);
   
@@ -268,7 +265,7 @@ void registerNativeMethod(RetypedJavaMethod m, gnu.bytecode.Method reflectMethod
     removeFromScope(auto);
 }
 
-void registerNativeConstructor(RetypedJavaMethod m, gnu.bytecode.Method reflectMethod,
+private void registerNativeConstructor(RetypedJavaMethod m, gnu.bytecode.Method reflectMethod,
                                  mlsub.typing.TypeConstructor classe)
 {
   ?MethodDeclaration auto = retyped.put(reflectMethod, m);
@@ -293,6 +290,6 @@ void registerNativeField(JavaFieldAccess f, gnu.bytecode.Field reflectField)
 
 private void removeFromScope(MethodDeclaration m)
 {
-  Node.getGlobalScope().removeSymbol(m.getSymbol());
+  Module.javaScope.removeSymbol(m.getSymbol());
   unregisterDispatchTest(m);
 }

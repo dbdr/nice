@@ -21,10 +21,12 @@ public class GlobalVarScope extends VarScope
   lookup(i)
   {
     // If there is any method by that name waiting, load it.
-    loadJavaMethods(i.toString());
+    loadJavaMethods(i.toString(), this);
 
     return super;
   }
+
+  globalLookup(i) = this.lookup(i);
 }
 
 VarScope createGlobalVarScope()
@@ -38,15 +40,15 @@ VarScope createGlobalVarScope()
  */
 public class GlobalTypeScope extends TypeScope
 {
-  public Module module = cast(null);
-  private Set<String> set;
+  public bossa.modules.Package pkg = cast(null);
+  private Set<String> set = new HashSet();
 
-  setModule(mod)
+  setPackage(bossa.modules.Package pkg)
   {
-    module = notNull(mod);
+    this.pkg = pkg;
   }
 
-  getModule() = module;
+  getPackage() = pkg;
 
   addMapping(name, s)
   {
@@ -90,7 +92,7 @@ public class GlobalTypeScope extends TypeScope
 	   ambiguity with another symbol from another package.
 	*/
 	boolean first = true;
-	String[] pkgs = module.listImplicitPackages();
+	String[] pkgs = pkg.listImplicitPackages();
 	for (int i = 0; i < pkgs.length; i++)
 	  {
 	    String fullName = pkgs[i] + "." + name;
@@ -112,13 +114,13 @@ public class GlobalTypeScope extends TypeScope
     if (res != null)
       return res;
 
-    return cast(lookupJavaClass(notNull(name), loc));
+    return cast(lookupJavaClass(notNull(name), loc, Module.javaScope));
   }
 }
 
 TypeScope createGlobalTypeScope()
 {
-  let res = new GlobalTypeScope(null, set: new HashSet());
+  let res = new GlobalTypeScope(null);
 
   try {
     res.addMapping("java.lang.Object", mlsub.typing.TopMonotype.instance);

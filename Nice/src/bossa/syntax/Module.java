@@ -1,7 +1,7 @@
 /**************************************************************************/
-/*                             N I C E                                    */
-/*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 1999                             */
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2005                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -13,27 +13,29 @@
 package bossa.syntax;
 
 /**
-   A Nice module.
+   The smallest unit containing code (typically, the content of a file).
 
-   @version $Date$
-   @author Daniel Bonniot
+   Definitions marked as 'private' are only visible inside their Module.
  */
 
-public interface Module extends mlsub.compilation.Module
+public class Module
 {
-  String[] listImplicitPackages();
-  bossa.modules.Compilation compilation();
-  boolean interfaceFile();
+  public final bossa.modules.Package pkg;
+  VarScope scope;
+  String name;
 
-  /****************************************************************
-   * Code generation
-   ****************************************************************/
+  static VarScope javaScope;
 
-  gnu.bytecode.ClassType createClass(String name);
-  void addGlobalVar(gnu.expr.Declaration declaration, boolean constant);
-  gnu.bytecode.Method lookupDispatchClassMethod(gnu.bytecode.ClassType clas, String name, String attribute, String value);
-  gnu.expr.ReferenceExp addMethod(gnu.expr.LambdaExp method, 
-				  boolean packageMethod);
-  gnu.expr.ClassExp getClassExp(Object def);
-  void addUserClass(gnu.expr.ClassExp classe);
+  public Module(bossa.modules.Package pkg, String name, VarScope scope)
+  {
+    this.pkg = pkg;
+    this.name = name;
+    this.scope = scope;
+
+    javaScope = scope;
+  }
+
+  bossa.modules.Compilation compilation() { return pkg.getCompilation(); }
+
+  public boolean compiled() { return pkg.interfaceFile(); }
 }

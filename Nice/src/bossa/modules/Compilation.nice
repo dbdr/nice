@@ -54,6 +54,7 @@ class Compilation extends CompilationInterface
 
   Map<String,Package> packages = new HashMap();
   Map<String,mlsub.typing.TypeConstructor> javaTypeConstructors = new HashMap();
+  bossa.syntax.VarScope globalScope = cast(null);
 
   void setMainPackage(String packageName)
   {

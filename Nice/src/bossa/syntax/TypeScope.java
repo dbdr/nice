@@ -31,8 +31,8 @@ public class TypeScope implements TypeMap
   }
 
   // only for GlobalTypeScope
-  void setModule(Module mod) {}
-  Module getModule() { return null; }
+  void setPackage(bossa.modules.Package pkg) {}
+  bossa.modules.Package getPackage() { return null; }
   public mlsub.typing.TypeConstructor globalLookup(String name, Location loc)
   { return null; }
 

@@ -80,7 +80,7 @@ class GlobalVarSymbol extends MonoSymbol
             notNull(res).noteValue(definition.compileValue());
           }
 
-        definition.module.addGlobalVar(res, definition.constant);
+        definition.module.pkg.addGlobalVar(res, definition.constant);
       }
 
     return res;

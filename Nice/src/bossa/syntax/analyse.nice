@@ -177,8 +177,11 @@ class Info
 
   ?VarSymbol lookup(String name) = this.vars[name];
 
-  List<VarSymbol> globalLookup(LocatedString name) = 
+  List<VarSymbol> outerLookup(LocatedString name) =
     this.outerVarScope.lookup(name);
+
+  List<VarSymbol> globalLookup(LocatedString name) =
+    this.outerVarScope.globalLookup(name);
 
   ?mlsub.typing.TypeSymbol lookupType(LocatedString name)
   {
@@ -509,9 +512,9 @@ Expression analyseIdent(IdentExp e, Info info, boolean assigned)
 
   ?List<VarSymbol> symbols;
   if (e.isInfix())
-    symbols = cast(notNull(Node.getGlobalScope()).lookup(e.ident));
-  else
     symbols = info.globalLookup(e.ident);
+  else
+    symbols = info.outerLookup(e.ident);
 
   if (symbols != null && symbols.size() > 0)
     {

@@ -55,9 +55,6 @@ NiceFieldAccess createNiceFieldAccess(NiceField field)
         field: field);
 
   res.addChild(params);
-  let symbol = new MethodSymbol(res, field.getName(), constr, notNull(field.sym.syntacticType));
-  res.symbol = symbol;
-  symbol.propagate = Node.global;
-  res.addChild(symbol);
-  return res;    
+  res.setSymbol(new MethodSymbol(res, field.getName(), constr, notNull(field.sym.syntacticType)));
+  return res;
 }

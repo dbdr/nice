@@ -144,9 +144,6 @@ public InlinedMethod createInlinedMethod(LocatedString name,
 	parameter: param);
 
   res.addChild(parameters);
-  let symbol = new MethodSymbol(res, name, constraint, returnType);
-  res.symbol = symbol;
-  symbol.propagate = Node.global;
-  res.addChild(symbol);
-  return res; 
+  res.setSymbol(new MethodSymbol(res, name, constraint, returnType));
+  return res;
 }

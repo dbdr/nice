@@ -164,7 +164,7 @@ public abstract class MethodImplementation extends Definition
   private gnu.expr.ReferenceExp createRef()
   {
     this.createMethod(name.toString());
-    gnu.expr.ReferenceExp ref = module.addMethod(compiledMethod, true);
+    gnu.expr.ReferenceExp ref = module.pkg.addMethod(compiledMethod, true);
 
     return ref;
   }

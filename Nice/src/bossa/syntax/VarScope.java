@@ -82,6 +82,14 @@ public class VarScope
     return new LinkedList();
   }
 
+  List globalLookup(LocatedString i)
+  {
+    if (outer != null)
+      return outer.globalLookup(i);
+    else
+      return null;
+  }
+
   /****************************************************************
    * Debugging
    ****************************************************************/

@@ -71,7 +71,7 @@ public class JavaClass extends ClassImplementation
     if (ignoredRetyping)
       return;
 
-    fetchMethods(definition.getTC(), cast(definition.getJavaType()));
+    fetchMethods(definition.getTC(), cast(definition.getJavaType()), Module.javaScope);
   }
 
   printInterface(s)
@@ -113,8 +113,9 @@ boolean excludedInterface(mlsub.typing.TypeConstructor itf)
   return excludedClass(blackListInterface, t);
 }
 
-mlsub.typing.TypeConstructor createJavaType(bossa.modules.Compilation compilation, String className,
-                                 gnu.bytecode.Type javaType)
+mlsub.typing.TypeConstructor createJavaType
+  (bossa.modules.Compilation compilation, String className,
+   gnu.bytecode.Type javaType, VarScope scope)
 {
   if (bossa.util.Debug.javaTypes)
     bossa.util.Debug.println("Registering java class "+className);
@@ -206,8 +207,8 @@ mlsub.typing.TypeConstructor createJavaType(bossa.modules.Compilation compilatio
     }
 
   if (javaType instanceof gnu.bytecode.ClassType)
-    fetchMethods(res, javaType);
-    
+    fetchMethods(res, javaType, scope);
+
   return res;
 }
 
@@ -233,7 +234,8 @@ boolean instantiable(gnu.bytecode.Type javaType)
        gnu.bytecode.Access.INTERFACE)) == 0;
 }
 
-?mlsub.typing.TypeConstructor lookupJavaClass(String className, ?Location loc)
+?mlsub.typing.TypeConstructor lookupJavaClass(String className, ?Location loc,
+					      VarScope scope)
 {
   let classType = nice.tools.code.TypeImport.lookup(className, loc);
 
@@ -245,5 +247,5 @@ boolean instantiable(gnu.bytecode.Type javaType)
   if (compilation.javaTypeConstructors.containsKey(classType))
     return compilation.javaTypeConstructors.get(classType);
 
-  return createJavaType(compilation, classType.getName(), classType);
+  return createJavaType(compilation, classType.getName(), classType, scope);
 }

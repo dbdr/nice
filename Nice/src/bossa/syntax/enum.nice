@@ -77,7 +77,7 @@ public EnumDefinition createEnumDefinition(LocatedString name, List<LocatedStrin
 
   classDef.setImplementation(impl);
 
-  if (! notNull(Definition.currentModule).interfaceFile())
+  if (! notNull(Definition.currentModule).compiled())
     // create the method implementation of family()
     globalDefs.add(createMethodBodyDefinition(impl, new LocatedString("family"),
 	null, new LinkedList(), createReturnStmt(createLiteralArrayExp(
@@ -133,7 +133,7 @@ class EnumSymbol extends MonoSymbol
       {
           res = new gnu.expr.Declaration(notNull(name).toString(), nice.tools.code.Types.javaType(type));
           this.setDeclaration(notNull(res));
-          definition.module.addGlobalVar(res, true);
+          definition.module.pkg.addGlobalVar(res, true);
       }
     
     return res;

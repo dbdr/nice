@@ -18,7 +18,7 @@ public class dispatch
 
   public static void resetDispatchTest() {}
 
-  public static void readImportedAlternative(gnu.bytecode.ClassType c, gnu.bytecode.Method method, bossa.util.Location location) {}
+  public static void readImportedAlternative(gnu.bytecode.ClassType c, gnu.bytecode.Method method, bossa.util.Location location, Module module) {}
 
   static TypeScope createGlobalTypeScope()
   { return null; }
@@ -27,7 +27,7 @@ public class dispatch
 
   public static void resetJavaClasses() {}
 
-  static VarScope createGlobalVarScope()
+  public static VarScope createGlobalVarScope()
   { return null; }
 
   public static void resetTypeDefinitionMappings() {}
@@ -38,7 +38,7 @@ public class dispatch
   public static mlsub.typing.Monotype[] getTypeDefTypeParameters(mlsub.typing.TypeConstructor tc)
   { return null; }
 
-  public static AST createAST(Module module, List defs)
+  public static AST createAST(bossa.modules.Package module, List defs)
   { return null; }
 
   public static LocatedString NiceClass_getName(Object nc)

@@ -186,6 +186,7 @@ AST AST(List<Definition>, int) = native new AST(List, int);
 ?mlsub.typing.TypeSymbol lookup(TypeMap, LocatedString) = native mlsub.typing.TypeSymbol TypeMap.lookup(LocatedString);
 ?mlsub.typing.TypeSymbol lookup(TypeMap, String) = native mlsub.typing.TypeSymbol TypeMap.lookup(String);
 List<VarSymbol> lookup(VarScope, LocatedString) = native List VarScope.lookup(LocatedString);
+List<VarSymbol> globalLookup(VarScope, LocatedString) = native List VarScope.globalLookup(LocatedString);
 Map<gnu.bytecode.Type,mlsub.typing.TypeConstructor> javaTypeConstructors(bossa.modules.Compilation ) = native bossa.modules.Compilation.javaTypeConstructors;
 ?LocatedString name(Symbol) = native Symbol.name;
 ?mlsub.typing.TypeConstructor associatedTC(mlsub.typing.Interface) = native mlsub.typing.TypeConstructor mlsub.typing.Interface.associatedTC();
@@ -215,6 +216,8 @@ gnu.expr.QuoteExp falseExp() = native gnu.expr.QuoteExp.falseExp;
 gnu.expr.QuoteExp trueExp() = native gnu.expr.QuoteExp.trueExp;
 gnu.expr.QuoteExp voidExp() = native gnu.expr.QuoteExp.voidExp;
 gnu.expr.QuoteExp QuoteExp_undefined_exp() = native gnu.expr.QuoteExp.undefined_exp;
+GlobalVarScope scope(Module) = native Module.scope;
+GlobalVarScope javaScope() = native Module.javaScope;
 
 // Local Variables:
 // nice-xprogram: "../bin/nicec -d ../classes"

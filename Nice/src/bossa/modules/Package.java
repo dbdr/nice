@@ -32,7 +32,7 @@ import gnu.expr.ClassExp;
    @version $Date$
    @author Daniel Bonniot (bonniot@users.sourceforge.net)
  */
-public class Package implements mlsub.compilation.Module, Located, bossa.syntax.Module
+public class Package implements mlsub.compilation.Module, Located
 {
   /****************************************************************
    * Loading
@@ -73,6 +73,9 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
 
     compilation.packages.put(name.toString(), this);
 
+    if (compilation.globalScope == null)
+      compilation.globalScope = bossa.syntax.dispatch.createGlobalVarScope();
+
     source = compilation.locator.find(this);
     if (source == null)
       User.error(name, "Could not find package " + name);
@@ -112,10 +115,8 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
    **/
   private void read(boolean shouldReload)
   {
-    Module oldModule = Definition.currentModule;
-    Definition.currentModule = this;
-    Node.setModule(this);
-    
+    bossa.syntax.Node.setPackage(this);
+
     compilation.progress(this, "parsing");
 
     definitions = new ArrayList();
@@ -127,10 +128,8 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     if (compiling())
       // Inform compilation that at least one package is going to generate code
       compilation.recompilationNeeded = true;
-
-    Definition.currentModule = oldModule;
   }
-  
+
   void setOpens(Set opens)
   {
     // when we import a Nice package, we also open it.
@@ -154,8 +153,8 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     for(Method method = source.getBytecode().getMethods();
 	method != null;
 	method = method.getNext())
-      bossa.syntax.dispatch.readImportedAlternative(source.getBytecode(), method,
-					  location());
+      bossa.syntax.dispatch.readImportedAlternative
+        (source.getBytecode(), method, location(), compiledModule);
   }
   
   /****************************************************************
@@ -830,7 +829,9 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
   /** The compilation that is in process. */
   Compilation compilation;
   
-  public Compilation compilation() { return compilation; }
+  public Compilation getCompilation() { return compilation; }
+
+  bossa.syntax.Module compiledModule = null;
 
   /** 
       @return true if this package was loaded from an interface file,

@@ -16,7 +16,7 @@ import java.util.*;
 
 import bossa.util.*;
 import bossa.util.Debug;
-import nice.tools.code.*;
+import nice.tools.typing.Types;
 
 import mlsub.typing.*;
 import mlsub.typing.Polytype;
@@ -24,6 +24,8 @@ import mlsub.typing.Monotype;
 import mlsub.typing.FunType;
 import mlsub.typing.TupleType;
 import mlsub.typing.Constraint;
+
+import nice.tools.code.EnsureTypeProc;
 
 /**
    A function call.
@@ -254,7 +256,7 @@ public class CallExp extends Expression
     // Allow expressions to know in what context they are used.
     // Important for litteral arrays and tuples.
     Expression.adjustToExpectedType(arguments.computedExpressions,
-                                    Types.domain(function.getType()));
+                                    Types.parameters(function.getType()));
   }
 
   void computeType()
@@ -357,7 +359,7 @@ public class CallExp extends Expression
 	res = letExpRes;
       }
 
-    return EnsureTypeProc.ensure(res, Types.javaType(type));
+    return EnsureTypeProc.ensure(res, nice.tools.code.Types.javaType(type));
   }
 
   private gnu.expr.Expression[] compileParams()
@@ -373,7 +375,7 @@ public class CallExp extends Expression
     if (domain != null)
       for (int i = 0; i < params.length; i++)
 	params[i] = EnsureTypeProc.ensure
-	  (params[i], Types.javaType(domain[i]));
+	  (params[i], nice.tools.code.Types.javaType(domain[i]));
 
     return params;
   }

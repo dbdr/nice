@@ -113,7 +113,7 @@ implements Located
       case absent:
 	if (raw instanceof MonotypeVar)
 	  {
-	    nice.tools.code.Types.makeMarkedType((MonotypeVar) raw);
+	    nice.tools.typing.Types.makeMarkedType((MonotypeVar) raw);
 	    return raw;
 	  }
 	else

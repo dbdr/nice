@@ -12,7 +12,7 @@
 
 package bossa.syntax;
 
-import nice.tools.code.Types;
+import nice.tools.typing.Types;
 
 import bossa.util.*;
 import java.util.*;
@@ -161,7 +161,8 @@ public class Block extends Statement
     
     String getName() { return left.name.toString(); }
     VarSymbol getSymbol() { return left; }
-    gnu.bytecode.Type getBytecodeType() { return Types.javaType(left.type); }
+    gnu.bytecode.Type getBytecodeType() 
+    { return nice.tools.code.Types.javaType(left.type); }
 
     gnu.expr.Expression initValue()
     {
@@ -223,7 +224,8 @@ public class Block extends Statement
     
     String getName() { return left.name.toString(); }
     VarSymbol getSymbol() { return left; }
-    gnu.bytecode.Type getBytecodeType() { return Types.javaType(left.type); }
+    gnu.bytecode.Type getBytecodeType() 
+    { return nice.tools.code.Types.javaType(left.type); }
 
     MonoSymbol left; 
 
@@ -268,7 +270,8 @@ public class Block extends Statement
 
     String getName() { return left.name.toString(); }
     VarSymbol getSymbol() { return left; }
-    gnu.bytecode.Type getBytecodeType() { return Types.javaType(left.type); }
+    gnu.bytecode.Type getBytecodeType() 
+    { return nice.tools.code.Types.javaType(left.type); }
 
     mlsub.typing.Polytype inferredReturnType()
     {
@@ -277,7 +280,7 @@ public class Block extends Statement
 
     mlsub.typing.Monotype declaredReturnType()
     {
-      return Types.codomain(left.getType());
+      return Types.result(left.getType());
     }
 
     FunSymbol left;

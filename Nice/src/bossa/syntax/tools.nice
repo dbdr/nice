@@ -60,10 +60,10 @@ localVariable(e@SymbolExp)
 localVariable(e@AssignExp) = localVariable(notNull(e.to));
 
 mlsub.typing.Monotype makeSure(mlsub.typing.Monotype m) = 
-  notNull(bossa.syntax.Monotype.sure(nice.tools.code.Types.rawType(m)));
+  notNull(bossa.syntax.Monotype.sure(nice.tools.typing.Types.rawType(m)));
 
 mlsub.typing.Monotype makeUnsure(mlsub.typing.Monotype m) = 
-  notNull(bossa.syntax.Monotype.maybe(nice.tools.code.Types.rawType(m)));
+  notNull(bossa.syntax.Monotype.maybe(nice.tools.typing.Types.rawType(m)));
 
 mlsub.typing.Monotype checkMonomorphic(mlsub.typing.Polytype type,
 				       Block.LocalValue decl)
@@ -121,7 +121,7 @@ bossa.util.UserError ensureLocated(bossa.util.UserError e,
     parameters = null;
   else 
     {
-      let originalType = nice.tools.code.Types.rawType(sym.getMonotype());
+      let originalType = nice.tools.typing.Types.rawType(sym.getMonotype());
       if (originalType instanceof mlsub.typing.MonotypeConstructor)
 	parameters = originalType.getTP();
       else

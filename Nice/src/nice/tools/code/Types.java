@@ -75,7 +75,7 @@ public final class Types
   */
   public static void setBytecodeType(Monotype m)
   {
-    m = equivalent(m);
+    m = nice.tools.typing.Types.equivalent(m);
     
     if (m instanceof mlsub.typing.TupleType)
       setBytecodeType(((mlsub.typing.TupleType) m).getComponents());
@@ -177,11 +177,11 @@ public final class Types
   */
   private static Type javaTypeOrNull(Monotype m)
   {
-    Type res = rawJavaType(equivalent(m));
+    Type res = rawJavaType(nice.tools.typing.Types.equivalent(m));
     if (res == null)
       return null;
 
-    boolean maybe = isMaybe(m.equivalent());
+    boolean maybe = nice.tools.typing.Types.isMaybe(m.equivalent());
     if (maybe) 
       return equivalentObjectType(res);
     else
@@ -611,7 +611,7 @@ public final class Types
     if (!(m instanceof MonotypeConstructor))
       return QuoteExp.nullExp;
     
-    TypeConstructor tc = rawType(m).head();
+    TypeConstructor tc = nice.tools.typing.Types.rawType(m).head();
 
     if (tc == null)
       return QuoteExp.nullExp;
@@ -635,132 +635,6 @@ public final class Types
   private static Expression zeroInt = new QuoteExp(new Integer(0));
   private static Expression zeroFloat = new QuoteExp(new Float(0.0));
   private static Expression zeroChar = new QuoteExp(new Character((char) 0));
-
-  /****************************************************************
-   * Predicates
-   ****************************************************************/
-
-  public static boolean isVoid(mlsub.typing.Monotype m)
-  {
-    return equivalent(m).head() == PrimitiveType.voidTC;
-  }
-
-  public static boolean isVoid(mlsub.typing.Polytype t)
-  {
-    return isVoid(t.getMonotype());
-  }
-
-  public static boolean isPrimitive(TypeConstructor tc)
-  {
-    return javaType(tc) instanceof PrimType;
-  }
-
-  /****************************************************************
-   * Manipulations on nice types
-   ****************************************************************/
-
-  public static boolean isMaybe(Monotype m)
-  {
-    // This is prob. laxist, since getTC() might be different but equivalent to maybeTC (?)
-    return (m instanceof MonotypeConstructor)
-      && ((MonotypeConstructor) m).getTC() == PrimitiveType.maybeTC;
-  }
-
-  public static boolean isSure(Monotype m)
-  {
-    // see comment by isMaybe (e?)
-    return (m instanceof MonotypeConstructor)
-      && ((MonotypeConstructor) m).getTC() == PrimitiveType.sureTC;
-  }
-
-  public static Monotype equivalent(Monotype m)
-  {
-    return rawType(m).equivalent();
-  }
-
-  public static void setMarkedKind(Monotype m)
-  {
-    m.setKind(NullnessKind.instance);
-  }
-
-  public static void makeMarkedType(MonotypeVar m)
-  {
-    m.setPersistentKind(NullnessKind.instance);
-  }
-
-  /** return the type with nullness markers removed */
-  public static Monotype rawType(Monotype m)
-  {
-    m = m.equivalent();
-    if (!(m instanceof MonotypeConstructor))
-      {
-	// It is probably a bug if this happens
-	//Internal.warning("Not kinded monotype: " + m);
-	return m;
-      }
-    else
-      return ((MonotypeConstructor) m).getTP()[0];
-  }
-
-  /** return the type with nullness markers removed */
-  public static Monotype rawType(MonotypeConstructor mc)
-  {
-    return mc.getTP()[0];
-  }
-
-  /** @return the domain of a functional monotype with nullness marker */
-  public static Monotype[] domain(Monotype type)
-  {
-    return rawType(type).domain();
-  }
-
-  /** @return the domain of a functional polytype with nullness marker */
-  public static Monotype[] domain(Polytype type)
-  {
-    return rawType(type.getMonotype()).domain();
-  }
-
-  /** @return the codomain of a functional polytype with nullness marker */
-  public static Monotype codomain(Polytype type)
-  {
-    return ((FunType) rawType(type.getMonotype())).codomain();
-  }
-
-  /** @return the <code>rank</code>th type parameter of this type, or null. */
-  public static Monotype getTypeParameter(Polytype type, int rank)
-  {
-    // This can only help
-    type.simplify();
-
-    return getTypeParameter(type.getMonotype(), rank);
-  }
-
-  /** @return the <code>rank</code>th type parameter of this type, or null. */
-  public static Monotype getTypeParameter(Monotype type, int rank)
-  {
-    // get rid of the nullness part
-    type = nice.tools.code.Types.rawType(type);
-
-    if (! (type instanceof MonotypeConstructor))
-      return null;
-
-    Monotype[] parameters = ((MonotypeConstructor) type).getTP();
-
-    if (parameters.length <= rank)
-      return null;
-    else
-      return parameters[rank];
-  }
-
-  /** 
-      Transforms \forall T:K.U into \forall T:K.sure<U>
-  */
-  public static Polytype addSure(Polytype type)
-  {
-    return new Polytype
-      (type.getConstraint(), 
-       bossa.syntax.Monotype.sure(type.getMonotype()));
-  }
 
   /****************************************************************
    * Reset the state for a new compilation.

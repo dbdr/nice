@@ -90,7 +90,7 @@ public class FunExp extends Expression implements Function
       }
     else
       if (! alwaysReturns && 
-	  ! nice.tools.code.Types.isVoid(inferredReturnType))
+	  ! nice.tools.typing.Types.isVoid(inferredReturnType))
 	throw User.error(this, "Missing return statement");
 
     Monotype t = new FunType(MonoSymbol.getMonotype(formals), 

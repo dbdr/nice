@@ -20,7 +20,7 @@ import mlsub.typing.Monotype;
 import mlsub.typing.FunType;
 import mlsub.typing.Constraint;
 
-import nice.tools.code.Types;
+import nice.tools.typing.Types;
 
 import gnu.bytecode.*;
 import gnu.expr.*;
@@ -426,12 +426,12 @@ public abstract class MethodDeclaration extends Definition
   
   public gnu.bytecode.Type javaReturnType()
   {
-    return Types.javaType(getReturnType());
+    return nice.tools.code.Types.javaType(getReturnType());
   }
   
   public gnu.bytecode.Type[] javaArgTypes()
   {
-    return Types.javaType(getType().domain());
+    return nice.tools.code.Types.javaType(getType().domain());
   }
   
   public void compile()

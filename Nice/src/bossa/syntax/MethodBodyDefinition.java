@@ -20,7 +20,7 @@ import java.util.*;
 
 import bossa.util.Debug;
 import bossa.util.Location;
-import nice.tools.code.Types;
+import nice.tools.typing.Types;
 import nice.tools.code.Gen;
 
 import mlsub.typing.Monotype;
@@ -90,7 +90,7 @@ public class MethodBodyDefinition extends MethodImplementation
       // Either there is no specialization on the first parameter, or
       // it was equivalent to the declaration type and has been erased,
       // so we return the information in the declaration.
-      return nice.tools.code.Types.equivalent(declaration.getArgTypes()[0]).
+      return Types.equivalent(declaration.getArgTypes()[0]).
         head();
   }
 
@@ -451,7 +451,7 @@ public class MethodBodyDefinition extends MethodImplementation
 	  }
 
 	try {
-	  Types.setBytecodeType(monotypes);
+	  nice.tools.code.Types.setBytecodeType(monotypes);
 
 	  Typing.implies();
 	}
@@ -502,10 +502,10 @@ public class MethodBodyDefinition extends MethodImplementation
 
     for(int n = 0; n < parameters.length; n++)
       res[n] = formals[n].atNull() ? 
-	Types.javaType(PrimitiveType.nullTC) :
+	nice.tools.code.Types.javaType(PrimitiveType.nullTC) :
 	formals[n].tc == bossa.syntax.PrimitiveType.arrayTC ?
 	nice.tools.code.SpecialArray.unknownTypeArray() :
-	Types.javaType(parameters[n].getMonotype());
+	nice.tools.code.Types.javaType(parameters[n].getMonotype());
 
     return res;
   }

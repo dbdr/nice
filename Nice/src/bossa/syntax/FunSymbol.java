@@ -13,7 +13,7 @@
 package bossa.syntax;
 
 import java.util.*;
-import nice.tools.code.Types;
+import nice.tools.typing.Types;
 
 class FunSymbol extends PolySymbol
 {

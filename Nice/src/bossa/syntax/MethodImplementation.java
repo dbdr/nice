@@ -19,7 +19,7 @@ package bossa.syntax;
    @author daniel (bonniot@users.sourceforge.net)
  */
 
-import nice.tools.code.Types;
+import nice.tools.typing.Types;
 import nice.tools.code.Gen;
 import mlsub.typing.Typing;
 import mlsub.typing.TypeConstructor;

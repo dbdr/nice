@@ -59,7 +59,7 @@ abstract class UserOperator extends MethodDeclaration
       {
 	mlsub.typing.Monotype[] paramTypes = getArgTypes();
 	for (int i = 0; i < symbols.length; i++) {
-	  if (Types.isVoid(paramTypes[i]))
+	  if (nice.tools.typing.Types.isVoid(paramTypes[i]))
 	    throw bossa.util.User.error(symbols[i].syntacticType, 
 					"A parameter cannot have a void type");
 	  if (symbols[i].name != null)

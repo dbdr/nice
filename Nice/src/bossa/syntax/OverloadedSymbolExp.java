@@ -23,7 +23,7 @@ import mlsub.typing.FunType;
 import mlsub.typing.TupleType;
 import mlsub.typing.Monotype;
 
-import nice.tools.code.Types;
+import nice.tools.typing.Types;
 
 /**
    A symbol, for which overloading resolution has yet to be done.
@@ -200,7 +200,7 @@ public class OverloadedSymbolExp extends Expression
       {
 	VarSymbol res = (VarSymbol) symbols.get(0);
 	// store the formal argument types for later use together with the type
-	callExp.argTypes = nice.tools.code.Types.domain(res.getClonedType());
+	callExp.argTypes = nice.tools.typing.Types.parameters(res.getClonedType());
 	res.releaseClonedType();
 
 	callExp.type = (Polytype) arguments.types.get(res);
@@ -260,7 +260,7 @@ public class OverloadedSymbolExp extends Expression
       if (res != null)
         return res;
 
-      if (Types.domain(expectedType) != null)
+      if (Types.parameters(expectedType) != null)
         { // in case of function objects symbols find the most precise match
 	  List nonMin = removeNonMinimal(symbols);
 	  if (symbols.size() == 1)
@@ -382,7 +382,7 @@ public class OverloadedSymbolExp extends Expression
     
     for(int s1 = 0; s1<len; s1++) {
 
-      Domain d1 = domain(syms[s1].getType());
+      Domain d1 = Types.domain(syms[s1].getType());
       
       for(int s2 = 0; s2<len; s2++)
 	/*
@@ -397,7 +397,7 @@ public class OverloadedSymbolExp extends Expression
 	*/
 	if (s1 != s2 && !remove[s2]) {
 
-	  Domain d2 = domain(syms[s2].getType());
+	  Domain d2 = Types.domain(syms[s2].getType());
 
 	  try{
 	    Typing.leq(d2, d1);
@@ -498,7 +498,7 @@ public class OverloadedSymbolExp extends Expression
   private static Domain domain(Polytype t, int[] usedArguments)
   {
     // remove nullness marker
-    Monotype[] m = Types.domain(t.getMonotype());
+    Monotype[] m = Types.parameters(t.getMonotype());
 
     Monotype[] dom;
 
@@ -520,14 +520,6 @@ public class OverloadedSymbolExp extends Expression
       }
 
     return new Domain(t.getConstraint(), new TupleType(dom));
-  }
-
-  private static Domain domain(Polytype t)
-  {
-    // remove nullness marker
-    Monotype[] m = Types.domain(t.getMonotype());
-
-    return new Domain(t.getConstraint(), new TupleType(m));
   }
 
   void computeType()

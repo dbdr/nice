@@ -21,7 +21,7 @@ import mlsub.typing.Monotype;
 import mlsub.typing.MonotypeConstructor;
 import mlsub.typing.Polytype;
 import mlsub.typing.TypeConstructor;
-import nice.tools.code.Types;
+import nice.tools.typing.Types;
 
 /**
    Creates an array containing the given elements.
@@ -114,7 +114,8 @@ public class LiteralArrayExp extends Expression
   public gnu.expr.Expression compile()
   {
     gnu.expr.Expression[] args = Expression.compile(elements);
-    ArrayType t = nice.tools.code.SpecialTypes.array(Types.lowestUpperBound(args));
+    ArrayType t = nice.tools.code.SpecialTypes.array
+      (nice.tools.code.Types.lowestUpperBound(args));
 
     return new gnu.expr.ApplyExp
       (new nice.tools.code.LiteralArrayProc

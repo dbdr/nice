@@ -57,7 +57,7 @@ public class OptionOr extends Procedure2 implements bossa.syntax.Macro
 
   public void checkSpecialRequirements(bossa.syntax.Expression[] arguments)
   {
-    if (nice.tools.code.Types.isSure(arguments[0].getType().getMonotype()))
+    if (nice.tools.typing.Types.isSure(arguments[0].getType().getMonotype()))
       bossa.util.User.warning(arguments[0], "First argument is a non-null value thus the second one will not be used.");
   }
 

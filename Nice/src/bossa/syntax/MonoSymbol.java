@@ -14,7 +14,7 @@ package bossa.syntax;
 
 import mlsub.typing.Polytype;
 import mlsub.typing.FunTypeKind;
-import nice.tools.code.Types;
+import nice.tools.typing.Types;
 
 import bossa.util.*;
 

@@ -156,7 +156,7 @@ public class CompOp extends Procedure2 implements Branchable, bossa.syntax.Macro
    
     if (literalexp != null)
       {	
-	mlsub.typing.TypeConstructor tc = nice.tools.code.Types.equivalent(otherexp.getType().getMonotype()).head();
+	mlsub.typing.TypeConstructor tc = nice.tools.typing.Types.equivalent(otherexp.getType().getMonotype()).head();
 	if (mlsub.typing.Typing.testRigidLeq(tc, literalexp.tc) &&
 	   ! (mlsub.typing.Typing.testRigidLeq(literalexp.tc, tc)))
           bossa.util.User.warning(otherexp, "Comparing a value with a constant outside the range of that value");

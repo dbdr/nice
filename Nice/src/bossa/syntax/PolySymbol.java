@@ -13,7 +13,7 @@
 package bossa.syntax;
 
 import mlsub.typing.Polytype;
-import nice.tools.code.Types;
+import nice.tools.typing.Types;
 
 import bossa.util.*;
 

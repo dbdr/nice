@@ -17,7 +17,7 @@ import java.util.*;
 
 import gnu.bytecode.*;
 
-import nice.tools.code.Types;
+import nice.tools.typing.Types;
 
 import mlsub.typing.Monotype;
 import mlsub.typing.MonotypeConstructor;
@@ -176,7 +176,7 @@ public class NewArrayExp extends Expression
 
   public gnu.expr.Expression compile()
   {
-    Type t = Types.javaType(type);
+    Type t = nice.tools.code.Types.javaType(type);
     
     return new gnu.expr.ApplyExp
       (new nice.tools.code.MultiArrayNewProc((ArrayType) t, 

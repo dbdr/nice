@@ -158,7 +158,7 @@ public class NiceClass extends ClassDefinition.ClassImplementation
     {
       sym.type = sym.syntacticType.resolve(typeScope);
       
-      if (Types.isVoid(sym.type))
+      if (nice.tools.typing.Types.isVoid(sym.type))
 	User.error(sym, "A field cannot have void type");
 
       value = dispatch.analyse(value, scope, typeScope);

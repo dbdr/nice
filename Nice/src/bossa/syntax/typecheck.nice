@@ -670,7 +670,7 @@ typecheck(e@ExpLocalVariable)
       e.initValue = decl.value = value = value.noOverloading();
       target.type = checkMonomorphic(value.getType(), decl);
 
-      if (nice.tools.code.Types.isVoid(target.type))
+      if (nice.tools.typing.Types.isVoid(target.type))
         throw error(decl, "A variable cannot have a void type");
     } 
   else
@@ -738,7 +738,7 @@ typecheck(decl@Block.LocalVariable)
           target.type == PrimitiveType.shortType)
 	target.type = notNull(PrimitiveType.intType);
 
-      if (nice.tools.code.Types.isVoid(target.type))
+      if (nice.tools.typing.Types.isVoid(target.type))
         throw error(decl, "A variable cannot have a void type");
 
     }
@@ -770,7 +770,7 @@ typecheck(decl@Block.LocalConstant)
   mlsub.typing.Polytype type = notNull(decl.value).getType();
 
   notNull(decl.left).type = checkMonomorphic(type, decl);
-  if (nice.tools.code.Types.isVoid(notNull(decl.left).type))
+  if (nice.tools.typing.Types.isVoid(notNull(decl.left).type))
      throw error(decl, "A variable cannot have a void type");
 
 }
@@ -858,7 +858,7 @@ typecheck(r@ReturnStmt)
 	r.value = notNull(r.value).noOverloading();
       else
 	{
-	  if (! r.fake && nice.tools.code.Types.isVoid(expectedType))
+	  if (! r.fake && nice.tools.typing.Types.isVoid(expectedType))
 	    throw bossa.util.User.error(r, "Cannot return a value here");
 	  
 	  r.value = notNull(r.value).resolveOverloading
@@ -870,7 +870,7 @@ typecheck(r@ReturnStmt)
     }
   
   try{
-    if ( !(r.fake && expectedType != null && nice.tools.code.Types.isVoid(expectedType)))
+    if (! (r.fake && expectedType != null && nice.tools.typing.Types.isVoid(expectedType)))
       function.checkReturnedType(r.returnType());
   }
   catch(Function.WrongReturnType e){
@@ -894,7 +894,7 @@ typecheck(s@SynchronizedStmt)
 {
   s.object = notNull(s.object).noOverloading();
   mlsub.typing.Polytype type = notNull(s.object).getType();
-  if (isPrimitive(type))
+  if (nice.tools.typing.Types.isPrimitive(type))
     throw bossa.util.User.error(s.object, 
 		     "Synchronization cannot be done on primitive values");
   try {
@@ -984,9 +984,6 @@ void wrongReturnType(bossa.util.Located responsible,
 
   throw new bossa.util.UserError(responsible, message);
 }
-
-boolean isPrimitive(mlsub.typing.Polytype type) =
-  nice.tools.code.Types.javaType(type) instanceof gnu.bytecode.PrimType;
 
 void checkNotNull(mlsub.typing.Polytype type)
 {

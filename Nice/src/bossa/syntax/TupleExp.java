@@ -76,7 +76,7 @@ public class TupleExp extends bossa.syntax.Expression
 
   void adjustToExpectedType(Monotype expectedType)
   {
-    Monotype m = Types.equivalent(expectedType);
+    Monotype m = nice.tools.typing.Types.equivalent(expectedType);
 
     // Get the expected component types
     if (m instanceof TupleType)

@@ -54,7 +54,7 @@ public class DefaultMethodImplementation extends MethodImplementation
 
   final mlsub.typing.TypeConstructor firstArgument()
   {
-    return nice.tools.code.Types.equivalent(declaration.getArgTypes()[0]).head();
+    return nice.tools.typing.Types.equivalent(declaration.getArgTypes()[0]).head();
   }
 
   void doResolve()

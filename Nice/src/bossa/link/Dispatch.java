@@ -405,7 +405,7 @@ public final class Dispatch
 	  {
 	    MonotypeConstructor mc = (MonotypeConstructor) arg;
 	    marker = mc.getTC();
-	    raw = nice.tools.code.Types.rawType(mc);
+	    raw = nice.tools.typing.Types.rawType(mc);
 	  }
 	else
 	  {

@@ -20,9 +20,10 @@ import mlsub.typing.Monotype;
 import mlsub.typing.MonotypeConstructor;
 import mlsub.typing.Typing;
 import mlsub.typing.TypingEx;
+import nice.tools.typing.Types;
 
 import gnu.expr.*;
-import nice.tools.code.*;
+import nice.tools.code.Gen;
 
 /**
    Represents the information about one argument of a method body.
@@ -807,7 +808,7 @@ public class Pattern implements Located
     if (atReference())
       return Gen.referenceEqualsExp(atValue.compile(), parameter);
 
-    gnu.bytecode.Type ct = Types.javaType(tc);
+    gnu.bytecode.Type ct = nice.tools.code.Types.javaType(tc);
     if (exactlyAt)
       return Gen.isOfClass(parameter, ct);
       

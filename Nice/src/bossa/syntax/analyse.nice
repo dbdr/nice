@@ -193,7 +193,7 @@ class Info
     if (type != null)
       {
 	symbol.type = notNull(type.resolve(this.typeMap));
-	if (nice.tools.code.Types.isVoid(symbol.type))
+	if (nice.tools.typing.Types.isVoid(symbol.type))
 	  throw error(symbol, "A variable cannot have a void type");
       }
 

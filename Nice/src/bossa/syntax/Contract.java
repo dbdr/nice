@@ -77,7 +77,7 @@ public class Contract
         return;
       }
 
-    if (! nice.tools.code.Types.isVoid(resultType))
+    if (! nice.tools.typing.Types.isVoid(resultType))
       result = new MonoSymbol(new LocatedString("result", location), 
                               resultType) {
 	  boolean isAssignable()

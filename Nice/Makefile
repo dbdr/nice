@@ -14,11 +14,11 @@ SHELL = /bin/sh
 TOP=${PWD}
 
 javac = javac
-#javac = jikes
+#javac = jikes-classpath
 
 JAVAC_FLAGS = -O -g
 
-JAVAC= ${javac} -classpath "${TOP}/classes:${TOP}/classes.old" -sourcepath "${TOP}/src" -d "${TOP}/classes" $(JAVAC_FLAGS)
+JAVAC= ${javac} -classpath "${TOP}/classes:${TOP}/classes.old" -sourcepath "${TOP}/src:${TOP}/stdlib" -d "${TOP}/classes" $(JAVAC_FLAGS)
 JAVACC= CLASSPATH="${TOP}/external/JavaCC.zip:${CLASSPATH}" java COM.sun.labs.javacc.Main
 JAVADOC=javadoc
 

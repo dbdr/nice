@@ -680,7 +680,9 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     res.setName(name);
     res.setSimple(true);
     res.body = QuoteExp.voidExp;
-    res.setFile(source.getName());
+    // This is not true, but useful to make some Java-centric tools happy.
+    // The real file info in the the SourceDebugExtension attribute.
+    res.setFile(name.substring(name.lastIndexOf('.') + 1) + ".nice");
     res.needsConstructor = true;
     return res;
   }

@@ -12,7 +12,7 @@
 
 // File    : Package.java
 // Created : Wed Oct 13 16:09:47 1999 by bonniot
-//$Modified: Wed Jul 26 15:44:19 2000 by Daniel Bonniot $
+//$Modified: Wed Jul 26 16:11:28 2000 by Daniel Bonniot $
 
 package bossa.modules;
 
@@ -369,7 +369,7 @@ public class Package implements mlsub.compilation.Module
   private void closeJar()
   {
     try{
-      JarEntry dispatchEntry = new JarEntry("dispatchClass.class");
+      JarEntry dispatchEntry = new JarEntry("dispatch.class");
       jar.putNextEntry(dispatchEntry);
       dispatchClass.writeToStream(jar);
 
@@ -483,11 +483,11 @@ public class Package implements mlsub.compilation.Module
     try{
       kawa.standard.Scheme.registerEnvironment();
       
-      ct = new ClassType("dispatchClass");
+      ct = new ClassType("dispatch");
       ct.setSuper(Type.pointer_type);
       ct.setModifiers(Access.PUBLIC|Access.FINAL);
-      comp = new gnu.expr.Compilation(ct,"dispatchClass",
-				      "dispatchClass","prefix",false);
+      comp = new gnu.expr.Compilation(ct, "dispatch",
+				      "dispatch", "prefix", false);
     }
     catch(ExceptionInInitializerError e){
       Internal.error("Error initializing Package class:\n"+

@@ -12,7 +12,7 @@
 
 // File    : compiler.nice
 // Created : Sat Feb 19 16:21:04 2000 by Daniel Bonniot
-//$Modified: Wed Jul 26 14:57:35 2000 by Daniel Bonniot $
+//$Modified: Wed Jul 26 19:08:14 2000 by Daniel Bonniot $
 
 package bossa.tools;
 
@@ -37,8 +37,8 @@ main(args)
   boolean doLink = true;
   List<Option> opts = makeVector(10);
 
-  opts.add(option('r',"recompile",
-		  "force recompilation of packages given on the command line",
+  opts.add(option('r', "recompile",
+		  "Force recompilation of packages given on the command line",
 		  "none/command-line/all",
   		  fun()=>{ recompileCL=true; },
   		  fun(String arg)=>{
@@ -51,25 +51,30 @@ main(args)
 		        recompileCL=false;
 		        recAll=false;
 		      }
+		    else println("Unkown argument to \'recompile\': " + arg);
 		    }));
 
   opts.add(option('R', "recompileAll",
-		  "recompile all packages",
+		  "Force recompilation of all dependant packages",
                   fun()=>{ recAll = true; }));
 
-  opts.add(option('c',"compile",
-		  "just compile packages, do not link them",
+  opts.add(option('c', "compile",
+		  "Compile packages, do not link them",
   		  fun()=>{ doLink=false; }));
 
-  opts.add(option('h',"help","print help message and exit",
+  opts.add(option('h', "help", "Print help message and exit",
 		  fun()=>
                   {
 		    println(printOptions(opts));
 		    System.exit(1);
 		  }));
 
-  opts.add(option('?',"usage",
-		  "print usage information and exit",
+  opts.add(option('?', "version",
+		  "Print version info and exit",
+		  fun()=>version()));
+
+  opts.add(option('?', "usage",
+		  "Print usage information and exit",
 		  fun()=>usage()));
 
   Sequence<String> rest = parse("nicec", args, opts);
@@ -107,7 +112,16 @@ main(args)
 void usage();
 usage()
 {
-  println("Usage: nicec <package name>");
+  println("Usage: nicec [options] [package name]");
   println("Type \"nicec --help\" for a list of options");
-  exit(-1);
+  System.exit(0);
+}
+
+void version();
+version()
+{
+  println("Nice compiler alpha version");
+  println("Copyright (C) 2000 Daniel Bonniot");
+  println("Report bugs to d.bonniot@mail.dotcom.fr");
+  System.exit(0);
 }

@@ -95,6 +95,32 @@ class HTMLWriter {
     writer.close();
   }
 
+  write(gv@GlobalVarDeclaration, packageName) {
+    //Handle global variables
+    
+    //Initialise a FileWriter
+    File dir = new File(outdir, packageName.replace('.',java.io.File.separator));
+    if(!dir.exists() && !dir.mkdirs()) {
+        System.err.println("Error creating directory structure");
+    }
+    
+    BufferedWriter writer = new BufferedWriter
+      (new FileWriter(new File(dir, "gv_" gv.getName() ".html")));
+    
+    writer.write(getHeader(gv.getName().toString()));
+  
+    writer.write("<h1>Global Variable " + gv.getName() + "</h1>");
+  
+    writer.write(htmlSafe(gv.toString()));
+  
+    writer.write("<p>");
+    writer.write("nicedoc comments would go here...");
+    writer.write("</p>");
+ 
+    writer.write(getFooter());
+    writer.close();
+  }
+  
   write(m@MethodDeclaration, packageName) {
     //Handle methods
     
@@ -103,13 +129,6 @@ class HTMLWriter {
     if(!dir.exists() && !dir.mkdirs()) {
         System.err.println("Error creating directory structure");
     }
-    
-    /*String fileName = m.getName().toString();
-    //we only want information after the last .
-    //that is, nice.lang.Maybe -> Maybe
-    //System.out.println("Raw filename: " + fileName);
-    fileName = fileName.replace('/', "@slash");
-    fileName = fileName.replace('.', "@dot");*/
     
     BufferedWriter writer = new BufferedWriter
       (new FileWriter(new File(dir, calculateMethodFilename(m))));
@@ -142,9 +161,10 @@ class HTMLWriter {
         (new FileWriter(new File(dir, "index.html")));
       writer.write(getHeader("Package " + p.getName()));
             
-      //we need to separate class and methods
+      //we need to separate class, methods, and global variables
       ArrayList<ClassDefinition.Class> classes = new ArrayList();
       ArrayList<MethodDeclaration> methods = new ArrayList();
+      ArrayList<GlobalVarDeclaration> globalVars = new ArrayList();
       for(Definition d : p.getDefinitions().definitions()) {
         if(d instanceof ClassDefinition.Class) {
           classes.add(d);
@@ -155,8 +175,11 @@ class HTMLWriter {
         else if(d instanceof DefaultMethodImplementation) {
           methods.add(d.getDeclaration());
         }
+        else if(d instanceof GlobalVarDeclaration) {
+          globalVars.add(d);
+        }
         else {
-          System.err.println("Ignoring " + d);
+          System.err.println("Ignoring " d "\n  (type " d.getClass() ")");
         }
       }
       
@@ -180,8 +203,15 @@ class HTMLWriter {
                        ": " m.getType() "</li>\n");
       }
       writer.write("</ul>\n");
-    
-    
+      
+      //Write global vars
+      writer.write("<b>Global Variables:</b>\n");
+      writer.write("<ul>\n");
+      for(GlobalVarDeclaration gv : globalVars) {
+           writer.write("<li><a href='gv_" gv.getName() ".html'>" gv.getName() "</a></li>\n");
+      }
+      writer.write("</ul>\n");
+      
       writer.write(getFooter());
       writer.close();
     } catch(IOException ioe) {
@@ -212,7 +242,8 @@ class HTMLWriter {
 }
 
 /** Converts a String that may contain characters such as '<' to one that will display
- * properly in html.  Submitted by S. Bayer to http://www.rgagnon.com/javadetails/java-0306.html.
+ * properly in html.  Submitted by S. Bayer to http://www.rgagnon.com/javadetails/java-0306.html,
+ * although I've made some changes.
  */
 String htmlSafe(String s) {
     StringBuffer sb = new StringBuffer(s.length());
@@ -250,10 +281,13 @@ String htmlSafe(String s) {
                 // Handle Newline
                 sb.append("&lt;br/&gt;");
             else {
-                //char and int or not related in nice, so we can't do a direct cast
+                //char and int are not related in nice, so we can't do a direct cast
                 //hence, we use int(c) instead of (int)c
-                int ci = 0xffff & int(c);
-                if(ci < 160)
+                int ci = int(c);
+                /*This was originally 160 in S. Bayer version, but I couldn't see the sense of that
+                 *so I changed it to 128, as 127 is the maximum value of an ascii character
+                 */
+                if(ci < 128)
                     // nothing special only 7 Bit
                     sb.append(c);
                 else {

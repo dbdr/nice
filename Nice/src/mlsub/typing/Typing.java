@@ -295,8 +295,9 @@ public final class Typing
     if(dbg)
       Debug.println("Polytype leq: "+t1+" <: "+t2);
 
-    int l;
-    if(dbg) l=enter("#"); else l=enter();
+    // The additions we are going to make should be discarded at the end,
+    // so as not to influence existential type variables in the context.
+    int l = enter(true);
     
     try{
       Constraint.enter(t2.getConstraint());
@@ -307,7 +308,7 @@ public final class Typing
       leq(t1.getMonotype(), t2.getMonotype());
     }
     finally{
-      if(leave() != l)
+      if(leave(true, false) != l)
 	throw new InternalError("Unmatched enters and leaves");
     }
   }
@@ -325,8 +326,9 @@ public final class Typing
     if(dbg)
       Debug.println("Polytype leq: "+t1+" <: "+m2);
 
-    int l;
-    if(dbg) l=enter("#"); else l=enter();
+    // The additions we are going to make should be discarded at the end,
+    // so as not to influence existential type variables in the context.
+    int l = enter(true);
     
     try{
       implies();
@@ -335,7 +337,7 @@ public final class Typing
       leq(t1.getMonotype(), m2);
     }
     finally{
-      if(leave() != l)
+      if(leave(true, false) != l)
 	throw new InternalError("Unmatched enters and leaves");
     }
   }
@@ -469,7 +471,9 @@ public final class Typing
 	return;
       }
     
-    enter();
+    // The additions we are going to make should be discarded at the end,
+    // so as not to influence existential type variables in the context.
+    enter(true);
     try{
       Constraint.enter(d1.getConstraint());
 
@@ -479,7 +483,7 @@ public final class Typing
       leq(d1.getMonotypes(), d2.getMonotypes(), dispatchable);
     }
     finally{
-      leave();
+      leave(true, false);
     }
   }
 

@@ -15,8 +15,6 @@
 
 package bossa.modules;
 
-//import bossa.modules.Compilation;
-
 import bossa.util.*;
 import bossa.syntax.*;
 import gnu.bytecode.*;
@@ -46,16 +44,16 @@ public class Package implements mlsub.compilation.Module, Located
     // If we've already loaded the source
     // or none of our imports changed since last time we compiled,
     // there is nothing to do
-    if (source.sourcesRead || date<=lastModification())
+    if (source.sourcesRead || date <= source.lastCompilation)
       return;
     
     if (source instanceof JarSource)
       User.error(this, name + " should be recompiled, but it was loaded from an archive file");
     
     if (Debug.modules)
-      Debug.println("Recompiling " + this + 
-		    " because a required package changed " + 
-		    new java.util.Date(date));
+      Debug.println
+      (this + " was compiled " + new java.util.Date(lastModification()) + 
+       "\nA required package changed " + new java.util.Date(date) );
 
     read(true);
   }
@@ -289,6 +287,10 @@ public class Package implements mlsub.compilation.Module, Located
     try{
       ast.resolveScoping();
       ast.createContext();
+
+      // this must be done before freezing
+      if (!sourcesRead)
+	readAlternatives();
     }
     catch(Throwable e){
       Internal.error(e);
@@ -330,9 +332,6 @@ public class Package implements mlsub.compilation.Module, Located
 
   public void link()
   {
-    if (!sourcesRead)
-      readAlternatives();
-    
     if (!isRoot)
       return;
     
@@ -349,6 +348,8 @@ public class Package implements mlsub.compilation.Module, Located
   {
     if (jar != null)
       closeJar();
+    else
+      addClass(dispatchClass);
   }
   
   private static JarOutputStream jar;
@@ -423,7 +424,7 @@ public class Package implements mlsub.compilation.Module, Located
     // if this package already comes from an interface file, or
     // if we produce a jar whith all the libraries (staticLink)
     //   since we wont need the interface to execute
-    if (!sourcesRead || compilation.staticLink)
+    if (!sourcesRead || jar != null && compilation.staticLink)
       return;
 
     try{
@@ -510,11 +511,10 @@ public class Package implements mlsub.compilation.Module, Located
     gnu.expr.Compilation comp = null;
     try{
       String name = this.name.toString();
-      ct = new ClassType(name);
+      ct = new ClassType(name+".dispatch");
       ct.setSuper(Type.pointer_type);
       ct.setModifiers(Access.PUBLIC|Access.FINAL);
-      comp = new gnu.expr.Compilation(ct, name,
-				      name, "prefix", false);
+      comp = new gnu.expr.Compilation(ct, name, name, "prefix", false);
     }
     catch(ExceptionInInitializerError e){
       Internal.error("Error initializing Package class:\n"+
@@ -569,9 +569,9 @@ public class Package implements mlsub.compilation.Module, Located
     
     comp.compileClassInit(initStatements);
     
-    addClass(outputBytecode, true);
+    addClass(outputBytecode);
     for (int iClass = 0;  iClass < comp.numClasses;  iClass++)
-      addClass(comp.classes[iClass], true);
+      addClass(comp.classes[iClass]);
   }
 
   private void copyStreams(InputStream in, OutputStream out)
@@ -602,7 +602,7 @@ public class Package implements mlsub.compilation.Module, Located
     // objects representing this class.
     // However if the class exists but is invalid, we create a new one.
 
-    String className = this.name + "$" + name;
+    String className = this.name + "." + name;
     ClassType res; 
     try{
       res = ClassType.make(className);
@@ -617,11 +617,6 @@ public class Package implements mlsub.compilation.Module, Located
 
   public void addClass(ClassType c)
   {
-    addClass(c, false);
-  }
-
-  public void addClass(ClassType c, boolean inSub)
-  {
     // if we did not have to recompile, no class has to be regenerated
     if (!sourcesRead)
       return;
@@ -632,25 +627,16 @@ public class Package implements mlsub.compilation.Module, Located
       else
 	 c.setSourceFile(c.sourcefile);
 
-      int lastDot = c.getName().lastIndexOf('.');
-      StringBuffer filename = new StringBuffer(c.getName());
-
       boolean putInJar = jar != null && compilation.staticLink;
-
       // Jar and Zip files use forward slashes
       char sepChar = putInJar ? '/' : File.separatorChar;
-
-      //filename.setCharAt(lastDot, inSub ? '/' : '$');
-      for (int i = 0; i < lastDot+1; i++)
-	if (filename.charAt(i) == '.')
-	  filename.setCharAt(i, sepChar);
-      filename.append(".class");
+      String filename = c.getName().replace('.', sepChar) + ".class";
 
       if (jar == null || !compilation.staticLink)
-	c.writeToFile(new File(rootDirectory, filename.toString()));
+	c.writeToFile(new File(rootDirectory, filename));
       else
 	{
-	  jar.putNextEntry(new JarEntry(filename.toString()));
+	  jar.putNextEntry(new JarEntry(filename));
 	  c.writeToStream(jar);
 	}
     }

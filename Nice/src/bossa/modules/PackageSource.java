@@ -40,7 +40,7 @@ abstract class PackageSource
   }
   abstract Unit[] getDefinitions(boolean forceReload);
 
-  long lastModification;
+  long lastModification, lastCompilation;
 
   boolean sourcesRead;
   

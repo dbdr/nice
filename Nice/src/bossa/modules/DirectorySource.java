@@ -46,11 +46,13 @@ class DirectorySource extends PackageSource
     File itf = getInterface();
 
     lastModification = maxLastModification(sources);
+    lastCompilation = itf == null ? -1 : itf.lastModified();
     
-    if (!forceReload &&
-	itf != null && 
-	lastModification <= itf.lastModified())
+    if (!forceReload && lastModification <= lastCompilation)
       return new Unit[]{ new Unit(read(itf), itf.toString()) };
+
+    if (Debug.modules && !forceReload && itf != null)
+      Debug.println(pkg + " has changed, recompiling");
     
     if (sources.length == 0)
       User.error(pkg.name, 

@@ -250,6 +250,8 @@ Stack<gnu.bytecode.Variable> copies(FormalParameters.Parameter.Symbol) = native 
 gnu.expr.CopyArgument CopyArgument(Stack<gnu.bytecode.Variable>) = native new gnu.expr.CopyArgument(Stack);
 MethodContainer MethodContainer(LocatedString, int, MethodContainer.Constraint, List<?boolean>) = native new MethodContainer(LocatedString, int, MethodContainer.Constraint, List);
 AST AST(List<Definition>, int) = native new AST(List, int);
+?String getParentFor(AtomicConstraint, mlsub.typing.TypeConstructor) = native String AtomicConstraint.getParentFor(mlsub.typing.TypeConstructor);
+mlsub.typing.AtomicConstraint resolve(AtomicConstraint, TypeScope) = native mlsub.typing.AtomicConstraint AtomicConstraint.resolve(TypeScope);
 
 // Retypings needed since java types are not strict.
 mlsub.typing.Polytype boolPolytype() = native nice.tools.typing.PrimitiveType.boolPolytype;

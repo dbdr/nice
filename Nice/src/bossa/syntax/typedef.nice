@@ -406,8 +406,8 @@ public abstract class CTypeDefinition extends TypeDefinition
       typeParameters[i] = mvar;
 
       bossa.syntax.Monotype v = bossa.syntax.Monotype.create(mvar);
-      atoms.add(new MonotypeLeqCst(bossa.syntax.Monotype.create(params[i]), v));
-      atoms.add(new MonotypeLeqCst(v, bossa.syntax.Monotype.create(params[i])));
+      atoms.add(new MonotypeLeqCst(m1: bossa.syntax.Monotype.create(params[i]), m2: v));
+      atoms.add(new MonotypeLeqCst(m1: v, m2: bossa.syntax.Monotype.create(params[i])));
     }
 
     return new MethodContainer.Constraint(

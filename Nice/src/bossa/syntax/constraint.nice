@@ -1,0 +1,102 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2004                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package bossa.syntax;
+
+import bossa.util.*;
+
+/**
+   Syntactic inequality between monotypes.
+
+*/
+public class MonotypeLeqCst extends AtomicConstraint
+{
+  Monotype m1;
+  Monotype m2;
+
+  resolve(ts)
+  {
+    return new mlsub.typing.MonotypeLeqCst
+      (m1.resolve(ts), m2.resolve(ts));
+  }
+
+  toString() = m1 + " <: " + m2;
+}
+
+/**
+   Inequality between TypeConstructors.
+
+*/
+public class TypeConstructorLeqCst extends AtomicConstraint
+{
+  mlsub.typing.TypeConstructor t1;
+  TypeIdent t2;
+
+  resolve(ts)
+  {
+    // If t2 resolve to an interface definition,
+    // this constraint meant t1 implements t2
+    let s = t2.resolveToTypeSymbol(ts);
+
+    if (s instanceof mlsub.typing.Interface)
+      return new mlsub.typing.ImplementsCst(t1, s);
+    
+    if (!(s instanceof mlsub.typing.TypeConstructor))
+      throw User.error(t2, t2 + " is not a class");
+
+    let c2 = getTypeDefinition(s);
+
+    if (c2 != null)
+      {
+	let associatedInterface =
+	  c2.getAssociatedInterface();
+    
+	if (associatedInterface!=null)
+	  return new mlsub.typing.ImplementsCst(t1, associatedInterface);
+      }
+
+    return new mlsub.typing.TypeConstructorLeqCst(t1, s);
+  }
+
+  toString() = t1 + " <: " + t2;
+
+  getParentFor(tc)
+  {
+    if (this.t1 == tc)
+      return t2.toString();
+    else
+      return null;
+  }
+}
+
+/**
+   A type constructor implements an interface.
+   
+*/
+public class ImplementsCst extends AtomicConstraint
+{
+  TypeIdent tc;
+  TypeIdent itf;
+
+  resolve(scope)
+  {
+    TypeConstructor stc = tc.resolveToTC(scope);
+    
+    TypeSymbol sitf = itf.resolveToTypeSymbol(scope);
+    if (! (sitf instanceof Interface))
+      throw User.error(itf, itf+" should be an interface");
+    
+    return new mlsub.typing.ImplementsCst(stc, sitf);
+  }
+
+  toString() = tc + ":" + itf;
+}

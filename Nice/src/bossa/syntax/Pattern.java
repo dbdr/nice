@@ -215,7 +215,6 @@ public class Pattern implements Located
        {
 	 NewExp val = (NewExp)symbol.getValue();
 
-	 symbol.getDefinition().resolve();
 	 tc = val.tc;
 	 atValue = new ConstantExp(null, tc, symbol,
 				name.toString(), location);

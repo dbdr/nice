@@ -71,7 +71,7 @@ public final class User
       Internal.printStackTrace();
     
     nice.tools.compiler.OutputMessages.warning
-      ((responsible == null ? "" : responsible.location().toString() + ": ") +
+      ("\n"+(responsible == null ? "" : responsible.location().toString() + ": ") +
        "Warning:\n" + message);
   }
 

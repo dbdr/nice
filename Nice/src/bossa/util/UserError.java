@@ -49,9 +49,9 @@ public class UserError extends RuntimeException
   public String getMessage()
   {
     if (location == null)
-      return message;
+      return "\n"+message;
     else
-      return location + ":\n" + message;
+      return "\n"+location + ":\n" + message;
   }
 
   public String message;

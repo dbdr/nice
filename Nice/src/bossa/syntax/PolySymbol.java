@@ -12,14 +12,13 @@
 
 // File    : PolySymbol.java
 // Created : Fri Jul 16 17:03:51 1999 by bonniot
-//$Modified: Mon Oct 25 19:38:29 1999 by bonniot $
-// Description : A local variable
+//$Modified: Fri Nov 05 17:02:42 1999 by bonniot $
 
 package bossa.syntax;
 
 import bossa.util.*;
 
-/** A variable symbol which has a polytype (eg a local variable)
+/** A variable symbol which has a polytype (eg a method symbol)
  *
  * @see MonoSymbol
  */

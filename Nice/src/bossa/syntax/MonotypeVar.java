@@ -12,7 +12,7 @@
 
 // File    : MonotypeVar.java
 // Created : Fri Jul 23 15:36:39 1999 by bonniot
-//$Modified: Fri Nov 05 15:43:38 1999 by bonniot $
+//$Modified: Wed Nov 10 16:08:40 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -71,7 +71,7 @@ public class MonotypeVar extends Monotype
     return equivalentCodomain;
   }
   
-  public Collection domain()
+  public List domain()
   {
     return equivalentDomain;
   }
@@ -111,7 +111,15 @@ public class MonotypeVar extends Monotype
       return this;
     
     TypeSymbol s=ts.lookup(this.name);
-    User.error(s==null,this,this.name+" is not defined"," in "+ts);
+    if(s==null)
+      {
+	JavaTypeConstructor tc = JavaTypeConstructor.lookup(this.name);
+	
+	if(tc!=null)
+	  return new MonotypeConstructor(tc, null, name.location());
+
+	User.error(this,this.name+" is not defined"," in "+ts);
+      }
 
     if(s instanceof Monotype)
       return (Monotype) s;
@@ -239,7 +247,7 @@ public class MonotypeVar extends Monotype
   
   /** When this variable is comparable to a functional type */
   private MonotypeVar equivalentCodomain;
-  private Collection equivalentDomain;
+  private List equivalentDomain;
   private Monotype functionalType;
 
   private TypeConstructor equivalentTC;

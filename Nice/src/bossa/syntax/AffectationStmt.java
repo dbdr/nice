@@ -12,7 +12,7 @@
 
 // File    : AffectationStmt.java
 // Created : Mon Jul 05 15:49:27 1999 by bonniot
-//$Modified: Mon Oct 25 13:12:40 1999 by bonniot $
+//$Modified: Tue Nov 09 17:55:03 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -36,12 +36,19 @@ public class AffectationStmt extends Statement
    * Type cheking
    ****************************************************************/
   
+  static void checkAssignment(Polytype left, ExpressionRef right)
+    throws TypingEx
+  {
+    right.resolveOverloading(left);
+    Typing.leq(right.getType(),left);
+  }
+  
   void typecheck()
   {
+    to=to.noOverloading();
     User.error(!to.isAssignable(),to+" cannot be assigned a value");
     try{
-      value.resolveOverloading(to.getType());
-      Typing.leq(value.getType(),to.getType());
+      checkAssignment(to.getType(),value);
     }
     catch(TypingEx t){
       User.error(this,"Typing error : "+to+
@@ -49,6 +56,21 @@ public class AffectationStmt extends Statement
     }
   }
 
+  /****************************************************************
+   * Code generation
+   ****************************************************************/
+
+  public gnu.expr.Expression compile()
+  {
+    gnu.expr.Declaration decl=to.declaration();
+    
+    if(decl!=null)
+      return new gnu.expr.SetExp(decl,value.compile());
+	
+    Internal.warning(this,"Assignment to "+to.getClass());
+    return new gnu.expr.SetExp(to.toString(),value.compile());
+  }
+  
   /****************************************************************
    * Printing
    ****************************************************************/
@@ -58,5 +80,6 @@ public class AffectationStmt extends Statement
     return to+" = "+value;
   }
 
-  private Expression to,value;
+  private Expression to;
+  private ExpressionRef value;
 }

@@ -12,7 +12,7 @@
 
 // File    : ExpressionRef.java
 // Created : Tue Aug 17 16:04:40 1999 by bonniot
-//$Modified: Thu Oct 28 12:54:17 1999 by bonniot $
+//$Modified: Tue Nov 09 11:28:26 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -27,7 +27,11 @@ import bossa.util.*;
  * @author bonniot
  */
 
-public class ExpressionRef extends Expression
+// It set this class final since it may be used intensively
+// so this will reduce the overhead,
+// and I don't see why it should be subclassed
+
+final public class ExpressionRef extends Expression
 {
   public ExpressionRef(Expression e)
   {
@@ -81,6 +85,30 @@ public class ExpressionRef extends Expression
     return this;
   }
   
+  Expression noOverloading()
+  {
+    content=content.noOverloading();
+    return this;
+  }
+  
+  /****************************************************************
+   * Code generation
+   ****************************************************************/
+
+  public gnu.expr.Expression compile()
+  {
+    return content.compile();
+  }
+
+  public gnu.expr.Declaration declaration()
+  {
+    return content.declaration();
+  }
+  
+  /****************************************************************
+   * Locations
+   ****************************************************************/
+
   public void setLocation(Location l)
   {
     content.setLocation(l);

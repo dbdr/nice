@@ -12,7 +12,7 @@
 
 // File    : FieldExp.java
 // Created : Mon Jul 05 17:29:46 1999 by bonniot
-//$Modified: Thu Aug 26 13:09:58 1999 by bonniot $
+//$Modified: Mon Nov 08 20:13:17 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -40,11 +40,6 @@ abstract public class FieldExp extends Expression
   
   Expression resolveExp()
   {
-    //TODO
-//      prefix=prefix.resolveExp();
-//      access=prefix.memberScope().lookupOne(field);
-//      // If we reach this point, prefix should be a class
-//      User.error(access==null,"Field \""+field+"\" not found in class "+prefix.getType().toString/*Base*/());
     return this;
   }
 
@@ -59,6 +54,16 @@ abstract public class FieldExp extends Expression
     type=access.getType();
   }
 
+  /****************************************************************
+   * Code generation
+   ****************************************************************/
+
+  public gnu.expr.Expression compile()
+  {
+    Internal.error("compile in FieldExp");
+    throw new Error();
+  }
+  
   public String toString()
   {
     return prefix+"."+field;

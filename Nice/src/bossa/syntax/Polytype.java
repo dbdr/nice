@@ -12,7 +12,7 @@
 
 // File    : Polytype.java
 // Created : Tue Jul 13 12:51:38 1999 by bonniot
-//$Modified: Mon Oct 25 15:06:13 1999 by bonniot $
+//$Modified: Wed Nov 10 16:49:52 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -20,7 +20,7 @@ import java.util.*;
 import bossa.util.*;
 
 /**
- * A constrained monotype
+ * A constrained monotype.
  */
 public class Polytype extends Node
 {
@@ -121,7 +121,7 @@ public class Polytype extends Node
    * Functional types
    ****************************************************************/
 
-  Collection /* of Monotype */ domain()
+  List /* of Monotype */ domain()
   {
     return monotype.domain();
   }

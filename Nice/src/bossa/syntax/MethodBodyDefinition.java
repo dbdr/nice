@@ -12,7 +12,7 @@
 
 // File    : MethodBodyDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Fri Nov 05 15:23:01 1999 by bonniot $
+//$Modified: Wed Nov 10 18:52:01 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -145,8 +145,8 @@ public class MethodBodyDefinition extends Node
   }
 
   void doResolve()
-  // Resolution is delayed to enable overloading
   {
+    // Resolution is delayed to enable overloading
   }
   
   void lateBuildScope(VarScope outer, TypeScope typeOuter)
@@ -171,8 +171,6 @@ public class MethodBodyDefinition extends Node
     }
 
     Scopes res=super.buildScope(outer,typeOuter);
-
-    //return res;
   }
 
   /****************************************************************
@@ -256,21 +254,126 @@ public class MethodBodyDefinition extends Node
    * Code generation
    ****************************************************************/
 
-  private static final ClassType object=ClassType.make("java.lang.Object");
-  
   public void compile(bossa.modules.Module module)
   {
-    int nArgs=formals.size();
-    ClassType[] arg_types=new ClassType[nArgs];
-    for(int i=0;i<nArgs;i++)
-      arg_types[i]=object;
-
+    if(Debug.codeGeneration)
+      Debug.println("Compiling "+name);
+    
     Method m=module.bytecode.addMethod
       (name.toString()+Pattern.bytecodeRepresentation(formals),
-       arg_types,object,
+       definition.javaArgTypes(),definition.javaReturnType(),
        Access.PUBLIC|Access.STATIC|Access.FINAL);
+
+    if(name.content.equals("main"))
+      mainAlternative=m;
+
     m.initCode();
+
+    Statement.currentMethodBlock=new gnu.expr.BlockExp();
+    Statement.currentMethodBlock.exitLabel=new gnu.bytecode.Label(m);
+
+    // args
+    gnu.expr.Expression[] eVal=new gnu.expr.Expression[parameters.size()];
+    gnu.expr.LetExp let=new gnu.expr.LetExp(eVal);
+    
+    int n=0;
+    for(Iterator i=parameters.iterator();
+	i.hasNext();n++)
+      {
+	MonoSymbol param = (MonoSymbol) i.next();
+	eVal[n]=new gnu.expr.QuoteExp(null);
+	param.decl=let.addDeclaration(param.name.toString());
+      }
+    let.setBody(body.compile());
+    
+    // obscure
+    gnu.expr.Compilation comp=new gnu.expr.Compilation(m,module.bytecode,module.name,module.name,"prefix??",false);
+    
+    //gnu.expr.Expression bodyExp=body.compile();
+    //Statement.currentMethodBlock.setBody(bodyExp);
+    Statement.currentMethodBlock.setBody(let);
+    Statement.currentMethodBlock.compile(comp,definition.javaReturnType());
+    m.getCode().emitReturn();
   }
+
+  private static gnu.bytecode.Method mainAlternative=null;
+  
+  static void compileMain(bossa.modules.Module module)
+  {
+    if(mainAlternative==null)
+      return;
+    
+    if(Debug.codeGeneration)
+      Debug.println("Compiling main method");
+    
+    Method m=module.bytecode.addMethod
+      ("main",
+       "([Ljava.lang.String;)V",
+       Access.PUBLIC | Access.STATIC);
+    m.initCode();
+
+    Statement.currentMethodBlock=new gnu.expr.BlockExp();
+    Statement.currentMethodBlock.exitLabel=new gnu.bytecode.Label(m);
+
+    // args
+    gnu.expr.Expression[] eVal=new gnu.expr.Expression[1];
+    eVal[0]=new gnu.expr.QuoteExp(null);
+
+    gnu.expr.LetExp let=new gnu.expr.LetExp(eVal);
+    gnu.expr.Declaration args=let.addDeclaration("args");
+    gnu.expr.Expression mainBody=new gnu.expr.ApplyExp
+      (new gnu.expr.QuoteExp(new gnu.expr.PrimProcedure(mainAlternative)),eVal);
+
+    let.setBody(mainBody);
+
+    // obscure
+    gnu.expr.Compilation comp=new gnu.expr.Compilation(m,module.bytecode,module.name,module.name,"prefix??",false);
+    
+    Statement.currentMethodBlock.setBody(let);
+    Statement.currentMethodBlock.compile(comp,gnu.bytecode.Type.void_type);
+    m.getCode().emitReturn();
+  }
+
+
+
+
+//    static void compileMain(bossa.modules.Module)
+//    {
+//      if(mainAlternative==null)
+//        // No main method alternative in this module.
+//        // It won't be runnable
+//        return;
+    
+//      if(Debug.codeGeneration)
+//        Debug.println("Compiling main method");
+    
+//      Method m=module.bytecode.addMethod
+//        ("main",
+//         "([Ljava.lang.String;)V",
+//         Access.PUBLIC | Access.STATIC);
+//      m.initCode();
+
+//      Statement.currentMethodBlock=new gnu.expr.BlockExp();
+//      Statement.currentMethodBlock.exitLabel=new gnu.bytecode.Label(m);
+//      // Body
+//      gnu.expr.Expression[] callArg = new gnu.expr.Expression[1];
+//      callArg[0]=new gnu.expr.QuoteExp(null);
+//      Statement.currentMethodBlock.setBody
+//        (new gnu.expr.ApplyExp
+//         (new gnu.expr.QuoteExp(new gnu.expr.PrimProcedure(mainAlternative)),callArg));
+
+//      gnu.expr.LambdaExp bodyExp = new gnu.expr.LambdaExp(Statement.currentMethodBlock);
+//      bodyExp.outer=new gnu.expr.ModuleExp();
+//      gnu.expr.Declaration arg0=bodyExp.addDeclaration("arg0");
+
+//      gnu.expr.Compilation comp=new gnu.expr.Compilation(bodyExp,module.name,"prefix??",false);
+//      comp.method=m;
+//      bodyExp.primMethod=m;
+    
+//      //Statement.currentMethodBlock.compile(comp,gnu.bytecode.Type.void_type);
+//      bodyExp.compile(comp,gnu.bytecode.Type.void_type);
+//      //m.getCode().emitReturn();
+//    }
 
   /****************************************************************
    * Printing

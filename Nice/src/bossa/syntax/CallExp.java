@@ -12,7 +12,7 @@
 
 // File    : CallExp.java
 // Created : Mon Jul 05 16:27:27 1999 by bonniot
-//$Modified: Thu Oct 28 12:56:35 1999 by bonniot $
+//$Modified: Tue Nov 09 15:15:50 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -55,7 +55,7 @@ public class CallExp extends Expression
   }
 
   static boolean wellTyped(Expression fun,
-			   List /* of Type */ parameters)
+			   List /* of Polytype */ parameters)
   {
     try{
       Polytype t=getType(fun,parameters);
@@ -100,7 +100,7 @@ public class CallExp extends Expression
 	{  
 	  String end="not within the domain of the function \""+fun+"\"";
 	  if(parameters.size()>=2)
-	    Internal.error(loc,"The parameters "+
+	    User.error(loc,"The parameters "+
 			   Util.map("(",", ",")",parameters) +
 			   " are "+end);
 	  else
@@ -117,7 +117,7 @@ public class CallExp extends Expression
   }
   
   private static Polytype getType(Expression fun,
-			      List /* of Polytype */ parameters)
+				  List /* of Polytype */ parameters)
     throws TypingEx,BadSizeEx,ReportErrorEx
   {
     Polytype funt=fun.getType();
@@ -135,8 +135,7 @@ public class CallExp extends Expression
     try{ funt.getConstraint().assert(); }
     catch(TypingEx e) { 
       throw new ReportErrorEx("The conditions for using this function are not fullfiled");
-    }
-    
+    }    
     
     if(Typing.dbg)
       {
@@ -156,19 +155,38 @@ public class CallExp extends Expression
     cst.and(MonotypeLeqCst.constraint(Polytype.getMonotype(parameters),dom));
     return new Polytype(cst,codom);
   }
+
+  private void resolveOverloading()
+  //TODO: decide where to resolve overloading, and do it just once
+  {
+    parameters=Expression.noOverloading(parameters);
+    fun=fun.resolveOverloading(Expression.getType(parameters));
+  }
   
   void computeType()
   {
-    fun=fun.resolveOverloading(Expression.getType(parameters));
+    resolveOverloading();
     type=getTypeAndReportErrors(location(),fun,parameters);
   }
 
   boolean isAssignable()
   {
-    //TODO: decide where to resolve overloading, and do it just once
-    fun=fun.resolveOverloading(Expression.getType(parameters));
+    resolveOverloading();
     return fun.isFieldAccess();
   }
+  
+  /****************************************************************
+   * Code generation
+   ****************************************************************/
+
+  public gnu.expr.Expression compile()
+  {
+    return new gnu.expr.ApplyExp(fun.compile(),compile(parameters));
+  }
+  
+  /****************************************************************
+   * Printing
+   ****************************************************************/
   
   public String toString()
   {

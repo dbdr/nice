@@ -12,7 +12,7 @@
 
 // File    : MonoSymbol.java
 // Created : Fri Jul 16 17:10:53 1999 by bonniot
-//$Modified: Mon Oct 25 12:48:18 1999 by bonniot $
+//$Modified: Wed Nov 10 16:11:02 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -54,11 +54,11 @@ public class MonoSymbol extends VarSymbol
    * Maps getMonotype over a collection of MonoSymbols
    *
    * @param varsymbols the collection of MonoSymbols
-   * @return the collection of their Monotypes
+   * @return the list of their Monotypes
    */
-  static Collection getMonotype(Collection c)
+  static List getMonotype(Collection c)
   {
-    Collection res=new ArrayList(c.size());
+    List res=new ArrayList(c.size());
     for(Iterator i=c.iterator();i.hasNext();)
       res.add(((MonoSymbol)i.next()).getMonotype());
     return res;

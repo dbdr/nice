@@ -12,7 +12,7 @@
 
 // File    : ClassDefinition.java
 // Created : Thu Jul 01 11:25:14 1999 by bonniot
-//$Modified: Fri Nov 05 16:16:44 1999 by bonniot $
+//$Modified: Wed Nov 10 17:18:45 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -145,7 +145,7 @@ public class ClassDefinition extends Node
   }
   
   /****************************************************************
-   * 
+   * Selectors
    ****************************************************************/
 
   Constraint getConstraint()
@@ -196,6 +196,35 @@ public class ClassDefinition extends Node
     }
   }
 
+  public static void createSpecialContext()
+  {
+    try{
+      for(Iterator i=specialTypeConstructors.iterator();i.hasNext();)
+	{
+	  TypeConstructor tc = (TypeConstructor)i.next();
+	  bossa.typing.Typing.introduce(tc);
+	  Typing.assertImp(tc,InterfaceDefinition.top(0),true);
+	}
+    }
+    catch(TypingEx e){
+      Internal.error("Initial context error in java classes");
+    }
+  }
+  
+  /**
+   * Registers a type constructor that was not defined by a class.
+   *
+   * This is used to add special type constructors
+   * -- like <code>JavaTypeConstructor</code> --
+   * in the initial context.
+   */
+  static void addSpeciaTypeConstructor(TypeConstructor tc)
+  {
+    specialTypeConstructors.add(tc);
+  }
+  
+  private static ArrayList specialTypeConstructors = new ArrayList(10);
+  
   /****************************************************************
    * Module Interface
    ****************************************************************/
@@ -229,7 +258,7 @@ public class ClassDefinition extends Node
     if(!isSharp)
       return;
     
-    ClassType c=new ClassType(module.className(name.toString().substring(1)));
+    ClassType c=ClassType.make(module.className(name.toString().substring(1)),gnu.bytecode.Type.pointer_type);
     addFields(c);    
     module.addClass(c);
   }

@@ -12,62 +12,65 @@
 
 // File    : stdlib.bossa
 // Created : Thu Jul 08 16:20:19 1999 by bonniot
-//$Modified: Thu Oct 28 11:41:34 1999 by bonniot $
+//$Modified: Wed Nov 10 17:06:40 1999 by bonniot $
 // Description : Prolog file, included before all bossa file
 
 //variable <Any T> T null;
 
-final class void {}
+//final class void {}
 
 // Booleans
 abstract class Boolean {}
 class True  extends Boolean {}
 class False extends Boolean {}
 
-variable True<>  true =new True();
-variable False<> false=new False();
+variable True  true =new True();
+variable False false=new False();
 
 Boolean not(Boolean);
-not(b@True)  = false;
-not(b@False) = true;
+not(b@True)  {
+  return new False();
+}
+not(b@False) = new True();
 
 Boolean and(Boolean,Boolean);
-and(b1@True,b2@True) = true;
-and(b1,b2)           = false;
+and(b1@True,b2@True) = new True();
+and(b1,b2)           = new False();
 
 Boolean or(Boolean,Boolean);
-and(b1@False,b2@False) = false;
-and(b1,b2)             = true;
+or(b1@False,b2@False) = new False();
+or(b1,b2)             = new True();
 
 // builtin control structures
 // "if(cond) t else e endif" 
 // is rewritten *by the parser* into abstract syntax for 
 // "_if(cond,fun()=>{return t;},fun()=>{return e;})"
+
 T _if <Any T> (Boolean,fun()(T),fun()(T));
 
-_if(cond@True,t,e) = t();
+// _if(cond@True,t,e) = t();
 
-_if(cond@False,t,e) = e();
+//  _if(cond@False,t,e) = e();
 
-void _while(fun()(Boolean),fun()());
-_while(test,body)
-{
-  if(not(test()))
-    return;
-  body();
-  _while(test,body);
-}
+//  void _while(fun()(Boolean),fun()());
+//  _while(test,body)
+//  {
+//    if(not(test()))
+//      return;
+//    body();
+//    _while(test,body);
+//  }
 
-// Clone
-//interface Cloneable;
+//  // Clone
+//  //interface Cloneable;
 
-//T clone{Cloneable T}(T);
+//  //T clone{Cloneable T}(T);
 
 //Comparable
 //It is a type class !
 interface Comparable;
 
-Boolean equals</*Comparable*/ Any T>(T,T);
+//  Boolean equals</*Comparable*/ Any T>(T,T);
 
 // Numeric
 interface Num extends Comparable;
@@ -83,48 +86,44 @@ class Integer extends Float
   abstracts Ordinal 
 {}
 
-add(x@Integer,y@Integer)
-{ return new Integer(); }
+//  add(x@Integer,y@Integer)
+//  { return new Integer(); }
 
-add(x#Float,y#Float)
-{ return new Integer(); }
+//  add(x#Float,y#Float)
+//  { return new Integer(); }
 
-succ(x@Integer) = x+1;
+//  succ(x@Integer) = x+1;
 
-Boolean lt(Integer, Integer); // strict (<)
-Boolean leq(Integer, Integer);// non-strict (<=)
+//  Boolean lt(Integer, Integer); // strict (<)
+//  Boolean leq(Integer, Integer);// non-strict (<=)
 
-// Strings and characters
-class Char {}
+//  // Strings and characters
+//  class Char {}
 
-class String implements Comparable {}
+//  class String implements Comparable {}
 
-Char get(String,Integer);
-Integer length(String);
-String concat(String,String);
+//  Char get(String,Integer);
+//  Integer length(String);
+//  String concat(String,String);
 
 // Builtin class Array
 class Array<T>{}
 
-T 
-get<Any T>(Array<T>, Integer);
+T get<Any T>(Array<T>, Integer);
 
-void 
-set<Any T>(Array<T>, Integer, T);
+void set<Any T>(Array<T>, Integer, T);
 
-Integer
-capacity<Any T>(Array<T>);
+Integer capacity<Any T>(Array<T>);
 
-void
-resize<Any R>(Array<R>, Integer);
+void resize<Any R>(Array<R>, Integer);
 
-// List
-interface Container<T>;
-interface List<T> extends Container;
+//  // List
+//  interface Container<T>;
+//  interface List<T> extends Container;
 
-list<B> map <Any A, Any B, List list>(fun(A)(B),list<A>);
-T fold_left <Any T, Any U, List list>(fun(T,U)(T),T,list<U>);
-U fold_right<Any T, Any U, List list>(fun(T,U)(U),list<T>);
+//  list<B> map <Any A, Any B, List list>(fun(A)(B),list<A>);
+//  T fold_left <Any T, Any U, List list>(fun(T,U)(T),T,list<U>);
+//  U fold_right<Any T, Any U, List list>(fun(T,U)(U),list<T>);
 
-// Main function, called with command line arguments in an array
-Integer main(Array<String>);
+//  // Main function, called with command line arguments in an array
+java.lang.Integer main(Array<java.lang.String>);

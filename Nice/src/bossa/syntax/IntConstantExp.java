@@ -12,7 +12,7 @@
 
 // File    : IntConstantExp.java
 // Created : Mon Jul 05 17:30:56 1999 by bonniot
-//$Modified: Thu Sep 02 14:58:42 1999 by bonniot $
+//$Modified: Wed Nov 10 17:08:17 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -25,14 +25,12 @@ public class IntConstantExp extends ConstantExp
 {
   public IntConstantExp(int value)
   {
-    className="Integer";
-    this.value=value;
+    className="java.lang.Integer";
+    this.value=new Integer(value);
   }
 
   public String toString()
   {
-    return new Integer(value).toString();
+    return ((Integer)value).toString();
   }
-
-  protected int value;
 }

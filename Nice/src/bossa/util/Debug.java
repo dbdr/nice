@@ -12,7 +12,7 @@
 
 // File    : Debug.java
 // Created : Thu Jul 22 15:37:02 1999 by bonniot
-//$Modified: Fri Nov 05 15:43:54 1999 by bonniot $
+//$Modified: Wed Nov 10 14:38:50 1999 by bonniot $
 
 package bossa.util;
 
@@ -62,11 +62,13 @@ public abstract class Debug
   }
 
   public static final boolean 
-    K0		= getBoolean(false,"debug.K0"),
-    typing	= getBoolean(false,"debug.typing"),
-    engine	= getBoolean(false,"debug.engine"),
-    modules	= getBoolean(false,"debug.modules"),
-    IDs		= getBoolean(false,"debug.IDs"),
-    overloading = getBoolean(false,"debug.overloading"),
-    errorMsg	= getBoolean(false,"debug.errorMsg");
+    K0			= getBoolean(false,"debug.K0"),
+    typing		= getBoolean(false,"debug.typing"),
+    engine		= getBoolean(false,"debug.engine"),
+    modules		= getBoolean(false,"debug.modules"),
+    IDs			= getBoolean(false,"debug.IDs"),
+    overloading 	= getBoolean(false,"debug.overloading"),
+    errorMsg		= getBoolean(false,"debug.errorMsg"),
+    codeGeneration 	= getBoolean(false,"debug.codeGeneration"),
+    javaTypes		= getBoolean(false,"debug.javaTypes");
 }

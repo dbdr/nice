@@ -12,7 +12,7 @@
 
 // File    : OverloadedSymbolExp.java
 // Created : Thu Jul 08 12:20:59 1999 by bonniot
-//$Modified: Thu Nov 04 14:57:58 1999 by bonniot $
+//$Modified: Wed Nov 10 16:47:57 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -40,18 +40,60 @@ public class OverloadedSymbolExp extends Expression
     return false;
   }
 
-  Expression resolveOverloading(List /* of Type */ parameters)
+  /**
+   * Adds a method to access an instance field of a java class if applicable.
+   *
+   * @param ident the name of the field
+   * @param parameters the list of the <code>Polytype</code>s 
+   *   of the parameters
+   * @param to a list to add the access method to
+   */
+//    private static void addJavaFieldAccess
+//      (LocatedString ident,
+//       List parameters,
+//       Collection to)
+//    {
+//      // Access to a field may only have one parameters: its owner
+//      if(parameters.size()!=1)
+//        return;
+    
+//      Polytype t=(Polytype)parameters.iterator().next();
+    
+//      String javaClass=t.getJavaClass();
+//      if(javaClass==null)
+//        return;
+
+//      java.lang.reflect.Field field = StaticFieldAccess.getField(javaClass,ident.content,ident.location());
+    
+//      if(field==null)
+//        return;
+    
+//      User.error(java.lang.reflect.Modifier.isStatic(field.getModifiers()),
+//  	       ident,
+//  	       "Static fields should be declared explicitely");
+    
+//      to.add(new FieldAccessMethod(javaClass,ident));
+//    }
+
+  private Expression uniqueExpression()
   {
-    if(Debug.overloading) Debug.println("Overloading resolution for "+this);
-    Iterator i=symbols.iterator();
-    while(i.hasNext())
+    return new SymbolExp((VarSymbol)symbols.iterator().next(),location());
+  }
+  
+  Expression resolveOverloading(List /* of Polytype */ parameters)
+  {
+    if(Debug.overloading) 
+      Debug.println("Overloading resolution for "+this);
+    
+    //addJavaFieldAccess(ident,parameters,symbols);
+    
+    for(Iterator i=symbols.iterator();i.hasNext();)
       {
-	VarSymbol s=(VarSymbol)i.next();
+	Object s=i.next();
+
 	if(!(s instanceof MethodDefinition))
-	  {
-	    i.remove();
-	    continue;
-	  }
+	  { i.remove(); continue; }
+
 	if(((MethodDefinition)s).getArity()!=parameters.size())
 	  { i.remove(); continue; }
       }
@@ -61,11 +103,12 @@ public class OverloadedSymbolExp extends Expression
 
     if(symbols.size()>=2)
       {
-	i=symbols.iterator();
-	while(i.hasNext())
+	for(Iterator i=symbols.iterator();i.hasNext();)
 	  {
 	    VarSymbol s=(VarSymbol)i.next();
-	    if(Debug.overloading) Debug.println("OVERLOADING: Trying with "+s);
+
+	    if(Debug.overloading) 
+	      Debug.println("Overloading: Trying with "+s);
 	    
 	    if(!CallExp.wellTyped(new SymbolExp(s,location()),parameters))
 	      i.remove();
@@ -73,16 +116,17 @@ public class OverloadedSymbolExp extends Expression
       }
     
     if(symbols.size()==1)
-      return new SymbolExp((VarSymbol)symbols.iterator().next(),location());
+      return uniqueExpression();
 
     User.error(symbols.size()==0,this,
 	       "No alternative matches the parameters while resolving overloading for "+ident);
+
     //There is ambiguity
     User.error(this,"Ambiguity for symbol "+ident+". Possibilities are :\n"+
 	       Util.map("","","",symbols));
     return null;
   }
-  
+
   Expression resolveOverloading(Polytype expectedType)
   {
     if(Debug.overloading) Debug.println("Overloading resolution (expected type "+expectedType+") for "+this);
@@ -103,7 +147,7 @@ public class OverloadedSymbolExp extends Expression
 	       "No alternative has expected type "+expectedType);
 
     if(symbols.size()==1)
-      return new SymbolExp((VarSymbol)symbols.iterator().next(),location());
+      return uniqueExpression();
 
     //There is ambiguity
     User.error(this,"Ambiguity for symbol "+ident+". Possibilities are :\n"+
@@ -111,10 +155,35 @@ public class OverloadedSymbolExp extends Expression
     return null;    
   }
   
+  Expression noOverloading()
+  {
+    if(symbols.size()==1)
+      return uniqueExpression();
+
+    User.error(this,"Ambiguity for symbol "+ident+". Possibilities are :\n"+
+	       Util.map("","","",symbols));
+    return null;
+  }
+  
   void computeType()
   {
-    Internal.error(this,ident+" has not been resolved yet.\nPossibilities are :"+this);
+    Internal.error(this,ident+" has not been resolved yet.\n"+
+		   "Possibilities are :"+this);
   }
+
+  /****************************************************************
+   * Code generation
+   ****************************************************************/
+
+  public gnu.expr.Expression compile()
+  {
+    Internal.error("compile in OverloadedSymbolExp");
+    throw new Error();
+  }
+  
+  /****************************************************************
+   * Printing
+   ****************************************************************/
 
   public String toString()
   {

@@ -12,14 +12,16 @@
 
 // File    : VarSymbol.java
 // Created : Wed Jul 07 16:56:06 1999 by bonniot
-//$Modified: Mon Oct 25 12:38:53 1999 by bonniot $
-// Description : A variable (local, field, parameter)
+//$Modified: Fri Nov 05 18:52:52 1999 by bonniot $
 
 package bossa.syntax;
 
 import java.util.*;
 import bossa.util.*;
 
+/**
+ * A variable (local, field, parameter)
+ */
 abstract class VarSymbol extends Node
 {
   public VarSymbol(LocatedString name)
@@ -59,4 +61,5 @@ abstract class VarSymbol extends Node
   }
 
   LocatedString name;
+  gnu.expr.Declaration decl=null;
 }

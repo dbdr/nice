@@ -12,7 +12,7 @@
 
 // File    : AST.java
 // Created : Thu Jul 01 11:01:56 1999 by bonniot
-//$Modified: Fri Nov 05 15:21:24 1999 by bonniot $
+//$Modified: Wed Nov 10 15:12:42 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -43,8 +43,8 @@ public class AST extends Node
   
   public void createContext()
   {
-    // Necessary because toplevel assertions can be unsatisfiable
-    // in which case we should be able to backtrack
+    ClassDefinition.createSpecialContext();
+    
     for(Iterator i=definitions.iterator();i.hasNext();)
       ((Definition) i.next()).createContext();
   }
@@ -62,8 +62,13 @@ public class AST extends Node
 
   public void compile(bossa.modules.Module module)
   {
+    // compile all the field accesses that have been generated
+    FieldAccessMethod.compileMethods(module);
+    
     for(Iterator i=definitions.iterator();i.hasNext();)
       ((Definition)i.next()).compile(module);
+
+    MethodBodyDefinition.compileMain(module);
   }
   
   public String toString()

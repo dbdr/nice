@@ -12,7 +12,7 @@
 
 // File    : FunType.java
 // Created : Fri Jul 02 17:41:24 1999 by bonniot
-//$Modified: Mon Oct 25 14:58:49 1999 by bonniot $
+//$Modified: Wed Nov 10 16:09:36 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -26,7 +26,7 @@ import bossa.engine.*;
  */
 public class FunType extends Monotype
 {
-  public FunType(Collection /* of Monotype */ in, Monotype out)
+  public FunType(List /* of Monotype */ in, Monotype out)
   {
     if(in==null)
       in=new ArrayList(0);
@@ -41,7 +41,7 @@ public class FunType extends Monotype
   }
 
   /** the list of input types */
-  public Collection domain()
+  public List domain()
   {
     return in;
   }
@@ -107,6 +107,6 @@ public class FunType extends Monotype
     return Util.map("(",", ",")",true,in)+"->"+out.toStringExtern();
   }
 
-  private Collection in;
+  private List in;
   private Monotype out;
 }

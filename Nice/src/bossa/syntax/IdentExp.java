@@ -12,7 +12,7 @@
 
 // File    : IdentExp.java
 // Created : Mon Jul 05 16:25:58 1999 by bonniot
-//$Modified: Tue Aug 24 16:59:43 1999 by bonniot $
+//$Modified: Tue Nov 09 11:23:32 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -41,16 +41,28 @@ public class IdentExp extends Expression
 
   Expression resolveExp()
   {
-    if(scope.overloaded(ident))
+    // Always returns a collection, because of java fields access
+
+    //if(scope.overloaded(ident))
        {
 	 Collection c=scope.lookup(ident);
 	 return new OverloadedSymbolExp(c,ident);
        }
-    VarSymbol s=scope.lookupOne(ident);
-    User.error(s==null,ident,"Variable \""+ident+"\" is not defined");
-    return new SymbolExp(s);
+       //VarSymbol s=scope.lookupOne(ident);
+       //User.error(s==null,ident,"Variable \""+ident+"\" is not declared");
+       //return new SymbolExp(s);
   }
 
+  /****************************************************************
+   * Code generation
+   ****************************************************************/
+
+  public gnu.expr.Expression compile()
+  {
+    Internal.error("compile in IdentExp");
+    throw new Error();
+  }
+  
   /****************************************************************
    * Printing
    ****************************************************************/

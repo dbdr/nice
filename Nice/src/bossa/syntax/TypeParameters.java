@@ -12,7 +12,7 @@
 
 // File    : TypeParameters.java
 // Created : Mon Jul 12 17:51:12 1999 by bonniot
-//$Modified: Wed Sep 15 15:38:47 1999 by bonniot $
+//$Modified: Tue Nov 09 19:23:40 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -66,7 +66,7 @@ public class TypeParameters
 
   public String toString()
   {
-    return Util.map("<",", ",">",true,content);
+    return Util.map("<",", ",">",/* true ,*/ content);
   }
 
   public int size()

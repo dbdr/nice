@@ -12,7 +12,7 @@
 
 // File    : Expression.java
 // Created : Mon Jul 05 16:25:02 1999 by bonniot
-//$Modified: Thu Oct 28 12:54:37 1999 by bonniot $
+//$Modified: Tue Nov 09 11:24:24 1999 by bonniot $
 // Description : 
 
 package bossa.syntax;
@@ -88,6 +88,31 @@ public abstract class Expression extends Node
     return this;
   }
   
+  /**
+   * No overloading information is known,
+   * just checks there is one alternative.
+   *
+   * @return the resolved expression. Doesn't return if OR is not possible.
+   */
+  Expression noOverloading()
+  {
+    return this;
+  }
+  
+  /**
+   * Iterates the resolveOverloading() method.
+   */
+  static List /* of Expression */ noOverloading(List expressions)
+  {
+    Iterator i=expressions.iterator();
+    List res=new ArrayList(expressions.size());
+
+    while(i.hasNext())
+      res.add( ((Expression) i.next()) .noOverloading());
+
+    return res;
+  }
+  
   /** computes the static type of the expression */
   abstract void computeType();
 
@@ -135,6 +160,31 @@ public abstract class Expression extends Node
 
     return res;
   }
+
+  /****************************************************************
+   * Code generation
+   ****************************************************************/
+
+  abstract public gnu.expr.Expression compile();
+
+  public static gnu.expr.Expression[] compile(List expressions)
+  {
+    gnu.expr.Expression[] res=new gnu.expr.Expression[expressions.size()];
+    int n=0;
+    for(Iterator i=expressions.iterator();
+	i.hasNext();n++)
+      res[n]=((Expression)i.next()).compile();
+    return res;
+  }
+  
+  public gnu.expr.Declaration declaration()
+  {
+    return null;
+  }
+  
+  /****************************************************************
+   * Locations
+   ****************************************************************/
 
   public void setLocation(Location l)
   {

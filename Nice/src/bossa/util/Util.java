@@ -12,7 +12,7 @@
 
 // File    : Util.java
 // Created : Fri Jul 02 18:35:58 1999 by bonniot
-//$Modified: Wed Oct 13 14:52:24 1999 by bonniot $
+//$Modified: Tue Nov 09 19:23:25 1999 by bonniot $
 // Description : Usefull fonctions used everywhere
 
 package bossa.util;
@@ -68,14 +68,12 @@ public class Util
 			   boolean alwaysInitEnd, Collection c)
   {
     if(alwaysInitEnd)
-      return init+map("",delim,"",c)+end;
+      return init + map("",delim,"",c) + end;
     
     switch(c.size())
       {
-      case 0 : return "";
-      case 1 : 
-	Iterator i=c.iterator();
-	return i.next().toString();
+      case 0  : return "";
+      case 1  : return c.iterator().next().toString();
       default : return map(init,delim,end,c);
       }
   }

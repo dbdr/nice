@@ -12,7 +12,7 @@
 
 // File    : StringConstantExp.java
 // Created : Thu Sep 02 14:49:48 1999 by bonniot
-//$Modified: Thu Sep 02 14:58:21 1999 by bonniot $
+//$Modified: Tue Nov 09 17:46:38 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -25,7 +25,7 @@ public class StringConstantExp extends ConstantExp
 {
   public StringConstantExp(String value)
   {
-    className="String";
+    className="java.lang.String";
     this.value=value;
   }
 
@@ -33,6 +33,4 @@ public class StringConstantExp extends ConstantExp
   {
     return "\""+value+"\"";
   }
-
-  protected String value;
 }

@@ -12,7 +12,7 @@
 
 // File    : TypeConstructor.java
 // Created : Thu Jul 08 11:51:09 1999 by bonniot
-//$Modified: Thu Nov 04 15:31:30 1999 by bonniot $
+//$Modified: Wed Nov 10 16:47:42 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -140,6 +140,11 @@ public class TypeConstructor
     return !definition.isAbstract;
   }
   
+  gnu.bytecode.Type getJavaType()
+  {
+    return gnu.bytecode.ClassType.make(name.content);
+  }
+  
   /****************************************************************
    * Scoping
    ****************************************************************/
@@ -186,11 +191,6 @@ public class TypeConstructor
       res.add(((TypeConstructor)i.next()).resolve(typeScope));
 
     return res;
-  }
-
-  VarScope memberScope()
-  {
-    return definition.getScope();
   }
 
   /****************************************************************

@@ -12,7 +12,7 @@
 
 // File    : Statement.java
 // Created : Mon Jul 05 15:48:25 1999 by bonniot
-//$Modified: Thu Aug 19 14:30:47 1999 by bonniot $
+//$Modified: Fri Nov 05 18:40:47 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -36,6 +36,41 @@ public abstract class Statement extends Node
     super(propagate);
   }
   
+  /****************************************************************
+   * Code generation
+   ****************************************************************/
+
+  abstract gnu.expr.Expression compile();
+
+  static gnu.expr.Expression[] compile(List statements)
+  {
+    gnu.expr.Expression[] res=new gnu.expr.Expression[statements.size()];
+    int n=0;
+    for(Iterator i=statements.iterator();
+	i.hasNext();n++)
+      res[n]=((Statement)i.next()).compile();
+    return res;
+  }
+
+  /**
+   * The block corresponding to the method beeing compiled.
+   * Usefull for 'return'.
+   * Maybe this would be nicer not to be global.
+   */
+  static gnu.expr.BlockExp currentMethodBlock=null;
+  
+  static gnu.expr.Expression sequence(gnu.expr.Expression e1, gnu.expr.Expression e2)
+  {
+    gnu.expr.Expression[] array=new gnu.expr.Expression[2];
+    array[0]=e1;
+    array[1]=e2;
+    return new gnu.expr.BeginExp(array);
+  }
+  
+  /****************************************************************
+   * Location
+   ****************************************************************/
+
   public Location location()
   {
     return loc;

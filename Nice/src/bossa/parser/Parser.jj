@@ -12,13 +12,13 @@
 
 // File    : parser.jj
 // Created : Thu Jul 01 10:27:05 1999 by bonniot
-//$Modified: Thu Nov 04 15:12:50 1999 by bonniot $
+//$Modified: Wed Nov 10 16:13:02 1999 by bonniot $
 // Description : Parseur JavaCC pour Bossa
 //   Tokens based on the Jazz parser
 
 options {
   JAVA_UNICODE_ESCAPE = true;
-  //DEBUG_LOOKAHEAD = true;
+  DEBUG_LOOKAHEAD = false;
 }
 
 PARSER_BEGIN(Parser)
@@ -298,7 +298,7 @@ TOKEN: /* String literals */
 TOKEN:
 {
   < IDENT: <IDENT_START> (<IDENT_PART>)* >
-| < #IDENT_PART: (<IDENT_START> | <IDENT_DIGIT> | "'") >
+| < #IDENT_PART:       (<IDENT_START> | <IDENT_DIGIT> | "'") >
 | < #IDENT_START:
      [
       "\u0041"-"\u005a",
@@ -364,6 +364,17 @@ LocatedString string():
 {
   t=<IDENT> 
   { return new LocatedString(t.image,new Location(t)); }
+}
+
+LocatedString doted_string():
+{
+  Token t;
+  String image="";
+}
+{
+  t=<IDENT> { image+=t.image; }
+    ( "." t=<IDENT> {image+="."+t.image; } ) *
+  { return new LocatedString(image,new Location(t)); }
 }
 
 Collection strings():
@@ -575,7 +586,7 @@ MonotypeVar monotypeVar():
 {
   //TMP
   [ "+" ]
-  name=string()
+  name=doted_string()
   { return new MonotypeVar(name); }
 }
 
@@ -615,7 +626,7 @@ Monotype monotypeConstructor():
 FunType funmonotype():
 {
     Monotype codom=null;
-    Collection dom=null;
+    List dom=null;
     Constraint cst;
     Token t;
 }
@@ -674,7 +685,7 @@ TypeParameters typeParameters():
 Polytype funpolytype():
 {
     Monotype codom;
-    Collection dom;
+    List dom;
     Constraint cst;
 }
 {
@@ -699,7 +710,7 @@ Polytype polytype():
 /*                          Classes                                    */
 /***********************************************************************/
 
-MethodDefinition methodDef(ClassDefinition c):
+MethodDefinition classMethodDefinition(ClassDefinition c):
 {
   LocatedString name;
   List parameters;
@@ -715,7 +726,9 @@ MethodDefinition methodDef(ClassDefinition c):
   parameters=monotypes()
   ")"
   ";"
-  { return new MethodDefinition(c,name,cst,returnType,parameters); }
+  { 
+    return new MethodDefinition(c,name,cst,returnType,parameters); 
+  }
 }
 
 List extensions():
@@ -866,6 +879,61 @@ MethodDefinition methodDefinition():
     { return new MethodDefinition(name,cst,returnType,parameters); }
 }
 
+MethodDefinition nativeMethodDefinition():
+{
+    LocatedString name;
+    Monotype returnType;
+    List parameters;
+    Constraint cst;
+    MethodDefinition res;
+    String className=null,methodName=null; // for native java methods
+    boolean isStatic=false;
+    LocatedString method,s;
+    List javaTypes=null;
+}
+{
+  "native" 
+    [ "static" { isStatic=true; } ]
+  returnType=monotype()
+    name=string()
+    cst=constraint()
+    "("
+    ( parameters=monotypes() | { parameters=new ArrayList(); } )
+    ")"
+    "="
+      
+    s=doted_string() 
+    // if we stop here, it's a static field
+    // else it's a method
+    ( 
+      ";"
+      { method=s; }
+    | 
+      { 
+	javaTypes=new ArrayList();
+	javaTypes.add(s.toString()); 
+      }
+      method=doted_string()
+      "("
+      [
+       s=doted_string() { javaTypes.add(s.toString()); }
+       ( "," s=doted_string() { javaTypes.add(s.toString()); } )*
+      ]
+      ")"  
+      ";"
+    )
+  { 
+    int dot=method.toString().lastIndexOf('.');
+    methodName=method.toString().substring(dot+1,method.toString().length());
+    className=method.toString().substring(0,dot);
+
+    if(javaTypes!=null)
+      return new JavaMethodDefinition(className,methodName,javaTypes,name,cst,returnType,parameters,isStatic);
+    else
+      return new StaticFieldAccess(className,methodName,name,cst,returnType,parameters);
+  }
+}
+
 Definition globalVariable():
 {
   LocatedString name;
@@ -892,6 +960,8 @@ Definition definition():
     res=interfaceDefinition()
   | 
     res=globalVariable()
+  |
+    res=nativeMethodDefinition()
   |
     LOOKAHEAD( monotype() string() )
     res=methodDefinition()
@@ -1151,7 +1221,7 @@ AffectationStmt affectation(Expression left):
   { return new AffectationStmt(left,right); }
 }
 
-LocalDeclarationStmt localDeclaration():
+Block.LocalDeclaration localDeclaration():
 {
   Monotype t;
   LocatedString id;
@@ -1161,7 +1231,7 @@ LocalDeclarationStmt localDeclaration():
   t=monotype()
   id=string()
   [ "=" e=expression() ]
-  { return new LocalDeclarationStmt(id,t,e,false); }
+  { return new Block.LocalDeclaration(id,t,e); }
 }
 
 Statement statementInIf():
@@ -1217,9 +1287,9 @@ Statement whileStmt():
   }
 }
 
-Statement statement():
+Object statement():
 {
-  Statement res;
+  Object res;
   Expression e=null;
   Token first,last;
 }
@@ -1236,7 +1306,7 @@ Statement statement():
 |
   res=whileStmt()
 |  
-  LOOKAHEAD(polytype() string())
+  LOOKAHEAD(monotype() string())
   res=localDeclaration() ";" 
 | 
   (
@@ -1250,14 +1320,14 @@ Statement statement():
   )
 )
   { last=getToken(0);
-    res.setLocation(new Location(first).englobe(new Location(last)));
+    if(res instanceof Statement) ((Statement)res).setLocation(new Location(first).englobe(new Location(last)));
     return res; }
 }
 
 List statements():
 {
   List res=new ArrayList();
-  Statement s;
+  Object s;
 }
 {
   ( s=statement() { res.add(s); } )*

@@ -12,7 +12,7 @@
 
 // File    : Monotype.java
 // Created : Thu Jul 01 19:28:28 1999 by bonniot
-//$Modified: Mon Oct 25 15:02:09 1999 by bonniot $
+//$Modified: Wed Nov 10 16:34:26 1999 by bonniot $
 // Description : Abstract syntactic type, without constraint
 
 package bossa.syntax;
@@ -25,9 +25,9 @@ abstract public class Monotype
 {
   abstract Monotype cloneType();
 
-  Collection cloneTypes(Collection types)
+  List cloneTypes(Collection types)
   {
-    Collection res=new ArrayList(types.size());
+    List res=new ArrayList(types.size());
     Iterator i=types.iterator();
     while(i.hasNext())
       res.add((Monotype)i.next());
@@ -58,6 +58,14 @@ abstract public class Monotype
     for(int i=1;i<=arity;i++)
       res.add(fresh(new LocatedString(associatedVariable.content+i,associatedVariable.location())));
     return res;
+  }
+  
+  /**
+   * Returns the name of a java class that is decribed by this type
+   */
+  gnu.bytecode.Type getJavaType()
+  {
+    return gnu.bytecode.Type.pointer_type;
   }
   
   /**************************************************************
@@ -91,7 +99,7 @@ abstract public class Monotype
    ****************************************************************/
 
   /** the list of input Monotypes if this type is functional */
-  public Collection domain()
+  public List domain()
   {
     return null;
   }

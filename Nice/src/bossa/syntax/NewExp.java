@@ -12,7 +12,7 @@
 
 // File    : NewExp.java
 // Created : Thu Jul 08 17:15:15 1999 by bonniot
-//$Modified: Thu Oct 28 11:36:57 1999 by bonniot $
+//$Modified: Fri Nov 05 18:23:06 1999 by bonniot $
 // Description : Allocation of a new object
 
 package bossa.syntax;
@@ -44,6 +44,20 @@ public class NewExp extends Expression
 	       tc+" is abstract, it can't be instantiated");
   }
   
+  /****************************************************************
+   * Code generation
+   ****************************************************************/
+
+  public gnu.expr.Expression compile()
+  {
+    return new gnu.expr.NewExp
+      (new gnu.bytecode.ClassType(tc.name.toString()));
+  }
+  
+  /****************************************************************
+   * Printing
+   ****************************************************************/
+
   public String toString()
   {
     return "new "+tc;

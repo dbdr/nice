@@ -12,7 +12,7 @@
 
 // File    : SymbolExpr.java
 // Created : Thu Jul 08 12:20:59 1999 by bonniot
-//$Modified: Wed Sep 08 16:45:42 1999 by bonniot $
+//$Modified: Mon Nov 08 18:52:02 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -58,10 +58,33 @@ public class SymbolExp extends Expression
     type=symbol.getType().cloneType();
   }
 
+  /****************************************************************
+   * Code generation
+   ****************************************************************/
+
+  public gnu.expr.Expression compile()
+  {
+    if(symbol instanceof MethodDefinition)
+      return new gnu.expr.QuoteExp(((MethodDefinition)symbol).getDispatchMethod());
+    
+    Internal.warning(symbol.decl==null,this+" has no gnu decl");
+    
+    return new gnu.expr.ReferenceExp(symbol.name.toString(),symbol.decl);
+  }
+  
+  public gnu.expr.Declaration declaration()
+  {
+    return symbol.decl;
+  }
+  
+  /****************************************************************
+   * Printing
+   ****************************************************************/
+
   public String toString()
   {
     return symbol.name.toString();
   }
 
-  VarSymbol symbol;
+  private VarSymbol symbol;
 }

@@ -12,7 +12,7 @@
 
 // File    : LocalDeclarationStmt.java
 // Created : Tue Jul 06 12:06:20 1999 by bonniot
-//$Modified: Fri Nov 05 15:22:52 1999 by bonniot $
+//$Modified: Mon Nov 08 14:23:45 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -93,6 +93,13 @@ public class LocalDeclarationStmt extends Statement
 				 Type.pointer_type,
 				 Access.PUBLIC|Access.STATIC);
   }
+
+  public gnu.expr.Expression compile()
+  {
+    Internal.error("compile local");
+    return null;  
+  }
+  
 
   /****************************************************************
    * Printing

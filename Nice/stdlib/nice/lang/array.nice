@@ -85,16 +85,16 @@ void set(double[], int, double)  = inline nice.lang.inline.ArraySetOp("d");
 
 <C,T,U> map(a@Array, func) = fill(new U[a.length], int i => func(a[i]));
 
-<C,T,U> filter(a@Array, test) = a.filter(test);
+<C,T> filter(a@Array, test) = a.filter(test);
 
 // Specialized versions for arrays.
 
-<T, U | T <: U> U[] filter(T[] a, T -> boolean test)
+<T> T[] filter(T[] a, T -> boolean test)
 {
   int l = a.length;
   int found = 0;
 
-  U[] res = cast(new U[l]);
+  T[] res = cast(new T[l]);
 
   a.foreach(T elem =>
 	{ if(test(elem)) res.set(found++, elem); } );

@@ -26,7 +26,9 @@ import java.util.*;
 
 <Collection C, T, U> C<U> map(C<T> coll, T->U func);
 
-<Collection C, T, U | T <: U> C<U> filter(C<T>, T->boolean);
+//<Collection C, T, U | T <: U> C<U> filter(C<T>, T->boolean);
+//temporaly using a non polymorpic return because of type inference
+<Collection C, T> C<T> filter(C<T>, T->boolean);
 
 /** Return a collection containing all elements for which converter
     returns a non-null value.
@@ -125,9 +127,9 @@ U foldRight(List<T> list, (T, U)->U func, U init, int from)
   return res;
 }
 
-<C,T,U> filter(coll, test)
+<C,T> filter(coll, test)
 {
-  C<U> res = coll.similarEmptyCollection();
+  C<T> res = coll.similarEmptyCollection();
   for (T elem : coll)
     if (test(elem))
       res.add(elem);

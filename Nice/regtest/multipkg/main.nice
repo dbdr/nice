@@ -3,6 +3,11 @@ package regtest.multipkg;
 import regtest.multipkg.a;
 import regtest.multipkg.b;
 
+// Test multiple imports of the same package
+import regtest.multipkg;
+import regtest.multipkg.a;
+import regtest.multipkg.b;
+
 class AA extends regtest.multipkg.a.A {}
 class BB extends B {}
 

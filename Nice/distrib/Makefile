@@ -58,7 +58,7 @@ send: ${TARFILE} ${ZIPFILE} ${RPMDIR}/${RPMFILE}
 	 echo lcd ${RPMDIR}; echo put ${RPMFILE} \
 	)\
         | ftp -n upload.sourceforge.net
-	echo -e "Redirect /Wiki http://nice.sourceforge.net/cgi-bin/view" \
+	echo -e "Redirect /Wiki http://nice.sourceforge.net/cgi-bin/twiki/view" \
   "\nRedirect /Nice.tar http://prdownloads.sourceforge.net/nice/${TARFILE}" \
   "\nRedirect /Nice.zip http://prdownloads.sourceforge.net/nice/${ZIPFILE}" \
   "\nRedirect /nice.deb http://prdownloads.sourceforge.net/nice/${DEB}" \

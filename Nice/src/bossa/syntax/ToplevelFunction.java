@@ -153,6 +153,9 @@ implements Function
     if (body == null)
       return;
 
+    if(Debug.codeGeneration)
+      Debug.println("Compiling toplevel function " + this);
+
     LambdaExp lexp = Gen.dereference(getCode());
 
     Gen.setMethodBody(lexp, body.generateCode());

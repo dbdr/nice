@@ -195,8 +195,10 @@ public class Declaration
   // This should be a type property, not a variable property, at some point!
   public static final int IS_SINGLE_VALUE = 0x40000;
 
-  public static final int TRANSIENT = 0x40000;
-  public static final int VOLATILE  = 0x80000;
+  public static final int TRANSIENT = 0x80000;
+  public static final int VOLATILE  = 0x100000;
+
+  public static final int NOT_INITIALIZED = 0x200000;
 
   protected int flags = IS_SIMPLE;
 
@@ -312,7 +314,8 @@ public class Declaration
   {
     // This is a kludge.  Ideally, we should do some data-flow analysis.
     // But at least it makes sure require'd variables are not initialized.
-    return ! ignorable()
+    return ! getFlag(NOT_INITIALIZED)
+      && ! ignorable()
       && ! (value == QuoteExp.nullExp && base != null);
   }
 

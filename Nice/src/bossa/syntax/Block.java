@@ -68,6 +68,8 @@ public class Block extends Statement
       decl.noteValue(null);
       if (! getSymbol().isAssignable())
 	decl.setFlag(gnu.expr.Declaration.IS_CONSTANT);
+      if (value == null)
+	decl.setFlag(gnu.expr.Declaration.NOT_INITIALIZED);
       getSymbol().setDeclaration(decl);
 
       return initValue();
@@ -135,7 +137,7 @@ public class Block extends Statement
     gnu.expr.Expression initValue()
     {
       if (value == null)
-	return Types.defaultValue(left.type);
+	return gnu.expr.QuoteExp.undefined_exp;
       else
 	return value.generateCode();
     }

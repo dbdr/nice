@@ -621,7 +621,7 @@ public final class Types
       && ((MonotypeConstructor) m).getTC() == PrimitiveType.sureTC;
   }
 
-  static Monotype equivalent(Monotype m)
+  public static Monotype equivalent(Monotype m)
   {
     return rawType(m).equivalent();
   }

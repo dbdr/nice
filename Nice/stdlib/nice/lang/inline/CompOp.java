@@ -21,7 +21,7 @@ import gnu.bytecode.*;
 
    @author Daniel Bonniot
 */
-public class CompOp extends Procedure2 implements Inlineable,Branchable
+public class CompOp extends Procedure2 implements Branchable, bossa.syntax.Macro
 {
   private final static int
     error = 0,
@@ -136,6 +136,32 @@ public class CompOp extends Procedure2 implements Inlineable,Branchable
   {
     return retType;
   }
+
+  public void checkSpecialRequirements(bossa.syntax.Expression[] arguments)
+  {
+    bossa.syntax.ConstantExp literalexp = null;
+    bossa.syntax.Expression otherexp = null;
+    if (arguments[0] instanceof bossa.syntax.ConstantExp &&
+        ! (arguments[1] instanceof bossa.syntax.ConstantExp))
+      {
+        literalexp = (bossa.syntax.ConstantExp)arguments[0];
+        otherexp = arguments[1];
+      }
+    else if (arguments[1] instanceof bossa.syntax.ConstantExp &&
+       	     ! (arguments[0] instanceof bossa.syntax.ConstantExp))
+      {
+        literalexp = (bossa.syntax.ConstantExp)arguments[1];
+        otherexp = arguments[0];
+      }
+   
+    if (literalexp != null)
+      {	
+	mlsub.typing.TypeConstructor tc = nice.tools.code.Types.equivalent(otherexp.getType().getMonotype()).head();
+	if (mlsub.typing.Typing.testRigidLeq(tc, literalexp.tc) &&
+	   ! (mlsub.typing.Typing.testRigidLeq(literalexp.tc, tc)))
+          bossa.util.User.warning(otherexp, "Comparing a value with a constant outside the range of that value");
+      }
+   }
 
   // Interpretation
 

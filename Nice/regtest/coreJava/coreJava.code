@@ -46,6 +46,11 @@
     j = 456L + 0xABC;
     p("" + j);
 
+    {
+      int x = 0xFFFFFFFF;
+      p("" + x);
+    }
+
     p("" + (i++));
     p("" + i);
     i = i++;

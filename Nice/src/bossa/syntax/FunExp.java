@@ -30,12 +30,8 @@ public class FunExp extends Expression implements Function
 {
   public FunExp(bossa.syntax.Constraint cst, List formals, Statement body)
   {
-    this.formals = new MonoSymbol[formals.size()];
-    for (int i = 0; i < this.formals.length; i++)
-    {
-      MonoSymbol m = (MonoSymbol) formals.get(i);
-      this.formals[i] = m;
-    }
+    this.formals = (MonoSymbol[]) 
+      formals.toArray(new MonoSymbol[formals.size()]);
     
     this.constraint = cst;
     this.body = body;

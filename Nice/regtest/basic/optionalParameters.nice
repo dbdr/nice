@@ -29,7 +29,7 @@ test_optional()
 
   oP(1, 2, 3, 4, 5);
   oP(d:1, b:2, 3, 4, 5);
-  oP(1, b:3, d:3, e:4, skip);
+  oP(1, b:3, d:3, e:4);
   oP(1, b:3, d:3, e:4, skip:true);
 
   printAny(3);

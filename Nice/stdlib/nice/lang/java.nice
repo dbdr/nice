@@ -58,6 +58,11 @@ String substring(StringBuffer, int, int) =
 
 java.util.Properties<String,String> getProperties() = 
   native java.util.Properties java.lang.System.getProperties();
+?String System_getProperty(String) = native String System.getProperty(String);
+<T | T <: ?String> T System_getProperty(String,T) = 
+  native String System.getProperty(String, String);
+?String System_setProperty(String,String) = 
+ native String System.setProperty(String,String);
 
 //               PACKAGE: java.text
 
@@ -71,6 +76,9 @@ DateFormat getDateInstance(int style) = native DateFormat DateFormat.getDateInst
 <Any T> void println (PrintStream ps, T object) = 
   native void PrintStream.println(Object);
 String getAbsolutePath (File) = native String File.getAbsolutePath();
+
+?String readLine(BufferedReader) = native String BufferedReader.readLine();
+?String readLine(DataInput) = native String DataInput.readLine();
 
 /**
    In Java, System.out and System.err are possibly null.

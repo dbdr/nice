@@ -63,8 +63,7 @@ String manUsage(Program prg)
 {
   StringBuffer res = new StringBuffer();
   res.append(".B ").append(prg.name).append("\n\\&");
-  if (prg.options != null)
-    res.append("[options]");
+  res.append("[options]");
   if (prg.arguments != null)
     res.append(' ').append(prg.arguments);
   return res.toString();

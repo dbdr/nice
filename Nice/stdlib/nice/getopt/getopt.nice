@@ -24,21 +24,18 @@ parse(progName@String, args, options)
 
   options.foreach(Option o =>
     {
-      if(o.longName != null)
-      {
-	LongOpt l;
-	if(o.noShortName)
-	  {
-	    uniqId = uniqId+1;
-	    l = new LongOpt(name:o.longName, has_arg:optType(o), val:char(uniqId));
-	  }
-	else
-	  l = new LongOpt(name:o.longName,has_arg:optType(o),val:o.shortName);
-        l.initLongOpt();
-	o.optval = l.getVal();
-
-	longOptions.add(l);
-      }
+      LongOpt l;
+      if(o.noShortName)
+        {
+          uniqId = uniqId+1;
+          l = new LongOpt(name:o.longName, has_arg:optType(o), val:char(uniqId));
+        }
+      else
+        l = new LongOpt(name:o.longName,has_arg:optType(o),val:o.shortName);
+             l.initLongOpt();
+      o.optval = l.getVal();
+      
+      longOptions.add(l);
 
       if(!o.noShortName)
         shortOptions = shortOptions + toString(o.shortName) + optSuffix(o);
@@ -107,8 +104,8 @@ String printOption(Option opt)
   String tab = "\n" + pad("", column, ' ');
 
   String res = opt.noShortName ? "    " : ("  -" + opt.shortName);
-  if(opt.longName != null)
-    res = res + (opt.noShortName ? " " : ",") + " --" + opt.longName;
+
+  res = res + (opt.noShortName ? " " : ",") + " --" + opt.longName;
   
   res += paramString(opt);
 

@@ -33,8 +33,8 @@ String man(Option opt)
 
   if (! opt.noShortName)
     res.append("\\-").append(opt.shortName);
-  if(opt.longName != null)
-    res.append((opt.noShortName ? "" : ", ") + "\\-\\-" + opt.longName);
+
+  res.append((opt.noShortName ? "" : ", ") + "\\-\\-" + opt.longName);
   
   res.append(paramString(opt));
   res.append('\n');

@@ -374,9 +374,9 @@ public char getopt()
      the long option, just like "--fu", and not "-f" with arg "u".
 
      This distinction seems to be the most useful approach.  */
-  if ((long_options != null) && (argv[optind].startsWith("--")
-      || (long_only && ((argv[optind].length()  > 2) || 
-      (optstring.indexOf(argv[optind].charAt(1)) == -1)))))
+  if (argv[optind].startsWith("--") ||
+      (long_only && ((argv[optind].length()  > 2) || 
+      (optstring.indexOf(argv[optind].charAt(1)) == -1))))
     {
        char c = this.checkLongOption();
 

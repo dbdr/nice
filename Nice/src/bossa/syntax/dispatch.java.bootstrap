@@ -41,24 +41,6 @@ public class dispatch
   public static Monotype createTypeIdent(LocatedString name)
   { return null;}
 
-  public static Expression createIdentExp(LocatedString i)
-  { return null; }
-
-  public static Expression createCallExp(Expression function, Expression param1)
-  { return null; }
-
-  public static Expression createCallExp(Expression function, Expression param1, Expression param2)
-  { return null; }
-
-  public static VarSymbol createMethodSymbol(MethodDeclaration declaration, LocatedString name, Constraint constraint, Monotype returnType)
-  { return null; }
-  
-  public static VarSymbol createMethodSymbol(MethodDeclaration declaration, LocatedString name, mlsub.typing.Polytype type)
-  { return null; }
-
-  public static gnu.bytecode.Method getImplementationAbove(MethodDeclaration decl, gnu.bytecode.ClassType firstArg)
-  { return null; }
-
   static Expression analyse(Expression e, VarScope v, TypeScope t) 
   { return null; }
 

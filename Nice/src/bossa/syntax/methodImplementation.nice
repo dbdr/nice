@@ -47,7 +47,7 @@ public abstract class MethodImplementation extends Definition
 
   public Pattern[] getPatterns() = formals;
 
-  boolean hasThis() = notNull(declaration).formalParameters().hasThis();
+  boolean hasThis() = notNull(notNull(declaration).formalParameters()).hasThis();
 
   void buildSymbols()
   {
@@ -105,7 +105,7 @@ public abstract class MethodImplementation extends Definition
   */
   void addPatterns()
   {
-    mlsub.typing.Monotype[] parameters = notNull(nice.tools.typing.Types.parameters(notNull(declaration).getType()));
+    mlsub.typing.Monotype[] parameters = notNull(nice.tools.typing.Types.parameters(notNull(notNull(declaration).getType())));
     for (int i = 0; i < formals.length; i++)
       if (formals[i].tc == null)
         formals[i] = createPattern(formals[i].name,

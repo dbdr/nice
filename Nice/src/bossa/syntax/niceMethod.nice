@@ -33,7 +33,7 @@ public class NiceMethod extends UserOperator
   public boolean isMain()
   {
     return name.toString().equals("main") && arity==1 &&
-	this.getType().domain()[0].toString().equals("java.lang.String[]");
+	notNull(this.getType()).domain()[0].toString().equals("java.lang.String[]");
   }
 
   resolve()
@@ -94,7 +94,7 @@ public class NiceMethod extends UserOperator
 
     for (s : notNull(homonyms))
       {
-        let d = s.getMethodDeclaration();
+        let MethodDeclaration d = cast(s.getMethodDeclaration());
 
         // Ignore non-methods.
         if (d == null || d.isIgnored())
@@ -202,8 +202,20 @@ public NiceMethod createNiceMethod(LocatedString name,
 	FormalParameters parameters,
 	Contract contract, boolean isOverride)
 {
-  let res = new NiceMethod(name, constraint, returnType, parameters, contract: contract,
-	isOverride: isOverride, returnTypeLocation: returnType.location());
+  let res = new NiceMethod(name, Node.down, 
+	parameters: parameters,
+        arity: parameters.size,
+	syntacticConstraint: constraint.toString(),
+	symbol: cast(null),
+	contract: contract,
+	isOverride: isOverride,
+	returnTypeLocation: returnType.location());
+
+  res.addChild(parameters);
+  let symbol = createMethodSymbol(res, name, constraint, returnType);
+  res.symbol = symbol;
+  symbol.propagate = Node.global;
+  res.addChild(symbol);
   return res; 
 }
 
@@ -367,7 +379,7 @@ public gnu.expr.Expression getDispatchMethod(NiceMethod def, Module module)
 
   res = nice.tools.code.Gen.createMethod
     (name, argTypes, retType, def.getSymbols(), true, receiver != null);
-  res.parameterCopies = def.formalParameters().getParameterCopies();
+  res.parameterCopies = notNull(def.formalParameters()).getParameterCopies();
 
   // add unique information to disambiguate which method this represents
   res.addBytecodeAttribute

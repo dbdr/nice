@@ -45,14 +45,19 @@ NiceFieldAccess createNiceFieldAccess(NiceField field)
   let classDef = field.getTypeDefinition();
   let argType = Monotype.sure(classDef.lowlevelMonotype());
 
-  return new NiceFieldAccess(field.getName(),
-          Constraint.create(classDef.getBinders()),
-	  field.sym.syntacticType,
-	  new FormalParameters([new FormalParameters.Parameter(Monotype.create(argType))]),
-	  field: field);
-}
+  let params = new FormalParameters([new FormalParameters.Parameter(Monotype.create(argType))]);
+  let constr = Constraint.create(classDef.getBinders());
+  let res = new NiceFieldAccess(field.getName(), Node.down,
+	parameters: params,
+        syntacticConstraint: constr.toString(),
+        symbol: cast(null),
+        arity: 1,
+        field: field);
 
-private FormalParameters makeList(mlsub.typing.Monotype t)
-{
-  return new FormalParameters([new FormalParameters.Parameter(Monotype.create(t))]);
+  res.addChild(params);
+  let symbol = createMethodSymbol(res, field.getName(), constr, notNull(field.sym.syntacticType));
+  res.symbol = symbol;
+  symbol.propagate = Node.global;
+  res.addChild(symbol);
+  return res;    
 }

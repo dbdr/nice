@@ -39,7 +39,7 @@ public class ImportedConstructor extends Constructor
     // Adding the constraint in the type scope. It can be useful for
     // the default values of the formal parameters
     // (e.g. an anonymous function refering to a type parameter).
-    let cst = this.getType().getConstraint();
+    let cst = notNull(this.getType()).getConstraint();
     if (mlsub.typing.Constraint.hasBinders(cst))
       try {
         notNull(typeScope).addSymbols(notNull(cst).binders());
@@ -76,8 +76,8 @@ public class ImportedConstructor extends Constructor
     gnu.bytecode.Type[] fullArgTypes = cast(method.arg_types);
     List<gnu.bytecode.Type> argTypes = new LinkedList();
 
-    for (int i = 0; i < parameters.size; i++)
-      if (! parameters.hasDefaultValue(i))
+    for (int i = 0; i < notNull(parameters).size; i++)
+      if (! notNull(parameters).hasDefaultValue(i))
         argTypes.add(fullArgTypes[i]);
 
     return method.getDeclaringClass().getDeclaredMethod("<init>",
@@ -99,15 +99,25 @@ public ?ImportedConstructor loadImportedConstructor(NiceClass def, gnu.bytecode.
       (new mlsub.typing.MonotypeConstructor(classDef.getTC(), classDef.getTypeParameters())));
 
   let constraint = classDef.classConstraint == null ?
-          null : notNull(classDef.classConstraint).shallowClone();
+          bossa.syntax.Constraint.True : notNull(classDef.classConstraint).shallowClone();
 
-  let res = new ImportedConstructor(
-          new LocatedString("<init>",def.getDefinition().location()),
-          constraint, returnType,
-          FormalParameters.readBytecodeAttribute(attr, 
-		notNull(Node.compilation).parser),
-	  classe: def, isDefault: gnu.bytecode.Attribute.get(method, "default") != null,
-	  method: method);
+  let name = new LocatedString("<init>",def.getDefinition().location());
+  let parameters = FormalParameters.readBytecodeAttribute(attr, 
+		notNull(Node.compilation).parser);
+
+  let res = new ImportedConstructor(name, Node.down,
+        parameters: parameters,
+        arity: parameters.size,
+	syntacticConstraint: constraint.toString(),
+        symbol: cast(null),
+	classe: def,
+	isDefault: gnu.bytecode.Attribute.get(method, "default") != null,
+	method: method);
+  res.addChild(parameters);
+  let symbol = createMethodSymbol(res, name, constraint, returnType);
+  res.symbol = symbol;
+  symbol.propagate = Node.global;
+  res.addChild(symbol);
 
   addConstructor(res.classe.getDefinition().getTC(), res);
   return res;

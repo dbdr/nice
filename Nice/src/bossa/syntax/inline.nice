@@ -129,3 +129,24 @@ public class InlinedMethod extends MethodDeclaration
 	    (parameter!=null ? "(\""+parameter+"\");\n" : ";\n"));
   }
 }
+
+public InlinedMethod createInlinedMethod(LocatedString name, 
+	Constraint constraint, Monotype returnType, 
+	FormalParameters parameters,
+	LocatedString inlineProcedure, String param)
+{
+  let res = new InlinedMethod(name, Node.down, 
+	parameters: parameters,
+        arity: parameters.size,
+	syntacticConstraint: constraint.toString(),
+	symbol: cast(null),
+	inlineProcedure: inlineProcedure,
+	parameter: param);
+
+  res.addChild(parameters);
+  let symbol = createMethodSymbol(res, name, constraint, returnType);
+  res.symbol = symbol;
+  symbol.propagate = Node.global;
+  res.addChild(symbol);
+  return res; 
+}

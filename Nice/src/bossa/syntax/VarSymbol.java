@@ -53,7 +53,7 @@ public abstract class VarSymbol extends Node implements Located
     return null;
   }
 
-  public MethodDeclaration getMethodDeclaration()
+  public Object getMethodDeclaration()
   {
     return null;
   }

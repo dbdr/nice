@@ -28,8 +28,7 @@ public class JavaMethod extends MethodDeclaration
       this.registerForDispatch();
   }
   
-  isJavaMethod() = true;
-  getReflectMethod() = notNull(reflectMethod);
+  public gnu.bytecode.Method getReflectMethod() = notNull(reflectMethod);
    
   /** @return a string that uniquely represents this method */
   getFullName()
@@ -61,7 +60,7 @@ public class JavaMethod extends MethodDeclaration
     Internal.error("Automatic java methods should not be exported");
   }
 
-  registerForDispatch()
+  public void registerForDispatch()
   {
     if (this.registered)
       return;
@@ -69,12 +68,6 @@ public class JavaMethod extends MethodDeclaration
     registerDispatchTest(this);
     this.registered = true;
   }
-}
-
-new JavaMethod( LocatedString name, mlsub.typing.Polytype type,
-                  gnu.bytecode.Method reflectMethod )
-{
-  this( name, null, type, reflectMethod : reflectMethod );
 }
 
 /**
@@ -97,12 +90,21 @@ class JavaConstructor extends JavaMethod
     return null;
 
   if (constructor)
-    return new JavaConstructor(
-      new LocatedString("new " + m.getDeclaringClass().getName(),
-    	                  Location.nowhere()), type, m);
-  else
-    return new JavaMethod(new LocatedString(m.getName(), Location.nowhere()),
-                          type, m);
+    {
+      let name = new LocatedString("new " + m.getDeclaringClass().getName(), Location.nowhere());
+      let res = new JavaConstructor(name, Node.global,
+		parameters: null, arity: type.domain().length,
+		type: type, symbol: cast(null), reflectMethod: m);
+      res.symbol = createMethodSymbol(res, name, type);
+      return res;
+    }
+
+  let name = new LocatedString(m.getName(), Location.nowhere());
+  let res = new JavaMethod(name, Node.global,
+		parameters: null, arity: type.domain().length,
+		type: type, symbol: cast(null), reflectMethod: m);
+  res.symbol = createMethodSymbol(res, name, type);
+  return res;
 }
 
 /**

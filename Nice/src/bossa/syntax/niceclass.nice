@@ -388,7 +388,7 @@ public class CNiceClass extends NiceClass
 
     for (msym : constructors)
       {
-	let m = msym.getMethodDeclaration();
+	let MethodDeclaration m = cast(msym.getMethodDeclaration());
 
         // Only consider parent methods for which a call from this class
         // is legal.
@@ -435,8 +435,8 @@ public class CNiceClass extends NiceClass
     List<(?MethodDeclaration, List<FormalParameters.Parameter>)> res = new ArrayList();
     for (msym : constructors)
       {
-        let decl = msym.getMethodDeclaration();
-        res.add((decl, decl.formalParameters().getParameters(scope)));
+        let MethodDeclaration decl = cast(msym.getMethodDeclaration());
+        res.add((decl, notNull(decl.formalParameters()).getParameters(scope)));
       }
 
     if (definition.classConstraint != null)
@@ -555,15 +555,17 @@ public class CNiceClass extends NiceClass
 	// the two constraints.
 	// There might be simpler code to do this, and we could avoid
 	// duplicating the type variables.
-	if (parent instanceof JavaMethod && ! parent.getType().isMonomorphic())
+	if (parent instanceof JavaMethod && ! notNull(parent.getType()).isMonomorphic())
 	  specificCst = identifyTypeParameters(cst, parent, typeParameters);
 
+        let cname = new LocatedString("<init>",definition.location());
+        let ctype = new mlsub.typing.Polytype(specificCst, new mlsub.typing.FunType(Monotype.resolve(definition.getLocalScope(), values.types()),Monotype.sure(new mlsub.typing.MonotypeConstructor(definition.getTC(), definition.getTypeParameters()))));
 	notNull(constructorMethod)[i] = new DefaultConstructor
-	  (new LocatedString("<init>",definition.location()), values,
-	   specificCst,
-	   Monotype.resolve(definition.getLocalScope(), values.types()),
-	   Monotype.sure(new mlsub.typing.MonotypeConstructor(definition.getTC(), definition.getTypeParameters())),
-           classe: this, isDefault: true, fields: fields, parent: parent);
+	  (cname, Node.global, parameters: values, arity: values.size,
+	   symbol: cast(null), type: ctype,
+	   classe: this, isDefault: true, fields: fields, parent: parent);
+        notNull(constructorMethod)[i].symbol = createMethodSymbol(notNull(constructorMethod)[i], cname, ctype);
+
 	addConstructor(definition.getTC(), notNull(constructorMethod)[i]);
       }
   }
@@ -697,10 +699,10 @@ mlsub.typing.Constraint identifyTypeParameters
    mlsub.typing.Monotype[] typeParameters)
 {
   mlsub.typing.MonotypeConstructor result =
-    cast(nice.tools.typing.Types.rawType(method.getType().codomain()));
+    cast(nice.tools.typing.Types.rawType(notNull(method.getType()).codomain()));
   let methodTP = result.getTP();
 
-  let cst2 = method.getType().getConstraint();
+  let cst2 = notNull(method.getType()).getConstraint();
   mlsub.typing.Constraint and = mlsub.typing.Constraint.and(cst, cst2);
 
   let atoms = and.atoms();

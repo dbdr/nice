@@ -29,7 +29,7 @@ abstract class Constructor extends MethodDeclaration
 
   void addConstructorCallSymbol()
   {
-    let type = new mlsub.typing.Polytype(this.getType().getConstraint(),
+    let type = new mlsub.typing.Polytype(notNull(this.getType()).getConstraint(),
        new mlsub.typing.FunType(this.getArgTypes(), nice.tools.typing.PrimitiveType.voidType));
     classe.addConstructorCallSymbol(createConstructorCallSymbol(this, name, type));
   }
@@ -50,14 +50,14 @@ abstract class Constructor extends MethodDeclaration
     res.append("Class ").append(name);
 
     //Arguments where none expected
-    if (parameters.size == 0)
+    if (notNull(parameters).size == 0)
       {
         res.append(" has no fields. Therefore its constructor takes no arguments.");
         return res.toString();
       }
 
     //No such field
-    List<String> nonmatching = notNull(arguments).noMatchByName(parameters);
+    List<String> nonmatching = notNull(arguments).noMatchByName(notNull(parameters));
     if (!nonmatching.isEmpty())
       {
         res.append(" has no field named "+nonmatching[0]);
@@ -68,7 +68,7 @@ abstract class Constructor extends MethodDeclaration
     // - three different messages depending on whether
     //an explanation of the syntax is necessary
     res = new StringBuffer();
-    List<FormalParameters.Parameter> missing = notNull(arguments).missingArgs(parameters);
+    List<FormalParameters.Parameter> missing = notNull(arguments).missingArgs(notNull(parameters));
     List<FormalParameters.Parameter> fieldsToList;
 
     if (notNull(arguments).size() == 0)
@@ -77,7 +77,7 @@ abstract class Constructor extends MethodDeclaration
           .append(" require initial values.\n");
         res.append(this.syntaxExample())
           .append("Class ").append(name).append(" has the following fields:\n");
-        fieldsToList = parameters.asList();
+        fieldsToList = notNull(parameters).asList();
       }
     else if (missing.size() > 0)
       {
@@ -90,7 +90,7 @@ abstract class Constructor extends MethodDeclaration
           .append(name)
           .append(".\n")
           .append("The constructor accepts the following arguments:\n" );
-        fieldsToList = parameters.asList();
+        fieldsToList = notNull(parameters).asList();
       }
     for (field : fieldsToList)
       {
@@ -109,7 +109,7 @@ abstract class Constructor extends MethodDeclaration
     res.append("Use the following syntax:\n")
       .append("  new ").append(name).append("(");
 
-    let Iterator<FormalParameters.Parameter> params = parameters.getRequiredParameters().iterator();
+    let Iterator<FormalParameters.Parameter> params = notNull(parameters).getRequiredParameters().iterator();
     int paramCount = 0;
     int len = name.length();
     while(params.hasNext())

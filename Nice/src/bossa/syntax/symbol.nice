@@ -197,7 +197,7 @@ public class MethodSymbol extends FunSymbol
 new MethodSymbol(MethodDeclaration declaration, LocatedString name,
 	Constraint constraint, Monotype returnType )
 {
-  FormalParameters parameters = declaration.formalParameters();
+  FormalParameters parameters = notNull(declaration.formalParameters());
   this(name, declaration: declaration, parameters: parameters, arity: parameters.size,
 	syntacticType: new Polytype(constraint, createFunType(parameters.types(), returnType)));
 }
@@ -227,11 +227,11 @@ class ConstructorCallSymbol extends MethodSymbol
 }
 
 // Bootstrap (for conversion to nice)
-VarSymbol createMethodSymbol(MethodDeclaration declaration,
+MethodSymbol createMethodSymbol(MethodDeclaration declaration,
 	LocatedString name, Constraint constraint, Monotype returnType ) =
 		new MethodSymbol(declaration,name,constraint,returnType);
 
-VarSymbol createMethodSymbol(MethodDeclaration declaration,
+MethodSymbol createMethodSymbol(MethodDeclaration declaration,
 	LocatedString name, mlsub.typing.Polytype type ) =
 		new MethodSymbol(declaration,name,type);
 

@@ -227,8 +227,21 @@ RetypedJavaMethod createRetypedJavaMethod(
      Monotype returnType,
      FormalParameters parameters)
 {
-  return new RetypedJavaMethod(name, constraint, returnType, parameters,
-	className: className, methodName: methodName, javaTypes: javaTypes);
+  let res = new RetypedJavaMethod(name, Node.down,
+	parameters: parameters,
+	syntacticConstraint: constraint.toString(),
+	symbol: cast(null),
+        arity: parameters.size,
+        className: className,
+        methodName: methodName,
+        javaTypes: javaTypes);
+
+  res.addChild(parameters);
+  let symbol = createMethodSymbol(res, name, constraint, returnType);
+  res.symbol = symbol;
+  symbol.propagate = Node.global;
+  res.addChild(symbol);
+  return res;
 }
 
 

@@ -108,7 +108,7 @@ public class SuperExp extends Expression
 
   computeType()
   {
-    mlsub.typing.Polytype type = notNull(currentMethod).getDeclaration().getType();
+    mlsub.typing.Polytype type = notNull(notNull(currentMethod).getDeclaration().getType());
     mlsub.typing.FunType monotype;
     mlsub.typing.Constraint constraint;
     if (! type.isMonomorphic())
@@ -179,7 +179,7 @@ public class SuperExp extends Expression
 
 }
 
-public ?gnu.bytecode.Method getImplementationAbove(MethodDeclaration /* JavaMethod */ decl, gnu.bytecode.ClassType firstArg)
+public ?gnu.bytecode.Method getImplementationAbove(JavaMethod decl, gnu.bytecode.ClassType firstArg)
 {
   let thisMethod = decl.getReflectMethod();
   let superClass = firstArg.getSuperclass();

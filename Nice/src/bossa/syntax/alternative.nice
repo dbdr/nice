@@ -141,7 +141,7 @@ public class Alternative implements Located
 
   Alternative addDefaultPatterns(MethodDeclaration def)
   {
-    mlsub.typing.Monotype[?] parameters = nice.tools.typing.Types.parameters(def.getType());
+    mlsub.typing.Monotype[?] parameters = nice.tools.typing.Types.parameters(notNull(def.getType()));
     Pattern[?] newPatterns = null;
 
     for (int i = 0; i < patterns.length; i++)
@@ -185,7 +185,7 @@ public void addAllAlternatives(MethodDeclaration from, MethodDeclaration to)
 {
   String fullName = to.getFullName();
 
-  if (from.isJavaMethod())
+  if (from instanceof JavaMethod)
     createJavaAlternative(from).add(fullName);
 
   ?List<Alternative> list = alternativesMap.get(from.getFullName());
@@ -347,7 +347,7 @@ class JavaAlternative extends Alternative
 public Alternative createJavaAlternative(bossa.syntax.MethodDeclaration method)
 {
 
-  Pattern[] patterns = notNull(nice.tools.typing.Types.parameters(method.getType())).
+  Pattern[] patterns = notNull(nice.tools.typing.Types.parameters(notNull(method.getType()))).
 	mapToArray(mlsub.typing.Monotype param => createPattern(null,
 		nice.tools.typing.Types.concreteConstructor(param),
          	nice.tools.typing.Types.isSure(param)));
@@ -417,8 +417,7 @@ public void readImportedAlternative(gnu.bytecode.ClassType c, gnu.bytecode.Metho
                                 code: new gnu.expr.QuoteExp(new gnu.expr.PrimProcedure(method)),
                                 loc: location);
 
-    alt.add(nice.tools.util.System.split
-              (fullName, MethodDeclaration.methodListSeparator));
+    alt.add(nice.tools.util.System.split(fullName, methodListSeparator));
   }
   catch(UnknownPattern ex) {
     // This can happen if the class exists only in a later version
@@ -444,10 +443,10 @@ private void registerJavaMethod(String fullName)
       if (sym.getMethodDeclaration() == null)
         continue;
 
-      MethodDeclaration md = notNull(sym.getMethodDeclaration());
+      MethodDeclaration md = cast(sym.getMethodDeclaration());
       if (md.getFullName().equals(fullName))
         {
-          md.registerForDispatch();
+          cast(md).registerForDispatch();
           return;
         }
     }

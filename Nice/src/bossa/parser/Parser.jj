@@ -1407,7 +1407,7 @@ Definition methodDeclaration(Constraint cst, boolean isOverride):
 	  "(" [ param=rawString() ] ")"
 	]
 	";"
-	{ res=new InlinedMethod(name,cst,returnType,parameters,
+	{ res=bossa.syntax.dispatch.createInlinedMethod(name,cst,returnType,parameters,
 				inlinedName, param); }
       )
     | { Contract contract; }
@@ -1423,7 +1423,7 @@ Definition methodDeclaration(Constraint cst, boolean isOverride):
       |
         // Nice method
         ";"
-        { res = new NiceMethod
+        { res = bossa.syntax.dispatch.createNiceMethod
             (name, cst, returnType, parameters, contract, isOverride); }
       )
     )

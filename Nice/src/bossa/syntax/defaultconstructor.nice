@@ -74,15 +74,15 @@ class DefaultConstructor extends Constructor
     thisDecl.setType(thisType);
     let thisExp = new gnu.expr.ThisExp(thisDecl);
 
-    let fullArgs = notNull(parameters.getMonoSymbols());
+    let fullArgs = notNull(notNull(parameters).getMonoSymbols());
     let fullArgTypes = this.javaArgTypes();
 
     List<MonoSymbol> args = new LinkedList();
     List<gnu.bytecode.Type> argTypes = new LinkedList();
 
-    for (int i = 0; i < parameters.size; i++)
+    for (int i = 0; i < notNull(parameters).size; i++)
       {
-        if (omitDefaults && parameters.hasDefaultValue(i))
+        if (omitDefaults && notNull(parameters).hasDefaultValue(i))
           continue;
 
         args.add(fullArgs[i]);
@@ -113,7 +113,7 @@ class DefaultConstructor extends Constructor
         // Add attributes useful for the nice compiler. These are not needed
         // for the version omitting defaults, since that one is only there for
         // Java users' sake.
-        lambda.addBytecodeAttribute(parameters.asBytecodeAttribute());
+        lambda.addBytecodeAttribute(notNull(parameters).asBytecodeAttribute());
         lambda.addBytecodeAttribute(new gnu.bytecode.MiscAttr("default"));
       }
     else
@@ -130,7 +130,7 @@ class DefaultConstructor extends Constructor
     superArgs.add(thisExp);
     for (int i = 0; i < len; i++)
       {
-        if (! (omitDefaults && parameters.hasDefaultValue(i)))
+        if (! (omitDefaults && notNull(parameters).hasDefaultValue(i)))
           superArgs.add(args[i].compile());
       }
 

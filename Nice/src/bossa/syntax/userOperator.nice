@@ -40,7 +40,7 @@ public abstract class UserOperator extends MethodDeclaration
     this.removeChild(this.getSymbol());
     this.getSymbol().doResolve();
 
-    symbols = parameters.getMonoSymbols();
+    symbols = notNull(parameters).getMonoSymbols();
     if (symbols != null)
       {
 	mlsub.typing.Monotype[] paramTypes = this.getArgTypes();
@@ -75,7 +75,7 @@ public abstract class UserOperator extends MethodDeclaration
     // Adding the constraint in the type scope. It can be useful for
     // the default values of the formal parameters 
     // (e.g. an anonymous function refering to a type parameter).
-    let cst = this.getType().getConstraint();
+    let cst = notNull(this.getType()).getConstraint();
     if (mlsub.typing.Constraint.hasBinders(cst))
       try {
         notNull(typeScope).addSymbols(notNull(cst).binders());
@@ -100,7 +100,7 @@ public abstract class UserOperator extends MethodDeclaration
     contract.typecheck();
 
     // Set bytecode types for type variables.
-    mlsub.typing.FunType ft = cast(this.getType().getMonotype());
+    mlsub.typing.FunType ft = cast(notNull(this.getType()).getMonotype());
 
     nice.tools.code.Types.setBytecodeType(ft.domain());
     nice.tools.code.Types.setBytecodeType(ft.codomain());

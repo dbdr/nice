@@ -69,7 +69,7 @@ mlsub.typing.Monotype ensureMonomorphic(mlsub.typing.Polytype type,
 
       // Make sure we are in a local typing context, so the new type variables
       // are discarded when the typechecking of the current method is over.
-      MethodDeclaration.enterLocalContext();
+      enterLocalContext();
 
       notNull(type.getConstraint).enter(true);
     }
@@ -226,7 +226,6 @@ int[?] getUsedArguments(Arguments, VarSymbol) = native int[] Arguments.getUsedAr
 ?mlsub.typing.Constraint getConstraint(mlsub.typing.Polytype) = native mlsub.typing.Constraint mlsub.typing.Polytype.getConstraint();
 MonoSymbol[?] getMonoSymbols(FormalParameters) = native MonoSymbol[] FormalParameters.getMonoSymbols();
 mlsub.typing.AtomicConstraint[?] AtomicConstraint_substitute(java.util.Map<mlsub.typing.TypeSymbol,mlsub.typing.TypeSymbol>, AtomicConstraint[?]) = native mlsub.typing.AtomicConstraint[] mlsub.typing.AtomicConstraint.substitute(java.util.Map, mlsub.typing.AtomicConstraint[]);
-FormalParameters parameters(MethodDeclaration) = native MethodDeclaration.parameters;
 ?gnu.expr.Expression getInitializer(NiceClass) = native gnu.expr.Expression NiceClass.getInitializer();
 void addConstructorCallSymbol(NiceClass, VarSymbol) = native void NiceClass.addConstructorCallSymbol(VarSymbol);
 gnu.expr.Expression callSuperMethod(NiceClass, gnu.bytecode.Method) = native gnu.expr.Expression NiceClass.callSuperMethod(gnu.bytecode.Method);
@@ -273,7 +272,6 @@ Monotype[?] types(FormalParameters) = native Monotype[] FormalParameters.types()
 ?mlsub.typing.TypeSymbol lookup(TypeMap, LocatedString) = native mlsub.typing.TypeSymbol TypeMap.lookup(LocatedString);
 ?mlsub.typing.TypeSymbol lookup(TypeMap, String) = native mlsub.typing.TypeSymbol TypeMap.lookup(String);
 void substitute(bossa.syntax.FormalParameters, Map<java.lang.String, bossa.syntax.Monotype>) = native void FormalParameters.substitute(Map);
-?Iterator<MethodDeclaration> listSpecializedMethods(MethodDeclaration) = native Iterator MethodDeclaration.listSpecializedMethods();
 Monotype[] Monotype_toArray(?List<Monotype>) = native Monotype[] Monotype.toArray(List);
 List<VarSymbol> lookup(VarScope, LocatedString) = native List VarScope.lookup(LocatedString);
 Map<gnu.bytecode.Type,mlsub.typing.TypeConstructor> javaTypeConstructors(bossa.modules.Compilation ) = native bossa.modules.Compilation.javaTypeConstructors;

@@ -98,7 +98,7 @@ private boolean trivialTestOK(Stack<Alternative> alternatives)
   return alternatives.peek().allAtAny();
 }
 
-private boolean trivialTestJava(MethodDeclaration m, Stack<Alternative> alternatives)
+private boolean trivialTestJava(JavaMethod m, Stack<Alternative> alternatives)
 {
   gnu.bytecode.Method reflectMethod = m.getReflectMethod();
 
@@ -288,7 +288,7 @@ private boolean testTypes(MethodDeclaration method,
     {
       if (firstArg != null)
         {
-          let superImplementation = getImplementationAbove(method, firstArg);
+          let superImplementation = getImplementationAbove(cast(method), firstArg);
           if (superImplementation != null && superImplementation.isAbstract() == false)
             // It's OK, this case is covered by a Java implementation.
             return false;

@@ -32,7 +32,7 @@ public class CustomConstructor extends UserOperator
   void addConstructorCallSymbol()
   {
     mlsub.typing.Polytype type = new mlsub.typing.Polytype
-      (this.getType().getConstraint(),
+      (notNull(this.getType()).getConstraint(),
        new mlsub.typing.FunType(this.getArgTypes(), nice.tools.typing.PrimitiveType.voidType));
     notNull(classe).addConstructorCallSymbol(
 	createConstructorCallSymbol(this, name, type));
@@ -109,12 +109,12 @@ public class CustomConstructor extends UserOperator
     // In the bytecode, we want to use the same type parameter names
     // as the class definition, even if the source of this custom constructor
     // renamed them locally.
-    let cst = this.getType().getConstraint();
+    let cst = notNull(this.getType()).getConstraint();
     if (mlsub.typing.Constraint.hasBinders(cst))
-      parameters.substitute
+      notNull(parameters).substitute
         (this.typeParamMap(notNull(cst).binders(), notNull(classe).getTypeParameters()));
 
-    lambda.addBytecodeAttribute(parameters.asBytecodeAttribute());
+    lambda.addBytecodeAttribute(notNull(parameters).asBytecodeAttribute());
     initializationCode =
       new gnu.expr.QuoteExp(new gnu.expr.InitializeProc(lambda));
     initializationCodeImplicitThis =
@@ -123,7 +123,7 @@ public class CustomConstructor extends UserOperator
     return new gnu.expr.QuoteExp(new gnu.expr.InstantiateProc(lambda));
   }
 
-  getConstructorInvocation(boolean)
+  getConstructorInvocation(omitDefaults)
   {
     this.getCode();
     return notNull(initializationCode);
@@ -142,10 +142,23 @@ public class CustomConstructor extends UserOperator
 public CustomConstructor createCustomConstructor(LocatedString className, Constraint cst,
                     FormalParameters params, Statement body)
 {
-  return new CustomConstructor(new LocatedString("<init>", className.location()),
-	cst, getCCReturnType(className, cst), params, contract: noContract,
-	className: className, body: body);
+  let name = new LocatedString("<init>", className.location());
+  let returnType = getCCReturnType(className, cst);
+  let res = new CustomConstructor(name, Node.down,
+	parameters: params,
+        arity: params.size,
+	syntacticConstraint: cst.toString(),
+        symbol: cast(null),
+	contract: noContract,
+	className: className,
+	body: body);
 
+  res.addChild(params);
+  let symbol = createMethodSymbol(res, name, cst, returnType);
+  res.symbol = symbol;
+  symbol.propagate = Node.global;
+  res.addChild(symbol);
+  return res;
 }
 
 private Monotype getCCReturnType(LocatedString className, Constraint cst)

@@ -110,22 +110,36 @@ JavaFieldAccess createJavaFieldAccess(LocatedString className,String fieldName,
      LocatedString name,Constraint cst,
      Monotype returnType, FormalParameters parameters)
 {
-  return new JavaFieldAccess(name, cst, returnType, parameters,
-    className : className,
-    fieldName : fieldName );
+  let res = new JavaFieldAccess(name, Node.down,
+	parameters: parameters,
+	syntacticConstraint: cst.toString(),
+        arity: parameters.size,
+        symbol: cast(null),
+	className : className,
+	fieldName : fieldName );
+  res.addChild(parameters);
+  let symbol = createMethodSymbol(res, name, cst, returnType);
+  res.symbol = symbol;
+  symbol.propagate = Node.global;
+  res.addChild(symbol);
+  return res;
 }
 
   
-new JavaFieldAccess(gnu.bytecode.Field field, mlsub.typing.Monotype[?] parameters)
+JavaFieldAccess createJavaFieldAccess(gnu.bytecode.Field field, mlsub.typing.Monotype[?] parameters)
 {
-  this(
-    new LocatedString(field.getName(), Location.nowhere()), 
-    null,
-    parameters, 
-    nice.tools.code.Types.monotype(field.getType(), field.isFinal()),
-    field : field,
-    className : new LocatedString(field.getDeclaringClass().getName(), Location.nowhere()),
-    fieldName : field.getName() );
+  let type = new mlsub.typing.Polytype(null, new mlsub.typing.FunType(parameters,
+	nice.tools.code.Types.monotype(field.getType(), field.isFinal())));
+  let res = new JavaFieldAccess(new LocatedString(field.getName(),Location.nowhere()), Node.global,
+	parameters: null,
+        arity: type.domain().length,
+        type: type,
+        symbol: cast(null),
+	field: field,
+	className: new LocatedString(field.getDeclaringClass().getName(), Location.nowhere()),
+	fieldName: field.getName() );
+  res.symbol = createMethodSymbol(res, new LocatedString(field.getName(),Location.nowhere()), type);
+  return res;
 }
 
 ?MethodDeclaration makeJavaFieldAccess(gnu.bytecode.Field f)
@@ -139,7 +153,7 @@ new JavaFieldAccess(gnu.bytecode.Field field, mlsub.typing.Monotype[?] parameter
     else
       params = null;
     
-    JavaFieldAccess res = new JavaFieldAccess(f, params);
+    JavaFieldAccess res = createJavaFieldAccess(f, params);
 
     if (bossa.util.Debug.javaTypes)
       bossa.util.Debug.println("Loaded field " + res);

@@ -1,0 +1,320 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2004                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package bossa.syntax;
+
+import bossa.util.*;
+
+//import mlsub.typing.*;
+
+//import gnu.bytecode.*;
+//import gnu.expr.*;
+
+/**
+   Declaration of a method.
+   
+   Can be 
+   - a {@link bossa.syntax.NiceMethod Nice method}, 
+     with several method bodies @see bossa.syntax.MethodBodyDefinition
+   - a {@link bossa.syntax.JavaMethod Java method}
+   - an {@link bossa.syntax.InlinedMethod inlined method}
+   
+*/
+public abstract class MethodDeclaration extends Definition
+{
+  int arity;
+  ?FormalParameters parameters;
+  private MethodSymbol symbol;
+
+  ?mlsub.typing.Polytype type = null;
+
+  private ?String syntacticConstraint = null;
+
+  ?gnu.expr.Expression code = null;
+
+  public ?mlsub.typing.Polytype getType()
+  {
+    return type;
+  }
+  
+  public mlsub.typing.Monotype[] getArgTypes()
+  {
+    if (type == null)
+      symbol.resolve();
+
+    return notNull(type).domain();
+  }
+  
+  public mlsub.typing.Monotype getReturnType()
+  {
+    return notNull(type).codomain();
+  }
+  
+  boolean isIgnored()
+  {
+    return false;
+  }
+
+  /**
+      This is called in a pass before typechecking itself.
+      This is important, to typecheck and disambiguate the default values
+      of optional parameters, that will be used to typecheck code.
+  */
+  void typedResolve()
+  {
+    if (module.interfaceFile() && ! notNull(parameters).hasDefaultValue())
+      return;
+
+    if (!mlsub.typing.Constraint.hasBinders(notNull(type).getConstraint()))
+      {
+	notNull(parameters).typecheck(notNull(type).domain());
+	return;
+      }
+    
+    try{
+      mlsub.typing.Typing.enter();
+    
+      try{
+	notNull(notNull(type).getConstraint()).enter();
+
+        /*
+          We typecheck with rigid type parameters. It means that
+          default values must be valid for any instance of the method type.
+
+          Alternatively, it could be decided that it is ok to have default
+          values that satisfy only specific instances. In that case, it would
+          be necessary to do some changes in K0. The difficulty is with
+          overloading: the (now soft) type variables could be modified
+          in an unsuccesful overloading resolution, and that modifications
+          need to be discarded.
+        */
+        mlsub.typing.Typing.implies();
+
+	notNull(parameters).typecheck(notNull(type).domain());
+      }
+      finally{
+	mlsub.typing.Typing.leave();
+      }
+    }
+    catch(mlsub.typing.TypingEx e){
+      User.error(this,
+		 "The type of method " + symbol.name +
+		 " is not well formed: " + type + "\n" + e);
+    }
+  }
+
+  /**
+     Do further typechecking, once the context of the method is entered.
+  */
+  void innerTypecheck() {}
+
+  typecheck()
+  {
+    if (this.isIgnored())
+      return;
+
+    // what we do here is equivalent to getType().checkWellFormedness();
+    // except we also want to find the bytecode types when
+    // the constraint is asserted
+
+    // see getType().checkWellFormedness
+
+    mlsub.typing.Polytype type = notNull(this.getType());
+
+    ?UserError error = null;
+    try{
+      if (mlsub.typing.Constraint.hasBinders(type.getConstraint()))
+        mlsub.typing.Typing.enter();
+      else
+        inGlobalContext = true;
+    
+      try{
+	mlsub.typing.Constraint.enter(type.getConstraint());
+
+        try {
+          this.innerTypecheck();
+        } catch(UserError e){
+          error = e;
+        }
+      }
+      finally{
+	if (! inGlobalContext)
+          mlsub.typing.Typing.leave();
+        else
+          inGlobalContext = false;
+      }
+    }
+    catch(mlsub.typing.TypingEx e){
+      // If we got an earlier error, it's preferable to report that one.
+      if (error == null)
+        if (mlsub.typing.Constraint.hasBinders(type.getConstraint()))
+          User.error(this,
+                     "The type of method " + symbol.name +
+                     " is not well formed: " + type + "\n" + e);
+        else
+          User.error(this, "Type error in method " + symbol.name);          
+    }
+    if (error != null)
+      throw error;
+  }
+
+  /** Typechecking when the package has already been compiled. */
+  void typecheckCompiled()
+  {
+    // Nothing by default
+  }
+
+  toString()
+  {
+    if(this.getType() == null)
+      return "method " + this.getName();
+    
+    return
+      (syntacticConstraint != null ? notNull(syntacticConstraint)
+       : mlsub.typing.Constraint.toString(notNull(this.getType()).getConstraint()))
+      + String.valueOf(this.getReturnType())
+      + " "
+      + this.getName().toQuotedString()
+      + "("
+      // parameters can be null if type was set lowlevel (native code, ...)
+      + (parameters != null ?
+	 notNull(parameters).toString() : Util.map("",", ","", notNull(this.getType()).domain()))
+      + ")"
+      ;
+  }
+  
+  public int getArity()
+  {
+    return arity;
+  }
+  
+  public ?FormalParameters formalParameters()
+  {
+    return parameters;
+  }
+  
+  /** 
+   * true if this method represent the access to the field of an object.
+   */
+  public boolean isFieldAccess() { return false; }
+
+  void checkSpecialRequirements(Expression[?] arguments)
+  {
+    // Do nothing by default.
+  }
+
+  String explainWhyMatchFails(Arguments arguments)
+  {
+    return symbol.defaultExplainWhyMatchFails(arguments);
+  }
+
+  MethodSymbol getSymbol() { return symbol; }
+
+  /****************************************************************
+   * Code generation
+   ****************************************************************/
+
+  /** @return a string that uniquely represents this method */
+  public String getFullName()
+  {
+    return "NONE";
+  }
+
+  public boolean specializesMethods()
+  {
+    return false;
+  }
+
+  public ?Iterator<MethodDeclaration> listSpecializedMethods()
+  {
+   return null;
+  }
+
+  /** @return a string that uniquely represents this method 
+      and those that it specializes. 
+  */
+  String getAllFullNames()
+  {
+    let i = this.listSpecializedMethods();
+
+    if (i == null)
+      return this.getFullName();
+
+    StringBuffer res = new StringBuffer();
+    res.append(this.getFullName());
+    while (i.hasNext())
+      {
+        res.append(methodListSeparator);
+        res.append(i.next().getFullName());
+      }
+
+    return res.toString();
+  }
+
+  gnu.expr.Expression computeCode();
+
+  public gnu.expr.Expression getCode() 
+  {
+    // Default implementation.
+    return this.getCodeInCallPosition();
+  }
+  
+  /** Call to the constructor. This should be overriden by methods
+      that really give access to a constructor.
+  */
+  gnu.expr.Expression getConstructorInvocation(boolean omitDefaults)
+  {
+    throw new Error("Constructor for " + this + " (" + this.getClass() + ")");
+  }
+  
+  gnu.expr.Expression getCodeInCallPosition() 
+  {
+    if (code == null)
+      {
+	code = this.computeCode();
+	
+	if (code == null)
+	  Internal.error(this, "No code for " + this);
+      }
+
+    return notNull(code);
+  }
+
+  public gnu.bytecode.Type javaReturnType()
+  {
+    return nice.tools.code.Types.javaType(this.getReturnType());
+  }
+  
+  public gnu.bytecode.Type[] javaArgTypes()
+  {
+    return nice.tools.code.Types.javaType(notNull(this.getType()).domain());
+  }
+  
+  compile() {}
+}
+
+let char methodListSeparator = ';';
+
+/** Whether typechecking is currently happening in the global context */
+var boolean inGlobalContext = false;
+
+/** Make sure that we are in a local context, which will be discarded 
+    when typechecking this method is over.
+*/
+void enterLocalContext()
+{
+  if (! inGlobalContext)
+    return;
+
+  mlsub.typing.Typing.enter();
+  inGlobalContext = false;
+}

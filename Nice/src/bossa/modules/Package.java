@@ -96,11 +96,6 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     computeImportedPackages();
 
     thisPkg = new gnu.expr.Package(getName());
-    
-    // Create it before any module compiles
-
-    //if (isRoot)
-    //module = createModule(name.toString() + "module");
   }
 
   /**
@@ -536,16 +531,6 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     }
   }
   
-  public void writeJar()
-  {
-    String name = this.name.toString();
-    int lastDot = name.lastIndexOf('.');
-    if (lastDot!=-1)
-      name = name.substring(lastDot+1, name.length());
-    
-    System.out.println("NOT WRITING JAR");
-  }
-
   /****************************************************************
    * Code generation
    ****************************************************************/
@@ -572,13 +557,11 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
       {
 	implementationClass.addDeclaration(declaration);
 	declaration.setFlag(Declaration.STATIC_SPECIFIED|Declaration.TYPE_SPECIFIED);
-	//declaration.setSimple(true);
       }
     
     return declaration;
   }
 
-  //private static ModuleExp module;
   private gnu.expr.Package thisPkg;
   private ClassExp implementationClass, dispatchClass;
 
@@ -627,11 +610,6 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     nice.tools.code.NiceInterpreter.init();
   }
 
-  private void initDispatch()
-  {
-  }
-  
-
   /**
    * Creates bytecode for the alternatives defined in the module.
    */
@@ -640,15 +618,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     dispatchClass = createClassExp(name + ".dispatch");
 
     if (!compiling())
-      {
-	// XXX OPTIM:
-	// This generates ClassType objects for nice classes, 
-	// while they are not used. 
-	//ast.compile();
-
-
-	return;
-      }
+      return;
 
     if (Debug.passes)
       Debug.println(this + ": generating code");    
@@ -680,42 +650,6 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     return res;
   }
 
-  /*
-  public final void addClass(ClassType c)
-  {
-    addClass(c, false);
-  }
-  
-  void addClass(ClassType c, boolean alwaysInJar)
-  {
-    // if we did not have to recompile, no class has to be regenerated
-    if (!compiling())
-      return;
-    
-    try{
-      if (c.sourcefile == null)
-	c.setSourceFile(name+sourceExt);
-      else
-	 c.setSourceFile(c.sourcefile);
-
-      boolean putInJar = jar != null && (alwaysInJar||compilation.staticLink);
-      // Jar and Zip files use forward slashes
-      char sepChar = putInJar ? '/' : File.separatorChar;
-      String filename = c.getName().replace('.', sepChar) + ".class";
-
-      if (!putInJar)
-	c.writeToFile(new File(rootDirectory, filename));
-      else
-	{
-	  jar.putNextEntry(new JarEntry(filename));
-	  c.writeToStream(jar);
-	}
-    }
-    catch(IOException e){
-      User.error(this.name, "Could not write code for " + this + ": " + e);
-    }
-  }
-  */
   /**
      @return an expression to call this method 
      if the package has not been recompiled.

@@ -39,3 +39,4 @@ String replace(String source, char c, String with)
 }
 
 char get(String s, int index) = native char String.charAt(int);
+char charAt(String s, int index) = native char String.charAt(int);

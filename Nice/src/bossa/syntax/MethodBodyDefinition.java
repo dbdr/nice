@@ -126,10 +126,14 @@ public class MethodBodyDefinition extends Definition
     
     // Overriding a mono-method can currently not dispatch on other args
     if (d instanceof JavaMethod)
-      for (int i = 1; i < formals.length; i++)
-	if (!(formals[i].atAny()))
-	  User.error(this, this + " is a native method. Dispatch can only occur on the first argument");
-    
+      {
+	for (int i = 1; i < formals.length; i++)
+	  if (!(formals[i].atAny()))
+	    User.error(this, this + " is a native method. Dispatch can only occur on the first argument");
+      }
+    else if (! (d instanceof NiceMethod))
+      User.error(this, "Implementations can only be made for methods, but " + d.getName() + " is a function.\nIt was defined at:\n" + d.location());
+
     this.declaration = d;
     parameters = buildSymbols(this.formals, declaration.getArgTypes());
     scope.addSymbols(parameters);

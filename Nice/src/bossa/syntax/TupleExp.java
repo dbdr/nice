@@ -35,7 +35,7 @@ public class TupleExp extends bossa.syntax.Expression
 {
   public TupleExp(List expressions)
   {
-    this.expressions = expChildren(expressions);
+    this.expressions = expTabChildren(expressions);
   }
 
   /****************************************************************
@@ -44,10 +44,10 @@ public class TupleExp extends bossa.syntax.Expression
 
   boolean isAssignable()
   {
-    for (Iterator i = expressions.iterator(); i.hasNext();)
-      if (!((bossa.syntax.Expression) i.next()).isAssignable())
+    for (int i = 0; i < expressions.length; i++)
+      if (! expressions[i].isAssignable())
 	return false;
-
+    
     return true;
   }
   
@@ -72,7 +72,7 @@ public class TupleExp extends bossa.syntax.Expression
 
   protected gnu.expr.Expression compile()
   {
-    int len = expressions.size();
+    int len = expressions.length;
     
     // The array is not a special array, since it has nothing to
     // do with collections.
@@ -92,9 +92,7 @@ public class TupleExp extends bossa.syntax.Expression
       stmts[i] = 
 	new ApplyExp(new gnu.kawa.reflect.ArraySet(componentType),
 		     new Expression[]{
-		       array, intExp(i),
-		       ((bossa.syntax.Expression) expressions.get(i))
-		       .generateCode()
+		       array, intExp(i), expressions[i].generateCode()
 		     });
     
     stmts[len] = array;
@@ -106,7 +104,7 @@ public class TupleExp extends bossa.syntax.Expression
 
   gnu.expr.Expression compileAssign(gnu.expr.Expression array)
   {
-    int len = expressions.size();
+    int len = expressions.length;
 
     LetExp let = null;
     Expression tupleExp;
@@ -127,7 +125,7 @@ public class TupleExp extends bossa.syntax.Expression
     
     Expression[] stmts = new Expression[len];
     for (int i=0; i<len; i++)
-      stmts[i] = ((bossa.syntax.Expression) expressions.get(i)).compileAssign
+      stmts[i] = expressions[i].compileAssign
 	(new ApplyExp(new gnu.kawa.reflect.ArrayGet(componentType),
 		      new Expression[]{
 			tupleExp, 
@@ -156,5 +154,5 @@ public class TupleExp extends bossa.syntax.Expression
     return Util.map("(", ", ", ")", expressions);
   }
 
-  List expressions;
+  bossa.syntax.Expression[] expressions;
 }

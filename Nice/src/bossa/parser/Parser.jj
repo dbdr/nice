@@ -586,9 +586,13 @@ TypeSymbol binder(Collection atomics):
     atomics.add(new TypeConstructorLeqCst(second,first)); 
     return second; 
   }
-|
-  [ "Any" ] id=monotypeVar()
-  { return id; }
+| { boolean sure = false; }
+  [ "Any" | "!" { sure = true; } ] id=monotypeVar()
+  { 
+    if (sure)
+      atomics.add(AtomicConstraint.sureTypeVar(id));
+    return id; 
+  }
 }
 
 List binders(Collection atomics):
@@ -1156,12 +1160,12 @@ MethodContainer.Constraint classTypeParameters(List tags):
 MonotypeVar taggedMonotypeVar(List tags, List atoms):
 {
   MonotypeVar mv;
-  TypeIdent bound = null;
+  Monotype bound = null;
   boolean sure = false;
 }
 {
-  [ LOOKAHEAD( typeIdent() ("+" | "-" | monotypeVar()) )
-    bound=typeIdent() 
+  [ LOOKAHEAD( monotype() ("+" | "-" | monotypeVar()) )
+    bound=monotype() 
   ]
 
   ( "+" { tags.add(Boolean.TRUE); }
@@ -1181,7 +1185,7 @@ MonotypeVar taggedMonotypeVar(List tags, List atoms):
       }
 
     if (sure)
-      atoms.add(MethodContainer.Constraint.sureTypeVar(mv));
+      atoms.add(AtomicConstraint.sureTypeVar(mv));
 
     return mv;
   }

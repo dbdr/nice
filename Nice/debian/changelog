@@ -11,6 +11,8 @@ nice (0.7.6) unstable; urgency=low
   * Allows anonymous functions to be made of one statement without braces:
       (char c => if (Character.isLetter(c)) wordBuffer.append(c))
       (char c => assert c != 'Z')
+  * Method type parameters can be constrained to be non null by prefixing
+    with the ! character, just like class type parameters.
   * Parser support for public-read and private-write fields (experimental).
   * Bugfixes (using anonymous functions while overriding native methods, 
     automatic array conversions in polymorphic code, ...).

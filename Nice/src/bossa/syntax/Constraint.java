@@ -16,6 +16,7 @@ import java.util.*;
 import bossa.util.*;
 import mlsub.typing.TypeSymbol;
 import mlsub.typing.TypeConstructor;
+import mlsub.typing.MonotypeVar;
 
 /**
    A list of binders + atomic constraints.
@@ -138,7 +139,7 @@ public class Constraint extends Node
     else 
       {
 	// Put in a parsable format.
-	String res = "<";
+	StringBuffer res = new StringBuffer("<");
 	boolean first = true;
 	
 	Constraint c = this.shallowClone();
@@ -147,7 +148,28 @@ public class Constraint extends Node
 	  {
 	    TypeSymbol s = (TypeSymbol)i.next();
 	    if(!(s instanceof TypeConstructor))
-	      continue;
+	      // Handle the ! constraint
+	      {
+		MonotypeVar mv = (MonotypeVar) s;
+		for(Iterator j = c.atomics.iterator(); j.hasNext();)
+		  {
+		    AtomicConstraint atom = (AtomicConstraint)j.next();
+		    
+		    if (atom.isSureConstraintFor(mv))
+		      {
+			if(first)
+			  first = false;
+			else
+			  res.append(',');
+			res.append('!').append(s);
+			j.remove();
+			i.remove();
+			break;
+		      }
+		  }
+		
+		continue;
+	      }
 
 	    TypeConstructor tc = (TypeConstructor)s;
 	    boolean ok = false;
@@ -162,8 +184,8 @@ public class Constraint extends Node
 		    if(first)
 		      first = false;
 		    else
-		      res += ",";
-		    res += parent + " " + tc;
+		      res.append(',');
+		    res.append(parent).append(' ').append(tc);
 		    j.remove();
 		    i.remove();
 		    ok = true;
@@ -174,12 +196,10 @@ public class Constraint extends Node
 	      Internal.error("Unable to print the constraint in a parsable form because of "+tc);
 	  }
 	
-	return
-	  res + 
-	  Util.map((res.length()>1 ? ", " : "") + "Any ",", Any ","", 
-		   c.binders) +
-	  Util.map(" | ",", ","",c.atomics) + 
-	  "> ";
+	res.append(Util.map((res.length()>1 ? ", " : "") + "Any ",", Any ","", 
+			    c.binders));
+	res.append(Util.map(" | ",", ","",c.atomics)).append("> ");
+	return res.toString();
       }
   }
 

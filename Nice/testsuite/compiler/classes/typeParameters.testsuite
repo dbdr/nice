@@ -122,3 +122,37 @@ public class Elem<!A> {
   A data;
   toString() = data.toString();
 }
+
+/// PASS
+  /// package a
+  /// Toplevel
+public class Elem<!E> {
+  E data;
+  public E getData() = data;
+}
+  /// package b import a
+  new Elem(data: "");
+
+/// FAIL
+  /// package a
+  /// Toplevel
+public class Elem<!E> {
+  E data;
+}
+  /// package b import a
+  /* /// FAIL HERE */ new Elem(data: null);
+
+/// PASS
+  /// Toplevel
+public class Elem<List<String> E> {
+  E data;
+}
+
+/// FAIL
+  /// package a
+  /// Toplevel
+public class Elem<List<String> E> {
+  E data;
+}
+  /// package b import a
+  new Elem(data: "");

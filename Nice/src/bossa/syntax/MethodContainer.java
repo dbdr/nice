@@ -76,12 +76,6 @@ public abstract class MethodContainer extends Definition
       this.atoms = atoms;
     }
 
-    public static AtomicConstraint sureTypeVar(MonotypeVar tv)
-    {
-      return AtomicConstraint.create
-	(new mlsub.typing.MonotypeLeqTcCst(tv, PrimitiveType.sureTC));
-    }
-
     MonotypeVar[] typeParameters;
     List atoms;
   }
@@ -140,10 +134,39 @@ public abstract class MethodContainer extends Definition
 	    res.append("+");
 	    break;
 	  }
+
+	if (resolvedConstraints != null)
+	for (int i = 0; i < resolvedConstraints.length; i++)
+	  if (resolvedConstraints[i] instanceof mlsub.typing.MonotypeLeqTcCst)
+	    {
+	      mlsub.typing.MonotypeLeqTcCst cst = (mlsub.typing.MonotypeLeqTcCst) resolvedConstraints[i];
+	      if (cst.m == typeParameters[n]) {
+		res.append('!');
+		break;
+	      }
+	    }
+
 	res.append(typeParameters[n].toString());
 	if (n + 1 < typeParameters.length)
 	  res.append(", ");
       }
+
+    if (resolvedConstraints != null) {
+      boolean first = true;
+      for (int n = 0; n < resolvedConstraints.length; n++)
+	{
+	  if (resolvedConstraints[n] instanceof mlsub.typing.MonotypeLeqTcCst)
+	    break;
+	  if (first) {
+	    res.append(" | ");
+	    first = false;
+	  }
+	  res.append(resolvedConstraints[n]);
+	  if (n + 1 < typeParameters.length)
+	    res.append(", ");
+	}
+    }
+
     return res.append(">").toString();
   }
 }

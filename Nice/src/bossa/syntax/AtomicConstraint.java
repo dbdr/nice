@@ -71,6 +71,17 @@ public abstract class AtomicConstraint extends Node
     return null;
   }
 
+  public static AtomicConstraint sureTypeVar(mlsub.typing.MonotypeVar tv)
+  {
+    return AtomicConstraint.create
+      (new mlsub.typing.MonotypeLeqTcCst(tv, PrimitiveType.sureTC));
+  }
+
+  boolean isSureConstraintFor(mlsub.typing.MonotypeVar mv)
+  {
+    return false;
+  }
+
   /****************************************************************
    * Wrapper for lowlevel AtomicConstraint
    ****************************************************************/
@@ -116,6 +127,12 @@ public abstract class AtomicConstraint extends Node
 	}
       
       return null;
+    }
+
+    boolean isSureConstraintFor(mlsub.typing.MonotypeVar mv)
+    {
+      return atom instanceof mlsub.typing.MonotypeLeqTcCst &&
+	((mlsub.typing.MonotypeLeqTcCst) atom).m == mv;
     }
 
     public String toString()

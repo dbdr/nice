@@ -27,7 +27,7 @@ public class MonotypeLeqTcCst extends AtomicConstraint
     this.tc = tc;
   }
   
-  private final Monotype m;
+  public final Monotype m;
   private final TypeConstructor tc;
 
   /**

@@ -34,7 +34,7 @@ find_home()
 
 ## Parsing special command line arguments
 
-java=${JAVA-java -Xms8M}
+java=${JAVA-java -Xms32M}
 scriptName="$0"
 progname=`basename $scriptName`
 experimental=false

@@ -21,11 +21,17 @@ import java.util.*;
   return res;
 }
 
-/*
-val fold_right : f:('a -> 'b -> 'b) -> 'a list -> init:'b -> 'b
+<Any T, Any U> U foldRight(java.util.List<T> l, (T, U)->U f, U init) =
+  foldRight(l, f, init, 0);
 
-    List.fold_right f [a1; ...; an] b is f a1 (f a2 (... (f an b) ...)). Not tail-recursive. 
-*/
+private <Any T, Any U> 
+U foldRight(java.util.List<T> l, (T, U)->U f, U init, int from)
+{
+  if (from < l.size())
+    return f(l[from], l.foldRight(f, init, from + 1));
+  else
+    return init;
+}
 
 /****************************************************************
  * Implementations
@@ -139,6 +145,15 @@ filter<C,T>(c#java.util.Stack, test)
       return s.get(i);
 
   return null;
+}
+
+<Any T> int findIndex (List<T> s, T->boolean test)
+{
+  for (int i = 0; i < s.size(); i++)
+    if (test(s.get(i)))
+      return i;
+
+  throw new java.util.NoSuchElementException();
 }
 
 boolean or(java.util.List<boolean> s)

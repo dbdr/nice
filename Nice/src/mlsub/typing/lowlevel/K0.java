@@ -7,7 +7,7 @@ import java.util.Vector;
  *
  * @version $OrigRevision: 1.22 $, $OrigDate: 1999/10/28 10:56:58 $
  * @author Alexandre Frey
- * @author Daniel Bonniot (Abstractable Interfaces)
+ * @author Daniel Bonniot (Abstractable Interfaces, and unlimited backtrack)
  **/
 public final class K0 {
   public static abstract class Callbacks  {
@@ -660,7 +660,6 @@ public final class K0 {
       // nothing to do !
       return;
     }
-    iface.implementors.set(x);
     if (isRigid(x)) {
       if (!iface.rigidImplementors.get(x)) {
         throw new LowlevelImplementsClash(x, iid);
@@ -668,6 +667,7 @@ public final class K0 {
         return;
       }
     }
+    iface.implementors.set(x);
     // include unit since unit implements all the interfaces
     reduceDomain(x, true, iface.rigidImplementors);
   }
@@ -1424,7 +1424,7 @@ public final class K0 {
   // to backtrack undoes all the modification made to this constraint since
   // the last call to mark() in the same nested level. It is an error if there
   // are more calls to backtrack() than to mark(). This mode is adapted to
-  // type checking and used by the Bossa compiler.
+  // type checking and used by the Nice compiler.
   private int backtrackMode;
   final public static int BACKTRACK_UNLIMITED=1;
   final public static int BACKTRACK_ONCE=2;
@@ -1433,6 +1433,7 @@ public final class K0 {
     // may be non-null if backtrackMode==BACKTRACK_UNLIMITED    
     Backup previous;
     int savedM;
+    //int savedN;
     BitMatrix savedC;
     BitVector savedGarbage;
     DomainVector savedDomains;
@@ -1445,14 +1446,17 @@ public final class K0 {
         this.previous = null;
       }
       this.savedM = K0.this.m;
+      //this.savedN = K0.this.n;
       this.savedC = (BitMatrix)K0.this.C.clone();
       this.savedGarbage = (BitVector)K0.this.garbage.clone();
       this.savedDomains = (DomainVector)K0.this.domains.clone();
+      /*
       this.savedImplementors = new BitVector[K0.this.nInterfaces()];
       for (int iid = 0; iid < savedImplementors.length; iid++) {
         savedImplementors[iid]
           = (BitVector)K0.this.getInterface(iid).implementors.clone();
       }
+      */
     }
   }
 
@@ -1473,13 +1477,17 @@ public final class K0 {
     this.C = backup.savedC;
     this.Ct = backup.savedC.transpose();
     this.n = backup.savedC.size();
+    //this.n = backup.savedN;
+    //this.C.setSize(n);
     this.garbage = backup.savedGarbage;
     this.domains = backup.savedDomains;
+    
     for (int iid = 0; iid < nInterfaces(); iid++) {
       Interface I = getInterface(iid);
       I.setIndexSize(m);
-      I.implementors = backup.savedImplementors[iid];
+      //I.implementors = backup.savedImplementors[iid];
     }
+    
     clearTags();
     if (backtrackMode == BACKTRACK_UNLIMITED) {
       backup = backup.previous;

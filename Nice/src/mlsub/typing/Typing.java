@@ -12,7 +12,7 @@
 
 // File    : Typing.java
 // Created : Tue Jul 20 11:57:17 1999 by bonniot
-//$Modified: Fri Jun 16 11:48:51 2000 by Daniel Bonniot $
+//$Modified: Sat Jun 17 14:13:54 2000 by Daniel Bonniot $
 
 package mlsub.typing;
 
@@ -214,6 +214,7 @@ public final class Typing
   public static void leq(Polytype t1, Polytype t2) 
     throws TypingEx
   {
+    
     if (!(Constraint.hasBinders(t1.getConstraint()) || 
 	  Constraint.hasBinders(t2.getConstraint())))
       {
@@ -234,6 +235,34 @@ public final class Typing
     
       Constraint.assert(t1.getConstraint());
       leq(t1.getMonotype(), t2.getMonotype());
+    }
+    finally{
+      if(leave()!=l)
+	throw new InternalError("Unmatched enters and leaves");
+    }
+  }
+
+  /** Particular case. */
+  public static void leq(Polytype t1, Monotype m2) 
+    throws TypingEx
+  {
+    if (!(Constraint.hasBinders(t1.getConstraint())))
+      {
+	leq(t1.getMonotype(), m2);
+	return;
+      }
+    
+    if(dbg)
+      Debug.println("Polytype leq: "+t1+" <: "+m2);
+
+    int l;
+    if(dbg) l=enter("#"); else l=enter();
+    
+    try{
+      implies();
+    
+      Constraint.assert(t1.getConstraint());
+      leq(t1.getMonotype(), m2);
     }
     finally{
       if(leave()!=l)
@@ -589,8 +618,6 @@ public final class Typing
 	    k.reduceDomainToConcrete(varTC);
 	  }
 	  catch(Unsatisfiable e){
-	    Debug.println(e+"");
-	    
 	    // tuples is empty here
 	    return tuples;
 	  }

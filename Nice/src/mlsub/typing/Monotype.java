@@ -12,7 +12,7 @@
 
 // File    : Monotype.java
 // Created : Thu Jul 01 19:28:28 1999 by bonniot
-//$Modified: Tue Jun 13 15:20:42 2000 by Daniel Bonniot $
+//$Modified: Fri Jun 16 15:48:02 2000 by Daniel Bonniot $
 
 package mlsub.typing;
 
@@ -44,7 +44,27 @@ abstract public class Monotype implements mlsub.typing.lowlevel.Element
     // No Monotype lives at runtime.
     return false;
   }
+
+  /** 
+      Returns true if this monotype is only made of
+      top-level, rigid type constructors
+  */
+  public boolean isRigid()
+  {
+    return false;
+  }
   
+  public final static boolean isRigid(Monotype[] ms)
+  {
+    if(ms==null) return true;
+    
+    for(int i=0; i<ms.length; i++)
+      if(!(ms[i].isRigid()))
+	return false;
+
+    return true;
+  }
+
   /****************************************************************
    * Substitution
    ****************************************************************/

@@ -12,7 +12,7 @@
 
 // File    : Variance.java
 // Created : Fri Jul 23 12:15:46 1999 by bonniot
-//$Modified: Wed Jun 07 19:58:07 2000 by Daniel Bonniot $
+//$Modified: Fri Jun 16 16:13:04 2000 by Daniel Bonniot $
 
 package mlsub.typing;
 
@@ -26,7 +26,7 @@ import mlsub.typing.lowlevel.*;
  * @author bonniot
  */
 
-public class Variance 
+public final class Variance 
   implements Kind /* Variance is the Kind of MonotypeConstructors */
 {
   private Variance(int n)

@@ -12,7 +12,7 @@
 
 // File    : IdentExp.java
 // Created : Mon Jul 05 16:25:58 1999 by bonniot
-//$Modified: Wed Jun 14 16:05:20 2000 by Daniel Bonniot $
+//$Modified: Sat Jun 17 13:29:15 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -57,7 +57,10 @@ public class IdentExp extends Expression
 
   void computeType()
   {
-    Internal.error("computeType in IdentExp ("+this+")");
+    if(ignoreInexistant)
+      User.error(ident, "Variable "+ident+" is not declared");
+    else
+      Internal.error("computeType in IdentExp ("+this+")");
   }
 
   /****************************************************************

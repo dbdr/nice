@@ -75,7 +75,7 @@ public final class SpecialArray extends gnu.bytecode.ArrayType
    * _Array components
    ****************************************************************/
 
-  private static ClassType _ArrayType;
+  public static ClassType _ArrayType;
   private static Field _ArrayField;
   public static Method _ArrayMakeMethod;
 

@@ -12,7 +12,7 @@
 
 // File    : ReturnStmt.java
 // Created : Mon Jul 05 17:21:40 1999 by bonniot
-//$Modified: Tue Jun 13 16:20:32 2000 by Daniel Bonniot $
+//$Modified: Fri Jun 16 12:21:08 2000 by Daniel Bonniot $
 // Description : return in a function or method
 
 package bossa.syntax;
@@ -48,7 +48,7 @@ public class ReturnStmt extends Statement
       return;
     
     try{
-      Typing.leq(returnType(),new Polytype(Constraint.True, declaredRetType));
+      Typing.leq(returnType(), declaredRetType);
     }
     catch(TypingEx e){
       User.error(this,

@@ -12,7 +12,7 @@
 
 // File    : ImplementsCst.java
 // Created : Fri Aug 27 10:45:33 1999 by bonniot
-//$Modified: Tue Jun 13 18:33:56 2000 by Daniel Bonniot $
+//$Modified: Fri Jun 16 16:14:18 2000 by Daniel Bonniot $
 
 package mlsub.typing;
 
@@ -22,7 +22,7 @@ package mlsub.typing;
  * @author bonniot
  */
 
-public class ImplementsCst extends AtomicConstraint
+public final class ImplementsCst extends AtomicConstraint
 {
   public ImplementsCst(TypeConstructor tc, Interface itf)
   {

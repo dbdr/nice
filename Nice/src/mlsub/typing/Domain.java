@@ -12,7 +12,7 @@
 
 // File    : Domain.java
 // Created : Fri Jun 02 16:59:06 2000 by Daniel Bonniot
-//$Modified: Thu Jun 15 16:25:14 2000 by Daniel Bonniot $
+//$Modified: Fri Jun 16 16:14:34 2000 by Daniel Bonniot $
 
 package mlsub.typing;
 

@@ -12,7 +12,7 @@
 
 // File    : Constraint.java
 // Created : Fri Jun 02 17:02:45 2000 by Daniel Bonniot
-//$Modified: Fri Jun 09 19:06:33 2000 by Daniel Bonniot $
+//$Modified: Fri Jun 16 15:06:11 2000 by Daniel Bonniot $
 
 package mlsub.typing;
 
@@ -34,16 +34,8 @@ public final class Constraint
     this.atoms = atoms;
     if(atoms!=null)
       natoms = atoms.length;
-    check();
   }
 
-  private void check()
-  {
-    for(int i=0; i<natoms; i++)
-      if(atoms[i]==null)
-	throw new Error();
-  }
-  
   /** Ensures that null is returned if there are no binders and atoms */
   public final static Constraint create(TypeSymbol[] binders,
 					AtomicConstraint[] atoms)
@@ -85,33 +77,37 @@ public final class Constraint
 
   public static Constraint and(Constraint c1, Constraint c2)
   {
-    Constraint res = new Constraint();
-
     final int
       nbinders1 = (c1 == null ? 0 : c1.nbinders),
       nbinders2 = (c2 == null ? 0 : c2.nbinders),
       natoms1   = (c1 == null ? 0 : c1.natoms),
       natoms2   = (c2 == null ? 0 : c2.natoms);
     
+    if(nbinders1==0 && nbinders2==0 && natoms1==0 && natoms2==0)
+      return null;
+    
+    Constraint res = new Constraint();
     res.nbinders = nbinders1 + nbinders2;
     res.natoms = natoms1 + natoms2;
 
-    if (res.nbinders==0 && res.natoms==0)
-      return null;
+    if(res.nbinders>0)
+      {
+	res.binders = new TypeSymbol[res.nbinders];
+	for(int i=0; i<nbinders1; i++)
+	  res.binders[i] = c1.binders[i];
+	for(int i=0; i<nbinders2; i++)
+	  res.binders[nbinders1 + i] = c2.binders[i];
+      }
     
-    res.binders = new TypeSymbol[res.nbinders];
-    for(int i=0; i<nbinders1; i++)
-      res.binders[i] = c1.binders[i];
-    for(int i=0; i<nbinders2; i++)
-      res.binders[nbinders1 + i] = c2.binders[i];
+    if(res.natoms>0)
+      {
+	res.atoms = new AtomicConstraint[res.natoms];
+	for(int i=0; i<natoms1; i++)
+	  res.atoms[i] = c1.atoms[i];
+	for(int i=0; i<natoms2; i++)
+	  res.atoms[natoms1 + i] = c2.atoms[i];
+      }
     
-    res.atoms = new AtomicConstraint[res.natoms];
-    for(int i=0; i<natoms1; i++)
-      res.atoms[i] = c1.atoms[i];
-    for(int i=0; i<natoms2; i++)
-      res.atoms[natoms1 + i] = c2.atoms[i];
-    
-    res.check();
     return res;
   }
   
@@ -143,14 +139,13 @@ public final class Constraint
     res.atoms[res.natoms-2] = a2;
     res.atoms[res.natoms-1] = a1;
 
-    res.check();
     return res;
   }
   
   /**
      Conjunction of the given constraints.
      
-     Leaves the parameters unmodifies.
+     Leaves the parameters unmodified.
   */
   public static Constraint and(Constraint[] cs, Constraint c1, Constraint c2)
   {
@@ -160,39 +155,43 @@ public final class Constraint
       natoms1   = (c1 == null ? 0 : c1.natoms),
       natoms2   = (c2 == null ? 0 : c2.natoms);
 
-    Constraint res = new Constraint();
-    res.natoms = natoms1 + natoms2;
-    res.nbinders = nbinders1 + nbinders2;
-
+    int lenBinders = nbinders1 + nbinders2;
+    int lenAtoms = natoms1 + natoms2;
+    
     for(int i=0; i<cs.length; i++)
       {
 	Constraint c = cs[i];
 	if(c==null)
 	  continue;
 	
-	res.natoms += cs[i].natoms;
-	res.nbinders += cs[i].nbinders;
+	lenBinders += cs[i].nbinders;
+	lenAtoms += cs[i].natoms;
       }
 
-    if (res.nbinders==0 && res.natoms==0)
+    if (lenAtoms==0 && lenBinders==0)
       return null;
-    
-    res.binders = new TypeSymbol[res.nbinders];
-    res.atoms = new AtomicConstraint[res.natoms];
-    
-    int lenBinders = res.nbinders;
-    int lenAtoms = res.natoms;
-    
-    for(int i=0; i<nbinders2; i++)
-      res.binders[--lenBinders] = c2.binders[i];
-    for(int i=0; i<nbinders1; i++)
-      res.binders[--lenBinders] = c1.binders[i];
 
-    for(int i=0; i<natoms2; i++)
-      res.atoms[--lenAtoms] = c2.atoms[i];
-    for(int i=0; i<natoms1; i++)
-      res.atoms[--lenAtoms] = c1.atoms[i];
-
+    Constraint res = new Constraint();
+    if(lenBinders>0)
+      {
+	res.nbinders = lenBinders;
+	res.binders = new TypeSymbol[lenBinders];
+	for(int i=0; i<nbinders2; i++)
+	  res.binders[--lenBinders] = c2.binders[i];
+	for(int i=0; i<nbinders1; i++)
+	  res.binders[--lenBinders] = c1.binders[i];
+      }
+    
+    if(lenAtoms>0)
+      {
+	res.natoms = lenAtoms;
+	res.atoms = new AtomicConstraint[lenAtoms];
+	for(int i=0; i<natoms2; i++)
+	  res.atoms[--lenAtoms] = c2.atoms[i];
+	for(int i=0; i<natoms1; i++)
+	  res.atoms[--lenAtoms] = c1.atoms[i];
+      }
+    
     for(int j=0; j<cs.length; j++)
       {
 	Constraint c = cs[j];
@@ -206,7 +205,6 @@ public final class Constraint
 	  res.atoms[--lenAtoms] = c.atoms[i];
       }
     
-    res.check();
     return res;
   }
   

@@ -12,7 +12,7 @@
 
 // File    : Domain.java
 // Created : Fri Jun 02 16:59:06 2000 by Daniel Bonniot
-//$Modified: Fri Jun 09 17:26:40 2000 by Daniel Bonniot $
+//$Modified: Fri Jun 16 16:13:54 2000 by Daniel Bonniot $
 
 package mlsub.typing;
 
@@ -22,7 +22,7 @@ package mlsub.typing;
  * @author Daniel Bonniot
  */
 
-public class Polytype
+public final class Polytype
 {
   public Polytype(Constraint constraint,
 		  Monotype monotype)

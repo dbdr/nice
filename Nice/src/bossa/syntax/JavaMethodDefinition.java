@@ -12,7 +12,7 @@
 
 // File    : JavaMethodDefinition.java
 // Created : Tue Nov 09 11:49:47 1999 by bonniot
-//$Modified: Wed Jun 14 19:59:59 2000 by Daniel Bonniot $
+//$Modified: Fri Jun 16 16:22:56 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -250,10 +250,15 @@ public class JavaMethodDefinition extends MethodDefinition
       User.error(this,
 		 "Class " + className + " was not found");
     
-    className = new LocatedString(holder.getName(),className.location());
-    
     if(!(holder instanceof ClassType))
-      User.error(this, className+" is a primitive type");
+      {
+	if (className.toString().equals("_Array"))
+	  holder = bossa.SpecialArray._ArrayType;
+	else
+	  User.error(this, className+" is a primitive type");
+      }
+    
+    className = new LocatedString(holder.getName(),className.location());
     
     reflectMethod = ((ClassType) holder).getDeclaredMethod(methodName,javaArgType);
     // use the following, or the Type.flushTypeChanges() in SpecialTypes

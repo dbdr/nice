@@ -12,7 +12,7 @@
 
 // File    : MonotypeConstructor.java
 // Created : Thu Jul 22 09:15:17 1999 by bonniot
-//$Modified: Wed Jun 07 18:25:36 2000 by Daniel Bonniot $
+//$Modified: Fri Jun 16 15:48:38 2000 by Daniel Bonniot $
 
 package mlsub.typing;
 
@@ -24,7 +24,7 @@ import mlsub.typing.lowlevel.*;
  * A monotype, build by application of
  * a type constructor to type parameters.
  */
-public class MonotypeConstructor extends Monotype
+public final class MonotypeConstructor extends Monotype
 {
   /**
    * Constructs a monotype by application of the type constructor
@@ -59,6 +59,15 @@ public class MonotypeConstructor extends Monotype
   public Monotype[] getTP()
   {
     return parameters;
+  }
+  
+  /** 
+      Returns true if this monotype is only made of
+      top-level, rigid type constructors
+  */
+  public boolean isRigid()
+  {
+    return tc.isConcrete() && Monotype.isRigid(parameters);
   }
   
   /**

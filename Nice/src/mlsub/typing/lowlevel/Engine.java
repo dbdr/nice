@@ -12,7 +12,7 @@
 
 // File    : Engine.java
 // Created : Tue Jul 27 15:34:53 1999 by bonniot
-//$Modified: Fri Jun 16 11:47:44 2000 by Daniel Bonniot $
+//$Modified: Fri Jun 16 12:00:33 2000 by Daniel Bonniot $
 
 package mlsub.typing.lowlevel;
 
@@ -42,10 +42,10 @@ public abstract class Engine
     if(dbg) Debug.println("Enter");
     floating.mark();
     frozenLeqs.mark();
-    for(Iterator i=constraints.iterator();
+    for(Iterator i = constraints.iterator();
 	i.hasNext();)
       { 
-	Engine.Constraint k=(Engine.Constraint)i.next();
+	Engine.Constraint k = (Engine.Constraint)i.next();
 	k.mark();
 	//k.rigidify();
       }
@@ -64,10 +64,10 @@ public abstract class Engine
 
     if(dbg) Debug.println("Implies");
 
-    for(Iterator i=constraints.iterator();
+    for(Iterator i = constraints.iterator();
 	i.hasNext();)
       { 
-	Engine.Constraint k=(Engine.Constraint)i.next();
+	Engine.Constraint k = (Engine.Constraint)i.next();
 	k.satisfy();
 	k.rigidify();
       }
@@ -86,10 +86,10 @@ public abstract class Engine
 
       if(dbg) Debug.println("Leave");
 
-      for(Iterator i=constraints.iterator();
+      for(Iterator i = constraints.iterator();
 	  i.hasNext();)
 	{ 
-	  Engine.Constraint k=(Engine.Constraint)i.next();
+	  Engine.Constraint k = (Engine.Constraint)i.next();
 	  try{
 	    if(dbg) Debug.println("** Satisfying "+k);
 	    
@@ -108,14 +108,14 @@ public abstract class Engine
   
   public static void backtrack()
   {
-    for(Iterator i=constraints.iterator();
+    for(Iterator i = constraints.iterator();
 	i.hasNext();)
       { 
-	Engine.Constraint k=(Engine.Constraint)i.next();
+	Engine.Constraint k = (Engine.Constraint)i.next();
 	k.backtrack();
       }
     floating.backtrack();
-    for(Iterator i=floating.iterator();i.hasNext();)
+    for(Iterator i = floating.iterator();i.hasNext();)
       ((Element)i.next()).setKind(null);
     floating.endOfIteration();
     frozenLeqs.backtrack();
@@ -135,7 +135,7 @@ public abstract class Engine
       throw new IllegalArgumentException
 	("Bad size in Engine.leq(Collections)");
     
-    for(int i=e1.length-1;i>=0;i--)
+    for(int i = e1.length-1;i>=0;i--)
       leq(e1[i], e2[i]);
   }
       
@@ -237,8 +237,8 @@ public abstract class Engine
   {
     Leq(Element e1,Element e2)
     {
-      this.e1=e1;
-      this.e2=e2;
+      this.e1 = e1;
+      this.e2 = e2;
     }
     public String toString()
     {
@@ -247,17 +247,17 @@ public abstract class Engine
     Element e1,e2;
   }
 
-  private static final BackableList frozenLeqs=new BackableList();
+  private static final BackableList frozenLeqs = new BackableList();
   
   public static void setKind(Element element, Kind k)
     throws Unsatisfiable
   {
-    Stack s=new Stack();
+    Stack s = new Stack();
 
     s.push(element);
     while(!s.empty())
       {
-	Element e=(Element)s.pop();
+	Element e = (Element)s.pop();
 	
 	if(e.getKind()!=null)
 	  if(e.getKind()==k)
@@ -273,10 +273,10 @@ public abstract class Engine
 
 	// Propagates the kind to all comparable elements
 	try{
-	  for(Iterator i=frozenLeqs.iterator();
+	  for(Iterator i = frozenLeqs.iterator();
 	      i.hasNext();)
 	    {
-	      Leq leq=(Leq)i.next();
+	      Leq leq = (Leq)i.next();
 	      if(leq.e1==e)
 		if(leq.e2.getKind()==null)
 		  {
@@ -314,12 +314,12 @@ public abstract class Engine
   public static void forceKind(Element element, Kind k)
     throws Unsatisfiable
   {
-    Stack s=new Stack();
+    Stack s = new Stack();
 
     s.push(element);
     while(!s.empty())
       {
-	Element e=(Element)s.pop();
+	Element e = (Element)s.pop();
 	
 	e.setKind(k);
 	k.register(e);
@@ -328,10 +328,10 @@ public abstract class Engine
 
 	// Propagates the kind to all comparable elements
 	try{
-	  for(Iterator i=frozenLeqs.iterator();
+	  for(Iterator i = frozenLeqs.iterator();
 	      i.hasNext();)
 	    {
-	      Leq leq=(Leq)i.next();
+	      Leq leq = (Leq)i.next();
 	      if(leq.e1==e)
 		if(leq.e2.getKind()==null)
 		  s.push(leq.e2);
@@ -365,7 +365,7 @@ public abstract class Engine
     throws Unsatisfiable
   {
     try{
-      for(Iterator i=floating.iterator();
+      for(Iterator i = floating.iterator();
 	  i.hasNext();)
 	{
 	  Element e = (Element) i.next();
@@ -381,33 +381,32 @@ public abstract class Engine
     }
     floating.clear();
     
-    for(Iterator i=frozenLeqs.iterator();
-	i.hasNext();)
+    for(Iterator i = frozenLeqs.iterator(); i.hasNext();)
       {
-	Leq leq=(Leq)i.next();
-	variablesConstraint.leq(leq.e1,leq.e2,initialContext);
+	Leq leq = (Leq) i.next();
+	variablesConstraint.leq(leq.e1, leq.e2, initialContext);
       }
     frozenLeqs.endOfIteration();
     frozenLeqs.clear();
   }
   
   /** Maps a Kind to its lowlevel constraint */
-  private static final HashMap kindsMap=new HashMap();
+  private static final HashMap kindsMap = new HashMap();
   
   public static Engine.Constraint getConstraint(Kind kind)
   {
     if(kind instanceof Engine.Constraint)
       return (Engine.Constraint) kind;
     
-    Engine.Constraint res=(Engine.Constraint) kindsMap.get(kind);
+    Engine.Constraint res = (Engine.Constraint) kindsMap.get(kind);
     if(res!=null)
       return res;
 
     if(dbg)
       Debug.println("Creating new Lowlevel constraint for "+kind);
     
-    res=new Engine.Constraint("kind "+kind.toString());
-    res.associatedKind=kind;
+    res = new Engine.Constraint("kind "+kind.toString());
+    res.associatedKind = kind;
     // if the constraint is created after the initial context has been defined,
     // we have to change the state of the constraint here
     if(!initialContext)
@@ -427,7 +426,7 @@ public abstract class Engine
   }
   
   /** The elements that have not yet been added to a Kind  */
-  private static final BackableList floating=new BackableList();
+  private static final BackableList floating = new BackableList();
   
   /** The constraint of monotype variables */
   public static final Engine.Constraint variablesConstraint;
@@ -441,7 +440,7 @@ public abstract class Engine
   private static final ArrayList constraints;
   static
   {
-    constraints=new ArrayList(10);
+    constraints = new ArrayList(10);
     constraints.add(variablesConstraint);
   }
   public static Iterator listConstraints()
@@ -452,27 +451,27 @@ public abstract class Engine
   public static void createInitialContext()
     throws Unsatisfiable
   {
-    for(Iterator i=constraints.iterator();
+    for(Iterator i = constraints.iterator();
 	i.hasNext();)
       { 
-	Engine.Constraint k=(Engine.Constraint)i.next();
+	Engine.Constraint k = (Engine.Constraint)i.next();
 	k.createInitialContext();
       }
-    initialContext=false;
+    initialContext = false;
   }
   
   public static void releaseInitialContext()
   {
-    for(Iterator i=constraints.iterator();
+    for(Iterator i = constraints.iterator();
 	i.hasNext();)
       { 
-	Engine.Constraint k=(Engine.Constraint)i.next();
+	Engine.Constraint k = (Engine.Constraint)i.next();
 	k.releaseInitialContext();
       }
-    initialContext=true;
+    initialContext = true;
   }
   
-  private static boolean initialContext=true;
+  private static boolean initialContext = true;
   public static boolean isInRigidContext() { return !initialContext; }
 
   /****************************************************************
@@ -484,14 +483,14 @@ public abstract class Engine
   {
     Constraint(String name)
     {
-      this.name=name;
+      this.name = name;
     }
     private String name;
 
     Constraint(String name, boolean variables)
     {
       this(name);
-      this.variables=variables;
+      this.variables = variables;
     }
 
     private boolean variables = false;
@@ -506,12 +505,12 @@ public abstract class Engine
     
     final K0 k0 = new K0(K0.BACKTRACK_UNLIMITED, new Callbacks());
     
-    private Vector elements=new Vector(10); // ArrayList would be better, but has no setSize method
+    private Vector elements = new Vector(10); // ArrayList would be better, but has no setSize method
     private BitVector concreteElements = new BitVector();
     
     public final void register(Element e)
     {
-      int id=k0.extend();
+      int id = k0.extend();
       e.setId(id);
       if(id>=elements.size())
 	elements.setSize(id+1);

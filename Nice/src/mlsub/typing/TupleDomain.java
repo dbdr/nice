@@ -12,7 +12,7 @@
 
 // File    : TupleDomain.java
 // Created : Fri Jun 02 18:31:04 2000 by Daniel Bonniot
-//$Modified: Sat Jun 03 12:43:48 2000 by Daniel Bonniot $
+//$Modified: Fri Jun 16 16:14:42 2000 by Daniel Bonniot $
 
 package mlsub.typing;
 
@@ -22,7 +22,7 @@ package mlsub.typing;
  * @author Daniel Bonniot
  */
 
-public class TupleDomain extends Domain
+public final class TupleDomain extends Domain
 {
   public TupleDomain(Constraint cst, Monotype[] tuple)
   {

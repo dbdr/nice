@@ -12,7 +12,7 @@
 
 // File    : FunType.java
 // Created : Thu Jul 22 09:15:17 1999 by bonniot
-//$Modified: Tue Jun 13 15:21:45 2000 by Daniel Bonniot $
+//$Modified: Fri Jun 16 16:08:15 2000 by Daniel Bonniot $
 
 package mlsub.typing;
 
@@ -21,7 +21,7 @@ import mlsub.typing.lowlevel.Kind;
 /**
  * A functional monotype.
  */
-public class FunType extends Monotype
+public final class FunType extends Monotype
 {
   public FunType(Monotype[] in, Monotype out)
   {
@@ -29,6 +29,15 @@ public class FunType extends Monotype
     this.out = out;
 
     this.kind = new FunTypeKind(this.in.length);
+  }
+  
+  /** 
+      Returns true if this monotype is only made of
+      top-level, rigid type constructors
+  */
+  public boolean isRigid()
+  {
+    return out.isConcrete() && Monotype.isRigid(in);
   }
   
   Monotype substitute(java.util.Map map)
@@ -83,6 +92,6 @@ public class FunType extends Monotype
       + ")(" + out + ")";
   }
 
-  Monotype[] in;
-  Monotype out;
+  private Monotype[] in;
+  private Monotype out;
 }

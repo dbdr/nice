@@ -12,7 +12,7 @@
 
 // File    : MethodBodyDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Thu Jun 15 19:10:52 2000 by Daniel Bonniot $
+//$Modified: Sat Jun 17 15:09:28 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -148,8 +148,11 @@ public class MethodBodyDefinition extends Definition
       else
 	{
 	  MethodDefinition m = (MethodDefinition)((MethodDefinition.Symbol)s).definition;
-	  if(m instanceof JavaMethodDefinition
+	  if(
 // It doesn't make sense to define a body for a native method, does it ?
+	     m instanceof JavaMethodDefinition
+	     || m instanceof FieldAccessMethod
+	     || m instanceof SetFieldMethod
 	     || m.getArity() != formals.size()
 	     )
 	    {

@@ -12,7 +12,7 @@
 
 // File    : Polytype.java
 // Created : Tue Jul 13 12:51:38 1999 by bonniot
-//$Modified: Fri Jun 09 17:33:36 2000 by Daniel Bonniot $
+//$Modified: Fri Jun 16 12:25:14 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -42,10 +42,10 @@ public class Polytype extends Node
 
   static Collection fromMonotypes(Collection monotypes)
   {
-    Collection res=new ArrayList(monotypes.size());
-    for(Iterator i=monotypes.iterator();
+    Collection res = new ArrayList(monotypes.size());
+    for(Iterator i = monotypes.iterator();
 	i.hasNext();)
-      res.add(new Polytype(Constraint.True,(Monotype)i.next()));
+      res.add(new Polytype(Constraint.True, (Monotype) i.next()));
     return res;
   }  
 

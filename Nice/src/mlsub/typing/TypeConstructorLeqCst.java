@@ -12,7 +12,7 @@
 
 // File    : TypeConstructorLeqCst.java
 // Created : Fri Jun 02 17:10:52 2000 by Daniel Bonniot
-//$Modified: Tue Jun 13 18:25:50 2000 by Daniel Bonniot $
+//$Modified: Fri Jun 16 16:13:22 2000 by Daniel Bonniot $
 
 package mlsub.typing;
 
@@ -22,7 +22,7 @@ package mlsub.typing;
  * @author Daniel Bonniot
  */
 
-public class TypeConstructorLeqCst extends AtomicConstraint
+public final class TypeConstructorLeqCst extends AtomicConstraint
 {
   public TypeConstructorLeqCst(TypeConstructor t1, TypeConstructor t2)
   {

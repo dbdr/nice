@@ -12,7 +12,7 @@
 
 // File    : CallExp.java
 // Created : Mon Jul 05 16:27:27 1999 by bonniot
-//$Modified: Thu Jun 15 17:32:52 2000 by Daniel Bonniot $
+//$Modified: Sat Jun 17 14:16:19 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -58,7 +58,7 @@ public class CallExp extends Expression
   public static CallExp create(Expression fun, 
 			       Expression param1)
   {
-    List params = new ArrayList(1);
+    List params = new LinkedList();
     params.add(param1);
     return new CallExp(fun, params);
   }
@@ -125,7 +125,7 @@ public class CallExp extends Expression
       User.error(loc, e.getMessage());
     }
     catch(TypingEx e){
-      //if(Typing.dbg) 
+      if(Typing.dbg) 
 	Debug.println(e.getMessage());
 
       if(fun.isFieldAccess())
@@ -144,7 +144,7 @@ public class CallExp extends Expression
 		       Util.map("(",",\n  ",")",paramTypes) +
 		       "\n are "+end);
 	  else
-	    User.error(loc,"The parameter \""+
+	    User.error(loc,"Parameter "+
 		       Util.map("",", ","",parameters) +
 		       " of type " +
 		       Util.map("",", ","",paramTypes) +
@@ -193,6 +193,15 @@ public class CallExp extends Expression
     }
 
     //computes the resulting type
+
+    /*
+      Optimization:
+      If we know codom is a constant,
+      the constraint parameters<dom is useless.
+    */
+    if(codom.isRigid())
+      return new Polytype(Constraint.True, codom);
+
     cst = Constraint.and
       (Polytype.getConstraint(parameters),
        cst,

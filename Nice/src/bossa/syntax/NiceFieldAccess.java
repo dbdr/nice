@@ -75,6 +75,7 @@ public class NiceFieldAccess extends FieldAccess
 
   public String toString()
   {
-    return "Field access to " + field;
+    return "" + field.sym.type + " " + 
+	field.getDeclaringClass().definition.name + "." + field.sym.name;
   }
 }

@@ -152,6 +152,11 @@ public class NiceClass extends ClassDefinition.ClassImplementation
 	  (type, sym.getName(), true, value);
     }
 
+    NiceClass getDeclaringClass()
+    {
+      return NiceClass.this;
+    }
+
     MonoSymbol sym;
     Expression value;
     boolean isFinal;

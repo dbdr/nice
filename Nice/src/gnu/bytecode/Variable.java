@@ -139,7 +139,7 @@ public class Variable extends Location implements java.util.Enumeration
 
   public void freeLocal (CodeAttr code)
   {
-    end_pc = code.PC;
+    end_pc = code.previousPC;
     int size = getType().size > 4 ? 2 : 1;
     while (--size >= 0)
       code.locals.used [offset + size] = null;

@@ -43,6 +43,9 @@ public class CodeAttr extends Attribute implements AttrContainer
   int readPC;
   byte[] code;
 
+  // The PC of the previous instruction.
+  int previousPC;
+
   /* The exception handler table, as a vector of quadruples
      (start_pc, end_pc, handler_pc, catch_type).
      Only the first exception_table_length quadrules are defined. */
@@ -115,6 +118,7 @@ public class CodeAttr extends Attribute implements AttrContainer
 
   public final void reserve (int bytes)
   {
+    previousPC = PC;
     if (code == null)
       code = new byte[100+bytes];
     else if (PC + bytes > code.length)

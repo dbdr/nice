@@ -43,8 +43,29 @@ public class CustomConstructor extends UserOperator
 
   void resolve()
   {
-    classTC = Node.getGlobalTypeScope().globalLookup(className);
-    TypeConstructors.addConstructor(classTC, this);
+    TypeConstructor tc = Node.getGlobalTypeScope().globalLookup(className);
+    TypeConstructors.addConstructor(tc, this);
+    classe = NiceClass.get(tc);
+
+    // Save the scopes, since we need them later, but they get null'ed.
+    thisScope = scope;
+    thisTypeScope = typeScope;
+  }
+
+  private VarScope thisScope;
+  private TypeScope thisTypeScope;
+
+  void resolveBody()
+  {
+    body = bossa.syntax.dispatch.analyse
+      (body, thisScope, thisTypeScope, false);
+  }
+
+  void innerTypecheck() throws TypingEx
+  {
+    super.innerTypecheck();
+
+    bossa.syntax.dispatch.typecheck(body); 
   }
 
   public void printInterface(java.io.PrintWriter s)
@@ -70,7 +91,6 @@ public class CustomConstructor extends UserOperator
   }
 
   LocatedString className;
-  Block body;
-  TypeConstructor classTC;
+  Statement body;
   NiceClass classe;
 }

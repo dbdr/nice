@@ -1,5 +1,9 @@
-public final class _Array implements nice.lang.Sequence
+public class _Array implements nice.lang.Sequence
 {
+  /****************************************************************
+   * Old methods
+   ****************************************************************/
+
   _Array(Object[] value)
   {
     this.value=value;

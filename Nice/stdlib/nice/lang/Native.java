@@ -1,79 +1,29 @@
 
+import gnu.text.Char;
+
 public class Native
 {
   public static final boolean pointerEquality(Object o1, Object o2)
   {
-    return o1==o2;
-  }
-
-  /****************************************************************
-   * Arrays
-   ****************************************************************/
-
-  public static _Array make(Object[] value)
-  {
-    if(value==null)
-      return null;
-    return new _Array(value);
-  }
-  
-  public static Object[] newInstance(int length)
-  {
-    return new Object[length];
-  }
-  
-  public static Object[] newInstance(int length, Object sample)
-  {
-    return (Object[]) 
-      java.lang.reflect.Array.newInstance(sample.getClass(),length);
-  }
-  
-  /** Return a new copy with newSize elements */
-  public static Object[] resizeArray(Object[] from, int newSize)
-  {
-    int copyLength = from.length;
-    if(newSize<copyLength)
-      copyLength=newSize;
+    if (o1 == o2) return true;
+    if (o1 == null || o2 == null) return false;
     
-    Object[] res = newInstance(newSize);
-    java.lang.System.arraycopy(from,0,res,0,copyLength);
-
-    return res;
-  }
-  
-  /** 
-   * This method is neccessary to dispatch 
-   * between Native arrays and _Arrays
-   */
-  static public int getLength(Object array)
-  {
-    if(array instanceof _Array)
-      return ((_Array) array).value.length;
-    else
-      return ((Object[]) array).length;
-  }
-  
-  /** 
-   * This method is neccessary to dispatch 
-   * between Native arrays and _Arrays
-   */
-  static public Object get(Object array, int index)
-  {
-    if(array instanceof _Array)
-      return ((_Array) array).value[index];
-    else
-      return ((Object[]) array)[index];
-  }
-  
-  /** 
-   * This method is neccessary to dispatch 
-   * between Native arrays and _Arrays
-   */
-  static public void set(Object array, int index, Object elem)
-  {
-    if(array instanceof _Array)
-      ((_Array) array).value[index]=elem;
-    else
-      ((Object[]) array)[index]=elem;
+    /*
+    System.out.println(o1 + " (" + o1.getClass() + ") == " + 
+		       o2 + " (" + o1.getClass() + ")");
+    */
+    if (o1 instanceof Number)
+      if (o2 instanceof Number)
+	return ((Number) o1).doubleValue() == ((Number) o2).doubleValue();
+      else
+	return false;
+    
+    if (o1 instanceof Char)
+      if (o2 instanceof Char)
+	return ((Char) o1).intValue() == ((Char) o2).intValue();
+      else
+	return false;
+    
+    return false;
   }
 }

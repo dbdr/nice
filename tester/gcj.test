@@ -1,6 +1,7 @@
 #! /bin/sh
 
 [ "$GCJ" ] || exit 8
+expr "$JDK_VERSION" '>=' 1.4 >/dev/null || exit 8
 
 cd Nice
 

@@ -153,6 +153,24 @@
   while (x == null)
     x++;
 
+/// FAIL
+  ?int x = 0;
+  if (x != null)
+    {
+      if (x != null)
+	x = null;
+      /* /// FAIL HERE */ x++;
+    }
+
+/// FAIL
+  ?int x = 0;
+  if (x != null)
+    {
+      while (x != null)
+	x = null;
+      /* /// FAIL HERE */ x++;
+    }
+
 /// COMMENT Check several variables at the same time
 
 /// PASS

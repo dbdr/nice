@@ -52,7 +52,7 @@ typecheck(e@AssignExp)
 	  // It is OK to assign the variable with a null value.
 	  variable.setVarType(now: unsureType,
 			      otherBranch: variable.type,
-			      out: unsureType);
+			      overrideOut: unsureType);
 	  return;
 	}
       catch (TypingEx newError) { t = newError; }
@@ -334,6 +334,17 @@ void pushOuterType(MonoSymbol variable, mlsub.typing.Monotype baseType)
   conditionalTypes.push((variable, baseType));
 }
 
+void overrideOuterType(MonoSymbol variable, mlsub.typing.Monotype newType)
+{
+  for (int i = 0; i < levels.size(); i++)
+    if (levels.get(i) % 2 == 1)
+      {
+	(MonoSymbol v, mlsub.typing.Monotype t) = conditionalTypes.get(i);
+	if (variable == v)
+	  conditionalTypes.set(i, (variable, newType));
+      }
+}
+
 typecheck(e@IfExp)
 {
   Expression condition = notNull(e.condition);
@@ -404,13 +415,22 @@ typecheck(e@IfExp)
    @param now type to be used in the next branch.
    @param otherBranch type to be used in the other branches
    @param out type to be used after returning to the outer block
+   @param overrideOut use that type when exiting all englobing blocks
 */
 private void setVarType(MonoSymbol variable, 
 			mlsub.typing.Monotype now, 
 			?mlsub.typing.Monotype otherBranch = null,
-			?mlsub.typing.Monotype out = null)
+			?mlsub.typing.Monotype out = null,
+			?mlsub.typing.Monotype overrideOut = null)
 {
   variable.type = now;
+  if (overrideOut != null)
+    {
+      overrideOuterType(variable, overrideOut);
+      // We also set it for the current block, in case there was no previous
+      // type set.
+      pushOuterType(variable, overrideOut);
+    }
   if (out != null)
     pushOuterType(variable, out);
   if (otherBranch != null)

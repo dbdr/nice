@@ -12,7 +12,7 @@
 
 // File    : Engine.java
 // Created : Tue Jul 27 15:34:53 1999 by bonniot
-//$Modified: Tue Aug 08 15:01:38 2000 by Daniel Bonniot $
+//$Modified: Tue Aug 08 16:45:53 2000 by Daniel Bonniot $
 
 package mlsub.typing.lowlevel;
 
@@ -627,6 +627,10 @@ public abstract class Engine
       for (int i = 0; i < k0.initialContextSize(); i++)
 	// we use wasEntered, since id is assumed not to be rigid
 	// i and res are rigid, so we use isLeq
+	// an alternative would be to (require) rigidify 
+	// (at least a closure of leq relation + other axioms)
+	// and use isLeq.
+	// could be more precise in presence of interfaces.
 	if (k0.wasEntered(id, i) && (res == -1 || k0.isLeq(i, res)))
 	  res = i;
       

@@ -28,7 +28,7 @@ public <ActionListenerHandler H> void removeActionListener
   listeners.foreach
     (NActionListener l =>
      {
-       if(actionPerformed != null && l.actionPerformed == actionPerformed) l.actionPerformed = null;
+       if(actionPerformed != null && l.getActionPerformed() == actionPerformed) l.setActionPerformed(null);
      }
      );
 }
@@ -44,7 +44,7 @@ public <AdjustmentListenerHandler H> void removeAdjustmentListener
   listeners.foreach
     (NAdjustmentListener l =>
      {
-       if(adjustmentValueChanged != null && l.adjustmentValueChanged == adjustmentValueChanged) l.adjustmentValueChanged = null;
+       if(adjustmentValueChanged != null && l.getAdjustmentValueChanged() == adjustmentValueChanged) l.setAdjustmentValueChanged(null);
      }
      );
 }
@@ -52,10 +52,10 @@ public <AdjustmentListenerHandler H> void removeAdjustmentListener
  
 public <ComponentListenerHandler H> void removeComponentListener
   (H this,
-   ComponentEvent ?-> void componentHidden,
-   ComponentEvent ?-> void componentMoved,
-   ComponentEvent ?-> void componentResized,
-   ComponentEvent ?-> void componentShown
+   ComponentEvent ?-> void componentHidden = null,
+   ComponentEvent ?-> void componentMoved = null,
+   ComponentEvent ?-> void componentResized = null,
+   ComponentEvent ?-> void componentShown = null
    )
 {
   NComponentListener[?] listeners = this.getNiceComponentListeners();
@@ -63,10 +63,10 @@ public <ComponentListenerHandler H> void removeComponentListener
   listeners.foreach
     (NComponentListener l =>
      {
-       if(componentHidden != null && l.componentHidden == componentHidden) l.componentHidden = null;
-       if(componentMoved != null && l.componentMoved == componentMoved) l.componentMoved = null;
-       if(componentResized != null && l.componentResized == componentResized) l.componentResized = null;
-       if(componentShown != null && l.componentShown == componentShown) l.componentShown = null;
+       if(componentHidden != null && l.getComponentHidden() == componentHidden) l.setComponentHidden(null);
+       if(componentMoved != null && l.getComponentMoved() == componentMoved) l.setComponentMoved(null);
+       if(componentResized != null && l.getComponentResized() == componentResized) l.setComponentResized(null);
+       if(componentShown != null && l.getComponentShown() == componentShown) l.setComponentShown(null);
      }
      );
 }
@@ -74,8 +74,8 @@ public <ComponentListenerHandler H> void removeComponentListener
  
 public <ContainerListenerHandler H> void removeContainerListener
   (H this,
-   ContainerEvent ?-> void componentAdded,
-   ContainerEvent ?-> void componentRemoved
+   ContainerEvent ?-> void componentAdded = null,
+   ContainerEvent ?-> void componentRemoved = null
    ) 
 {
   NContainerListener[?] listeners = this.getNiceContainerListeners();
@@ -83,8 +83,8 @@ public <ContainerListenerHandler H> void removeContainerListener
   listeners.foreach
     (NContainerListener l =>
      {
-       if(componentAdded != null && l.componentAdded == componentAdded) l.componentAdded = null;
-       if(componentRemoved != null && l.componentRemoved == componentRemoved) l.componentRemoved = null;
+       if(componentAdded != null && l.getComponentAdded() == componentAdded) l.setComponentAdded(null);
+       if(componentRemoved != null && l.getComponentRemoved() == componentRemoved) l.setComponentRemoved(null);
      }
      );
 } 
@@ -92,8 +92,8 @@ public <ContainerListenerHandler H> void removeContainerListener
  
 public <FocusListenerHandler H> void removeFocusListener
   (H this,
-   FocusEvent ?-> void focusGained,
-   FocusEvent ?-> void focusLost
+   FocusEvent ?-> void focusGained = null,
+   FocusEvent ?-> void focusLost = null
    )
 {
   NFocusListener[?] listeners = this.getNiceFocusListeners();
@@ -101,8 +101,8 @@ public <FocusListenerHandler H> void removeFocusListener
   listeners.foreach
     (NFocusListener l =>
      {
-       if(focusGained != null && l.focusGained == focusGained) l.focusGained = null;
-       if(focusLost != null && l.focusLost == focusLost) l.focusLost = null;
+       if(focusGained != null && l.getFocusGained() == focusGained) l.setFocusGained(null);
+       if(focusLost != null && l.getFocusLost() == focusLost) l.setFocusLost(null);
      }
      );
 }
@@ -110,8 +110,8 @@ public <FocusListenerHandler H> void removeFocusListener
   
 public <HierarchyBoundsListenerHandler H> void removeHierarchyBoundsListener
   (H this,
-   HierarchyEvent ?-> void hierarchyAncestorMoved,
-   HierarchyEvent ?-> void hierarchyAncestorResized
+   HierarchyEvent ?-> void hierarchyAncestorMoved = null,
+   HierarchyEvent ?-> void hierarchyAncestorResized = null
    ) 
 {
   NHierarchyBoundsListener[?] listeners = this.getNiceHierarchyBoundsListeners();
@@ -119,8 +119,8 @@ public <HierarchyBoundsListenerHandler H> void removeHierarchyBoundsListener
   listeners.foreach
     (NHierarchyBoundsListener l =>
      {
-       if(hierarchyAncestorMoved != null && l.hierarchyAncestorMoved == hierarchyAncestorMoved) l.hierarchyAncestorMoved = null;
-       if(hierarchyAncestorResized != null && l.hierarchyAncestorResized == hierarchyAncestorResized) l.hierarchyAncestorResized = null;
+       if(hierarchyAncestorMoved != null && l.getHierarchyAncestorMoved == hierarchyAncestorMoved) l.setHierarchyAncestorMoved(null);
+       if(hierarchyAncestorResized != null && l.getHierarchyAncestorResized == hierarchyAncestorResized) l.setHierarchyAncestorResized(null);
      }
      );
 }
@@ -136,7 +136,7 @@ public <HierarchyListenerHandler H> void removeHierarchyListener
   listeners.foreach
     (NHierarchyListener l =>
      {
-       if(hierarchyChanged != null && l.hierarchyChanged == hierarchyChanged) l.hierarchyChanged = null;
+       if(hierarchyChanged != null && l.getHierarchyChanged() == hierarchyChanged) l.setHierarchyChanged(null);
      }
      );
 }
@@ -144,8 +144,8 @@ public <HierarchyListenerHandler H> void removeHierarchyListener
   
 public <InputMethodListenerHandler H> void removeInputMethodListener
   (H this,
-   InputMethodEvent ?-> void caretPositionChanged,
-   InputMethodEvent ?-> void inputMethodTextChanged
+   InputMethodEvent ?-> void caretPositionChanged = null,
+   InputMethodEvent ?-> void inputMethodTextChanged = null
    )  
 {
   NInputMethodListener[?] listeners = this.getNiceInputMethodListeners(); 
@@ -153,8 +153,8 @@ public <InputMethodListenerHandler H> void removeInputMethodListener
   listeners.foreach
     (NInputMethodListener l =>
      {
-       if(caretPositionChanged != null && l.caretPositionChanged == caretPositionChanged) l.caretPositionChanged = null;
-       if(inputMethodTextChanged != null && l.inputMethodTextChanged == inputMethodTextChanged) l.inputMethodTextChanged = null;
+       if(caretPositionChanged != null && l.getCaretPositionChanged() == caretPositionChanged) l.setCaretPositionChanged(null);
+       if(inputMethodTextChanged != null && l.getInputMethodTextChanged() == inputMethodTextChanged) l.setInputMethodTextChanged(null);
      }
      );
 }
@@ -170,7 +170,7 @@ public <ItemListenerHandler H> void removeItemListener
   listeners.foreach
     (NItemListener l =>
      {
-       if(itemStateChanged != null && l.itemStateChanged == itemStateChanged) l.itemStateChanged = null;
+       if(itemStateChanged != null && l.getItemStateChanged() == itemStateChanged) l.setItemStateChanged(null);
      }
      );
 }   
@@ -178,9 +178,9 @@ public <ItemListenerHandler H> void removeItemListener
  
 public <KeyListenerHandler H> void removeKeyListener
   (H this,
-   KeyEvent ?-> void keyPressed,
-   KeyEvent ?-> void keyReleased,
-   KeyEvent ?-> void keyTyped
+   KeyEvent ?-> void keyPressed = null,
+   KeyEvent ?-> void keyReleased = null,
+   KeyEvent ?-> void keyTyped = null
    )
 {
   NKeyListener[?] listeners = this.getNiceKeyListeners(); 
@@ -188,9 +188,9 @@ public <KeyListenerHandler H> void removeKeyListener
   listeners.foreach
     (NKeyListener l =>
      {
-       if(keyPressed != null && l.keyPressed == keyPressed) l.keyPressed = null;
-       if(keyReleased != null && l.keyReleased == keyReleased) l.keyReleased = null;
-       if(keyTyped != null && l.keyTyped == keyTyped) l.keyTyped = null;
+       if(keyPressed != null && l.getKeyPressed() == keyPressed) l.setKeyPressed(null);
+       if(keyReleased != null && l.getKeyReleased() == keyReleased) l.setKeyReleased(null);
+       if(keyTyped != null && l.getKeyTyped() == keyTyped) l.setKeyTyped(null);
      }
      );
 }  
@@ -198,11 +198,11 @@ public <KeyListenerHandler H> void removeKeyListener
 
 public <MouseListenerHandler H> void removeMouseListener
   (H this,
-   MouseEvent ?-> void mouseClicked,
-   MouseEvent ?-> void mouseEntered,
-   MouseEvent ?-> void mouseExited,
-   MouseEvent ?-> void mousePressed,
-   MouseEvent ?-> void mouseReleased
+   MouseEvent ?-> void mouseClicked = null,
+   MouseEvent ?-> void mouseEntered = null,
+   MouseEvent ?-> void mouseExited = null,
+   MouseEvent ?-> void mousePressed = null,
+   MouseEvent ?-> void mouseReleased = null
    )
 {
   NMouseListener[?] listeners = this.getNiceMouseListeners();
@@ -210,11 +210,11 @@ public <MouseListenerHandler H> void removeMouseListener
   listeners.foreach
     (NMouseListener l =>
      {
-       if(mouseClicked != null && l.mouseClicked == mouseClicked) l.mouseClicked = null;
-       if(mouseEntered != null && l.mouseEntered == mouseEntered) l.mouseEntered = null;
-       if(mouseExited != null && l.mouseExited == mouseExited) l.mouseExited = null;
-       if(mousePressed != null && l.mousePressed == mousePressed) l.mousePressed = null;
-       if(mouseReleased != null && l.mouseReleased == mouseReleased) l.mouseReleased = null;
+       if(mouseClicked != null && l.getMouseClicked() == mouseClicked) l.setMouseClicked(null);
+       if(mouseEntered != null && l.getMouseEntered() == mouseEntered) l.setMouseEntered(null);
+       if(mouseExited != null && l.getMouseExited() == mouseExited) l.setMouseExited(null);
+       if(mousePressed != null && l.getMousePressed() == mousePressed) l.setMousePressed(null);
+       if(mouseReleased != null && l.getMouseReleased() == mouseReleased) l.setMouseReleased(null);
      }
      );
 }  
@@ -222,8 +222,8 @@ public <MouseListenerHandler H> void removeMouseListener
  
 public <MouseMotionListenerHandler H> void removeMouseMotionListener
   (H this,
-   MouseEvent ?-> void mouseDragged,
-   MouseEvent ?-> void mouseMoved
+   MouseEvent ?-> void mouseDragged = null,
+   MouseEvent ?-> void mouseMoved = null
    ) 
 {
   NMouseMotionListener[?] listeners = this.getNiceMouseMotionListeners();
@@ -231,8 +231,8 @@ public <MouseMotionListenerHandler H> void removeMouseMotionListener
   listeners.foreach
     (NMouseMotionListener l =>
      {
-       if(mouseDragged != null && l.mouseDragged == mouseDragged) l.mouseDragged = null;
-       if(mouseMoved != null && l.mouseMoved == mouseMoved) l.mouseMoved = null;
+       if(mouseDragged != null && l.getMouseDragged() == mouseDragged) l.setMouseDragged(null);
+       if(mouseMoved != null && l.getMouseMoved() == mouseMoved) l.setMouseMoved(null);
      }
      );
 } 
@@ -248,7 +248,7 @@ public <TextListenerHandler H> void removeTextListener
   listeners.foreach
     (NTextListener l =>
      {
-       if(textValueChanged != null && l.textValueChanged == textValueChanged) l.textValueChanged = null;
+       if(textValueChanged != null && l.getTextValueChanged() == textValueChanged) l.setTextValueChanged(null);
      }
      );
 }  
@@ -256,13 +256,13 @@ public <TextListenerHandler H> void removeTextListener
 
 public <WindowListenerHandler H> void removeWindowListener
   (H this,
-   WindowEvent ?-> void windowActivated,
-   WindowEvent ?-> void windowClosed,
-   WindowEvent ?-> void windowClosing,
-   WindowEvent ?-> void windowDeactivated,
-   WindowEvent ?-> void windowDeiconified,
-   WindowEvent ?-> void windowIconified,
-   WindowEvent ?-> void windowOpened
+   WindowEvent ?-> void windowActivated = null,
+   WindowEvent ?-> void windowClosed = null,
+   WindowEvent ?-> void windowClosing = null,
+   WindowEvent ?-> void windowDeactivated = null,
+   WindowEvent ?-> void windowDeiconified = null,
+   WindowEvent ?-> void windowIconified = null,
+   WindowEvent ?-> void windowOpened = null
    )  
 {
   NWindowListener[?] listeners = this.getNiceWindowListeners();
@@ -270,24 +270,24 @@ public <WindowListenerHandler H> void removeWindowListener
   listeners.foreach
     (NWindowListener l =>
      {
-       if(windowActivated != null && l.windowActivated == windowActivated) l.windowActivated = null;
-       if(windowClosed != null && l.windowClosed == windowClosed) l.windowClosed = null;
-       if(windowClosing != null && l.windowClosing == windowClosing) l.windowClosing = null;
-       if(windowDeactivated != null && l.windowDeactivated == windowDeactivated) l.windowDeactivated = null;
-       if(windowDeiconified != null && l.windowDeiconified == windowDeiconified) l.windowDeiconified = null;
-       if(windowIconified != null && l.windowIconified == windowIconified) l.windowIconified = null;
-       if(windowOpened != null && l.windowOpened == windowOpened) l.windowOpened = null;
+       if(windowActivated != null && l.getWindowActivated() == windowActivated) l.setWindowActivated(null);
+       if(windowClosed != null && l.getWindowClosed() == windowClosed) l.setWindowClosed(null);
+       if(windowClosing != null && l.getWindowClosing() == windowClosing) l.setWindowClosing(null);
+       if(windowDeactivated != null && l.getWindowDeactivated() == windowDeactivated) l.setWindowDeactivated(null);
+       if(windowDeiconified != null && l.getWindowDeiconified() == windowDeiconified) l.setWindowDeiconified(null);
+       if(windowIconified != null && l.getWindowIconified() == windowIconified) l.setWindowIconified(null);
+       if(windowOpened != null && l.getWindowOpened() == windowOpened) l.setWindowOpened(null);
      }
      );
 }   
 
 public <DragSourceListenerHandler H> void removeDragSourceListener
   (H this,
-   DragSourceDropEvent ?-> void dsDragDropEnd,
-   DragSourceDragEvent ?-> void dsDragEnter,
-   DragSourceDragEvent ?-> void dsDragOver,
-   DragSourceDragEvent ?-> void dsDropActionChanged,
-   DragSourceEvent ?-> void dsDragExit
+   DragSourceDropEvent ?-> void dsDragDropEnd = null,
+   DragSourceDragEvent ?-> void dsDragEnter = null,
+   DragSourceDragEvent ?-> void dsDragOver = null,
+   DragSourceDragEvent ?-> void dsDropActionChanged = null,
+   DragSourceEvent ?-> void dsDragExit = null
    ) 
 {
   NDragSourceListener[?] listeners = this.getNiceDragSourceListeners();
@@ -295,11 +295,11 @@ public <DragSourceListenerHandler H> void removeDragSourceListener
   listeners.foreach
     (NDragSourceListener l =>
      {
-       if(dsDragDropEnd != null && l.dsDragDropEnd == dsDragDropEnd) l.dsDragDropEnd = null;
-       if(dsDragEnter != null && l.dsDragEnter == dsDragEnter) l.dsDragEnter = null;
-       if(dsDragOver != null && l.dsDragOver == dsDragOver) l.dsDragOver = null;
-       if(dsDropActionChanged != null && l.dsDropActionChanged == dsDropActionChanged) l.dsDropActionChanged = null;
-       if(dsDragExit != null && l.dsDragExit == dsDragExit) l.dsDragExit = null;
+       if(dsDragDropEnd != null && l.getDsDragDropEnd() == dsDragDropEnd) l.setDsDragDropEnd(null);
+       if(dsDragEnter != null && l.getDsDragEnter() == dsDragEnter) l.setDsDragEnter(null);
+       if(dsDragOver != null && l.getDsDragOver() == dsDragOver) l.setDsDragOver(null);
+       if(dsDropActionChanged != null && l.getDsDropActionChanged() == dsDropActionChanged) l.setDsDropActionChanged(null);
+       if(dsDragExit != null && l.getDsDragExit() == dsDragExit) l.setDsDragExit(null);
      }
      );
 }
@@ -315,7 +315,7 @@ public <DragGestureListenerHandler H> void removeDragGestureListener
   listeners.foreach
     (NDragGestureListener l =>
      {
-       if(dragGestureRecognized != null && l.dragGestureRecognized == dragGestureRecognized) l.dragGestureRecognized = null;
+       if(dragGestureRecognized != null && l.getDragGestureRecognized() == dragGestureRecognized) l.setDragGestureRecognized(null);
      }
      );
 }
@@ -323,11 +323,11 @@ public <DragGestureListenerHandler H> void removeDragGestureListener
 
 public <DropTargetListenerHandler H> void removeDropTargetListener
   (H this,
-   DropTargetDropEvent ?-> void dtDrop,
-   DropTargetDragEvent ?-> void dtDragEnter,
-   DropTargetDragEvent ?-> void dtDragOver,
-   DropTargetDragEvent ?-> void dtDropActionChanged,
-   DropTargetEvent ?-> void dtDragExit
+   DropTargetDropEvent ?-> void dtDrop = null,
+   DropTargetDragEvent ?-> void dtDragEnter = null,
+   DropTargetDragEvent ?-> void dtDragOver = null,
+   DropTargetDragEvent ?-> void dtDropActionChanged = null,
+   DropTargetEvent ?-> void dtDragExit = null
    ) 
 {
   NDropTargetListener[?] listeners = this.getNiceDropTargetListeners();
@@ -335,11 +335,11 @@ public <DropTargetListenerHandler H> void removeDropTargetListener
   listeners.foreach
     (NDropTargetListener l =>
      {
-       if(dtDrop != null && l.dtDrop == dtDrop) l.dtDrop = null;
-       if(dtDragEnter != null && l.dtDragEnter == dtDragEnter) l.dtDragEnter = null;
-       if(dtDragOver != null && l.dtDragOver == dtDragOver) l.dtDragOver = null;
-       if(dtDropActionChanged != null && l.dtDropActionChanged == dtDropActionChanged) l.dtDropActionChanged = null;
-       if(dtDragExit != null && l.dtDragExit == dtDragExit) l.dtDragExit = null;
+       if(dtDrop != null && l.getDtDrop() == dtDrop) l.setDtDrop(null);
+       if(dtDragEnter != null && l.getDtDragEnter() == dtDragEnter) l.setDtDragEnter(null);
+       if(dtDragOver != null && l.getDtDragOver() == dtDragOver) l.setDtDragOver(null);
+       if(dtDropActionChanged != null && l.getDtDropActionChanged() == dtDropActionChanged) l.setDtDropActionChanged(null);
+       if(dtDragExit != null && l.getDtDragExit() == dtDragExit) l.setDtDragExit(null);
      }
      );
 }
@@ -355,7 +355,7 @@ public <DropTargetListenerHandler H> void removeDropTargetListener
 //JDK1.4    listeners.foreach
 //JDK1.4      (NAWTEventListener l =>
 //JDK1.4       {
-//JDK1.4         if(eventDispatched != null && l.eventDispatched == eventDispatched) l.eventDispatched = null;
+//JDK1.4         if(eventDispatched != null && l.getEventDispatched() == eventDispatched) l.setEventDispatched(null);
 //JDK1.4       }
 //JDK1.4       );
 //JDK1.4  }
@@ -371,7 +371,7 @@ public <DropTargetListenerHandler H> void removeDropTargetListener
 //JDK1.4    listeners.foreach
 //JDK1.4      (NMouseWheelListener l =>
 //JDK1.4       {
-//JDK1.4         if(mouseWheelMoved != null && l.mouseWheelMoved == mouseWheelMoved) l.mouseWheelMoved = null;
+//JDK1.4         if(mouseWheelMoved != null && l.getMouseWheelMoved() == mouseWheelMoved) l.setMouseWheelMoved(null);
 //JDK1.4       }
 //JDK1.4       );
 //JDK1.4  } 
@@ -379,8 +379,8 @@ public <DropTargetListenerHandler H> void removeDropTargetListener
  
 //JDK1.4  public <WindowFocusListenerHandler H> void removeWindowFocusListener
 //JDK1.4    (H this,
-//JDK1.4     WindowEvent ?-> void windowGainedFocus,
-//JDK1.4     WindowEvent ?-> void windowLostFocus
+//JDK1.4     WindowEvent ?-> void windowGainedFocus = null,
+//JDK1.4     WindowEvent ?-> void windowLostFocus = null
 //JDK1.4     )  
 //JDK1.4  {
 //JDK1.4    NWindowFocusListener[?] listeners = this.getNiceWindowFocusListeners();
@@ -388,8 +388,8 @@ public <DropTargetListenerHandler H> void removeDropTargetListener
 //JDK1.4    listeners.foreach
 //JDK1.4      (NWindowFocusListener l =>
 //JDK1.4       {
-//JDK1.4         if(windowGainedFocus != null && l.windowGainedFocus == windowGainedFocus) l.windowGainedFocus = null;
-//JDK1.4         if(windowLostFocus != null && l.windowLostFocus == windowLostFocus) l.windowLostFocus = null;
+//JDK1.4         if(windowGainedFocus != null && l.getWindowGainedFocus() == windowGainedFocus) l.setWindowGainedFocus(null);
+//JDK1.4         if(windowLostFocus != null && l.getWindowLostFocus() == windowLostFocus) l.setWindowLostFocus(null);
 //JDK1.4       }
 //JDK1.4       );
 //JDK1.4  } 
@@ -405,7 +405,7 @@ public <DropTargetListenerHandler H> void removeDropTargetListener
 //JDK1.4    listeners.foreach
 //JDK1.4      (NWindowStateListener l =>
 //JDK1.4       {
-//JDK1.4         if(windowStateChanged != null && l.windowStateChanged == windowStateChanged) l.windowStateChanged = null;
+//JDK1.4         if(windowStateChanged != null && l.getWindowStateChanged() == windowStateChanged) l.setWindowStateChanged(null);
 //JDK1.4       }
 //JDK1.4       );
 //JDK1.4  }
@@ -421,7 +421,7 @@ public <DropTargetListenerHandler H> void removeDropTargetListener
 //JDK1.4    listeners.foreach
 //JDK1.4      (NDragSourceMotionListener l =>
 //JDK1.4       {
-//JDK1.4         if(dragMouseMoved != null && l.dragMouseMoved == dragMouseMoved) l.dragMouseMoved = null;
+//JDK1.4         if(dragMouseMoved != null && l.getDragMouseMoved() == dragMouseMoved) l.setDragMouseMoved(null);
 //JDK1.4       }
 //JDK1.4       );
 //JDK1.4  }

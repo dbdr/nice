@@ -644,3 +644,37 @@ private boolean overlappingJavaMethods(MethodDeclaration m1,
 
   return Arrays.equals(m1.javaArgTypes(), m2.javaArgTypes());
 }
+
+?String explainNoMatch(Arguments args, List<VarSymbol> noMatches)
+{
+  List<String> argnames = new LinkedList();
+  for (int i = 0; i < args.arguments.length; i++)
+    if (args.arguments[i].name != null)
+      argnames.add(notNull(args.arguments[i].name).toString());
+
+  if (!argnames.isEmpty())
+    {
+      for (noMatch : noMatches)
+        if (noMatch.isFunSymbol())
+          argnames.retainAll(args.noMatchByName(noMatch.getFormalParameters()));
+
+      if (!argnames.isEmpty())
+	return " has an argument named " + argnames.get(0);
+    }
+  //fall back to default error message
+  return null;
+}
+
+List<String> noMatchByName(Arguments args, ?FormalParameters parameters)
+{
+  List<String> res = new LinkedList();
+  for (int i = 0; i < args.arguments.length; i++)
+    if (args.arguments[i].name != null)
+    { 
+      String s = notNull(args.arguments[i].name).toString();
+      if (parameters == null || !parameters.hasMatchFor(s))
+        res.add(s);
+    }
+
+  return res;
+}

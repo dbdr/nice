@@ -208,7 +208,6 @@ mlsub.typing.Monotype type(MonoSymbol) = native MonoSymbol.type;
 GlobalTypeScope getGlobalTypeScope() = native GlobalTypeScope Node.getGlobalTypeScope();
 ?gnu.bytecode.ClassType staticClass(Arguments) = native gnu.bytecode.ClassType Arguments.staticClass();
 ?gnu.bytecode.ClassType staticClass(Expression) = native gnu.bytecode.ClassType Expression.staticClass();
-?String explainNoMatch(Arguments, List<VarSymbol>) = native String Arguments.explainNoMatch(List);
 Map<VarSymbol,mlsub.typing.Polytype> types(Arguments) = native Arguments.types;
 <T> String map(String, String, String, T[]) = native String bossa.util.Util.map(String, String, String, Object[]);
 <T> String map(String, String, String, ?Collection<T>) = native String bossa.util.Util.map(String, String, String, Collection);
@@ -262,8 +261,6 @@ bossa.syntax.Monotype substitute(bossa.syntax.Monotype,Map<String,bossa.syntax.M
 List<bossa.syntax.Monotype> substitute(Map<String,bossa.syntax.Monotype>,Collection<bossa.syntax.Monotype>) = native List bossa.syntax.Monotype.substitute(Map,Collection);
 boolean containsAlike(List<bossa.syntax.Monotype>) = native boolean bossa.syntax.Monotype.containsAlike(List);
 mlsub.typing.Monotype[] rawResolve(TypeMap,Collection<bossa.syntax.Monotype>) = native mlsub.typing.Monotype[] bossa.syntax.Monotype.rawResolve(TypeMap, Collection);
-List<String> noMatchByName(Arguments, FormalParameters) = native List Arguments.noMatchByName(FormalParameters);
-List<FormalParameters.Parameter> missingArgs(Arguments, FormalParameters) = native List Arguments.missingArgs(FormalParameters);
 List<FormalParameters.Parameter> getRequiredParameters(FormalParameters) = native List FormalParameters.getRequiredParameters();
 List<FormalParameters.Parameter> asList(FormalParameters) = native List FormalParameters.asList();
 boolean containsAlike(Monotype[]) = native boolean Monotype.containsAlike(Monotype[]);

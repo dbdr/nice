@@ -268,7 +268,7 @@ private (int,int,int,int,int) parseLine(String line, int defaultId)
 	  (int start, id, int repeat, int outStart, int outInc) = 
 	    parseLine(section, id);
 
-	  if (lineNumber >= outStart && lineNumber <= outStart + repeat * outInc)
+	  if (lineNumber >= outStart && lineNumber < outStart + repeat * outInc)
 	    {
 	      // Found it!
 	      resultLine = start + (lineNumber - outStart)/outInc;

@@ -2,8 +2,7 @@ package regtest.basic;
 
 // Tuples
 
-void test_tuples();
-test_tuples()
+void test_tuples()
 {
   println("\n### Testing tuples ###\n");
 

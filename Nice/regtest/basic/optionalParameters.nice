@@ -5,7 +5,7 @@ package regtest.basic;
 */
 
 int o1(int x, int, int z = 20, int t = 0);
-o1(a, x, z, t) = a + 2*x + 3*z;
+o1(x, a, z, t) = x + 2*a + 3*z;
 
 int o1(int, int x, int y = 10);
 o1(a, x, y) = a + x + y/2;

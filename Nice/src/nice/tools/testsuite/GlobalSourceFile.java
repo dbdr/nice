@@ -33,6 +33,8 @@ public class GlobalSourceFile extends NiceSourceFile {
 		addToTopLevel(line);
 	}
 
-
+	public boolean isEmpty() {
+		return false;
+	}
 
 }

@@ -132,7 +132,7 @@ public class NiceSourceFile {
 					+ keywordStatement.substring(dontCompilePos + TestNice.KEYWORD_DONTCOMPILE.length());
 
 		keywordStatement = keywordStatement.substring(TestNice.KEYWORD_PACKAGE.length()).trim();
-		//	if contains no space than statement has only package name
+		//	if contains no space then statement has only package name
 		int spacePos = keywordStatement.indexOf(" ");
 		if (spacePos == -1) {
 			setPackage(keywordStatement);
@@ -263,6 +263,7 @@ public class NiceSourceFile {
 	 * @exception	IOException	TODO
 	 */
 	private void writeImports(BufferedWriter writer) throws IOException {
+		_imports.add("global");
 		for (Iterator iter = _imports.iterator(); iter.hasNext();) {
 			writer.write("import ");
 			writer.write((String)iter.next());

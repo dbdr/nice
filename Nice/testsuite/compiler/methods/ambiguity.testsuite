@@ -5,3 +5,19 @@ void /*/// FAIL HERE */ f(A);
 
 f(x@A) {}
 f(x@A) {}
+
+/// PASS bug
+  assert foo(null);
+  /// Toplevel
+class A {}
+class B {}
+
+boolean foo(?A a) = false;
+boolean foo(B b) = false;
+
+foo(null) = true;
+
+/// PASS bug
+  /// Toplevel
+void foo(int x, ?int y) {}
+override void foo(int x, int y) {}

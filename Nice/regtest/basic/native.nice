@@ -11,6 +11,6 @@ void test_native();
 test_native()
 {
   File f = new File("titi");
-  java.net.Socket s = new java.net.ServerSocket(1235);
+  java.net.ServerSocket s = new java.net.ServerSocket(1235);
 }
 

@@ -1071,7 +1071,7 @@ public class CodeAttr extends Attribute implements AttrContainer
       {
         arg_count++;
         receiverType = popType();
-        // Don't change anything is the call is an invokespecial
+        // Don't change anything if the call is an invokespecial
         if (opcode != 183 && receiverType != method.getDeclaringClass())
           {
             // We try to find a more precise method, given the known

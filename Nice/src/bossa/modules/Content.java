@@ -54,16 +54,17 @@ class Content
     return s == null ? "<empty>" : s;
   }
 
-  List getImports(Set opens)
+  List getImports(Set opens, boolean shouldReload)
   {
     Content.Unit[] readers;
-    /* 
-       If the package is up to date, preferably load imports from 
-       the compiled package, since that involves touching only one file 
-       instead of possiby several. 
+    /*
+       If the package is up to date, preferably load imports from
+       the compiled package, since that involves touching only one file
+       instead of possiby several.
     */
-    if (source != null && 
-	(compiled == null || lastModification > lastCompilation))
+    if (source != null &&
+	(shouldReload || compiled == null ||
+         lastModification > lastCompilation))
       readers = source.getDefinitions();
     else
       readers = compiled.getDefinitions();

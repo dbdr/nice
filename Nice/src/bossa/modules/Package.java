@@ -61,8 +61,8 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
   /****************************************************************
    * Single Constructor
    ****************************************************************/
-  
-  private Package(LocatedString name, 
+
+  private Package(LocatedString name,
 		  Compilation compilation,
 		  boolean isRoot)
   {
@@ -76,26 +76,29 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     if (source == null)
       User.error(name, "Could not find package " + name);
 
-    loadImports();
+    boolean shouldReload =
+      compilation.recompileAll ||
+      isRoot && compilation.recompileCommandLine;
+
+    loadImports(shouldReload);
 
     prepareCodeGeneration();
 
-    read(compilation.recompileAll || 
-	 isRoot && compilation.recompileCommandLine);
+    read(shouldReload);
   }
 
-  private void loadImports()
+  private void loadImports(boolean shouldReload)
   {
     Set opens = new TreeSet();
     opens.add("java.lang");
     opens.add("java.util");
 
-    imports = source.getImports(opens);
+    imports = source.getImports(opens, shouldReload);
 
     if (!name.toString().equals("nice.lang") && !Debug.ignorePrelude)
-      imports.add(new LocatedString("nice.lang", 
+      imports.add(new LocatedString("nice.lang",
 				    bossa.util.Location.nowhere()));
-    
+
     setOpens(opens);
 
     List p = this.getImports();

@@ -39,6 +39,9 @@ manual.pdf: manual.xml
 	fop manual.fo -pdf manual.pdf
 	rm manual.fo
 
+manual.ps: manual.pdf
+	pdftops manual.pdf
+
 %.html: %.xml new.xsl
 	if ! $(PROC) new.xsl $*.xml > $@; then rm $@; fi
 

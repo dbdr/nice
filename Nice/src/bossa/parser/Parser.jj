@@ -1743,31 +1743,25 @@ Expression Expression() :
 
   ( 
     LOOKAHEAD(funExpLookahead()) e1=funExp() 
-  | e1=ClassicExpression() 
+  |
+    e1=ConditionalExpression()
+    [ 
+      { e1.setLocation(Location.make(first, getToken(0))); }
+      op=AssignmentOperator() 
+      e2=Expression()
+      {
+        if(op.image.length()!=1)
+          e2=CallExp.create(symb(op.image.substring(0, 1),op),e1,e2);
+  
+        e1=AssignExp.create(e1,e2);
+      }
+    ]
   )
   { 
     last=getToken(0);
     e1.setLocation(Location.make(first, last));
     return e1;
   }
-}
-
-Expression ClassicExpression() :
-{ Expression e1,e2; Token op, start = getToken(1); }
-{
-  e1=ConditionalExpression()
-  [ 
-    { e1.setLocation(Location.make(start, getToken(0))); }
-    op=AssignmentOperator() 
-    e2=Expression()
-    {
-      if(op.image.length()!=1)
-        e2=CallExp.create(symb(op.image.substring(0, 1),op),e1,e2);
-
-      e1=AssignExp.create(e1,e2);
-    }
-  ]
-  { return e1; }
 }
 
 Expression SideEffectFreeExpression() :
@@ -1879,27 +1873,22 @@ Expression InstanceOfExpression() :
 }
 
 Expression RelationalExpression() :
-{ Expression e1, e2, e3; Token t; e3 = null; }
+{ Expression e1, e2, e3; Token t, t_prev = null; e3 = null; }
 {
   e1=RangeExpression()
-    [ (
-	( (t=">"|t=">=") e2=RangeExpression()
-	  {
-            if(e3 == null) e1=CallExp.create(symb(t),e1,e2);
-            else e1=CallExp.create(symb("&&",t),e1,CallExp.create(symb(t),e3,e2));
-            e3 = e2;
-          }
-        )+
-      |
-	( (t="<"|t="<=") e2=RangeExpression()
-	  {
-            if(e3 == null) e1=CallExp.create(symb(t),e1,e2);
-            else e1=CallExp.create(symb("&&",t),e1,CallExp.create(symb(t),e3,e2));
-            e3 = e2;
-          }
-        )+
-      )
-    ]
+  ( (t=">"|t=">="|t="<"|t="<=") e2=RangeExpression()
+    {
+      if(e3 == null) e1=CallExp.create(symb(t),e1,e2);
+      else
+      {
+        e1=CallExp.create(symb("&&",t),e1,CallExp.create(symb(t),e3,e2));
+        if (t.image.charAt(0) != t_prev.image.charAt(0))
+	  User.error(Location.make(t), "All chained comparisons should be in the same direction");
+      }
+      e3 = e2;
+      t_prev = t;
+    }
+  )*
   { return e1; }
 }
 
@@ -1970,40 +1959,21 @@ Expression UnaryExpression() :
 { Expression res; Token t=null; }
 {
 (
-  ( t="+" | t="-" ) res=PrimaryExpression() 
+  ( t="+" | t="-" | t="~" | t="!" ) res=PrimaryExpression() 
     { res=CallExp.create(symb(t),res); }
 |
-  res=PreIncrementExpression()
+  res=Pre_crementExpression()
 |
-  res=PreDecrementExpression()
-|
-  res=UnaryExpressionNotPlusMinus()
+  res=PostfixExpression()
 )
   { return res; }
 }
 
-Expression PreIncrementExpression() :
-{ Expression res; Token t; }
+Expression Pre_crementExpression() :
+{ Expression res; Token t; boolean inc = false; }
 {
-  t="++" res=PrimaryExpression()
-  { return new IncrementExp(res, true, true); }
-}
-
-Expression PreDecrementExpression() :
-{ Expression res; Token t; }
-{
-  t="--" res=PrimaryExpression()
-  { return new IncrementExp(res, true, false); }
-}
-
-Expression UnaryExpressionNotPlusMinus() :
-{ Expression res; Token t; }
-{
-  ( t="~" | t="!" ) res=PrimaryExpression()
-  { return CallExp.create(symb(t),res); }
-|
-  res=PostfixExpression()
-  { return res; }
+  ( t="++" {inc = true;} | t="--" ) res=PrimaryExpression()
+  { return new IncrementExp(res, true, inc); }
 }
 
 Expression PostfixExpression() :
@@ -2370,9 +2340,7 @@ Statement StatementExpression() :
 {
   { first = getToken(1); }
 (
-  e1=PreIncrementExpression()
-|
-  e1=PreDecrementExpression()
+  e1=Pre_crementExpression()
 |
   e1=PrimaryExpression()
   [

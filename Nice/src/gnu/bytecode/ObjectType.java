@@ -77,7 +77,8 @@ public class ObjectType extends Type
 
   public Type getImplementationType()
   {
-    return this == nullType ? pointer_type : this;
+    return this == nullType ? pointer_type
+      : this == tostring_type ? string_type : this;
   }
 
   public Type promote ()
@@ -95,7 +96,7 @@ public class ObjectType extends Type
    * Throw a ClassCastException when this is not possible. */
   public Object coerceFromObject (Object obj)
   {
-    if (this == Type.string_type)
+    if (this == Type.tostring_type)
       return obj.toString();
     if (obj != null)
       {
@@ -112,10 +113,9 @@ public class ObjectType extends Type
   /** Compile (in given method) cast from Object to this Type. */
   public void emitCoerceFromObject (CodeAttr code)
   {
-    /*
-    if (this == Type.string_type)
+    if (this == Type.tostring_type)
       code.emitInvokeVirtual(Type.toString_method);
-      else*/ if (this != Type.pointer_type)
+    else if (this != Type.pointer_type)
       code.emitCheckcast(this);
   }
 }

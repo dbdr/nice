@@ -143,4 +143,51 @@ public class Values extends TreeList implements Printable, Externalizable
     return isEmpty() ? empty : this;
   }
 
+  /** Helper method called by code using a SeriesTarget.
+   * The compiled code iterates through zero or more values.
+   * Return the index of the next value, or -1 if currently at eof.
+   * A non-Values object is treated as a singleton value,
+   * so in that case there is no next value.
+   */
+  public static int nextIndex(Object values, int curIndex)
+  {
+    if (values instanceof Values)
+      return ((Values) values).nextDataIndex(curIndex);
+    else
+      return curIndex == 0 ? 1 : -1;
+  }
+
+  /** Helper method called by code using a SeriesTarget.
+   * The compiled code iterates through zero or more values.
+   * Extract the object referenced by the curIndex.
+   * A non-Values object is treated as a singleton value.
+   */
+  public static Object nextValue(Object values, int curIndex)
+  {
+    if (values instanceof Values)
+      return ((Values) values).getNext(curIndex << 1, null);
+    else
+      return values;
+  }
+
+  public static void writeValues(Object value, Consumer out)
+  {
+    if (value instanceof Values)
+      {
+	((Values) value).consume(out);
+	/*
+	Object[] values = ((Values) value).getValues();
+	for (int i = 0;  i < values.length;  i++)
+	  writeValues(values[i], out);
+	*/
+      }
+    /*
+    else if (value instanceof Consumable)
+      {
+	((Consumable) value).consume(out);
+      }
+    */
+    else
+      out.writeObject(value);
+  }
 }

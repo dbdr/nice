@@ -135,7 +135,7 @@ thus improving safety.
 <section><title>Casts (<javaexn name="ClassCastException"/>)</title>
 <para>
 &java; allow casts of the form: <literal>(T) e</literal>. 
-At compile time, this assumes that <literal>e</literal> has type
+At compile time, this assumes that the expression <literal>e</literal> has type
 <literal>T</literal>. 
 At run time, if <literal>e</literal> does not evaluate to a value of type 
 <literal>T</literal>, a <javaexn name="ClassCastException"/> is thrown.
@@ -183,10 +183,10 @@ A few remarks on this &java; code:
 <itemizedlist>
 <listitem><para>
    there is no way to specify that the stack should only contain
-   strings
+   strings;
 </para></listitem>
 <listitem><para>
-   this forces to cast every element pop'ed out of the stack
+   this forces to cast every element pop'ed out of the stack;
 </para></listitem>
 <listitem><para>
    the invalid push is not detected at compile time. Much worse, it
@@ -416,8 +416,8 @@ must be done all over again.
 <para>
 Here obviously comes our motto: all this checking should be done
 automatically. This is exactly what Nice does. One documents whether a
-type can hold the null value by simply prefixing it with the '?'
-symbol. Thus:
+type can hold the null value by simply prefixing it with the 
+<literal>?</literal> symbol. Thus:
 <literal>?String name;</literal> is the declaration of String variable that
 might be null. To get its length, one must write
 <literal>int len = (name == null) ? 0 : name.length();</literal>. Calling

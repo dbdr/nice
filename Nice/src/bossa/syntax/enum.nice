@@ -77,7 +77,7 @@ public EnumDefinition createEnumDefinition(LocatedString name, List<LocatedStrin
 
   if (! notNull(Definition.currentModule).interfaceFile())
     // create the method implementation of family()
-    globalDefs.add(new MethodBodyDefinition(impl, new LocatedString("family"),
+    globalDefs.add(createMethodBodyDefinition(impl, new LocatedString("family"),
 	null, new LinkedList(), createReturnStmt(createLiteralArrayExp(
 	elements.map(LocatedString elem => new IdentExp(elem))), true)));
 

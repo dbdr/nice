@@ -1377,7 +1377,7 @@ MethodBodyDefinition methodBodyDefinition(NiceClass container):
     ]
     ")"
     body = code()
-    { return new MethodBodyDefinition(container,name,binders,
+    { return bossa.syntax.dispatch.createMethodBodyDefinition(container,name,binders,
 				      parameters,body); }
 }
 

@@ -6,7 +6,17 @@ else
   version="$1 $2"
 fi
 
+date="`date -u +'%Y.%m.%d, %T %Z'`"
+
 echo > dateBuild.nice
 echo "package nice.tools.compiler;" >> dateBuild.nice
 echo "let String versionNumber = \"$version\";" >> dateBuild.nice
-echo "let String buildDate = \""`date -u +"%Y.%m.%d, %T %Z"`"\";" >> dateBuild.nice
+echo "let String buildDate = \"$date\";" >> dateBuild.nice
+
+echo "Main-Class: nice.tools.compiler.console.fun
+Implementation-Title: Nice Compiler
+Implementation-Version: $version
+Implementation-Vendor: Daniel Bonniot
+Implementation-URL: http://nice.sourceforge.net
+Build-Id: Nice compiler version $version (build $date)
+" > ./Manifest

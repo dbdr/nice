@@ -251,7 +251,7 @@ class HTMLWriter {
         writer.write("<ul>\n");
         for(MethodDeclaration m : methods) {
             writer.write("<li><a href='" escapeFilename(getMethodFilename(m)) ".html'>" htmlEncode(m.getName()) "</a>" +
-                   ": " m.getType() "</li>\n");
+                   ": " htmlEncode(m.getType().toString()) "</li>\n");
         }
         writer.write("</ul>\n");
       }

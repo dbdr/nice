@@ -42,14 +42,14 @@ public final class rawBooleanArray extends rawArray
 
   public final Object get (int index)
   {
-    return Boolean.valueOf(arr[index]);
+    return new Boolean(arr[index]);
   }
 
   public final Object set (int index, Object element)
   {
     boolean old = arr[index];
     arr[index] = ((Boolean)element).booleanValue(); 
-    return Boolean.valueOf(old);
+    return new Boolean(old);
   }
 
 }

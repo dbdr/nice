@@ -57,3 +57,19 @@ class A
   boolean getFoo(?String s) = (s != null) && foo;
 }
 int foo() = 42;
+
+/// PASS bug
+  /// Toplevel
+  void foo(long e) requires e >= 0 {}
+
+/// PASS bug
+  /// Toplevel
+  void foo(float e) requires e >= 0 {}
+
+/// PASS
+  /// Toplevel
+  void foo(double e) requires e >= 0 {}
+
+/// PASS
+  /// Toplevel
+  void foo(int e) requires e >= 0 {}

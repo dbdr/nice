@@ -518,7 +518,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
   throws IOException
   {
     JarFile runtime = null;
-    
+
     if (runtimeJar != null)
       try {
 	runtime = new JarFile(runtimeJar);
@@ -568,7 +568,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
       ((Package) i.next()).addToArchive(jarStream, linkPerformed);
   }
 
-  private static void addEntry(String name, InputStream data, 
+  private static void addEntry(String name, InputStream data,
 			       JarOutputStream out)
   throws IOException
   {
@@ -582,7 +582,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     int size = in.available();
     if (size < 1024) size = 1024;
     byte[] buf = new byte[size];
-    
+
     try{
       int read;
       do
@@ -597,13 +597,13 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
       in.close();
     }
   }
-  
+
   /****************************************************************
    * Code generation
    ****************************************************************/
 
   /** The name of the class package functions and method implementations
-      are stored in. 
+      are stored in.
   **/
   static final String packageClassName = "fun";
 
@@ -611,13 +611,13 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
   {
     if (compiling())
       return bossa.syntax.dispatch.NiceClass_createClassExp(def);
-    
+
     String name = bossa.syntax.dispatch.NiceClass_getName(def).toString();
     ClassType classe = source.readClass(name);
     if (classe == null)
       Internal.error("Compiled class " + def + " was not found");
     importMethods(def, classe);
-    
+
     ClassExp res = new ClassExp(classe);
     addUserClass(res);
     return res;
@@ -645,8 +645,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
       classe.outer = getImplementationClass();
   }
 
-  public void addGlobalVar(gnu.expr.Declaration decl, 
-                           boolean constant)
+  public void addGlobalVar(gnu.expr.Declaration decl, boolean constant)
   {
     if (!compiling())
       // The code is already there

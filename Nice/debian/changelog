@@ -6,6 +6,8 @@ nice (0.7.9) unstable; urgency=low
         int x;
         equals(that@A) = this.x == that.x;
       }
+  * Compilation does not fail anymore if some classes on the classpath
+    have an invalid bytecode format.
 
  --
 

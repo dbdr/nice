@@ -76,22 +76,22 @@ boolean noShortName(Option o) = o.shortName.equals('?');
  * "Constructors"
  ****************************************************************/
 
-option(longName, purpose, action, shortName, visible) =
-  new NoParamOption(shortName: shortName, longName: longName,
+option(name, purpose, action, letter, visible) =
+  new NoParamOption(shortName: letter, longName: name,
 		    purpose: purpose, action: action, visible: visible);
 
-option(longName, purpose, optionHint, action, shortName, visible) =
-  new ParamOption(shortName: shortName,
-		  longName: longName,
+option(name, purpose, optionHint, actionParam, letter, visible) =
+  new ParamOption(shortName: letter,
+		  longName: name,
 		  purpose: purpose,
 		  optionHint: optionHint,
-		  actionParam: action,
+		  actionParam: actionParam,
 		  visible: visible);
 
-option(longName, purpose, optionHint, actionNoParam, actionParam, shortName,
+option(name, purpose, optionHint, actionNoParam, actionParam, letter,
        visible) =
-  new OptionalParamOption(shortName: shortName,
-			  longName: longName,
+  new OptionalParamOption(shortName: letter,
+			  longName: name,
 			  purpose: purpose,
 			  optionHint: optionHint,
 			  actionNoParam: actionNoParam,

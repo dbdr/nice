@@ -1,0 +1,92 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2000                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+/*
+   Efficient, scope driven symbol table.
+*/
+
+package nice.tools.ast;
+
+// Interface
+
+<Any Sym> SymbolTable<Sym> symbolTable();
+
+class SymbolTable<Sym> // implements Map<String, Sym>
+{
+  public Sym get(String name);
+  public void set(String name, Sym sym);
+
+  public void begin();
+  public void end();
+
+// Implementation
+
+  nice.lang.Hashtable<String, Binder<Sym>> symbols;
+
+  Binder<Sym> topBinder; // list of the binders added since last begin
+  Binder<Sym> marks;     // remembers topBinders at each begin
+}
+
+class Binder<Sym>
+{
+  Sym value;
+  String name;
+  Binder<Sym> nextBinder;
+  Binder<Sym> oldBinding;
+}
+
+symbolTable<Sym>()
+{
+  SymbolTable<Sym> res = new SymbolTable();
+  res.symbols = hashtable();
+  return res;
+}
+
+get<Sym>(t@SymbolTable, name)
+{
+  Binder<Sym> binder = t.symbols.get(name);
+  if (binder == null)
+    return null;
+  else
+    return binder.value;
+}
+
+set<Sym>(t@SymbolTable, name, sym)
+{
+  Binder<Sym> binder = new Binder();
+  binder.value = sym;
+  binder.name = name;
+  binder.nextBinder = t.topBinder;
+  t.topBinder = binder;
+  binder.oldBinding = t.symbols.get(name);
+  t.symbols.put(name, binder);
+}
+
+begin<Sym>(t@SymbolTable)
+{
+  Binder<Sym> mark = new Binder();
+  mark.nextBinder = t.topBinder;
+  mark.oldBinding = t.marks;
+  t.topBinder = null;
+  t.marks = mark;
+}
+
+end(t@SymbolTable)
+{
+  while (t.topBinder != null)
+    {
+      t.symbols.put(t.topBinder.name, t.topBinder.oldBinding);
+      t.topBinder = t.topBinder.nextBinder;
+    }
+  t.topBinder = t.marks.nextBinder;
+  t.marks = t.marks.oldBinding;
+}

@@ -106,14 +106,14 @@ main(args)
 		  fun()=>{ memInfo = true; }));
 
   Sequence<String> rest = parse("nicec", args, opts);
-  if(rest.size()<1 || rest.size()>1)
+  if (rest.size() != 1 || rest[0].length() == 0)
     {
-      if (rest.size()>1)
+      if (rest.size() > 1)
 	println("Supply only one package on the command line.\n" +
 		"nicec will automatically find dependancies.");
       usage();
     }
-  String packageName = rest.get(0);
+  String packageName = rest[0];
 
   Compilation compilation = 
     make(packageName, doLink, recompileCL, recAll, staticLink);

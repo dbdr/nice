@@ -20,7 +20,7 @@ import bossa.util.*;
  */
 public class CNiceClass extends NiceClass
 {
-  ClassDefinition definition;
+  TypeDefinition definition;
 
   private List<NewField> fields = new ArrayList();
   private List<OverridenField> overrides = new ArrayList();
@@ -101,7 +101,7 @@ public class CNiceClass extends NiceClass
     valueOverrides.add(new ValueOverride(declaringClass: this, name: fname, value: value));
   }
 
-  isInterface() = definition instanceof ClassDefinition.Interface;
+  isInterface() = definition instanceof InterfaceDefinition;
   
   ?CNiceClass getParent()
   {
@@ -228,7 +228,7 @@ public class CNiceClass extends NiceClass
 
     VarScope scope = notNull(definition.scope);
     mlsub.typing.Monotype thisType =
-      Monotype.sure(new mlsub.typing.MonotypeConstructor(definition.tc,
+      Monotype.sure(new mlsub.typing.MonotypeConstructor(definition.getTC(),
 			definition.getTypeParameters()));
     thisSymbol = new ThisSymbol(FormalParameters.thisName, thisType, declaringClass: this);
 
@@ -552,9 +552,9 @@ public class CNiceClass extends NiceClass
 	notNull(constructorMethod)[i] = new DefaultConstructor
 	  (this, true, definition.location(), values, cst,
 	   Monotype.resolve(definition.getLocalScope(), values.types()),
-	   Monotype.sure(new mlsub.typing.MonotypeConstructor(definition.tc, definition.getTypeParameters())),
+	   Monotype.sure(new mlsub.typing.MonotypeConstructor(definition.getTC(), definition.getTypeParameters())),
            fields: fields, parent: parent);
-	TypeConstructors.addConstructor(definition.tc, notNull(constructorMethod)[i]);
+	TypeConstructors.addConstructor(definition.getTC(), notNull(constructorMethod)[i]);
       }
   }
 
@@ -597,16 +597,17 @@ public class CNiceClass extends NiceClass
     if (superClass != null)
       res.add(typeExpression(superClass));
 
-    for (intf : definition.interfaces)
+    for (intf : definition.getInterfaces())
       {
 	let ?mlsub.typing.TypeConstructor assocTC = intf.associatedTC();
 	if (assocTC != null)
 	  res.add(typeExpression(assocTC));
       }
       
-    if (definition.javaInterfaces != null)
-      for (itf : notNull(definition.javaInterfaces))
-	res.add(typeExpression(notNull(itf)));
+    let ji = definition.getJavaInterfaces();  
+    if (ji != null)
+      for (itf : ji)
+        res.add(typeExpression(itf));
 
     if (res.isEmpty())
       return null;
@@ -685,7 +686,7 @@ class ThisSymbol extends MonoSymbol
   final CNiceClass declaringClass;
 }
 
-NiceClass createNiceClass(ClassDefinition cdef) = new CNiceClass(definition: cdef);
+NiceClass createNiceClass(TypeDefinition cdef) = new CNiceClass(definition: cdef);
 
 private TypeSymbol asTypeSymbol(mlsub.typing.Monotype type)
 {
@@ -698,10 +699,10 @@ private TypeSymbol asTypeSymbol(mlsub.typing.Monotype type)
 
 private gnu.expr.Expression typeExpression(TypeConstructor tc)
 {
-  let c = ClassDefinition.get(tc);
-  if (c != null && c.implementation instanceof NiceClass)
+  let c = getTypeDefinition(tc);
+  if (c != null && c.getImplementation() instanceof NiceClass)
     {
-      CNiceClass nc = cast(c.implementation);
+      CNiceClass nc = cast(c.getImplementation());
       return nc.classe;
     }
   else

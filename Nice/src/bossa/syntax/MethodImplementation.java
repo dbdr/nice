@@ -220,7 +220,7 @@ public abstract class MethodImplementation extends Definition
     if (arity != 2 || !(name.equals("writeObject")||name.equals("readObject")))
       return;
 
-    ClassDefinition def = ClassDefinition.get(firstArgument());
+    TypeDefinition def = dispatch.getTypeDefinition(firstArgument());
     if (def == null || ! (def.getImplementation() instanceof NiceClass))
       return;
 

@@ -30,7 +30,7 @@ abstract class NiceField
     declaringClass.definition.addChild(method);
   }
 
-  ClassDefinition getClassDefinition() = declaringClass.definition;
+  TypeDefinition getTypeDefinition() = declaringClass.definition;
 
   LocatedString getName() = sym.getName();
 

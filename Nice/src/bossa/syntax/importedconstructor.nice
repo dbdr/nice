@@ -96,7 +96,7 @@ public ?ImportedConstructor loadImportedConstructor(NiceClass def, gnu.bytecode.
 
   let classDef = def.getDefinition();
   let returnType = Monotype.create(Monotype.sure
-      (new mlsub.typing.MonotypeConstructor(classDef.tc, classDef.getTypeParameters())));
+      (new mlsub.typing.MonotypeConstructor(classDef.getTC(), classDef.getTypeParameters())));
 
   let constraint = classDef.classConstraint == null ?
           null : notNull(classDef.classConstraint).shallowClone();
@@ -108,6 +108,6 @@ public ?ImportedConstructor loadImportedConstructor(NiceClass def, gnu.bytecode.
 		notNull(JavaClasses.compilation).parser),
           constraint, returnType, method: method);
 
-  TypeConstructors.addConstructor(res.classe.getDefinition().tc, res);
+  TypeConstructors.addConstructor(res.classe.getDefinition().getTC(), res);
   return res;
 }

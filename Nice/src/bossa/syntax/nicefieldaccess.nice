@@ -36,13 +36,13 @@ public class NiceFieldAccess extends FieldAccess
   toString()
   {
     return "" + field.sym.type + " " + 
-	field.getClassDefinition().name + "." + field.getName();
+	field.getTypeDefinition().name + "." + field.getName();
   }
 }
 
 NiceFieldAccess createNiceFieldAccess(NiceField field)
 {
-  let classDef = field.getClassDefinition();
+  let classDef = field.getTypeDefinition();
   let argType = Monotype.sure(classDef.lowlevelMonotype());
 
   return new NiceFieldAccess(field.getName(),

@@ -6,7 +6,7 @@ package nice.tools.doc;
    @author Francis Barber
 */
 
-import bossa.syntax.*;
+import bossa.syntax;
 
 class Documenter {
 
@@ -36,7 +36,7 @@ class Documenter {
 	    " (class: " + d.getClass().getName() + ")");
   }
 
-  document(ClassDefinition.Class c)
+  document(TypeDefinition c)
   {
     // Here we handle classes
     // Example code that accesses some properties of classes:
@@ -46,9 +46,9 @@ class Documenter {
     if (superClass != null)
       println("  extends " + superClass.getName());
 
-    ClassDefinition.Interface[?] interfaces = c.getImplementedInterfaces();
+    InterfaceDefinition[?] interfaces = c.getImplementedInterfaces();
     if (interfaces != null)
-      interfaces.foreach(ClassDefinition.Interface i => 
+      interfaces.foreach(InterfaceDefinition i =>
 		         println("  implements " + i.getName()));
   }
 

@@ -91,7 +91,7 @@ public final class TypeIdent extends Monotype implements Located
 	}
 	catch(mlsub.typing.BadSizeEx e){
           // See if this is a class with default type parameters
-          mlsub.typing.Monotype type = ClassDefinition.toType(tc);
+          mlsub.typing.Monotype type = dispatch.getTypeWithTC(tc);
           if (type != null)
             return type;
 
@@ -126,7 +126,7 @@ public final class TypeIdent extends Monotype implements Located
 
     if (res instanceof TypeConstructor)
       {
-	ClassDefinition def = ClassDefinition.get((TypeConstructor) res);
+	TypeDefinition def = dispatch.getTypeDefinition((TypeConstructor) res);
 	if (def != null)
 	  {
 	    mlsub.typing.Interface itf = def.getAssociatedInterface();
@@ -147,7 +147,7 @@ public final class TypeIdent extends Monotype implements Located
 
     if (res instanceof TypeConstructor)
       {
-	ClassDefinition def = ClassDefinition.get((TypeConstructor) res);
+	TypeDefinition def = dispatch.getTypeDefinition((TypeConstructor) res);
 	if (def != null)
 	  {
 	    mlsub.typing.Interface itf = def.getAssociatedInterface();

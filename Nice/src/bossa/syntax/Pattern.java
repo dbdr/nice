@@ -123,7 +123,7 @@ public abstract class Pattern implements Located
       }
 
     // Class constraints
-    ClassDefinition def = ClassDefinition.get(tc);
+    TypeDefinition def = dispatch.getTypeDefinition(tc);
     if (def == null)
       return;
 

@@ -263,7 +263,7 @@ public final class Dispatch
 
   private static ClassType classTypeOfNiceClass(TypeConstructor tc)
   {
-    ClassDefinition def = ClassDefinition.get(tc);
+    TypeDefinition def = bossa.syntax.dispatch.getTypeDefinition(tc);
 
     if (def == null || ! (def.getImplementation() instanceof NiceClass))
       return null;

@@ -19,7 +19,7 @@ import bossa.util.*;
 */
 public class EnumDefinition extends Definition
 {
-  ClassDefinition classDef;
+  TypeDefinition classDef;
   List<EnumSymbol> symbols;
   String representation;
 
@@ -64,10 +64,10 @@ public class EnumDefinition extends Definition
 
 public EnumDefinition createEnumDefinition(LocatedString name, List<LocatedString> elements,
 		List<MonoSymbol> fields, List<List<Expression>> argsList,
-		List<Definition> globalDefs, ?List<TypeIdent> interfaces)
+		List<Definition> globalDefs, ?List<MonotypeConstructor> interfaces)
 {
   let shortName = name.toString();
-  let classDef = ClassDefinition.makeClass
+  let classDef = makeClass
 	(name,true,false, null, new ArrayList(),
 	new MonotypeConstructor(new TypeIdent(new LocatedString("nice.lang.Enum",
 		name.location())), null, name.location()), interfaces, null);

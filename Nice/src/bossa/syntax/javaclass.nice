@@ -23,7 +23,7 @@ import bossa.util.*;
 */
 public class JavaClass extends ClassImplementation
 {
-  ClassDefinition definition;
+  TypeDefinition definition;
   LocatedString javaName;
   boolean ignoredRetyping = false;
 
@@ -54,11 +54,11 @@ public class JavaClass extends ClassImplementation
     // Check that we don't give a wrong arity to a generic class.
     int nativeArity = classType.getArity();
     
-    if (nativeArity != -1 && nativeArity != notNull(definition.tc).arity())
+    if (nativeArity != -1 && nativeArity != definition.getTC().arity())
       User.error(definition, javaName + " has " + nativeArity + " type parameters");
     
     let old = JavaClasses.setTypeConstructorForJavaClass
-		(definition.compilation(), definition.tc, classType);
+		(definition.compilation(), definition.getTC(), classType);
 
     if (old != null)
       User.error(definition, javaName + " was already associated with the Nice class " + old);
@@ -71,7 +71,7 @@ public class JavaClass extends ClassImplementation
     if (ignoredRetyping)
       return;
 
-    JavaClasses.fetchMethods(definition.tc, cast(definition.getJavaType()));
+    JavaClasses.fetchMethods(definition.getTC(), cast(definition.getJavaType()));
   }
 
   printInterface(s)

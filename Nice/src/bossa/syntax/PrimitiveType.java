@@ -33,9 +33,9 @@ import nice.tools.code.SpecialTypes;
 
 public class PrimitiveType extends ClassImplementation
 {
-  public PrimitiveType(ClassDefinition definition)
+  public PrimitiveType(TypeDefinition definition)
   {
-    gnu.bytecode.Type t = registerPrimType(definition.name.toString(), definition.tc);
+    gnu.bytecode.Type t = registerPrimType(definition.name.toString(), definition.getTC());
     if (t == null)
       User.error(definition, definition.name + " is not a known primitive type");
     definition.setJavaType(t);

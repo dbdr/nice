@@ -1,0 +1,869 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2004                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package bossa.syntax;
+
+// Abstract
+// These are used by nice code only, therefore do not need to be in the
+// java file.
+int getBytecodeFlags(TypeDefinition c);
+?mlsub.typing.TypeConstructor getSuperClass(TypeDefinition c);
+boolean implementsJavaInterface(TypeDefinition c, String name);
+?mlsub.typing.Monotype lowlevelMonotype(TypeDefinition c);
+List<mlsub.typing.Interface> getInterfaces(TypeDefinition c);
+TypeConstructor[?] getJavaInterfaces(TypeDefinition c);
+?ClassDefinition getSuperClassDefinition(TypeDefinition c);
+int getVariance(TypeDefinition t);
+InterfaceDefinition[] getImplementedInterfaces(TypeDefinition c);
+
+/**
+   Abstract syntax for a type definition.
+ */
+
+public abstract class CTypeDefinition extends TypeDefinition
+{
+  Modifiers modifiers = new Modifiers();
+  mlsub.typing.TypeConstructor tc = cast(null);
+  ?ClassImplementation implementation = null;
+  ?gnu.bytecode.Type javaType = null;
+  ?List<int> typeParametersVariances = null;
+ 
+	// Interfaces
+  ?List<MonotypeConstructor> implementations = new LinkedList(); 
+  TypeConstructor[?] javaInterfaces = null;
+  List<mlsub.typing.Interface> interfaces = new ArrayList(5);
+  ?List<MonotypeConstructor> extensions = null;
+  
+  	// Abstract Interfaces
+  ?List<MonotypeConstructor> abstractions = new LinkedList();
+  mlsub.typing.Interface[?] abs = null;
+
+	// Parameters
+  ?mlsub.typing.Monotype[?] parentParams = null;
+  int[?] parentTypeParameterMap = null;
+  	
+  {
+    modifiers.makePublic();
+   
+    int arity = getVariance(this);
+   	 
+    let tpv = notNull( typeParametersVariances );
+
+    if (arity == -1 || arity <= tpv.size())
+      this.variance = makeVariance(tpv);
+    else
+      this.variance = Variance.make(new int[arity]);
+    
+    this.createTC();
+    typeParametersVariances = null;
+    
+    if( modifiers.isFinal() )
+		tc.setMinimal();
+  }
+
+  isConcrete() = !modifiers.isAbstract();
+    
+  implementsJavaInterface(name)
+  {
+    let ji = javaInterfaces;
+    if (ji != null)
+      for (int i = 0; i < ji.length; i++)
+        if (ji[i].toString().equals(name))
+          return true;
+
+    return false;
+  }
+
+  getTypeSymbol() = tc;
+  
+  getAssociatedInterface() = null;
+
+  getSuperClass() = null;
+  
+  getSuperClassDefinition() = null;
+  
+  getTC() = tc;
+  
+  getImplementedInterfaces()
+  {
+    if (interfaces.size() == 0) return new InterfaceDefinition[0];
+    List<InterfaceDefinition> res = new LinkedList();
+
+    for (mlsub.typing.Interface ai : interfaces)
+      {
+        let itf = getTypeDefinition(ai.associatedTC());
+        if (itf != null && itf instanceof InterfaceDefinition )
+          res.add(itf);
+      }
+
+    return res.toArray();
+  }
+ 
+  void createTC()
+  {
+    String name = notNull(this.name).toString();
+
+    if (name.equals("nice.lang.Array"))
+      tc = new ArrayTypeConstructor(name,variance,this.isConcrete(),true);      
+    else if (name.equals("nice.lang.Sure"))
+	  tc = new SureTypeConstructor(name,mlsub.typing.NullnessKind.instance,
+	  		this.isConcrete(), true );
+    else if (name.equals("nice.lang.Maybe"))
+	  tc = new MaybeTypeConstructor(name,mlsub.typing.NullnessKind.instance,
+	  		this.isConcrete(), true );
+    else if (name.equals("nice.lang.Null"))
+      {
+        tc = new mlsub.typing.TypeConstructor
+          ("null", mlsub.typing.NullnessKind.instance, this.isConcrete(), true);
+  	PrimitiveType.registerPrimType(name, tc);
+      }
+    else
+      {
+        tc = new mlsub.typing.TypeConstructor(name, variance, this.isConcrete(), true);
+        if (name.equals("nice.lang.Throwable"))
+	  PrimitiveType.throwableTC = tc;
+        else if (name.equals("nice.lang.Collection"))
+          PrimitiveType.collectionTC = tc;
+        else if (name.equals("nice.lang.Class"))
+          PrimitiveType.classTC = tc;
+      }
+
+    tcToTypeDef.put(tc, this);
+    Typing.introduce(tc);
+    this.addTypeSymbol(tc);
+  }
+
+  getLocalScope()
+  {
+    TypeScope localScope = notNull(typeScope);
+    if (classConstraint != null)
+      try {
+        localScope = new TypeScope(localScope);
+        mlsub.typing.TypeSymbol[] binders = notNull(this.getBinders());
+        for (int i = 0; i < binders.length; i++)
+         localScope.addSymbol(binders[i]);
+      }
+      catch(TypeScope.DuplicateName e) {
+        User.error(this, e);
+      }
+    
+    return localScope;
+  }
+
+  /****************************************************************
+   * Selectors
+   ****************************************************************/
+  
+  lowlevelMonotype()
+  {
+    try {
+      return new mlsub.typing.MonotypeConstructor(tc, this.getTypeParameters());
+    }
+    catch(mlsub.typing.BadSizeEx e) {
+      return getTypeWithTC(tc, this.getTypeParameters());
+    }
+  }
+  
+  /**
+     Return the type representing a constrained instance of this class,
+     or null if this class has no constraint on its type parameters.
+  */
+  getConstrainedType()
+  {
+    ?mlsub.typing.Constraint cst = this.getResolvedConstraint();
+
+    if (cst == null)
+      return null;
+
+    mlsub.typing.Polytype res = new mlsub.typing.Polytype
+      (cst, this.lowlevelMonotype());
+
+    return res.cloneType();
+  }
+
+  /****************************************************************
+   * Resolution
+   ****************************************************************/
+
+  /** Marker to avoid cycles and multiple resolutions. */
+  boolean isResolved = false;
+  boolean isResolving = false;
+
+  resolve()
+  {
+    if (isResolved)
+      return;
+    
+    if (isResolving)
+      {
+        // We found a cycle.
+        String message;
+        if (TypeConstructors.isInterface(tc))
+          message = "Interface " + this.getName() + " extends itself";
+        else
+          message = "Class " + this.getName() + " extends itself";
+
+        throw User.error(this, message);
+      }
+
+    isResolving = true;
+
+    try {
+      this.resolveClass();
+      super;
+      // This needs to be after super.resolve(), so that the constraint is resolved
+      notNull(implementation).resolveClass();
+    } finally {
+      isResolved = true;
+      isResolving = false;
+    }
+  }
+
+  void resolveClass()
+  {
+    this.resolveInterfaces(implementations);
+    abs = AbstractInterface.resolve(notNull(typeScope), abstractions);
+
+    implementations = null;
+    abstractions = null;
+
+    // Resolve the super-interfaces first.
+    for (mlsub.typing.Interface itf : interfaces)
+      {
+        let d = getTypeDefinition(itf.associatedTC());
+        if (d != null)
+          d.resolve();
+      }
+
+    this.createContext();
+  }
+
+  void createContext()
+  {
+    try {
+      for (mlsub.typing.Interface itf : interfaces)
+        {
+          try {
+            Typing.assertImp(tc, itf, true);
+          } catch(KindingEx e) {
+            User.error(name,
+                   "Class " + name + " cannot implement " + e.t2 +
+                   ": they do not have the same number or kind of type parameters");
+          }
+        }
+       
+      if (abs != null)
+        {
+          Typing.assertImp(tc, abs, true);
+          Typing.assertAbs(tc, abs);
+        }
+
+     let ji = javaInterfaces;
+	  
+     if (ji != null)
+       for (int i = 0; i < ji.length; i++)
+         if (tc.arity() == 0 || ! JavaClasses.excludedInterface(ji[i]))
+           try {
+              Typing.initialLeq(tc, ji[i]);
+           }
+           catch(KindingEx e)  {
+                User.error(name,
+                           "Class " + name + " cannot implement " + e.t2 +
+                           ": they do not have the same number or kind of type parameters");
+           }
+
+    }
+    catch(TypingEx e) {
+      User.error(name, "Error in " + name + " : " + e.getMessage());
+    }
+  }
+  
+  void resolveInterfaces(?List<MonotypeConstructor> names)
+  {
+    if (names == null)
+      return;
+
+    ?ArrayList<mlsub.typing.TypeConstructor> javaInterfaces = null;
+
+    for (MonotypeConstructor parent : names)
+      {
+        this.useInheritanceParams(this.resolveParams(parent, notNull(this.getLocalScope())));
+
+        let name = notNull(parent.tc);
+        let s = name.resolvePreferablyToItf(typeScope);
+
+	if (s instanceof mlsub.typing.Interface)
+	  {
+            interfaces.add(s);
+          }
+        else if (s instanceof mlsub.typing.TypeConstructor)
+	  {
+            let tc = s;
+            if (!TypeConstructors.isInterface(tc))
+              throw User.error(name, tc + " is not an interface");
+
+            if (javaInterfaces == null)
+              javaInterfaces = new ArrayList(5);
+
+            notNull(javaInterfaces).add(s);
+          }
+        else
+	  Internal.error("Symbol "+s+" is not Interface or TypeConstructor");
+      }
+
+    if (javaInterfaces != null)
+      this.javaInterfaces = javaInterfaces.toArray();
+  }
+
+  mlsub.typing.Monotype[?] resolveParams(MonotypeConstructor parent, TypeScope typeScope)
+  {
+    if (parent.parameters == null)
+      return null;
+
+    return bossa.syntax.Monotype.resolve(typeScope, cast(notNull(parent.parameters).content));
+  }
+
+  resolveBody()
+  {
+    notNull(implementation).resolveBody();
+  }
+
+  typecheckClass()
+  {
+    notNull(implementation).typecheck();
+  }
+
+  typecheck()
+  {
+    // Typechecking is done earlier, in typecheckClass.
+  }
+
+  precompile()
+  {
+    let impl = implementation;
+    if (impl != null && impl instanceof NiceClass)
+      impl.precompile();
+  }
+
+  compile()
+  {
+    notNull(implementation).compile();
+  }
+
+  /**
+     Called instead of compile if the package is up-to-date.
+  */
+  recompile()
+  {
+    notNull(implementation).recompile();
+  }
+
+  MethodContainer.Constraint specialize(?MethodContainer.Constraint our,
+                                        mlsub.typing.Monotype[?] params)
+  {
+    if (params == null)
+      return notNull(our);
+
+    this.parentParams = cast(params);
+    let parentMap = new int[params.length];
+    this.parentTypeParameterMap = parentMap;
+	let parentParams = notNull( this.parentParams );
+
+    List<mlsub.typing.TypeSymbol> binders = new ArrayList();
+    List<AtomicConstraint> atoms = new ArrayList();
+    let typeParameters = new mlsub.typing.Monotype[params.length];
+
+    if (our != null)
+    {
+      binders.addAll(Arrays.asList(our.getBinderArray()));
+      atoms.addAll(our.getAtoms());
+    }
+
+    for (int i = 0; i < params.length; i++)
+    {
+      if (params[i] instanceof MonotypeVar)
+      {
+        typeParameters[i] = params[i];
+        parentMap[i] = find(params[i], notNull(our).typeParameters);
+        parentParams[i] = null;
+        continue;
+      }
+
+      MonotypeVar mvar = new MonotypeVar("D" + i);
+      binders.add(mvar);
+      typeParameters[i] = mvar;
+
+      bossa.syntax.Monotype v = bossa.syntax.Monotype.create(mvar);
+      atoms.add(new MonotypeLeqCst(bossa.syntax.Monotype.create(params[i]), v));
+      atoms.add(new MonotypeLeqCst(v, bossa.syntax.Monotype.create(params[i])));
+    }
+
+    return new MethodContainer.Constraint(
+       binders.toArray(),
+       atoms,
+       typeParameters,
+       this.location());
+  }
+
+
+  void useInheritanceParams(mlsub.typing.Monotype[?] params)
+  {
+    if (parentParams == null && params != null)
+      classConstraint = this.specialize(this.classConstraint, params);
+  }
+  
+  getInterfaces() = interfaces.toArray();
+
+  addInterfaceImplementation(itf)
+  {
+    if (itf != null)
+      interfaces.add(itf);
+  }
+
+  getJavaInterfaces() = javaInterfaces;
+
+  setJavaType(javaType)
+  {
+    if (javaType == null)
+      return;
+
+    this.javaType = javaType;
+    nice.tools.code.Types.set(tc, javaType);
+  }
+
+  getJavaType() = notNull(javaType);
+
+  setImplementation(implementation)
+  {
+    this.implementation = implementation;
+  }
+
+  getImplementation() = notNull(implementation);
+  
+  getBytecodeFlags() = modifiers.getBits();
+}
+
+/**
+ * Definition for a class
+ */
+class ClassDefinition extends CTypeDefinition
+{ 
+	// Super class
+  ?MonotypeConstructor superClassIdent = null;
+  ?mlsub.typing.TypeConstructor superClass = null;
+
+  getSuperClass() = superClass;
+  
+  getSuperClassDefinition()
+  {
+    if (superClass == null)
+      return null;
+    let s = getTypeDefinition(notNull(superClass));
+    if (s instanceof ClassDefinition)
+      return s;
+    else
+      return null;
+  }
+
+  resolveClass()
+  {
+    let s = this.superClassIdent;
+    if (s != null) 
+      {
+        this.useInheritanceParams(this.resolveParams(s, this.getLocalScope()));
+        let superClass = notNull(s.tc).resolveToTC(typeScope);
+        let name = notNull(this.name);
+
+        this.superClass = superClass;
+	
+        if (superClass.isMinimal())
+          User.error(superClassIdent,
+		     superClass + " is a final class. It cannot be extended");
+        if (TypeConstructors.isInterface(superClass))
+          User.error(superClassIdent,
+		     superClass + " is an interface, so " + name +
+		     " may only implement it");
+        if (! nice.tools.code.Types.legalAccess(superClass, module.getName()))
+          User.error(superClassIdent, name + " cannot extend " + 
+		     superClass + ".  It is not available to this package.");
+
+        superClassIdent = null;
+      }
+
+    ?ClassDefinition d = this.getSuperClassDefinition();
+    if (d != null)
+      {
+         d.resolve();
+
+         if (d.getImplementation() instanceof PrimitiveType &&
+             !(this.getImplementation() instanceof PrimitiveType))
+           User.error(this, "A class can't extends a primitive");
+      }
+    
+    super;
+  }
+
+  createContext()
+  {
+    try {
+      if (superClass != null)
+        try {
+	  Typing.initialLeq(tc, superClass);
+	} catch(KindingEx e) {
+          User.error(name,
+		       "Class " + name + " cannot extend " + e.t2 +
+		       ": they do not have the same number or kind of type parameters");
+	}
+    } catch(TypingEx e) {
+	  User.error(name, "Error in class " + name + " : " + e.getMessage());
+    }  
+
+    super;
+  }
+}
+
+/**
+ * Definition for an interface
+ */
+class InterfaceDefinition extends CTypeDefinition
+{
+  ?mlsub.typing.Interface associatedInterface = null;
+ 
+  {
+    modifiers.makeInterface(); 
+    associatedInterface = new mlsub.typing.Interface(variance, tc);
+  }
+
+  isConcrete() = false;
+
+  implementsJavaInterface(String name) = false;
+
+  getTypeSymbol() =
+      notNull( associatedInterface );
+  
+  resolveClass()
+  {
+    this.resolveInterfaces(extensions);
+    extensions = null;
+    this.createAssociatedInterface();
+
+    super;
+  }
+
+  createContext()
+  {
+    try {
+  	  Typing.assertImp(tc, associatedInterface, true);
+    } catch(TypingEx e) {
+	  User.error(name, "Error in interface " + name, e.getMessage());
+    }
+
+    super;
+  }
+
+  getAssociatedInterface() = associatedInterface;
+
+  void createAssociatedInterface()
+  {
+    // the associated interface extends the associated interfaces
+    // of the classes we extend
+    for (mlsub.typing.Interface ai : interfaces)
+      {
+        try {
+          Typing.assertLeq(associatedInterface, ai);
+        } catch(KindingEx e) {
+        User.error(this, "Cannot extend interface " +ai+
+                          " which has a different variance");
+        }
+      }
+  }
+}
+
+/****************************************************************
+ * Printing
+ ****************************************************************/
+
+toString(ClassDefinition c) = "class "+c.name;
+
+toString(InterfaceDefinition i) = "interface "+i.name;
+
+printInterface(ClassDefinition c, java.io.PrintWriter s)
+{
+  super;
+  s.print(c.modifiers.toString() );
+  s.print(" class " );
+  s.print(c.getSimpleName());
+  s.print(c.printTypeParameters());
+  if (c.superClass != null)
+    s.print(" extends " + c.superClass);   
+  s.print(printInterfaces(" implements ", c.interfaces, c.javaInterfaces));
+  if (c.abs != null)
+    s.print(Util.map(" finally implements ",", ","",notNull(c.abs)));
+
+  notNull(c.implementation).printInterface(s);
+}
+
+printInterface(InterfaceDefinition i, java.io.PrintWriter s)
+{
+  super;
+  s.print(i.modifiers.toString());
+  s.print(" interface ");
+  s.print(i.getSimpleName());
+  s.print(i.printTypeParameters());
+  s.print(printInterfaces(" extends ", i.interfaces, i.javaInterfaces));
+  notNull(i.implementation).printInterface(s);
+}
+
+String printInterfaces(String keyword,
+                       ?List<mlsub.typing.Interface> interfaces,
+                       ?List<mlsub.typing.TypeConstructor> javaInterfaces )
+{
+  ?String sNice = null;
+  ?String sJava = null;
+  
+  if (interfaces != null && interfaces.size() != 0)
+    sNice = Util.map("", ", ", "", interfaces );
+  
+  if (javaInterfaces != null && javaInterfaces.size() != 0)
+    sJava = Util.map("", ", ", "", javaInterfaces );
+  
+  if (sNice != null)
+    return keyword + sNice + ( sJava != null ? ( ", " + sJava ) : "" );
+  else if (sJava != null)
+    return keyword + sJava;
+  else
+    return "";
+}
+
+// TypeConstructors with specialized printing
+
+class ArrayTypeConstructor extends mlsub.typing.TypeConstructor
+{
+  toString(parameters)
+  { 
+    if (parameters == null) return "";
+    return parameters[0].toString(false, "[]");
+  }
+
+  toString(parameters, isNull, suffix)
+  {
+    if (parameters == null) 
+      return "";
+
+    return parameters[0].toString(false, (suffix || "") + (isNull ? "[?]" : "[]"));
+  }
+}
+
+class SureTypeConstructor extends mlsub.typing.TypeConstructor
+{
+  toString(parameters, isNull, suffix)
+  { 
+    if (parameters == null)
+      return "";
+    if (parameters[0] instanceof MonotypeVar)
+      return "!" + parameters[0].toString(false, suffix);
+    else
+      //  return "!" + parameters[0].toString(); 
+      return parameters[0].toString(false, suffix);
+  }
+}
+
+class MaybeTypeConstructor extends mlsub.typing.TypeConstructor
+{
+  toString(parameters, isNull, suffix)
+  {
+    if (parameters == null)
+      return "";
+
+    return parameters[0].toString(true, suffix);
+  }
+}
+  
+/****************************************************************
+ * Map TypeConstructors to TypeDefinitions
+ ****************************************************************/
+
+var Map<mlsub.typing.TypeConstructor,TypeDefinition> tcToTypeDef = new HashMap();
+
+void resetTypeDefinitionMappings()
+{
+  tcToTypeDef = new HashMap();
+}
+
+?TypeDefinition getTypeDefinition(mlsub.typing.TypeConstructor tc) =
+  tcToTypeDef.get(tc);
+
+?TypeDefinition getTypeDefinition(mlsub.typing.Interface itf) =
+  tcToTypeDef.get( itf.associatedTC() );
+
+/**
+   Returns a monotype based on this tc, provided that the class
+   requires no type parameter because it specializes its parent.
+ */
+?mlsub.typing.Monotype getTypeWithTC(TypeConstructor tc)
+{
+  ?CTypeDefinition def = cast(getTypeDefinition(tc));
+
+  if (def == null)
+    return null;
+  	
+  let params = def.parentParams;
+  
+  if (params == null)
+    return null;
+  	
+  // Look for missing type parameters
+  int missing = 0;
+
+  for (int i = 0; i < params.length; i++)
+    if (params[i] == null)
+       missing++;
+
+  if (missing == 0)
+    return new mlsub.typing.MonotypeConstructor(tc, cast(params) );
+
+  return null;
+}
+
+/**
+   Returns a monotype based on this tc, provided that the class
+   requires exactly these type parameters because it specializes its parent.
+ */
+?mlsub.typing.Monotype getTypeWithTC( TypeConstructor tc, mlsub.typing.Monotype[] sourceParams )
+{
+  ?CTypeDefinition def = cast(getTypeDefinition(tc));
+
+  if (def == null)
+    return null;
+  	
+  let params = def.parentParams;
+  let paramMap = def.parentTypeParameterMap;
+  
+  if (params == null || paramMap == null)
+    return null;
+  	
+  ?mlsub.typing.Monotype[] fullParams = new mlsub.typing.Monotype[params.length];
+
+  int used = 0;
+  for (int i = 0; i < fullParams.length; i++)
+    if (params[i] == null)
+      {
+        fullParams[i] = sourceParams[paramMap[i]];
+        used++;
+      }
+    else
+      fullParams[i] = params[i];
+
+  if (used < sourceParams.length)
+    return null;
+
+  return new mlsub.typing.MonotypeConstructor(tc, cast(fullParams));
+}
+
+<T> int find(T o, T[?] array)
+{
+  if (o == null || array == null)
+    return -1;
+  for (int i = 0; ; i++)
+    if (array[i] == o)
+      return i;
+}
+
+// Variance lookup
+
+getVariance(CTypeDefinition t)
+{
+  int arity = getVariance(t.implementations);
+  if (arity != -1)
+    return arity;
+
+  arity = getVariance(t.abstractions);
+  return arity;
+}
+
+getVariance(ClassDefinition c)
+{
+  int arity = getVariance(c.superClassIdent);
+  return arity >= 0 ? arity : super;
+}
+
+getVariance(InterfaceDefinition i)
+{
+  int arity = getVariance(i.extensions);
+  return arity >= 0 ? arity : super;
+}
+
+int getVariance(?List<MonotypeConstructor> parents)
+{
+  if (parents == null)
+    return -1;
+
+  int res;
+  for (MonotypeConstructor m : parents)
+    {
+      res = getVariance(m);
+      if (res != -1)
+        return res;
+     }
+
+  return -1;
+}
+
+int getVariance(?MonotypeConstructor parent)
+{
+  if (parent == null)
+    return -1;
+
+  if (notNull(parent.parameters).content == null)
+    return -1;
+
+  // Assume non-variance
+  return notNull(notNull(parent.parameters).content).length;
+}
+
+// Constructors
+  
+ClassDefinition makeClass(LocatedString name,
+		    boolean isFinal, boolean isAbstract,
+		    ?MethodContainer.Constraint typeParameters,
+		    List<int> typeParametersVariances,
+		    MonotypeConstructor superClassIdent,
+		    ?List<MonotypeConstructor> implementations,
+		    ?List<MonotypeConstructor> abstractions )
+{
+  Modifiers mod = new Modifiers();
+  if (isFinal) mod.makeFinal();
+  if (isAbstract) mod.makeAbstract();
+
+  return new ClassDefinition(
+     name, Node.upper, typeParameters,
+     modifiers : mod,
+     typeParametersVariances : typeParametersVariances,
+     superClassIdent : superClassIdent,
+     implementations : implementations,
+     abstractions : abstractions );
+}
+
+InterfaceDefinition makeInterface(LocatedString name, 
+   		 ?MethodContainer.Constraint typeParameters,
+   		 List<int> typeParametersVariances,
+	     ?List<MonotypeConstructor> extensions,
+	     ?List<MonotypeConstructor> implementations,
+	     ?List<MonotypeConstructor> abstractions )
+{
+  return new InterfaceDefinition(
+     name, Node.upper, typeParameters,
+     typeParametersVariances : typeParametersVariances, 
+	 extensions : extensions,
+	 implementations : implementations,
+	 abstractions : abstractions );
+}

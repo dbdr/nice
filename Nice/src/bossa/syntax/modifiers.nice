@@ -1,0 +1,157 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2004                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package bossa.syntax;
+
+enum Modifier( short bit )
+{
+   PUBLIC(0x0001),
+   PRIVATE(0x0002),
+   PROTECTED(0x0004),
+   STATIC(0x0008),
+   FINAL(0x0010),
+   SUPER(0x0020),
+   SYNCHRONIZED(0x0020),
+   VOLATILE(0x0040),
+   TRANSIENT(0x0080),
+   NATIVE(0x0100),
+   INTERFACE(0x0200),
+   ABSTRACT(0x0400)
+}
+
+/**
+ * A set of modifiers
+ * @author Luc Perrin
+ */
+class Modifiers
+{
+   short bits = 0;
+
+   short getBits() = bits;
+
+   private void setBit( short bit )
+   {
+     bits |= bit;
+   }
+
+   private void removeBit( short bit )
+   {
+     bits &= short(~bit);
+   }
+
+   private boolean getBit( short bit ) = ( bits & bit ) != 0;
+ 
+   void setModifier( Modifier mod ) =
+	this.setBit( mod.bit );
+
+   void removeModifier( Modifier mod ) =
+	this.removeBit( mod.bit );
+
+   boolean getModifier( Modifier mod ) =
+	this.getBit( mod.bit );
+
+   void makePublic( )
+   {
+	this.setModifier( PUBLIC );
+   }
+
+   boolean isPublic() = this.getModifier( PUBLIC );
+
+   void makeProtected( )
+   {
+	this.setModifier( PROTECTED );
+   }
+
+   boolean isProtected() = this.getModifier( PROTECTED );
+
+   void makePrivate( )
+   {
+	this.setModifier( PRIVATE );
+   }
+
+   boolean isPrivate() = this.getModifier( PRIVATE );
+
+   void makeStatic( )
+   {
+	this.setModifier( STATIC );
+   }
+
+   boolean isStatic() = this.getModifier( STATIC );
+
+   void makeFinal( )
+   {
+	this.setModifier( FINAL );
+   }
+
+   boolean isFinal() = this.getModifier( FINAL );
+
+   void makeSynchronized( )
+   {
+	this.setModifier( SYNCHRONIZED );
+   }
+
+   boolean isSynchronized() = this.getModifier( SYNCHRONIZED );
+
+   void makeVolatile( )
+   {
+	this.setModifier( VOLATILE );
+   }
+
+   boolean isVolatile() = this.getModifier( VOLATILE );
+
+   void makeTransient( )
+   {
+	this.setModifier( TRANSIENT );
+   }
+
+   boolean isTransient() = this.getModifier( TRANSIENT );
+
+   void makeNative( )
+   {
+	this.setModifier( NATIVE );
+   }
+
+   boolean isNative() = this.getModifier( NATIVE );
+
+   void makeInterface( )
+   {
+	this.setModifier( INTERFACE );
+   }
+
+   boolean isInterface() = this.getModifier( INTERFACE );
+
+   void makeAbstract( )
+   {
+	this.setModifier( ABSTRACT );
+   }
+
+   boolean isAbstract() = this.getModifier( ABSTRACT );
+
+   toString()
+   {
+     StringBuffer buf = new StringBuffer();
+
+// Cannot be printed to nicei files yet
+//     if( this.getModifier( PUBLIC ) )       buf.append(" public");
+//     if( this.getModifier( PRIVATE ) )      buf.append(" private");
+
+     if( this.getModifier( PROTECTED ) )    buf.append(" protected");
+     if( this.getModifier( STATIC ) )       buf.append(" static");
+     if( this.getModifier( FINAL ) )        buf.append(" final");
+     if( this.getModifier( SYNCHRONIZED ) ) buf.append(" synchronized");
+     if( this.getModifier( VOLATILE ) )     buf.append(" volatile");
+     if( this.getModifier( TRANSIENT ) )    buf.append(" transient");
+     if( this.getModifier( NATIVE ) )       buf.append(" native");
+     if( this.getModifier( ABSTRACT ) )     buf.append(" abstract");
+     return buf.toString();
+  }
+}

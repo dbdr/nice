@@ -178,7 +178,7 @@ public final class Compilation
   private static NiceClass declaringClass(JavaMethod m, Alternative alt)
   {
     mlsub.typing.TypeConstructor firstArgument = alt.getPatterns()[0].getTC();
-    ClassDefinition def = ClassDefinition.get(firstArgument);
+    TypeDefinition def = bossa.syntax.dispatch.getTypeDefinition(firstArgument);
 
 
     if (def != null && def.getImplementation() instanceof NiceClass)

@@ -366,7 +366,7 @@ public class Enumeration
   private static boolean checkClassConstraint(Element var, 
                                               TypeConstructor sol)
   {
-    bossa.syntax.ClassDefinition def = bossa.syntax.ClassDefinition.get(sol);
+    bossa.syntax.TypeDefinition def = bossa.syntax.dispatch.getTypeDefinition(sol);
     
     if (def == null)
       return true;

@@ -1005,9 +1005,9 @@ void getField(CNiceClass c, boolean storeDocString):
 
 // The constraint prefixing the class keyword is optional
 // It is useful for complex constraints
-ClassDefinition classDefinition(Constraint cst, List definitions, boolean storeDocString):
+TypeDefinition typeDefinition(Constraint cst, List definitions, boolean storeDocString):
 {
-  ClassDefinition res;
+  TypeDefinition res;
   LocatedString name;
   MethodContainer.Constraint parameters = null;
   List l;
@@ -1024,7 +1024,7 @@ ClassDefinition classDefinition(Constraint cst, List definitions, boolean storeD
   [ "extends" ext = interfaces() ]
   [ "implements" imp=interfaces() ]
   [ "finally" "implements"  abs=interfaces() ]
-  { res = ClassDefinition.makeInterface
+  { res = bossa.syntax.dispatch.makeInterface
       (name, parameters, typeParametersVariances, ext, imp, abs); }
 |
   { boolean isFinal=false, isAbstract=false; }
@@ -1039,7 +1039,7 @@ ClassDefinition classDefinition(Constraint cst, List definitions, boolean storeD
   [ "extends" sup = superClass() ]
   [ "implements" imp=interfaces() ]
   [ "finally" "implements"  abs=interfaces() ]
-  { res = ClassDefinition.makeClass
+  { res = bossa.syntax.dispatch.makeClass
 	(name,
 	isFinal,isAbstract,
 	parameters,typeParametersVariances,
@@ -1563,7 +1563,7 @@ Definition definition(List definitions, boolean storeDocString):
         res=customConstructor(cst)
       | LOOKAHEAD ( "abstract" "interface" )
         res=interfaceDefinition(cst, definitions)
-      | res=classDefinition(cst, definitions, storeDocString)
+      | res=typeDefinition(cst, definitions, storeDocString)
       | res=methodDeclaration(cst, false)
       )
     )

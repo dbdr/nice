@@ -15,7 +15,7 @@ package nice.tools.doc;
     //println("Type: " + m.getType());
     //println("Formal Parameters: " + m.formalParameters());
 
-import bossa.syntax.*;
+import bossa.syntax;
 import java.util.*;
 import java.text.*;
 import java.io.*;
@@ -40,7 +40,7 @@ class HTMLWriter {
       //System.err.println("Ignoring " + d.getName() + " (class: " + d.getClass().getName() + ") with docString: "+ d.docString());
   }
 
-  write(ClassDefinition.Class c, packageName) {
+  write(TypeDefinition c, packageName) {
     // Here we handle classes
     
     //Initialise a FileWriter
@@ -65,8 +65,8 @@ class HTMLWriter {
     writer.write("<h1>Class " + htmlEncode(c.getName()) + "</h1>\n");
 
     //Print hierarchy
-    ArrayList<ClassDefinition.Class> list = new ArrayList();
-    ?ClassDefinition.Class superClass = c.getSuperClassDefinition();
+    ArrayList<TypeDefinition> list = new ArrayList();
+    ?ClassDefinition superClass = c.getSuperClassDefinition();
     while(superClass != null) {
       list.add(superClass);
       superClass = superClass.getSuperClassDefinition();
@@ -90,11 +90,11 @@ class HTMLWriter {
     writer.write("</pre>\n");
 
     //Implemented interfaces
-    ClassDefinition.Interface[?] interfaces = c.getImplementedInterfaces();
+    InterfaceDefinition[?] interfaces = c.getImplementedInterfaces();
     if(interfaces != null && interfaces.length > 0) {
       writer.write("<b>Implemented interfaces:</b>\n");
       writer.write("<ul>\n");
-      interfaces.foreach(ClassDefinition.Interface i => 
+      interfaces.foreach(InterfaceDefinition i =>
   		         writer.write("<li>" + htmlEncode(i.getName()) + "</li>\n"));
       writer.write("</ul>\n");
     }
@@ -246,7 +246,7 @@ class HTMLWriter {
       
       for(Definition d : p.getDefinitions().definitions()) {
         //we only display information about these types
-        if(d instanceof ClassDefinition.Class ||
+        if(d instanceof TypeDefinition ||
            d instanceof MethodDeclaration ||
            d instanceof DefaultMethodImplementation ||
            d instanceof GlobalVarDeclaration) {
@@ -306,7 +306,7 @@ class HTMLWriter {
       writer.write("<h1>Package " htmlEncode(p.getName()) "</h1>\n");
             
       //we need to separate class, methods, and global variables
-      (ArrayList<ClassDefinition.Class> classes,
+      (ArrayList<TypeDefinition> classes,
        ArrayList<MethodDeclaration> methods,
        ArrayList<GlobalVarDeclaration> globalVars) = separateDefinitions(p.getDefinitions().definitions());
       
@@ -314,7 +314,7 @@ class HTMLWriter {
       if(classes.size() > 0) {
         writer.write("<b>Classes:</b>\n");
         writer.write("<ul>\n");
-        for(ClassDefinition.Class c : classes) {
+        for(TypeDefinition c : classes) {
             String s = c.getName().toString();
             int index = s.lastIndexOf('.');
             if(index != s.length()-1)
@@ -533,14 +533,14 @@ String hexEncode(int i) {
  * Takes a List of definitions and sorts them into class definitions, 
  * method declarations, and global variable declarations.
  */
-(ArrayList<ClassDefinition.Class>,
+(ArrayList<TypeDefinition>,
  ArrayList<MethodDeclaration>,
  ArrayList<GlobalVarDeclaration>) separateDefinitions(List<Definition> definitions) {
-    ArrayList<ClassDefinition.Class> classes = new ArrayList();
+    ArrayList<TypeDefinition> classes = new ArrayList();
     ArrayList<MethodDeclaration> methods = new ArrayList();
     ArrayList<GlobalVarDeclaration> globalVars = new ArrayList();
     for(Definition d : definitions) {
-        if(d instanceof ClassDefinition.Class) {
+        if(d instanceof TypeDefinition) {
           classes.add(d);
         }
         else if(d instanceof MethodDeclaration) {
@@ -567,7 +567,7 @@ String sourceCodeFiles(File file, List<Definition> definitions) {
   
   StringBuffer buffer = new StringBuffer();
   //we need to separate class, methods, and global variables
-  (ArrayList<ClassDefinition.Class> classes,
+  (ArrayList<TypeDefinition> classes,
    ArrayList<MethodDeclaration> methods,
    ArrayList<GlobalVarDeclaration> globalVars) = separateDefinitions(definitions);
   
@@ -581,7 +581,7 @@ String sourceCodeFiles(File file, List<Definition> definitions) {
     buffer.append("    <h3 class=\"listheading\"><a href=\"javascript:toggle('" file.getName() "Classes');\">Classes</a></h3>\n");
     buffer.append("    <span id=\"" file.getName() "Classes\" style=\"display: none;\">\n");
     buffer.append("    <ul>\n");
-    for(ClassDefinition.Class c : classes) {
+    for(TypeDefinition c : classes) {
       String s = c.getName().toString();
       int index = s.lastIndexOf('.');
       if(index != s.length()-1)

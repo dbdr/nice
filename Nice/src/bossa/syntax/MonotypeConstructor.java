@@ -79,7 +79,7 @@ public class MonotypeConstructor extends Monotype
     }
     catch(mlsub.typing.BadSizeEx e){
       // See if this is a class with default type parameters
-      mlsub.typing.Monotype res = ClassDefinition.toType(lowlevelTC, resolvedParams);
+      mlsub.typing.Monotype res = dispatch.getTypeWithTC(lowlevelTC, resolvedParams);
       if (res != null)
         return res;
 

@@ -64,7 +64,7 @@ public class AbstractInterfaceImplementation extends Definition
 			 interfaceName.location()));
     interfaceITF = ident.resolveToItf(typeScope);
 
-    ClassDefinition def = ClassDefinition.get(classTC);
+    TypeDefinition def = dispatch.getTypeDefinition(classTC);
 
     boolean isNiceClass = def != null &&
       (def.getImplementation() instanceof NiceClass);

@@ -83,6 +83,17 @@ public class dispatch
   static void typecheck(Statement s) {}
   static void typecheck(Expression e) {}
 
+  public static void resetTypeDefinitionMappings() {}
+
+  public static TypeDefinition getTypeDefinition(mlsub.typing.TypeConstructor tc)
+  { return null; }
+  
+  public static mlsub.typing.Monotype getTypeWithTC(mlsub.typing.TypeConstructor tc)
+  { return null; }
+  
+  public static mlsub.typing.Monotype getTypeWithTC(mlsub.typing.TypeConstructor tc, mlsub.typing.Monotype[] sourceParams )
+  { return null; }
+
   static bossa.util.UserError unknownIdent(LocatedString ident)
   {
     return null;

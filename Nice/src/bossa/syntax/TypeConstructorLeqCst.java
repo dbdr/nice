@@ -47,7 +47,7 @@ public class TypeConstructorLeqCst extends AtomicConstraint
 
     TypeConstructor tc2 = (TypeConstructor) s;
 
-    ClassDefinition c2 = ClassDefinition.get(tc2);
+    TypeDefinition c2 = dispatch.getTypeDefinition(tc2);
     if(c2!=null)
       {
 	Interface associatedInterface =

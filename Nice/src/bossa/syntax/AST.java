@@ -53,7 +53,7 @@ public class AST extends Node
     for(Iterator i = children.iterator(); i.hasNext();)
       {
 	Definition node = (Definition)i.next();
-	if (node instanceof ClassDefinition)
+	if (node instanceof TypeDefinition)
 	  classes.add(node);
         else if (node instanceof CustomConstructor)
           {
@@ -72,8 +72,8 @@ public class AST extends Node
           methods.add(((DefaultMethodImplementation) node).getDeclaration());
       }
 
-    this.classes = (ClassDefinition[]) 
-      classes.toArray(new ClassDefinition[classes.size()]);
+    this.classes = (TypeDefinition[]) 
+      classes.toArray(new TypeDefinition[classes.size()]);
 
     this.methods = (MethodDeclaration[]) 
       methods.toArray(new MethodDeclaration[methods.size()]);
@@ -230,7 +230,7 @@ public class AST extends Node
   }
 
   private Module module;
-  private ClassDefinition[] classes;
+  private TypeDefinition[] classes;
   private MethodDeclaration[] methods;
   private MethodBodyDefinition[] methodImplementations;
   private Definition[] globals;

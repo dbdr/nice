@@ -55,7 +55,7 @@ public class NewExp extends CallExp
       }
 
     // Make sure that the constructors have been created.
-    let definition = ClassDefinition.get(tc);
+    let definition = getTypeDefinition(tc);
     if (definition != null)
       definition.resolve();
     

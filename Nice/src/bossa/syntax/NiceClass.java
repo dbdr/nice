@@ -34,15 +34,15 @@ public abstract class NiceClass extends ClassImplementation
 {
   abstract public LocatedString getName();
 
-  abstract ClassDefinition getDefinition();
+  abstract TypeDefinition getDefinition();
 
   abstract public boolean isInterface();
 
   static NiceClass get(TypeConstructor tc)
   {
-    ClassDefinition res = ClassDefinition.get(tc);
-    if (res != null && res.implementation instanceof NiceClass)
-      return ((NiceClass) res.implementation);
+   TypeDefinition res = bossa.syntax.dispatch.getTypeDefinition(tc);
+    if (res != null && res.getImplementation() instanceof NiceClass)
+      return ((NiceClass) res.getImplementation());
     else
       return null;
   }

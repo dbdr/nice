@@ -408,4 +408,37 @@ public class rawArray extends java.util.AbstractList
       default : throw new Error("Unexpected error in array conversion");
     }
   }
+
+  /****************************************************************
+   * Utility functions
+   ****************************************************************/
+
+  /**
+     Variant of java.lang.reflect.Array.set that is more flexible about how
+     the primitive values are boxed.
+  */
+  public static void Array_set(Object array, int index, Object value)
+  {
+    if (array instanceof Object[])
+      ((Object[])array)[index] = value;
+    else if (array instanceof int[])
+      ((int[])array)[index] = ((Number)value).intValue();
+    else if (array instanceof byte[])
+      ((byte[])array)[index] = ((Number)value).byteValue();
+    else if (array instanceof long[])
+      ((long[])array)[index] = ((Number)value).longValue();
+    else if (array instanceof char[])
+      ((char[])array)[index] = ((Character)value).charValue();
+    else if (array instanceof boolean[])
+      ((boolean[])array)[index] = ((Boolean)value).booleanValue();
+    else if (array instanceof double[])
+      ((double[])array)[index] = ((Number)value).doubleValue();
+    else if (array instanceof float[])
+      ((float[])array)[index] = ((Number)value).floatValue();
+    else if (array instanceof short[])
+      ((short[])array)[index] = ((Number)value).shortValue();
+    else
+      throw new IllegalArgumentException();
+  }
+
 }

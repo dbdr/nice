@@ -194,3 +194,15 @@ void f() {
     String s = c.t;
   }
 }
+
+/// FAIL
+  X<String> foo = new X();
+  if (foo instanceof Y)
+    foo.bar();
+
+  /// Toplevel
+  class X<T> {}
+  class Y<U,V>
+  {
+    void bar() {}
+  }

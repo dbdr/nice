@@ -129,7 +129,11 @@ bossa.util.UserError ensureLocated(bossa.util.UserError e,
 	return null;
     }
 
-  return (sym, Monotype.sure(new mlsub.typing.MonotypeConstructor(tc, parameters)));
+  try {
+    return (sym, Monotype.sure(new mlsub.typing.MonotypeConstructor(tc, parameters)));
+  } catch(BadSizeEx e) {
+    return null;
+  }
 }
 
 /****************************************************************

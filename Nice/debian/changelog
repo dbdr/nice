@@ -1,3 +1,10 @@
+nice (0.6) unstable; urgency=low
+
+  * First stable version, based on 0.5.6
+  * Fixed an error message for incorrect calls to anonymous functions.
+
+ -- Daniel Bonniot <bonniot@users.sourceforge.net>  Thu, 11 Jul 2002 10:52:52 +0200
+
 nice (0.5.6) unstable; urgency=low
 
   * Added the ".class" construct.

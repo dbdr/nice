@@ -210,8 +210,7 @@ PrintStream stderr () = native System.err;
 <K,V> TreeMap<K,V> TreeMap() = native new TreeMap();
 <K,V,T | K <: T> TreeMap<K,V> TreeMap(Comparator<T>) = native new TreeMap(Comparator);
 <K,K0,V,V0 | K0 <: K, V0 <: V> TreeMap<K,V> TreeMap(Map<K0,V0>) = native new TreeMap(Map);
-<K,V> TreeMap<K,V> TreeMap(Sor/*
-ap<K,V>) = native new TreeMap(SortedMap);
+<K,V> TreeMap<K,V> TreeMap(SorteMap<K,V>) = native new TreeMap(SortedMap);
 */
 /*
 interface Collection<T> = native java.util.Collection;
@@ -228,15 +227,15 @@ class AbstractList<T> extends AbstractCollection<T> implements List<T> = native 
 class AbstractSequentialList<T> extends AbstractList<T> = native java.util.AbstractSequentialList;
 class AbstractSet<T> extends AbstractCollection<T> implements Set<T> = native java.util.AbstractSet;
 class AbstractMap<K,V> implements Map<K,V> = native java.util.AbstractMap;
-class ArrayList<T> extends AbstractList<T> implements Cloneable, Serializable = native java.util.ArrayList;
-class HashMap<K,V> extends AbstractMap<K,V> implements Cloneable, Serializable = native java.util.HashMap;
-class HashSet<T> extends AbstractSet<T> implements Cloneable, Serializable = native java.util.HashSet;
-class Hashtable<K,V> implements Map<K,V>, Cloneable, Serializable = native java.util.Hashtable;
-class LinkedList<T> extends AbstractSequentialList<T> implements Cloneable, Serializable = native java.util.LinkedList;
+class ArrayList<T> extends AbstractList<T> = native java.util.ArrayList;
+class HashMap<K,V> extends AbstractMap<K,V> = native java.util.HashMap;
+class HashSet<T> extends AbstractSet<T> = native java.util.HashSet;
+class Hashtable<K,V> implements Map<K,V> = native java.util.Hashtable;
+class LinkedList<T> extends AbstractSequentialList<T> = native java.util.LinkedList;
 class Stack<T> extends Vector<T> = native java.util.Vector;
-class TreeMap<K,V> extends AbstractMap<K,V> implements SortedMap<K,V>, Cloneable, Serializable = native java.util.TreeMap;
-class TreeSet<T> extends AbstractSet<T> implements SortedSet<T>, Cloneable, Serializable = native java.util.TreeSet;
-class Vector<T> extends AbstractList<T> implements CloneabWeakSerializable = native java.util.Vector;
+class TreeMap<K,V> extends AbstractMap<K,V> implements SortedMap<K,V> = native java.util.TreeMap;
+class TreeSet<T> extends AbstractSet<T> implements SortedSet<T> = native java.util.TreeSet;
+class Vector<T> extends AbstractList<T> = native java.util.Vector;
 class WeakHashMap<K,V> extends AbstractMap<K,V> = native java.util.WeakHashMap;
 */
 

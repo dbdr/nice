@@ -39,8 +39,7 @@ class SourceMap extends Attribute
 
   public int getLength()
   {
-    // Truncate the content to keep it under 65535, because of a JVM bug.
-    return Math.min(65535, getBytes().length);
+    return getBytes().length;
   }
 
   private byte[] getBytes()
@@ -63,8 +62,7 @@ class SourceMap extends Attribute
     throws java.io.IOException
   {
     byte[] bytes = getBytes();
-    // Truncate the content to keep it under 65535, because of a JVM bug.
-    out.write(bytes, 0, Math.min(65535, bytes.length));
+    out.write(bytes, 0, bytes.length);
  }
 
   /*
@@ -90,6 +88,10 @@ class SourceMap extends Attribute
   {
     // We cannot do anything without the file name.
     if (file == null)
+      return -1;
+
+    // Truncate the content to keep it under 65535, because of a JVM bug.
+    if (buffer.length() + lines.length() > 65000)
       return -1;
 
     if (! file.equals(currentFile) || line < firstLine)

@@ -56,7 +56,8 @@ dist: share/java/Nice.jar
 	tar cf Nice-`date +"%Y.%m.%d"`.tar bin/nicer bin/nicec share/java/Nice.jar lib/emacs/nice-mode.el
 
 install: share/java/Nice.jar
-	mkdir -p ${INSTALLDIR}/bin ${INSTALLDIR}/share/java ${MANDIR} ${LISPDIR}
+	mkdir -p ${INSTALLDIR}/bin ${INSTALLDIR}/share/java \
+                 ${MANDIR} ${LISPDIR} ${DOCDIR}
 	cp bin/nicec ${INSTALLDIR}/bin/
 	cp share/java/Nice.jar ${INSTALLDIR}/share/java/ 
 	cp lib/emacs/nice-mode.el ${LISPDIR}

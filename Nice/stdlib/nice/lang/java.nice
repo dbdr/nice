@@ -196,12 +196,10 @@ PrintStream stderr () = native System.err;
 <T> HashSet<T> HashSet(int) = native new HashSet(int);
 <T> HashSet<T> HashSet(int,float) = native new HashSet(int,float);
 <T,U | U <: T> HashSet<T> HashSet(Collection<U>) = native new HashSet(Collection);
-/* JDK1.4
 <T> LinkedHashSet<T> LinkedHashSet() = native new LinkedHashSet();
 <T> LinkedHashSet<T> LinkedHashSet(int) = native new LinkedHashSet(int);
 <T> LinkedHashSet<T> LinkedHashSet(int,float) = native new LinkedHashSet(int,float);
 <T,U | U <: T> LinkedHashSet<T> LinkedHashSet(Collection<U>) = native new LinkedHashSet(Collection);
-JDK1.4 */
 <K,V> HashMap<K,V> HashMap() = native new HashMap();
 <K,V> HashMap<K,V> HashMap(int) = native new HashMap(int);
 <K,V> HashMap<K,V> HashMap(int,float) = native new HashMap(int,float);

@@ -62,6 +62,9 @@ In addition to traditional object-oriented features, Nice offers:
 <varlistentry><term>Parametric types</term><listitem><para> 
   This is especially useful for containers 
   (lists, hash-tables) and allows for shorter and safer code.
+  Values of primitive type (int, float, ...) can be used in polymorphic code,
+  in which case the wrapping and unwrapping is done automatically by the
+  compiler.
 </para>
 </listitem>
 </varlistentry>

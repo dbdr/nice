@@ -22,3 +22,12 @@
   ArrayList<int> alist = new ArrayList();
   alist.add(10);
   alist.remove(10);
+
+/// PASS
+  int[] a = [ 1, 10, 3 ];
+  a.sort((int i, int j) => j - i);
+  assert a[0] == 10;
+
+  String[] s = [ "a", "aa", "aaa" ];
+  s.sort((String s1, String s2) => s2.length - s1.length);
+  assert s[0] == "aaa";

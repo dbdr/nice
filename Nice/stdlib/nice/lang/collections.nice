@@ -160,6 +160,26 @@ similarEmptyCollection<C,T,U>(c#java.util.Stack)
 }
 
 /****************************************************************
+ * Sort
+ ****************************************************************/
+
+/**
+   comparator must return a negative integer, zero, or a positive integer 
+   as the first argument is less than, equal to, or greater than the second.
+*/
+<T> void sort(List<T> list, (T,T) -> int comparator) 
+{
+  Collections.sort(list, new NiceComparator(comparator: comparator));
+}
+
+class NiceComparator<T> implements java.util.Comparator
+{
+  final (T,T) -> int comparator;
+
+  compare(x, y) = (this.comparator)(x,y);
+}
+
+/****************************************************************
  * Standard operations
  ****************************************************************/
 

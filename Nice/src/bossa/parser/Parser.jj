@@ -1112,6 +1112,7 @@ MethodDeclaration methodDeclaration():
     MethodDeclaration res;
 }
 {
+  [ "public" | "private" ]
   cst=constraint()
     returnType=monotype()
     name=identOrBackquoted()

@@ -15,6 +15,7 @@ package nice.lang.inline;
 import gnu.mapping.Procedure2;
 import gnu.expr.*;
 import gnu.bytecode.*;
+import nice.tools.code.EnsureTypeProc;
 
 /**
    e1 || e2
@@ -36,15 +37,37 @@ public class OptionOr extends Procedure2 implements Inlineable
   {
     Expression[] args = exp.getArgs();
     CodeAttr code = comp.getCode();
+    Label _end = new Label(code);
 
-    args[0].compile(comp, target);
+    fixAndLoadArgument(args[0], comp, target);
     code.emitDup();
-    code.emitIfNull();
+    code.emitGotoIfNotNull(_end);
     code.emitPop(1);
-    args[1].compile(comp, target);
-    code.emitElse();
-    code.emitFi();
+    fixAndLoadArgument(args[1], comp, target);
+    _end.define(code);
   }
+
+  private void fixAndLoadArgument(Expression arg, Compilation comp, Target target)
+  {
+    if (arg instanceof ReferenceExp && ((ReferenceExp)arg).getBinding() != null)
+    {
+      Declaration.followAliases(((ReferenceExp)arg).getBinding()).load(comp);
+      return;
+    }
+    if ((arg instanceof ApplyExp) && (((ApplyExp)arg).getFunction() instanceof QuoteExp))
+    {
+      Object ensTP = ((QuoteExp)((ApplyExp)arg).getFunction()).getValue();
+      if (ensTP != null && (ensTP instanceof EnsureTypeProc))
+      {
+        Target t = new CheckedTarget(((EnsureTypeProc)ensTP).getReturnType(((ApplyExp)arg).getArgs()),
+ 			"nice.tools.code.EnsureTypeProc", gnu.mapping.WrongType.ARG_DESCRIPTION);
+	((ApplyExp)arg).getArgs()[0].compile(comp, t);
+        return;
+      }        
+    }
+    arg.compile(comp, target);
+  }    
+
 
   public Type getReturnType (Expression[] args)
   {

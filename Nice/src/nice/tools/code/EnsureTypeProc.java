@@ -19,6 +19,7 @@ package nice.tools.code;
 import gnu.expr.*;
 import gnu.bytecode.*;
 
+import nice.lang.inline.OptionOr;
 /**
    Ensures that the expression has the given bytecode type.
    
@@ -33,7 +34,7 @@ implements Inlineable
   public static Expression ensure(Expression exp, Type expectedType)
   {
     Type type = exp.getType();
-    
+
     if (! type.isAssignableTo(expectedType))
       return Inline.inline(new EnsureTypeProc(expectedType), exp);
     else
@@ -60,7 +61,17 @@ implements Inlineable
       }
     
     exp.getArgs()[0].compile(comp, target);
-    
+
+    // A nasty rare case
+    if ((oldTarget != null) &&
+        (oldTarget.getType() instanceof PrimType) &&
+        (exp.getArgs()[0] instanceof ApplyExp) && 
+        (((ApplyExp)exp.getArgs()[0]).getFunction() instanceof QuoteExp) && 
+        (((QuoteExp)((ApplyExp)exp.getArgs()[0]).getFunction()).getValue() instanceof OptionOr))
+    { 
+      type.emitCoerceFromObject(code);
+      return;
+    }
     /*
       If we changed the target, we also have to use the old one.
       It can happen that both produce code. For instance with

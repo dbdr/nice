@@ -5,7 +5,7 @@
    <meta name="Author" content="Daniel Bonniot">
    <meta name="GENERATOR" content="Mozilla/4.7 [en] (WinNT; I) [Netscape]">
    <title>The Nice programming language</title>
-   <link rel=stylesheet href="style.css">
+<link rel=stylesheet href="style.css">
 </head>
 <body text="#000000" bgcolor="#FFFFFF" link="#0000EF" vlink="#51188E" alink="#FF0000">
 
@@ -123,49 +123,45 @@ are equal.
 <tr>
 <td>
 <blockquote>
-<pre>
-class Object
+<pre>class Object
 {
-  boolean equals(Object that)
-  {
-    return this == that;
-  }
+&nbsp; boolean equals(Object that)
+&nbsp; {
+&nbsp;&nbsp;&nbsp; return this == that;
+&nbsp; }
 }
 
-class Person extends Object 
+class Person extends Object&nbsp;
 {
-  String name;
-  int age;
+&nbsp; String name;
+&nbsp; int age;
 
-  boolean equals(Object that)
-  {
-    <font color="#FF0000">if(!(that instanceof Person))</font>
-<font color="#FF0000">      return false;</font>
-    return name.equals((<font color="#FF0000">(Person)</font> that).name)
-       &amp;&amp; age==(<font color="#FF0000">(Person)</font> that).age;
-  }
-}
-</pre>
+&nbsp; boolean equals(Object that)
+&nbsp; {
+&nbsp;&nbsp;&nbsp; <font color="#FF0000">if(!(that instanceof Person))
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return false;
+</font>&nbsp;&nbsp;&nbsp; return name.equals((<font color="#FF0000">(Person)</font> that).name)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &amp;&amp; age==(<font color="#FF0000">(Person)</font> that).age;
+&nbsp; }
+}</pre>
 </blockquote>
 </td>
 
 <td>
 <blockquote>
-<PRE>
-&lt;<FONT COLOR="#b7860b">Any</FONT> T&gt; <FONT COLOR="#b7860b">boolean</FONT> <FONT COLOR="#cd0000">equals</FONT>(T, T);
+<pre>&lt;<font color="#B7860B">Any</font> T> <font color="#B7860B">boolean</font> <font color="#CD0000">equals</font>(T, T);
 
-<FONT COLOR="#cd0000">equals</FONT>(o1, o2) = o1==o2;
+<font color="#CD0000">equals</font>(o1, o2) = o1==o2;
 
-<FONT COLOR="#0000ee">class</FONT> <FONT COLOR="#cd0000">Person</FONT>
-{
-  <FONT COLOR="#b7860b">String</FONT> <FONT COLOR="#cd0000">name</FONT>;
-  <FONT COLOR="#b7860b">int</FONT> <FONT COLOR="#cd0000">age</FONT>;
+<font color="#0000EE">class</font> <font color="#CD0000">Person
+</font>{
+&nbsp; <font color="#B7860B">String</font> <font color="#CD0000">name</font>;
+&nbsp; <font color="#B7860B">int</font> <font color="#CD0000">age</font>;
 }
 
-<FONT COLOR="#cd0000">equals</FONT>(p1<FONT COLOR="#0000ee">@</FONT><FONT COLOR="#b7860b">Person</FONT>, p2<FONT COLOR="#0000ee">@</FONT><FONT COLOR="#b7860b">Person</FONT>) =
-  p1.name.equals(p2.name) &amp;&amp;
-  p1.age==p2.age;
-</PRE>
+<font color="#CD0000">equals</font>(p1<font color="#0000EE">@</font><font color="#B7860B">Person</font>, p2<font color="#0000EE">@</font><font color="#B7860B">Person</font>) =
+&nbsp; p1.name.equals(p2.name) &amp;&amp;
+&nbsp; p1.age==p2.age;</pre>
 </blockquote>
 </td>
 </tr>
@@ -201,49 +197,49 @@ holding the results. That is:
 
 <tr>
 <td>
-<blockquote><pre>
-
+<blockquote>
+<pre>
 interface BooleanFunction
 {
-  boolean apply(Object);
+&nbsp; boolean apply(Object);
 }
 
 interface Collection
 {
-  Collection filter(booleanFunction f);
+&nbsp; Collection filter(booleanFunction f);
 }
 
-interface List extends Collection 
+interface List extends Collection&nbsp;
 { ... }
 
 void main(String[] args)
 {
-  List l1;
-  BooleanFunction f;
-  ...
-  List l2 = <font color="#FF0000">(List)</font> l1.filter(f);
-}
-</pre></blockquote>
+&nbsp; List l1;
+&nbsp; BooleanFunction f;
+&nbsp; ...
+&nbsp; List l2 = <font color="#FF0000">(List)</font> l1.filter(f);
+}</pre>
+</blockquote>
 </td>
 
 <td>
-<blockquote><pre>
-<FONT COLOR="#0000ee">interface</FONT> <FONT COLOR="#cd0000">Collection</FONT>&lt;T&gt;
+<blockquote>
+<pre><font color="#0000EE">interface</font> <font color="#CD0000">Collection</font>&lt;T>
 {
-  <FONT COLOR="#0000ee">alike</FONT>&lt;T&gt; <FONT COLOR="#cd0000">filter</FONT>(<FONT COLOR="#0000ee">fun</FONT>(T)(<FONT COLOR="#b7860b">boolean</FONT>) f);
+&nbsp; <font color="#0000EE">alike</font>&lt;T> <font color="#CD0000">filter</font>(<font color="#0000EE">fun</font>(T)(<font color="#B7860B">boolean</font>) f);
 }
 
-<FONT COLOR="#0000ee">interface</FONT> <FONT COLOR="#cd0000">List</FONT>&lt;T&gt; <FONT COLOR="#0000ee">extends</FONT> <FONT COLOR="#b7860b">Collection</FONT>&lt;T&gt; 
+<font color="#0000EE">interface</font> <font color="#CD0000">List</font>&lt;T> <font color="#0000EE">extends</font> <font color="#B7860B">Collection</font>&lt;T>&nbsp;
 { ... }
 
-<FONT COLOR="#cd0000">main</FONT>(args)
+<font color="#CD0000">main</font>(args)
 {
-  <FONT COLOR="#b7860b">List</FONT>&lt;<FONT COLOR="#b7860b">int</FONT>&gt; <FONT COLOR="#cd0000">l1</FONT>;
-  <FONT COLOR="#0000ee">fun</FONT>(<FONT COLOR="#b7860b">int</FONT>)(<FONT COLOR="#b7860b">boolean</FONT>) f;
-  ...
-  <FONT COLOR="#b7860b">List</FONT> <FONT COLOR="#cd0000">l2</FONT> = l1.filter(f);
-}
-</pre></blockquote>
+&nbsp; <font color="#B7860B">List</font>&lt;<font color="#B7860B">int</font>> <font color="#CD0000">l1</font>;
+&nbsp; <font color="#0000EE">fun</font>(<font color="#B7860B">int</font>)(<font color="#B7860B">boolean</font>) f;
+&nbsp; ...
+&nbsp; <font color="#B7860B">List</font> <font color="#CD0000">l2</font> = l1.filter(f);
+}</pre>
+</blockquote>
 </td>
 </tr>
 </table></center>
@@ -272,33 +268,33 @@ cast-less use of clone.
 
 <tr>
 <td>
-<blockquote><pre>
-class Object
+<blockquote>
+<pre>class Object
 {
-  Object clone();
+&nbsp; Object clone();
 }
 
 void main(String[] args)
 {
-  java.util.Date d1;
-  ...
-  java.util.Date d2 = <font color="#FF0000">(Date)</font> d1.clone();
-}
-</pre></blockquote>
+&nbsp; java.util.Date d1;
+&nbsp; ...
+&nbsp; java.util.Date d2 = <font color="#FF0000">(Date)</font> d1.clone();
+}</pre>
+</blockquote>
 </td>
 
 <td>
-<blockquote><pre>
+<blockquote>
+<pre>
+&lt;<font color="#B7860B">Any</font> T> T <font color="#CD0000">clone</font>(T);
 
-&lt;<FONT COLOR="#b7860b">Any</FONT> T&gt; T <FONT COLOR="#cd0000">clone</FONT>(T);
-
-<FONT COLOR="#cd0000">main</FONT>(args)
+<font color="#CD0000">main</font>(args)
 {
-  java.util.Date d1;
-  ...
-  java.util.Date d2 = d1.clone();
-}
-</pre></blockquote>
+&nbsp; java.util.Date d1;
+&nbsp; ...
+&nbsp; java.util.Date d2 = d1.clone();
+}</pre>
+</blockquote>
 </td>
 </tr>
 </table></center>
@@ -350,6 +346,15 @@ arguments. The concrete syntax for functional type <i>(T1, T2, ..., Tn)
 = e; </tt>as an equivalent form for <tt>f(x@p) { return e; }</tt>. This
 is very handy when defining methods that return simple values, depending
 on the type of the argument -- that is doing <i>pattern-matching</i>.</li>
+
+<li>
+<b>Tuples</b>. Tuples allow for grouping several values in a single expression,
+without the pain of creating a specific class. For instance, <tt>("String",
+2*3, x.toString())</tt> is a tuple (a triplet in that case). It's type
+is written <tt>&lt;String, int, String></tt>. Tuple types are covariant,
+so a couple of <tt>int</tt> can be used where a couple of <tt>long</tt>
+is expected. A funny feature is that swapping two variables can be done
+without a temporary variable, using tuples: <tt>(x, y) = (y, x)</tt>.</li>
 </ul>
 </blockquote>
 

@@ -45,3 +45,8 @@ jar:
 
 dist: jar
 	tar cf lib/nice/Nice.tar bin/nicer bin/nicec lib/nice/Nice.jar lib/emacs/nice-mode.el
+
+# CVS
+
+status:
+	cvs status 2>&1 | egrep "File:|Examining" | grep -v "Up-to-date"

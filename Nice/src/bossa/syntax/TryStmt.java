@@ -88,7 +88,7 @@ public class TryStmt extends Statement
   Statement body;
   Statement finallyBody;
   List catches = new LinkedList();
-  
+
   public class Catch
   {
     Catch(TypeIdent tc, LocatedString var, Statement body)
@@ -106,7 +106,7 @@ public class TryStmt extends Statement
     CatchClause clause()
     {
       try{
-	Typing.leq(t, PrimitiveType.throwableTC());
+	Typing.leq(t, PrimitiveType.throwableTC);
       }
       catch(TypingEx e){
 	User.error(typeLocation, t + " is not catchable");

@@ -189,10 +189,6 @@ public class PrimitiveType extends ClassDefinition.ClassImplementation
   static TypeConstructor typeTC;
   static TypeConstructor collectionTC;
   static TypeConstructor throwableTC;
-  static TypeConstructor throwableTC()
-  {
-    return throwableTC;
-  }
 
   private static Polytype throwableType;
   static Polytype throwableType()
@@ -201,7 +197,7 @@ public class PrimitiveType extends ClassDefinition.ClassImplementation
       {
 	throwableType = new Polytype
 	  (Constraint.True, 
-	   Monotype.sure(new MonotypeConstructor(throwableTC(), null)));
+	   Monotype.sure(new MonotypeConstructor(throwableTC, null)));
       }
     return throwableType;
   }

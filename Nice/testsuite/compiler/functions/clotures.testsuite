@@ -25,3 +25,7 @@ void stripChar(char c, boolean b) {
 	b = true;
     });
   });
+
+/// PASS
+  /// Toplevel
+  let String->String->String foo = String s => String t => s+t;

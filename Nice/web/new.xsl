@@ -91,6 +91,9 @@
             <a class="nav" href="NiceManual.ps">PS</a>)
            <br />
            &nbsp;<span class="small">o</span><xsl:text> </xsl:text>
+           <a class="nav" href="/cgi-bin/twiki/view/Doc/QuickIntroduction">Getting started</a>
+           <br />
+           &nbsp;<span class="small">o</span><xsl:text> </xsl:text>
            <a class="nav" href="compilation.html">Using the compiler</a>
            <br />
           </td>

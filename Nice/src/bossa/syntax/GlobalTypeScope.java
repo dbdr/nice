@@ -12,6 +12,7 @@
 
 package bossa.syntax;
 
+import java.util.*;
 import bossa.util.*;
 import mlsub.typing.TypeSymbol;
 import mlsub.typing.TypeConstructor;
@@ -28,6 +29,16 @@ public class GlobalTypeScope extends TypeScope
   GlobalTypeScope()
   {
     super(null);
+    set = new HashSet();
+  }
+
+  void addMapping(String name, TypeSymbol s)
+  throws DuplicateName
+  {
+    super.addMapping(name, s);
+
+    if (!set.add(name.toLowerCase()))
+      throw new DuplicateName(name);
   }
 
   public TypeConstructor globalLookup(String name, Location loc)
@@ -85,4 +96,5 @@ public class GlobalTypeScope extends TypeScope
   }
 
   public Module module;
+  private Set set;
 }

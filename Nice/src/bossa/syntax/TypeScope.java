@@ -55,7 +55,7 @@ public class TypeScope implements TypeMap
 
   class DuplicateName extends Exception
   {
-    DuplicateName(String name, TypeSymbol old, TypeSymbol nou)
+    DuplicateName(String name)
     {
       super(name + " is already declared");
     }
@@ -66,7 +66,7 @@ public class TypeScope implements TypeMap
   {
     Object old = map.put(name,s);
     if (old != null)
-      throw new DuplicateName(name, (TypeSymbol) old, s);
+      throw new DuplicateName(name);
   }
 
   void addMappings(Collection names, TypeSymbol[] symbols) 

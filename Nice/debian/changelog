@@ -1,6 +1,6 @@
 nice (0.7.8) unstable; urgency=low
 
-  * Some operators(&&, ||, ...) generate better bytecode now.
+  * Some operators(&&, ||, ! and comparisons) generate better bytecode now.
   * Improved bytecode generation of pre\post-condition.
   * Implemented the enhanced for loop(similar to java 1.5 proposal).
     The loop works on arrays and collections, example:
@@ -17,7 +17,7 @@ nice (0.7.8) unstable; urgency=low
     Also report more nicely /* comments that are not closed.
   * Allow nested tuples on the left side of a tuple assignment:
       (String a, (String b, String c)) = ("a", ("b", "c"));
-  * Bugfixes.
+  * Bugfixes (solved problems with case insentive filenames, ...).
 
  --
 

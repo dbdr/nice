@@ -169,7 +169,6 @@ public class Constraint extends Node
 		    ok = true;
 		    break;
 		  }
-		Debug.println(atom+"");
 	      }
 	    if(!ok)
 	      Internal.error("Unable to print the constraint in a parsable form because of "+tc);

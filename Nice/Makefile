@@ -5,7 +5,7 @@ JAVAC=  javac -classpath ${TOP}/classes:${TOP}/src:${TOP}/stdlib -sourcepath ${T
 JAVACC= CLASSPATH=${TOP}/external/JavaCC.zip:${CLASSPATH} java COM.sun.labs.javacc.Main
 JAVADOC=javadoc #-linkoffline file:///C%7C/Apps/jdk1.2.1/docs/api file:///usr/opt/java122/docs/api
 
-NICEC= NICEJAR=${TOP}/stdlib nicec --classpath="${TOP}/stdlib:${TOP}/classes:${TOP}/src"
+NICEC= NICEJAR="${TOP}/stdlib" CLASSPATH="${TOP}/classes" nicec --classpath="${TOP}/stdlib:${TOP}/classes:${TOP}/src"
 NICEC_DEV= CLASSPATH=${TOP}/src/nice/tools/.compiler.jar:${TOP}/src:${TOP}/classes java -Dnice.systemJar=${TOP}/stdlib nice.tools.compiler.package --classpath="${TOP}/stdlib:${TOP}/classes:${TOP}/src"
 
 # run this first when you just checked out a fresh version
@@ -112,7 +112,7 @@ bootstrap:
 	ln -sf nicec bin/nicer
 	mkdir -p classes
 	cd classes; jar xf ../external/java-getopt-1.0.7.jar gnu
-	cd src/bossa/syntax && mv -f dispatch.java.bootstrap dispatch.java;true
+	-cd src/bossa/syntax && mv -f dispatch.java.bootstrap dispatch.java
 	${JAVAC} \
 		stdlib/nice/lang/Native.java stdlib/nice/lang/inline/*.java \
 		src/mlsub/compilation/Module.java \

@@ -36,27 +36,27 @@ public class OverloadedSymbolExp extends Expression
   {
     return createSymbolExp(symbols.get(0), this.location());
   }
-  
+
   private Expression uniqueExpression(VarSymbol sym, mlsub.typing.Polytype t)
   {
     SymbolExp res = createSymbolExp(sym, this.location());
     res.type = t;
     return res;
   }
-  
+
   resolveOverloading(CallExp callExp)
   {
     Arguments arguments = callExp.arguments;
     // It's better to do this know. OR is oriented, arguments first.
     arguments.computeTypes();
 
-    if (bossa.util.Debug.overloading) 
+    if (bossa.util.Debug.overloading)
       bossa.util.Debug.println("Overloading resolution for " + this +
 		    "\nwith parameters " + arguments);
 
     // FIRST PASS: only checks the number of parameters
-    
-    // remembers removed symbols, 
+
+    // remembers removed symbols,
     // to list possibilities if none matches
     LinkedList<VarSymbol> removed = new LinkedList();
 
@@ -66,7 +66,7 @@ public class OverloadedSymbolExp extends Expression
     for(let i = symbols.iterator(); i.hasNext();)
       {
 	let s = i.next();
-	
+
         if (s.isIgnored())
           {
             removed.add(s);
@@ -75,7 +75,7 @@ public class OverloadedSymbolExp extends Expression
           }
 
         let case = s.match(arguments);
-	if (case == 0) // Doesn't match 
+	if (case == 0) // Doesn't match
           {
 	    removed.add(s);
 	    i.remove();
@@ -88,8 +88,8 @@ public class OverloadedSymbolExp extends Expression
 	  { /* do nothing*/ }
 	else // Should not happen
           {
-	    Internal.warning("Unknown O.R. case: " + s.getClass()); 
-	    i.remove(); 
+	    Internal.warning("Unknown O.R. case: " + s.getClass());
+	    i.remove();
 	  }
       }
 
@@ -112,8 +112,8 @@ public class OverloadedSymbolExp extends Expression
     for (let i = symbols.iterator(); i.hasNext(); )
       {
 	let s = i.next();
-	
-	if(bossa.util.Debug.overloading) 
+
+	if(bossa.util.Debug.overloading)
 	  bossa.util.Debug.println("Overloading: Trying with "+s);
 
 	// we clone the type to avoid clashes with another use
@@ -123,7 +123,7 @@ public class OverloadedSymbolExp extends Expression
 	// before the clone type is released
 	s.makeClonedType();
 
-        mlsub.typing.Polytype[] argsType = 
+        mlsub.typing.Polytype[] argsType =
           this.computeArgsType(notNull(arguments.getExpressions(s)),
                           s.getClonedType(), arguments.getUsedArguments(s));
 
@@ -153,7 +153,7 @@ public class OverloadedSymbolExp extends Expression
 
     removeNonMinimal(symbols, arguments);
     removeOverlappingJavaMethods(symbols);
-    
+
     if (symbols.size() == 1)
       {
 	let res = symbols[0];
@@ -209,11 +209,11 @@ public class OverloadedSymbolExp extends Expression
 
   resolveOverloading(mlsub.typing.Polytype expectedType)
   {
-    if(bossa.util.Debug.overloading) 
+    if(bossa.util.Debug.overloading)
       bossa.util.Debug.println("Overloading resolution (expected type " + expectedType +
 		    ") for " + this);
 
-    // remembers removed symbols, 
+    // remembers removed symbols,
     // to list possibilities if none matches
     LinkedList<VarSymbol> removed = new LinkedList();
 
@@ -234,8 +234,8 @@ public class OverloadedSymbolExp extends Expression
 	  removed.add(s);
 	  i.remove();
 	  s.releaseClonedType();
-	  if(bossa.util.Debug.overloading) 
-	    bossa.util.Debug.println("Not "+s+" of type\n" + s.getClonedType() + 
+	  if(bossa.util.Debug.overloading)
+	    bossa.util.Debug.println("Not "+s+" of type\n" + s.getClonedType() +
 			  "\nbecause "+e);
 	}
       }
@@ -243,7 +243,7 @@ public class OverloadedSymbolExp extends Expression
     if (symbols.size() == 1)
       {
 	let s = symbols[0];
-	let symType = s.getClonedType();	
+	let symType = s.getClonedType();
 	s.releaseClonedType();
 	return this.uniqueExpression(s, symType);
       }
@@ -258,8 +258,8 @@ public class OverloadedSymbolExp extends Expression
 	  let nonMin = removeNonMinimal(symbols);
 	  if (symbols.size() == 1)
             {
- 	      let s = symbols[0];
-	      let symType = s.getClonedType();	
+	      let s = symbols[0];
+	      let symType = s.getClonedType();
 	      s.releaseClonedType();
               symbols = nonMin;
 	      return this.uniqueExpression(s, symType);
@@ -286,7 +286,7 @@ public class OverloadedSymbolExp extends Expression
 
   noOverloading()
   {
-    if(bossa.util.Debug.overloading) 
+    if(bossa.util.Debug.overloading)
       bossa.util.Debug.println("(no)Overloading resolution for "+this);
 
     if(symbols.size()==1)
@@ -307,7 +307,7 @@ public class OverloadedSymbolExp extends Expression
     if (symbols.size() != 0)
       throw new AmbiguityError(this);
 
-    throw User.error(this, 
+    throw User.error(this,
                      "No variable or field in this class has name " + ident);
   }
 
@@ -378,7 +378,7 @@ public class OverloadedSymbolExp extends Expression
       {
 	let sym = removed[0];
         if (sym.isIgnored())
-          return sym.getName() + 
+          return sym.getName() +
             " cannot be used because it has been ignored.\n" +
             "See above for the reason why it has been ignored";
 
@@ -413,7 +413,7 @@ public class OverloadedSymbolExp extends Expression
     if (removed.size() == 1)
       return ident + " has type " + removed[0].getType();
 
-    return "No symbol with name " + ident + " has type " + expectedType + 
+    return "No symbol with name " + ident + " has type " + expectedType +
 		":\n" + Util.map("", "\n", "", removed);
   }
 
@@ -430,7 +430,7 @@ Expression createOverloadedSymbolExp(List<VarSymbol> symbols, LocatedString iden
     return res;
   }
 
-private Expression createOverloadedSymbolExp(List<VarSymbol> symbols, LocatedString ident, 
+private Expression createOverloadedSymbolExp(List<VarSymbol> symbols, LocatedString ident,
                               boolean noImplicitThis)
   {
     let res = new OverloadedSymbolExp(symbols: symbols, ident: ident, noImplicitThis: noImplicitThis);
@@ -449,9 +449,9 @@ class AmbiguityError extends UserError {}
 
 new AmbiguityError(OverloadedSymbolExp sym)
     {
-      this(sym, 
-	    "Ambiguity for symbol " + sym.ident + 
-	    ". Possibilities are :\n" + 
+      this(sym,
+	    "Ambiguity for symbol " + sym.ident +
+	    ". Possibilities are :\n" +
 	    Util.map("", "\n", "", sym.symbols));
     }
 
@@ -461,15 +461,15 @@ List<VarSymbol> removeNonMinimal(Collection<VarSymbol> symbols)
   // optimization
   if(symbols.size()<2)
     return removed;
-    
+
   int len = symbols.size();
   List<VarSymbol> syms = new ArrayList(symbols);
   boolean[] remove = new boolean[len];
-    
+
   for(int s1 = 0; s1<len; s1++) {
 
     mlsub.typing.Domain d1 = nice.tools.typing.Types.domain(syms[s1].getType());
-      
+
     for(int s2 = 0; s2<len; s2++)
       /*
 	Look for symbols s1 and s2 such that
@@ -505,7 +505,7 @@ List<VarSymbol> removeNonMinimal(Collection<VarSymbol> symbols)
       {
 	if (bossa.util.Debug.overloading)
 	  bossa.util.Debug.println("Removing " + syms[i] + " since it is not minimal");
-	  
+
         removed.add(syms[i]);
 	symbols.remove(syms[i]);
        }
@@ -520,7 +520,7 @@ List<VarSymbol> removeNonMinimal(Collection<VarSymbol> symbols)
  * with s1:A->C and s2:B->D with B<:A,
  * removoNonMinimal will remove s1.
  *
- * This allows for java-style overloading, 
+ * This allows for java-style overloading,
  * where the most precise method is choosen at compile-time.
  */
 private void removeNonMinimal(List<VarSymbol> symbols, Arguments arguments)
@@ -528,16 +528,16 @@ private void removeNonMinimal(List<VarSymbol> symbols, Arguments arguments)
   // optimization
   if(symbols.size()<2)
     return;
-  
+
   int len = symbols.size();
   List<VarSymbol> syms = new ArrayList(symbols);
   boolean[] remove = new boolean[len];
-  
+
   for(int s1 = 0; s1<len; s1++) {
 
-    mlsub.typing.Domain d1 = domain(syms[s1].getClonedType(), 
-		 	arguments.getUsedArguments(syms[s1]));
-      
+    mlsub.typing.Domain d1 = domain(syms[s1].getClonedType(),
+			arguments.getUsedArguments(syms[s1]));
+
     for(int s2 = 0; s2<len; s2++)
       /*
 	Look for symbols s1 and s2 such that
@@ -550,7 +550,7 @@ private void removeNonMinimal(List<VarSymbol> symbols, Arguments arguments)
       */
       if (s1 != s2 && !remove[s2]) {
 
-	mlsub.typing.Domain d2 = domain(syms[s2].getClonedType(), 
+	mlsub.typing.Domain d2 = domain(syms[s2].getClonedType(),
 			     arguments.getUsedArguments(syms[s2]));
 
 	try {
@@ -573,7 +573,7 @@ private void removeNonMinimal(List<VarSymbol> symbols, Arguments arguments)
       {
 	if (bossa.util.Debug.overloading)
 	  bossa.util.Debug.println("Removing " + syms[i] + " since it is not minimal");
-	  
+
 	syms[i].releaseClonedType();
 	symbols.remove(syms[i]);
       }
@@ -606,7 +606,7 @@ private mlsub.typing.Domain domain(mlsub.typing.Polytype t, int[?] usedArguments
    When a Java class implements two interfaces,
    there is no ambiguity between methods of the same signature
    defined in both interfaces, since they are implemented by the same
-   method in the class. So this method removes all but one of the 
+   method in the class. So this method removes all but one of the
    overlapping methods.
 */
 private void removeOverlappingJavaMethods(List<VarSymbol> symbols)
@@ -614,7 +614,7 @@ private void removeOverlappingJavaMethods(List<VarSymbol> symbols)
   // optimization
   if(symbols.size()<2)
     return;
-  
+
   int len = symbols.size();
   List<VarSymbol> syms = new ArrayList(symbols);
 

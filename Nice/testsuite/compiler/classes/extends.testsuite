@@ -11,3 +11,20 @@
 /// FAIL
   /// Toplevel
   class A extends /*/// FAIL HERE */ java.lang.String {}
+
+/// FAIL
+  /// Toplevel
+  interface I {}
+  class A extends /*/// FAIL HERE */ I {}
+
+/// FAIL
+  /// Toplevel
+  class A extends /*/// FAIL HERE */ java.util.EventListener {}
+
+/// FAIL
+  /// Toplevel
+  class A implements /*/// FAIL HERE */ java.io.File {}
+
+/// FAIL
+  /// Toplevel
+  interface I extends /*/// FAIL HERE */ java.io.File {}

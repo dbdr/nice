@@ -1,7 +1,7 @@
 /**************************************************************************/
 /*                                N I C E                                 */
 /*             A high-level object-oriented research language             */
-/*                        (c) Daniel Bonniot 2000                         */
+/*                        (c) Daniel Bonniot 2002                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -14,6 +14,7 @@ package bossa.syntax;
 
 import bossa.util.*;
 import mlsub.typing.*;
+import nice.tools.code.Types;
 
 import gnu.bytecode.*;
 import java.util.*;
@@ -237,13 +238,12 @@ abstract public class ClassDefinition extends MethodContainer
 	  if (superClass.isMinimal())
 	    User.error(superClassIdent,
 		       superClass + " is a final class. It cannot be extended");
-	  superClassIdent = null;
-
-	  ClassDefinition def = ClassDefinition.get(superClass);
-	  if (def instanceof Interface)
-	    User.error(name,
+	  if (isInterface(superClass))
+	    User.error(superClassIdent,
 		       superClass + " is an interface, so " + name + 
 		       " may only implement it");
+
+	  superClassIdent = null;
 	}
 
       // Resolve the superclass first.
@@ -497,6 +497,10 @@ abstract public class ClassDefinition extends MethodContainer
 	  res[n++] = (mlsub.typing.Interface) s;
 	else
 	  {
+	    TypeConstructor tc = (TypeConstructor) s;
+	    if (! isInterface(tc))
+	      throw User.error(name, tc + " is not an interface");
+
 	    if (javaInterfaces == null)
 	      javaInterfaces = new ArrayList(5);
 	    javaInterfaces.add(s);
@@ -513,6 +517,13 @@ abstract public class ClassDefinition extends MethodContainer
       }
 
     return res;
+  }
+
+  private static boolean isInterface(TypeConstructor tc)
+  {
+    ClassDefinition def = ClassDefinition.get(tc);
+    return def instanceof Interface || 
+      def == null && ((ClassType) Types.get(tc)).isInterface();
   }
 
   void resolveBody()

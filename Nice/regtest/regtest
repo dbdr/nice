@@ -148,3 +148,8 @@ for subdir in *; do
 
   status
 done
+
+[ $pkg = $pkg_ok ] && exit 0
+
+# There was some error found
+exit 1

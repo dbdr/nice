@@ -82,11 +82,6 @@ public class MethodBodyDefinition extends MethodImplementation
     return res;
   }
 
-  public Collection associatedDefinitions()
-  {
-    return null;
-  }
-  
   final TypeConstructor firstArgument()
   {
     if (formals[0].tc != null)

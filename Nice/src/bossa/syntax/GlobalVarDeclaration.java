@@ -83,11 +83,6 @@ public class GlobalVarDeclaration extends Definition
     }
   }
 
-  public Collection associatedDefinitions()
-  {
-    return null;
-  }
-  
   void resolve()
   {
     if (value != null)

@@ -40,11 +40,6 @@ public class AbstractInterface extends MethodContainer
     addTypeSymbol(itf);
   }
 
-  public Collection associatedDefinitions()
-  {
-    return null;
-  }
-
   public void addMethod(Definition m)
   {
     addChild(m);

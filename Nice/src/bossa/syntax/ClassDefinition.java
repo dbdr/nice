@@ -433,11 +433,6 @@ public abstract class ClassDefinition extends MethodContainer
     addTypeSymbol(tc);
   }
 
-  public Collection associatedDefinitions()
-  {
-    return null;
-  }
-
   TypeScope getLocalScope()
   {
     TypeScope localScope = typeScope;

@@ -140,11 +140,6 @@ public class EnumDefinition extends Definition
     Expression value;
   }
 
-  public Collection associatedDefinitions()
-  {
-    return null;
-  }
-  
   void resolve()
   {
     for (Iterator it = symbols.iterator(); it.hasNext(); )

@@ -86,23 +86,8 @@ class Content
       }
 
     pkg.compilation.exitIfErrors();
-    
-    expand(definitions);
   }
 
-  private static void expand(List definitions)
-  {
-    Collection ads = new LinkedList();
-    for(Iterator i = definitions.iterator(); i.hasNext();)
-      {
-	Definition d = (Definition) i.next();
-	Collection c = d.associatedDefinitions();
-	if (c!=null)
-	  ads.addAll(c);
-      }
-    definitions.addAll(ads);
-  }
-  
   private void read(Content.Unit unit, List imports, Set opens)
   {
     bossa.util.Location.setCurrentFile(unit.file);

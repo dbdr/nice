@@ -33,17 +33,6 @@ public abstract class Definition extends Node implements bossa.util.Located
   }
   
   /**
-   * Returns a collection of definitions that are derived
-   * from the current definition.
-   * For example, a class definition A returns a collection
-   * with the definition of class #A.
-   */
-  public Collection associatedDefinitions()
-  {
-    return null;
-  }
-  
-  /**
      Resolve local entities, that do not influence the global context.
 
      Toplevel entities have already been resolved and declared earlier,

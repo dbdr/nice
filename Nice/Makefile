@@ -96,7 +96,7 @@ cvs-Nice:
 # Sourceforge
 
 sourceforge:
-	scp web/*.html web/*.css bonniot@shell.sourceforge.net:/home/groups/nice/htdocs
+	scp web/*.html web/*.css bonniot@shell.sourceforge.net:/home/groups/n/ni/nice/htdocs
 
 #****************************************************************
 # Bootstrap

@@ -21,9 +21,9 @@ build-stamp:
 
 	# Add here commands to compile the package.
 
-	# Ask javac to procue optimized code, but no debugging info
+	# Ask javac to produce optimized code, but no debugging info
         # so that the package is smaller.
-	$(MAKE) JAVAC_FLAGS="-O"
+	$(MAKE) complete JAVAC_FLAGS="-O"
 
 	#/usr/bin/docbook-to-man debian/nice.sgml > nice.1
 

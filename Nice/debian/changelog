@@ -22,6 +22,7 @@ nice (0.9.1) unstable; urgency=low
       }
   * Package-level constants and variables are now automatically initialized
     in the correct order when they directly depend on each other.
+  * Bugfixes (parameter's default value refering to previous parameters, ...)
 
  --
 

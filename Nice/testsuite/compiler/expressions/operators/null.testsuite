@@ -23,3 +23,10 @@
     ok = false;
   } catch (Error e) {}
   assert(ok);
+
+/// PASS
+  /// Toplevel
+(int,int) foo() {
+  Map<String,(int,int)> map = new HashMap();
+  return map.get("") || (1,1);
+}

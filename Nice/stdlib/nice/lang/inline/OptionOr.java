@@ -36,16 +36,14 @@ public class OptionOr extends Procedure2 implements Inlineable
   {
     Expression[] args = exp.getArgs();
     CodeAttr code = comp.getCode();
-    Target stack = Target.pushObject;
 
-    args[0].compile(comp, stack);
+    args[0].compile(comp, target);
     code.emitDup();
     code.emitIfNull();
     code.emitPop(1);
-    args[1].compile(comp, stack);
+    args[1].compile(comp, target);
     code.emitElse();
     code.emitFi();
-    target.compileFromStack(comp, Type.pointer_type);
   }
 
   public Type getReturnType (Expression[] args)

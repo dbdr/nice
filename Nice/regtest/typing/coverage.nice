@@ -8,6 +8,6 @@ abstract interface Abstract {}
 <Abstract A> void method1(A);
 <Abstract A> void method2(A, String);
 
-void method3(fun(String)(String));
+void method3(String->String);
 method3(f) {} // this case is mandatory to cover method3
 //method3(f@null) {} // this case should be illegal

@@ -9,10 +9,10 @@ interface Collection<T>
 {
   int size();
   boolean empty();
-  void iter(fun(T)());
+  void iter(T->void);
 
-  alike<T> filter(fun(T)(boolean));
-  <Any U> alike<U> map( fun(T)(U) );
+  alike<T> filter(T->boolean);
+  <Any U> alike<U> map(T->U);
 }
 
 empty(c@Collection) = c.size() == 0;
@@ -20,10 +20,10 @@ empty(c@Collection) = c.size() == 0;
 /**
    Equivalent definitions outside the interface:
 <Any T> int size(Collection<T>);
-<Any T> void iter(Collection<T>, fun(T)());
+<Any T> void iter(Collection<T>, T->void);
 
-<Collection C, Any T, Any U> C<U> map(C<T>, fun(T)(U));
-<Collection C, Any T> C<T> filter(C<T>, fun(T)(boolean));
+<Collection C, Any T, Any U> C<U> map(C<T>, T->U);
+<Collection C, Any T> C<T> filter(C<T>, T->boolean);
 */
 
 /** A growable Collection */
@@ -49,7 +49,7 @@ interface Sequence<T>
   T    get(int);    // alternative syntax: a[i]
   void set(int, T); // alternative syntax: a[i]=v
 
-  <Any U> U foldLeft(fun(U, T)(U), U);
+  <Any U> U foldLeft((U, T)->U, U);
 }
 
 iter(l@Sequence, f)
@@ -268,7 +268,7 @@ filter<C,T>(v@Vector, test)
  * Standard operations
  ****************************************************************/
 
-<Any T> T find (Sequence<T> s, fun(T)(boolean) test)
+<Any T> T find (Sequence<T> s, T->boolean test)
 {
   for (int i = 0; i < s.size(); i = i + 1)
     if (test(s.get(i)))
@@ -277,7 +277,7 @@ filter<C,T>(v@Vector, test)
   throw new java.util.NoSuchElementException();
 }
 
-<Any T> T findLast (Sequence<T> s, fun(T)(boolean) test)
+<Any T> T findLast (Sequence<T> s, T->boolean test)
 {
   for (int i = s.size(); --i >= 0;)
     if (test(s[i]))
@@ -286,7 +286,7 @@ filter<C,T>(v@Vector, test)
   throw new java.util.NoSuchElementException();
 }
 
-<Any T> ?T find (Sequence<!T> s, fun(!T)(boolean) test)
+<Any T> ?T find (Sequence<!T> s, !T->boolean test)
 {
   for (int i = 0; i < s.size(); i = i + 1)
     if (test(s.get(i)))

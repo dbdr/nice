@@ -2,14 +2,14 @@ package regtest.basic;
 
 /** Tests higher order functions */
 
-<Any T, Any U> U apply(fun(T)(U) f, T x) = f(x);
+<Any T, Any U> U apply(T->U f, T x) = f(x);
 
-<Any T, Any U> U apply2(fun(T)(U) f, T x);
+<Any T, Any U> U apply2(T->U f, T x);
 apply2(f, x) = f(x);
 
 class High
 {
-  alike high( fun()() );
+  alike high( ()->void );
 
   String->void fieldFunction;
 }

@@ -8,9 +8,9 @@ JAVAC=  javac -classpath "${TOP}/classes:${TOP}/src:${TOP}/stdlib" -sourcepath "
 JAVACC= CLASSPATH="${TOP}/external/JavaCC.zip:${CLASSPATH}" java COM.sun.labs.javacc.Main
 JAVADOC=javadoc #-linkoffline file:///C%7C/Apps/jdk1.2.1/docs/api file:///usr/opt/java122/docs/api
 
-NICEC_ARGS= --sourcepath="${TOP}/stdlib:${TOP}/src" -d "${TOP}/classes" --exclude-runtime 
-NICEC=nicec ${NICEC_ARGS}
-NICEC1=${TOP}/bin/nicec ${NICEC_ARGS}
+NICEC_ARGS= -d "${TOP}/classes" --exclude-runtime 
+NICEC=nicec ${NICEC_ARGS} --sourcepath="${TOP}/src"
+NICEC1=${TOP}/bin/nicec ${NICEC_ARGS} --sourcepath="${TOP}/stdlib:${TOP}/src"
 
 
 

@@ -723,6 +723,7 @@ typecheck(t@TryStmt)
 
 typecheck(s@SynchronizedStmt)
 {
+  s.object = notNull(s.object).noOverloading();
   mlsub.typing.Polytype type = notNull(s.object).getType();
   if (isPrimitive(type))
     throw bossa.util.User.error(s.object, 

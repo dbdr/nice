@@ -25,3 +25,19 @@ String f(String s)
     return s;
   }
 }
+
+/// PASS
+  /// Toplevel
+  class SharedBuffer {}
+
+  class Producer extends Thread {
+    SharedBuffer buffer;
+    run() { } 
+  }
+
+  class Consumer extends Thread {
+    SharedBuffer buffer;
+    run() {
+      synchronized(buffer) { }
+    } 
+  }

@@ -33,6 +33,7 @@ public class FormalParameters extends Node
     Monotype type;
 
     boolean match(String id) { return false; }
+    boolean requiresName() { return false; }
 
     void typecheck(mlsub.typing.Monotype domain)
     {
@@ -55,7 +56,13 @@ public class FormalParameters extends Node
     public NamedParameter(Monotype type, LocatedString name)
     { super(type); this.name = name; }
 
+    public NamedParameter(Monotype type, LocatedString name, boolean nameRequired)
+    { this(type, name); this.nameRequired = nameRequired; }
+
     LocatedString name;
+
+    boolean nameRequired = false;
+    boolean requiresName() { return nameRequired; }
 
     boolean match(String id) { return name.toString().equals(id); }
 
@@ -79,6 +86,10 @@ public class FormalParameters extends Node
       super(type, name); 
       this.defaultValue = defaultValue;
     }
+
+    public OptionalParameter
+      (Monotype type, LocatedString name, boolean nameRequired, Expression value)
+    { this(type, name, value); this.nameRequired = nameRequired; }
 
     Expression defaultValue;
 
@@ -260,7 +271,7 @@ public class FormalParameters extends Node
   boolean fill(int[] map, int num)
   {
     int i = 0;
-    while (i < map.length && map[i] != 0)
+    while (i < map.length && (map[i] != 0 || parameters[i].requiresName()))
       i++;
     
     if (i == map.length)

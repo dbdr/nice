@@ -53,7 +53,7 @@ public class OverloadedSymbolExp extends Expression
 
   OverloadedSymbolExp(VarSymbol[] symbols, LocatedString ident)
   {
-    this.symbols = new ArrayList();
+    this.symbols = new ArrayList(symbols.length);
     for (int i = 0; i < symbols.length; i++)
       this.symbols.add(symbols[i]);
 
@@ -117,13 +117,7 @@ public class OverloadedSymbolExp extends Expression
       }
 
     if (symbols.size() == 0)
-      User.error(this, 
-		 removed.size() == 0 ?
-		 "No method has name " + ident :
-		 removed.size() == 1 ?
-		 "Method " + ident + " expects parameters (" 
-		 + ((FunSymbol) removed.get(0)).parameters + ")":
-		 "No method with name " + ident + arguments.explainNoMatch());
+      User.error(this, noMatchError(removed, arguments));
 
     // SECOND PASS: check argument types
 
@@ -340,6 +334,37 @@ public class OverloadedSymbolExp extends Expression
 
   List symbols;
   LocatedString ident;
+
+  /****************************************************************
+   * Error messages
+   ****************************************************************/
+
+  /** No method in removed matched these arguments. */
+  private String noMatchError(List removed, Arguments arguments)
+  {
+    switch(removed.size())
+      {
+      case 0:
+	return "No method has name " + ident;
+
+      case 1:
+	FunSymbol f = (FunSymbol) removed.get(0);
+	boolean isConstructor = "<init>".equals(f.getName().toString());
+	if (!isConstructor)
+	  return "Method " + ident + " expects parameters (" + 
+	    f.parameters + ")";
+
+	// Here we assume that ident for constructors is formatted as
+	// "new ClassName". We might want something more robust.
+	return "Class " + ident.toString().substring(4) + 
+	  " has the following fields:\n" +
+	  f.parameters + "\n" +
+	  "Please provide values for the fields, at least for those with no default value.\nThe syntax is:\n  " + ident + "(field1: value1, ..., fieldN: valueN)";
+	  
+      default:
+	return "No method with name " + ident + arguments.explainNoMatch();
+      }
+  }
 
   class AmbiguityError extends UserError
   {

@@ -106,10 +106,11 @@ public class NiceClass extends ClassDefinition
     {
       if (value == null)
 	return new FormalParameters.NamedParameter(sym.syntacticType, 
-						   sym.getName());
+						   sym.getName(), true);
       else
 	return new FormalParameters.OptionalParameter(sym.syntacticType, 
-						      sym.getName(), value);
+						      sym.getName(), true,
+						      value);
     }
 
     MonoSymbol sym;

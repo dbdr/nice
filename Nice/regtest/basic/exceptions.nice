@@ -2,7 +2,9 @@
 
 package regtest.basic;
 
-class MyEx extends Exception {}
+class MyEx extends Exception {
+  String info;
+}
 
 void test_exceptions();
 test_exceptions()
@@ -22,10 +24,12 @@ test_exceptions()
   }
   
   try{
-    throw new MyEx();
+    MyEx ex = new MyEx();
+    ex.info = "woula";
+    throw ex;
   }
   catch(MyEx e){
-    println("MyEx");
+    println("MyEx: info=" + e.info);
   }
   catch(Exception e){
     println("Exception");

@@ -1,7 +1,7 @@
 /**************************************************************************/
 /*                                N I C E                                 */
 /*             A high-level object-oriented research language             */
-/*                        (c) Daniel Bonniot 2000                         */
+/*                        (c) Daniel Bonniot 2003                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -12,37 +12,37 @@
 
 package mlsub.compilation;
 
-import mlsub.compilation.*;
-
 /**
- * 'Make' tool for mlsub modules.
- * 
- * @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
+   Load modules, and resolve the identifiers, but do not compile them.
+
+   @author Daniel Bonniot (bonniot@users.sourceforge.net)
  */
 
-void compileComponent(Compilation compilation, List<Module> modules, 
-		      boolean doLink)
+void loadComponent(Compilation compilation, List<Module> modules)
 {
+  modules.foreach(Module m => m.scope());
+  modules.foreach(Module m => m.load());
+
   notNull(compilation.root).freezeGlobalContext();
 
   try {
-    modules.foreach(Module m => m.typecheck());
-    modules.foreach(Module m => m.compile());
-
-    if (doLink)
-      modules.foreach(Module m => m.link());
+    modules.foreach(Module m => m.typedResolve());
   }
   finally {
     notNull(compilation.root).unfreezeGlobalContext();
   }
+
+  modules.foreach(Module m => m.localResolve());
 }
 
-void make(mlsub.compilation.Compilation compilation)
+List<List<Module>> load(mlsub.compilation.Compilation compilation)
 {
-  List<List<Module>> sccs = load(compilation);
+  List<List<Module>> sccs =
+    stronglyConnectedComponents
+      (notNull(compilation.root), Module m => m.getRequirements());
 
   sccs.foreach(List<Module> scc => 
-	       compileComponent(compilation, scc, !compilation.skipLink));
-}
+	       loadComponent(compilation, scc));
 
-List<Module> getRequirements(Module) = native List Module.getRequirements();
+  return sccs;
+}

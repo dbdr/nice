@@ -1,0 +1,63 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2003                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package nice.tools.compiler;
+
+/**
+   Load packages, and resolve the identifiers, but do not compile them.
+
+   @author Daniel Bonniot (bonniot@users.sourceforge.net)
+ */
+
+List<bossa.modules.Package> load(Compilation compilation, String mainPackage)
+{
+  ?Throwable uncaughtException = null;
+
+  try {
+
+    bossa.modules.Package.currentCompilation = compilation;
+
+    if (compilation.runtimeFile == null)
+      compilation.runtimeFile = getNiceRuntime();
+    nice.tools.code.TypeImport.setRuntime(compilation.runtimeFile);
+    compilation.setMainPackage(mainPackage);
+
+    // We know that the Modules are in fact Packages
+    return cast(flatten(load(compilation)));
+  }
+  catch(bossa.util.UserError e){
+    bossa.util.Internal.warning("user error only caught in main"); 
+    compilation.listener.error(e.location, notNull(e.message));
+  }
+  catch(ExceptionInInitializerError e){
+    uncaughtException = e.getException();
+  }
+  catch(Throwable e){
+    uncaughtException = e;
+  }
+
+  if (uncaughtException != null)
+    {
+      let stackTrace = new java.io.StringWriter(500);
+      uncaughtException.printStackTrace(new java.io.PrintWriter(stackTrace));
+
+      compilation.listener.bug
+      (/*stackTrace:*/ stackTrace.toString(),
+       /*url:*/ 
+         "http://sourceforge.net/tracker/?func=add&group_id=12788&atid=112788"
+      );
+
+      throw uncaughtException;
+    }
+  else
+    throw new bossa.modules.Exit();
+}

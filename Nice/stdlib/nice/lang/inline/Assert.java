@@ -55,8 +55,16 @@ public class Assert extends ProcedureN implements Inlineable
 	code.ifAssertionsDisabledGoto
              (((ClassExp)comp.topLambda).getAssertionEnabledField(), end);
 
-    args[0].compile(comp, Type.boolean_type);
-    code.emitGotoIfIntNeZero(end); // The assertion is true.
+    Branchable branchOp = args[0].getBranchable();
+    if (branchOp != null)
+      {
+        branchOp.compileJump(comp, ((ApplyExp)args[0]).getArgs(), end);
+      }
+    else
+      {
+        args[0].compile(comp, Type.boolean_type);
+        code.emitGotoIfIntNeZero(end); // The assertion is true.
+      }
 
     code.emitNew(errorClass);
     code.emitDup();

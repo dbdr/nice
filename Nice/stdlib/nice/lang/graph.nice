@@ -47,8 +47,7 @@ package nice.lang;
   if(equals(min,mark.get(node)))
     {
       Vector<T> scc = new Vector();
-      // XXX: element does not need to be initialized. Remove when stable compiler allow this
-      T element = stack.peek();
+      T element;
       do
 	{
 	  element = stack.pop();

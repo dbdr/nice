@@ -935,7 +935,7 @@ while ((v = r.read()) != -1) {
     </section>
   </chapter>
 
-  <chapter><title>Interfacing with Java</title>
+  <chapter id="interfacingWithJava"><title>Interfacing with Java</title>
     <section><title>Using Java from Nice</title>
       <para>
         The Java libraries are automatically imported as necessary. 

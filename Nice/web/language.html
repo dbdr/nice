@@ -46,18 +46,19 @@ Classes and methods can be declared as in Java:
 } 
 </PRE>
 <p>Note that <tt>String display(); </tt><b>declares</b> a method, that
-is informs that this method exists. Now we have to <b>define</b> it, that
+is informs that this method exists. Now we have to <b>implement</b> it, that
 is tell what code is to be executed, depending on the runtime type of the
 person (in this short example either <tt>Person</tt> or <tt>Worker</tt>).
 <br>&nbsp;
 
-<h2>Defining methods</h2>
+<h2>Implementing methods</h2>
 
-Method definitions are placed outside of classes. Their order does not matter
-at all. The definitions of a single method may even occur in several files
-(this is not a flaw, it's an important feature that allows modularity).
-<p>So after the two above class definitions, we define two <b>alternatives</b>
-for method <tt>display </tt>:
+Method implementations can be placed outside of classes. 
+Their order does not matter. 
+The implementations of a single method may even occur in several files
+(this is an important feature that allows modularity).
+<p>So after the two above class definitions, we write two
+<b>implementations</b> for method <tt>display</tt>:
 <PRE>
 <FONT COLOR="#cd0000">display</FONT>(p<FONT COLOR="#0000ee">@</FONT><FONT COLOR="#b7860b">Person</FONT>) 
 { 
@@ -69,63 +70,14 @@ for method <tt>display </tt>:
   <FONT COLOR="#0000ee">return</FONT> p.name + <FONT COLOR="#a020f0">&quot; (age+&quot;</FONT> + p.age + <FONT COLOR="#a020f0">&quot;, salary=&quot;</FONT> + p.salary + <FONT COLOR="#a020f0">&quot;)&quot;</FONT>; 
 } 
 </PRE>
-<br>&nbsp;
 
-<h2>Parametric classes</h2>
-
-Classes and interfaces can have type parameters. For example, the <tt>Collection</tt>
-interface is parametrized by the type of its elements:
-<p>
-<PRE>
-<FONT COLOR="#0000ee">interface</FONT> <FONT COLOR="#cd0000">Collection</FONT>&lt;T&gt; 
-{ 
-  ... 
-} 
-</PRE>
-<p>If a class (resp. interface) has type parameters, then all its sub-classes
-(resp. sub-interfaces and implementing classes) must have the same type
-parameters.
-<p>
-<PRE>
-<FONT COLOR="#0000ee">class</FONT> <FONT COLOR="#cd0000">LinkedList</FONT>&lt;T&gt; <FONT COLOR="#0000ee">implements</FONT> <FONT COLOR="#b7860b">Collection&lt;T&gt; </FONT>
-{ 
-  <FONT COLOR="#b7860b">T </FONT><FONT COLOR="#cd0000">head</FONT>;
-  <FONT COLOR="#b7860b">LinkedList&lt;T&gt; </FONT><FONT COLOR="#cd0000">tail</FONT>; 
-} 
-</PRE>
-<p>A consequence of this rule is that there is no class (like <tt>Object</tt>
-in Java) that is an ancestor of all classes. There could not be, since
-all classes do not have the same number of type parameters.
-<br>However, it is possible to express that a method takes arguments of
-any type. For instance the <tt>equals</tt> method is declared in Nice:
-<br>
-<PRE>
-&lt;<FONT COLOR="#b7860b">Any T</FONT>&gt; <FONT COLOR="#b7860b">boolean</FONT> <FONT COLOR="#cd0000">equals</FONT>(<FONT COLOR="#b7860b">T</FONT>, <FONT COLOR="#b7860b">T</FONT>); 
-</PRE>
-<p>
-One can read this as 
-"for Any type T, the method <tt>equals</tt> takes two objects of type T, 
-and returns a boolean".
-<p>Thanks to the usual subsumption rule, this type makes it possible to
-call <tt>equals</tt> with arguments of different type, 
-as long as they are compatible (have a common super type). 
-For instance, it's legal to use <tt>equals</tt> to compare expressions 
-of type <tt>Collection&lt;int></tt> and <tt>LinkedList&lt;int></tt>,
-while it is not with types <tt>Collection&lt;String></tt> and <tt>String</tt>.
-<p>This approach is more sensible than Java's one, where the laters would
-be allowed and would always return false (not even raising a runtime error),
-while it is very likely a bug to compare a collection of strings to a string.
-<p>Note that it is also possible to define a function that takes two unrelated
-and unconstrained types. So it would be possible to define <tt>equals</tt> 
-to have the same typing behaviour it has in Java:
-<br><PRE>&lt;<FONT COLOR="#b7860b">Any T</FONT>, <FONT COLOR="#b7860b">Any U</FONT>&gt; <FONT COLOR="#b7860b">boolean</FONT> <FONT COLOR="#cd0000">equals</FONT>(<FONT COLOR="#b7860b">T</FONT>, <FONT COLOR="#b7860b">U</FONT>);</PRE>
 <br>&nbsp;
 
 <h2>Multiple dispatch</h2>
 
-In Nice, the choice of the method alternative is made at run-time, based
-on <b>all</b> parameters (in java, only the first, implicit parameter is
-used to choose the alternative). 
+In Nice, the choice of the method implementation is made at run-time, based
+on <b>all</b> parameters (in java, only the implicit parameter
+<tt>this</tt> is used to choose the alternative). 
 Such methods are thus called <b>multi-methods</b>.
 <p>
 Let's take the example of the <tt>equals</tt> method, 
@@ -192,7 +144,66 @@ projects).
 <p>Another great advantage of multi-methods is that they offer an attractive
 alternative to the <b>Visitor Pattern</b>. 
 <a href="visitor.html">This solution is presented in a full example</a>.
+
+<p>
+
+There is a 
+<a
+href="http://nice.sourceforge.net/cgi-bin/twiki/view/Doc/FunctionsAndMethods">
+more detailed introduction to methods in Nice</a> on the wiki.
+
 <br>&nbsp;
+
+<br>&nbsp;
+
+<h2>Parametric classes</h2>
+
+Classes and interfaces can have type parameters. For example, the <tt>Collection</tt>
+interface is parametrized by the type of its elements:
+<p>
+<PRE>
+<FONT COLOR="#0000ee">interface</FONT> <FONT COLOR="#cd0000">Collection</FONT>&lt;T&gt; 
+{ 
+  ... 
+} 
+</PRE>
+<p>If a class (resp. interface) has type parameters, then all its sub-classes
+(resp. sub-interfaces and implementing classes) must have the same type
+parameters.
+<p>
+<PRE>
+<FONT COLOR="#0000ee">class</FONT> <FONT COLOR="#cd0000">LinkedList</FONT>&lt;T&gt; <FONT COLOR="#0000ee">implements</FONT> <FONT COLOR="#b7860b">Collection&lt;T&gt; </FONT>
+{ 
+  <FONT COLOR="#b7860b">T </FONT><FONT COLOR="#cd0000">head</FONT>;
+  <FONT COLOR="#b7860b">LinkedList&lt;T&gt; </FONT><FONT COLOR="#cd0000">tail</FONT>; 
+} 
+</PRE>
+<p>A consequence of this rule is that there is no class (like <tt>Object</tt>
+in Java) that is an ancestor of all classes. There could not be, since
+all classes do not have the same number of type parameters.
+<br>However, it is possible to express that a method takes arguments of
+any type. For instance the <tt>equals</tt> method is declared in Nice:
+<br>
+<PRE>
+&lt;<FONT COLOR="#b7860b">Any T</FONT>&gt; <FONT COLOR="#b7860b">boolean</FONT> <FONT COLOR="#cd0000">equals</FONT>(<FONT COLOR="#b7860b">T</FONT>, <FONT COLOR="#b7860b">T</FONT>); 
+</PRE>
+<p>
+One can read this as 
+"for Any type T, the method <tt>equals</tt> takes two objects of type T, 
+and returns a boolean".
+<p>Thanks to the usual subsumption rule, this type makes it possible to
+call <tt>equals</tt> with arguments of different type, 
+as long as they are compatible (have a common super type). 
+For instance, it's legal to use <tt>equals</tt> to compare expressions 
+of type <tt>Collection&lt;int></tt> and <tt>LinkedList&lt;int></tt>,
+while it is not with types <tt>Collection&lt;String></tt> and <tt>String</tt>.
+<p>This approach is more sensible than Java's one, where the laters would
+be allowed and would always return false (not even raising a runtime error),
+while it is very likely a bug to compare a collection of strings to a string.
+<p>Note that it is also possible to define a function that takes two unrelated
+and unconstrained types. So it would be possible to define <tt>equals</tt> 
+to have the same typing behaviour it has in Java:
+<br><PRE>&lt;<FONT COLOR="#b7860b">Any T</FONT>, <FONT COLOR="#b7860b">Any U</FONT>&gt; <FONT COLOR="#b7860b">boolean</FONT> <FONT COLOR="#cd0000">equals</FONT>(<FONT COLOR="#b7860b">T</FONT>, <FONT COLOR="#b7860b">U</FONT>);</PRE>
 
 <h2>Precise types</h2>
 
@@ -329,8 +340,8 @@ void main(String[] args)
 
 <h2>Instructions and expressions</h2>
 
-The code of a method alternative, that goes between <tt>{</tt> and <tt>}</tt>,
-can be virtually any legal Java code.
+The code of a method implementation, that goes between <tt>{</tt> and
+<tt>}</tt>, can be almost any legal Java code.
 <br>Here is a list of the differences:
 <center><b>Missing constructs</b></center>
 
@@ -345,7 +356,9 @@ the "cast" fails, which is a nice property.</li>
 <li>
 <b>Visibility modifiers</b> (<tt>public, private</tt>) are accepted for
 class members, but are currently ignored. There is no theoretical problem
-to add visibility modifiers. This is future work to handle them.</li>
+to add visibility modifiers. We are <a
+href="roadmap.html">planning</a> 
+to support them before version <tt>1.0</tt>.</li>
 </ul>
 
 <center><b>Additional constructs</b></center>
@@ -372,7 +385,7 @@ arguments. The syntax for functional types is <tt>(T1, T2, ..., Tn)
 </li>
 
 <li>
-<b>Functional-like syntax for method definitions</b>. One can write <tt>f(x@P)
+<b>Functional-like syntax for method implementations</b>. One can write <tt>f(x@P)
 = e; </tt>as an equivalent form for <tt>f(x@p) { return e; }</tt>. This
 is very handy when defining methods that return simple values, depending
 on the type of the argument -- that is doing <i>pattern-matching</i>.</li>
@@ -439,34 +452,17 @@ name.
 <br><tt>&nbsp; w.close();</tt>
 <br><tt>}</tt>
 <br>&nbsp;
-<p>However, one might want to explicitely import methods to give them a
-more precise type (to benefit from parametric types for instance). Here
-is a more sophisticated example for the <tt>java.util.Map</tt> interface:
-<p><tt>interface Map&lt;Key,Element> = native java.util.Map;</tt>
-<p><tt>&lt;Any Key, Any Element> Element get(Map&lt;Key,Element>, Key)
-=</tt>
-<br><tt>&nbsp; native Object java.util.Map.get(Object);</tt>
-<br><br>
-Retyping can be more complex in practice but the java.util package is 
-already retyped in the compiler so you don't have to worry about it.
-<br>
-<p>Calling Nice code from Java is also possible.
-When calling a Nice method <tt>m</tt> declared in package
-<tt>my.package</tt>, the call in Java must be
-<tt>my.package.dispatch.m(...)</tt>. Of course the
-<tt>my.package</tt> part can be omitted if that package
-has been imported.
-Calling a Nice function is similar, replacing <tt>dispatch</tt>
-by <tt>fun</tt>.
-Nice classes can be created normally from Java using <tt>new</tt>.
-The constructor expects the initial value of all fields, given in the
-order they are defined (starting with fields from super-classes).
+<p>
+More advanced usage is described in the 
+<a href="manual.html#interfacingWithJava">corresponding section
+of the User's manual</a>: giving more precise types to Java methods, 
+calling Nice code from a Java program, ...
 <br>&nbsp;
 
 <h2>What else?</h2>
 
-A few advanced features are missing from this tutorial: 
-constructors, abstract interfaces, general constraints, final implementation.
+For a more complete description of the language, see 
+<a href="manual.html">the User's manual</a>.
 
 <h2>General information about Nice : 
 the <a href="index.html">Nice home page</a></h2>

@@ -37,11 +37,10 @@ public class Return extends Procedure1 implements Inlineable
   public void compile (ApplyExp exp, Compilation comp, Target target)
   {
     gnu.bytecode.CodeAttr code = comp.getCode();
-    Type type = code.getMethod().getReturnType();
     Expression[] args = exp.getArgs();
 
     if (args != null && args.length != 0)
-      args[0].compile(comp, new StackTarget(type));
+      args[0].compile(comp, new StackTarget(code.getMethod().getReturnType()));
 
     code.emitReturn();
   }

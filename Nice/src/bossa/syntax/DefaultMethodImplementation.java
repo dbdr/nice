@@ -28,12 +28,12 @@ public class DefaultMethodImplementation extends MethodImplementation
      Constraint constraint,
      Monotype returnType,
      FormalParameters parameters,
-     Contract contract,
+     Contract contract, boolean isOverride,
      Statement body)
   {
     super(name, body, getAnyPatterns(parameters, name.location()));
     this.declaration = new NiceMethod.WithDefault
-      (name, constraint, returnType, parameters, contract, this);
+      (name, constraint, returnType, parameters, contract, isOverride, this);
     addChild(declaration);
   }
 

@@ -47,7 +47,8 @@ public class NiceMethod extends UserOperator
      Monotype returnType,
      FormalParameters params,
      Statement body, 
-     Contract contract)
+     Contract contract,
+     boolean isOverride)
   {
     // it is a class method, there is an implicit "this" argument
 
@@ -125,22 +126,25 @@ public class NiceMethod extends UserOperator
     params.addThis(Monotype.create(Monotype.sure(thisType)));
     
     if (body == null)
-      return new NiceMethod(name, constraint, returnType, params, contract);
+      return new NiceMethod(name, constraint, returnType, params, contract, 
+                            isOverride);
     else
       return NiceMethod.WithDefault.create
-        (name, constraint, returnType, params, body, contract);
+        (name, constraint, returnType, params, body, contract, isOverride);
   }
 
   public NiceMethod(LocatedString name, 
 		    Constraint constraint, Monotype returnType, 
 		    FormalParameters parameters,
-		    Contract contract)
+		    Contract contract, boolean isOverride)
   {
     super(name, constraint, returnType, parameters, contract);
+    this.isOverride = isOverride;
     this.returnTypeLocation = returnType.location();
     bossa.link.Dispatch.register(this);
   }
 
+  private boolean isOverride;
   private bossa.util.Location returnTypeLocation;
 
   public boolean isMain()
@@ -295,24 +299,24 @@ public class NiceMethod extends UserOperator
        Monotype returnType,
        FormalParameters parameters,
        Statement body,
-       Contract contract)
+       Contract contract, boolean isOverride)
     {
       if (body == null)
         return new NiceMethod
-          (name, constraint, returnType, parameters, contract);
+          (name, constraint, returnType, parameters, contract, isOverride);
 
       return new DefaultMethodImplementation
-        (name, constraint, returnType, parameters, contract, body);
+        (name, constraint, returnType, parameters, contract, isOverride, body);
     }
 
     public WithDefault
       (LocatedString name, 
        Constraint constraint, Monotype returnType, 
        FormalParameters parameters,
-       Contract contract,
+       Contract contract, boolean isOverride,
        DefaultMethodImplementation impl)
     {
-      super(name, constraint, returnType, parameters, contract);
+      super(name, constraint, returnType, parameters, contract, isOverride);
       this.implementation = impl;
     }
 

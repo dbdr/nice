@@ -69,7 +69,7 @@ boolean foo(A) = false;
   /// package b import a
   /// Toplevel
 class B extends A {}
-boolean foo(B); foo(B x) = true;
+override boolean foo(B); foo(B x) = true;
 
 /// PASS
   A a = new C();

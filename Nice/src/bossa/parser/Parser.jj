@@ -900,8 +900,10 @@ Definition internalMethodOrFunction(MethodContainer c):
   Statement body = null;
   Contract contract;
   List statements = new LinkedList();
+  boolean isOverride = false;
 }
 {
+  [ "override" { isOverride = true; } ]
   cst=constraint()
   returnType=monotype()
   name=identOrBackquoted()
@@ -910,7 +912,8 @@ Definition internalMethodOrFunction(MethodContainer c):
   ( ";" | body = code() {statements.add(body);} )
   
   { return NiceMethod.create(c, name, cst, returnType, parameters, 
-                             body!=null?new Block(statements):null , contract); }
+                             body != null ? new Block(statements) : null,
+                             contract, isOverride); }
 }
 
 TypeIdent superClass():
@@ -1365,7 +1368,7 @@ MethodBodyDefinition methodBodyDefinition(NiceClass container):
 				      parameters,body); }
 }
 
-Definition methodDeclaration(Constraint cst):
+Definition methodDeclaration(Constraint cst, boolean isOverride):
 {
     LocatedString name;
     Monotype returnType;
@@ -1401,12 +1404,13 @@ Definition methodDeclaration(Constraint cst):
         { res = NiceMethod.WithDefault.create
             (name, cst, returnType, parameters, 
              body != null ? new Block(statements) : null, 
-             contract);
+             contract, isOverride);
         }
       |
         // Nice method
         ";"
-        { res = new NiceMethod(name,cst,returnType,parameters,contract); }
+        { res = new NiceMethod
+            (name, cst, returnType, parameters, contract, isOverride); }
       )
     )
   { return res; }
@@ -1547,13 +1551,15 @@ Definition definition(List definitions, boolean storeDocString):
     ( 
       res=globalVariable()
     | res=enumDefinition(definitions)
-    | { Constraint cst; } cst = constraint()
+    | "override" { Constraint cst; } cst = constraint() 
+      res=methodDeclaration(cst, true)
+    | cst = constraint()
       ( 
         res=customConstructor(cst)
       | LOOKAHEAD ( "abstract" "interface" )
         res=interfaceDefinition(cst)
       | res=classDefinition(cst, definitions, storeDocString)
-      | res=methodDeclaration(cst)
+      | res=methodDeclaration(cst, false)
       )
     )
   )

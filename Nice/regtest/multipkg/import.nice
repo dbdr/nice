@@ -49,7 +49,7 @@ void test_funs(Funs f0)
    f2 : int x => f0.f1,
    f3 : int x => f0.f2,
    f4 : int->int x => x(0),
-   f5 : int->int x => fun(int y) => x(y),
+   f5 : int->int x => int y => x(y),
    f6 : (int x, int y) => x - y,
 
    f7 : null,

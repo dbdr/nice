@@ -16,6 +16,7 @@ import bossa.util.*;
 import java.util.*;
 
 import mlsub.typing.TypeConstructor;
+import nice.tools.code.Types;
 
 /**
    Tools for classes and type constructors.
@@ -73,19 +74,15 @@ public final class TypeConstructors
     return definition != null && definition.isConcrete();
   }
   
-  /**
-     Test if a type constructor denotes a constant class,
-     in opposition to a type constructor variable.
-   */
-  static boolean constant(TypeConstructor tc)
+  static boolean isInterface(TypeConstructor tc)
   {
-    if(tc.isConcrete())
-      return true;
-
-    ClassDefinition definition = ClassDefinition.get(tc);
-    
-    return definition!=null;
+    ClassDefinition def = ClassDefinition.get(tc);
+    return def instanceof ClassDefinition.Interface || 
+      def == null && ((gnu.bytecode.ClassType) Types.get(tc)).isInterface();
   }
 
-  
+  static boolean isClass(TypeConstructor tc)
+  {
+    return Types.get(tc) != null;
+  }  
 }

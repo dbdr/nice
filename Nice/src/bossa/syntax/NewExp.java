@@ -37,12 +37,16 @@ public class NewExp extends CallExp
     tc = ti.resolveToTC(typeScope);
     ti = null;
     if(!TypeConstructors.instantiable(tc))
-      if(TypeConstructors.constant(tc))
-	User.error(this,
-		   tc+" is abstract, it can't be instantiated");
-      else
-	User.error(this,
-		   tc+" is a type variable, it can't be instantiated");
+      {
+	String message;
+	if (TypeConstructors.isInterface(tc))
+	  message = tc + " is an interface, it can't be instantiated";
+	else if (TypeConstructors.isClass(tc))
+	  message = tc + " is an abstract class, it can't be instantiated";
+	else
+	  message = tc + " is a type variable, it can't be instantiated";
+	throw User.error(this, message);
+      }
   }
   
   void resolve(TypeMap typeScope)

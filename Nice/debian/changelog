@@ -5,6 +5,8 @@ nice (0.7.4) unstable; urgency=low
     These replace the previous (very partial) collections from nice.lang.
     Functionals on collections (foreach, map, has, ...) are applicable
     to java.util Collections.
+  * Fixed error message for calling new on an interface or Java abstract
+    class.
 
  --
 

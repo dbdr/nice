@@ -243,7 +243,7 @@ abstract public class ClassDefinition extends MethodContainer
 	  if (superClass.isMinimal())
 	    User.error(superClassIdent,
 		       superClass + " is a final class. It cannot be extended");
-	  if (isInterface(superClass))
+	  if (TypeConstructors.isInterface(superClass))
 	    User.error(superClassIdent,
 		       superClass + " is an interface, so " + name + 
 		       " may only implement it");
@@ -514,7 +514,7 @@ abstract public class ClassDefinition extends MethodContainer
 	else
 	  {
 	    TypeConstructor tc = (TypeConstructor) s;
-	    if (! isInterface(tc))
+	    if (! TypeConstructors.isInterface(tc))
 	      throw User.error(name, tc + " is not an interface");
 
 	    if (javaInterfaces == null)
@@ -533,13 +533,6 @@ abstract public class ClassDefinition extends MethodContainer
       }
 
     return res;
-  }
-
-  private static boolean isInterface(TypeConstructor tc)
-  {
-    ClassDefinition def = ClassDefinition.get(tc);
-    return def instanceof Interface || 
-      def == null && ((ClassType) Types.get(tc)).isInterface();
   }
 
   void resolveBody()

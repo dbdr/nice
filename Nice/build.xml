@@ -3,7 +3,7 @@
 <project name="Nice" default="check">
   <property environment="env" />
   <property name="compiler" value="modern" description="example: ant -Dcompiler=gcj" />
-  <property name="jvmArgs" value="-Xms64m -Xmx128m" description="JVM options for speed" />
+  <property name="jvmArgs" value="-Xms64m -Xmx128m -ea" description="JVM options" />
   <property name="build" value="classes" />
   <property name="javaccVersion" value="javacc-3.2" />
   <property name="javaccZip" value="external/${javaccVersion}.zip" />

@@ -295,30 +295,16 @@ public final class JavaClasses
   {
     try{
       classType.addMethods();
-    }
-    catch(NoClassDefFoundError e){
-      User.warning("Class " + e.getMessage().replace('/','.') + 
-		   " was not found.\n" + 
-		   "It is refered to in class " + classType.getName() +
-		   "\nYou probably need to install the corresponding package.");
-    }
-    catch (ClassFormatError e) {
-      User.warning("Class " + classType.getName() + 
-		   " has an invalid bytecode format");
-    }
-    
-    for (Field f = classType.getFields(); f != null; f = f.getNext())
-      {
+
+      for (Field f = classType.getFields(); f != null; f = f.getNext())
 	if (retyped.get(f) == null)
 	  addSymbol(f, JavaFieldAccess.make(f));
-      }
 
-    for(Method m = classType.getMethods(); m!=null; m = m.getNext())
-      {
+      for (Method m = classType.getMethods(); m!=null; m = m.getNext())
 	if(m.isConstructor())
 	  {
 	    JavaMethod res = JavaMethod.make(m, true);
-    
+
 	    if (res != null)
 	      TypeConstructors.addConstructor(tc, res);
 	    else if(Debug.javaTypes)
@@ -345,7 +331,17 @@ public final class JavaClasses
 		addSymbol(m, JavaMethod.make(m, false));
 	      }
 	  }
-      }
+    }
+    catch(NoClassDefFoundError e){
+      User.warning("Class " + e.getMessage().replace('/','.') + 
+		   " was not found.\n" + 
+		   "It is refered to in class " + classType.getName() +
+		   "\nYou probably need to install the corresponding package.");
+    }
+    catch (ClassFormatError e) {
+      User.warning("Class " + classType.getName() + 
+		   " has an invalid bytecode format");
+    }
   }
 
   private static Method baseMethod(ClassType classType, Method m)

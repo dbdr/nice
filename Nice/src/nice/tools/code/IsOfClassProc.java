@@ -30,11 +30,18 @@ public class IsOfClassProc extends Procedure1 implements Inlineable
     Expression[] args = exp.getArgs();
     CodeAttr code = comp.getCode();
 
+    //first a check is needed for the case that the argument is null
     args[0].compile(comp, Target.pushObject);
+    code.emitDup();
+    code.emitIfNotNull();
     code.emitInvokeVirtual(getClassMethod);
     code.emitInvokeVirtual(getNameMethod);
     code.emitPushString(type.getName());
     code.emitInvokeVirtual(equalsMethod);
+    code.emitElse();
+    code.emitPop(1);
+    code.emitPushBoolean(false);
+    code.emitFi();
     target.compileFromStack(comp, Type.boolean_type);
   }
 

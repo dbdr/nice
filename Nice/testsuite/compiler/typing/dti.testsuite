@@ -27,7 +27,7 @@ boolean maybeTrue() = true;
   else
     s = null;
 
-  s.substring(1);
+  s. /*/// FAIL HERE*/ substring(1);
 
 /// PASS bug
   ?String s = maybeString();
@@ -75,7 +75,7 @@ boolean maybeTrue() = true;
       s = maybeStringGenerator();
     }
 
-  s.substring(1);
+  s. /*/// FAIL HERE*/ substring(1);
 
 /// FAIL
   ?String s = "abc";
@@ -98,22 +98,22 @@ boolean maybeTrue() = true;
   ?String s = "abc";
   try {
     s = null;
-    maybeException();
+    maybeThrow();
     s = "xyz";
   } catch (Exception e) {
-     s.substring(1);
+     s. /*/// FAIL HERE*/ substring(1);
   }
 
 /// FAIL
   ?String s = "abc";
   try {
-    maybeException();
+    maybeThrow();
   } catch (Exception e) {
      s = null;
   } catch (Exception e) {
      s = "xyz";
   } finally {
-    s.substring(1); 
+    s. /*/// FAIL HERE*/ substring(1); 
   }
 
 /// FAIL
@@ -121,7 +121,7 @@ boolean maybeTrue() = true;
   ()->void func;
   int x = 0;
   while (x++ < 10) {
-    s.substring(1);
+    s. /*/// FAIL HERE*/ substring(1);
     func = () => {s = null; };
     func();
   }

@@ -1,6 +1,6 @@
 package nice.tools.testsuite;
 
-
+import java.util.Iterator;
 
 /**
  * TestCase class fot the case that the test should fail
@@ -21,15 +21,17 @@ public class FailTestCase extends TestCase {
 
 
 	/**
-		Performs the test for this testcase.
-		Compilation should fail, otherwise throw exception.
-	*/
+	 * Performs the test for this testcase.
+	 * Compilation should fail, otherwise throw exception.
+	 * 
+	 */
 	public void performTest() {
 		super.performTest();
 		try {
 			compilePackages();
 		} catch(TestSuiteException e) {
 			pass();
+			checkFailPositions();
 			return;
 		} catch(CompilerBugException e) {
 			fail();
@@ -39,6 +41,73 @@ public class FailTestCase extends TestCase {
 		TestNice.getOutput().log("Compilation was expected to fail, but it succeeded.");
 		fail();
 	}
+	
+	
+	
+	/**
+	 * Parses the compiler messages for line, column, filename and compares them with the
+	 * Expected failure positions that the user defined. If the user definied more expected 
+	 * failure positions than the compiler recognized than a warning is shown.
+	 * A warning is also shown when the user expected a failure at another position than the
+	 * compiler recognized.
+	 * 
+	 */
+	private void checkFailPositions() {
+		String compilerMessages = getCompilerMessages();
+		//System.out.println(">" + compilerMessages + "<");
+		
+		for (Iterator iter = getFailPositions().iterator(); iter.hasNext();) {
+			FailPosition failPosition = (FailPosition)iter.next();
+			String s = failPosition.getFileName() + ": line " + failPosition.getLine() + ", column " + failPosition.getColumn() + ":";
+			//System.out.println(">" + s + "<");
+			if (compilerMessages.indexOf(s) == -1)
+				TestNice.getOutput().log("warning", "Failure not at expected position (" +
+						failPosition.getFileName() + ": line " + 
+						failPosition.getLine() + ", column " + failPosition.getColumn() + ")");
+			else
+				iter.remove();
+		
+		}
+		
+		if (getFailPositions().size() != 0)
+			TestNice.getOutput().log("warning", "more expected failures than compiler failures");
+		
+		/*
+		int failPositionCounter = 0;
+		int pos = 0;
+		
+		
+		while(true) {
+			int linePos = compilerMessages.indexOf(": line ", pos);
+			
+			if (linePos == -1)
+				break;
+			
+			pos = linePos + 7;
+			int columnPos = compilerMessages.indexOf(", column ");
+			
+			int line = Integer.parseInt(compilerMessages.substring(pos, columnPos).trim());
+			
+			pos = columnPos + 9;
+			int colonPos = compilerMessages.indexOf(":", pos);
+
+			int column = Integer.parseInt(compilerMessages.substring(pos, colonPos).trim());
+						
+			FailPosition failPosition = (FailPosition)getFailPositions().get(failPositionCounter++);
+
+			System.out.println("comp-line: " + line + "     comp-column: " + column);
+			System.out.println("exp-line: " + failPosition.getLine() + "     exp-column: " + failPosition.getColumn());
+
+
+			if (line != failPosition.getLine()  ||  column != failPosition.getColumn())
+				TestNice.getOutput().log("warning", "Failure not at expected position (" +
+						failPosition.getLine() + "," + failPosition.getColumn() +
+						") but at (" + line + "," + column + ")");
+		}
+		*/
+	}
+	
+	
 
 }
 

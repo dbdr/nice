@@ -19,25 +19,25 @@ import nice.tools.compiler.OutputMessages;
  */
 public class TestCase {
 	/**
-	 * TODO
+	 * Compiler message
 	 * 
 	 */
 	private static final String
 		ERROR_MSG = "Compilation failed with errors.";
 	/**
-	 * TODO
+	 * Compiler message
 	 * 
 	 */
 	private static final String
 		BUG_MSG = "Compilation failed because of a bug in the compiler.";
 	/**
-	 * TODO
+	 * Compiler message
 	 * 
 	 */
 	private static final String
 		WARNING_MSG = "Compilation successful despite warnings.";
 	/**
-	 * TODO
+	 * Compiler message
 	 * 
 	 */
 	private static final String
@@ -70,8 +70,25 @@ public class TestCase {
 	 * 
 	 */
 	private ByteArrayOutputStream _compilerMessagesStream;
-
 	
+	/**
+	 * Positions where failures should occur, defined by the user.
+	 * 
+	 */
+	private List _failPositions = new ArrayList();
+
+	/**
+		Counter that keeps track of the lines written to the
+		testcase source file. Needed for comparisons of
+		user defined failure positions to compiler reported
+		failure positions
+	*/
+	private int _lineCounter = 0;
+
+
+
+
+
 	/**
 	 * Constructor.
 	 * 
@@ -94,6 +111,15 @@ public class TestCase {
 		
 		if (_testSuite.hasGlobalSource())
 			_currentSourceFile.addImportGlobal();
+			
+		_lineCounter = 1;
+	}
+	
+	/**
+		Returns a list of expected failure positions defined by the user.
+	*/
+	protected List getFailPositions() {
+		return _failPositions;
 	}
 	
 	
@@ -105,27 +131,32 @@ public class TestCase {
 	 * @exception	TestSuiteException	TODO
 	 */
 	public void consumeLine(String line) throws TestSuiteException {
-		if (isKeywordLine(line))
+		//System.out.println("line " + _lineCounter + "   : " + line);
+		if (consumeKeywordLine(line))
 			return;
 
+		_lineCounter++;
+		consumeCommentedKeyword(line);
+		
 		_currentSourceFile.consumeLine(line);
 	}
 
 	
 	/**
 	 * Checks whether the line is a keyword line and sets the status new
-	 * if it is a keyword line
+	 * if it is a keyword line. Packages are also recorded in the dontcompile-collection
+	 if the word "dontcompile" occures in the keyword-line. Comments are delegated to the testsuite.
 	 * 
 	 * @param	line	TODO
 	 * @exception	TestSuiteException	TODO
 	 */
-	private boolean isKeywordLine(String line) throws TestSuiteException {
-		int posKeywordSign = line.indexOf(TestNice.KEYWORD_SIGN);
-		if (posKeywordSign == -1)
+	private boolean consumeKeywordLine(String line) throws TestSuiteException {
+		line = line.trim();
+		if (!line.startsWith(TestNice.KEYWORD_SIGN))
 			return false;
 		
-		String keywordStatement = line.substring(posKeywordSign + TestNice.KEYWORD_SIGN.length()).trim();
-		
+		String keywordStatement = line.substring(TestNice.KEYWORD_SIGN.length()).trim();
+		//System.out.println("keywordStatement: " + keywordStatement);
 		if (TestNice.KEYWORD_TOPLEVEL.equalsIgnoreCase(keywordStatement.toLowerCase()))
 			_currentSourceFile.setStatus(NiceSourceFile.STATUS_TOPLEVEL);
 		else if (keywordStatement.startsWith(TestNice.KEYWORD_PACKAGE)) {
@@ -143,6 +174,42 @@ public class TestCase {
 	}
 
 
+	/**
+		Consumes keywords embedded in comments.
+		Currently only <code>FAIL HERE</code> is supported.
+	*/
+	private void consumeCommentedKeyword(String line) {
+		int pos = 0;
+		while(true) {
+			int startCommentPos = line.indexOf("/*", pos);
+			if (startCommentPos == -1)
+				break;
+			int endCommentPos = line.indexOf("*/", startCommentPos + 2);
+			pos = endCommentPos;
+			//System.out.println("startCommentPos: " + startCommentPos);
+			//System.out.println("endCommentPos: " + endCommentPos);
+			if (startCommentPos == -1  ||  endCommentPos == -1)
+				return;
+				
+			String comment = line.substring(startCommentPos, endCommentPos);
+			int keywordSignPos = line.indexOf(TestNice.KEYWORD_SIGN);
+			//System.out.println("keywordSignPos: " + keywordSignPos);
+			if (keywordSignPos < startCommentPos  ||  endCommentPos < keywordSignPos)
+				return;
+			
+			String keywordStatement = line.substring(keywordSignPos + TestNice.KEYWORD_SIGN.length(), endCommentPos).trim();
+			//System.out.println("keywordStatement: <" + keywordStatement + ">");
+			
+			if (TestNice.KEYWORD_FAILHERE.equalsIgnoreCase(keywordStatement.toLowerCase())) {
+				//	determine column
+				int columnNum = endCommentPos + 2;
+				while(Character.isWhitespace(line.charAt(columnNum)))
+					columnNum++;
+				int lineNum = _lineCounter + _currentSourceFile.getCountImports() + 2;
+				_failPositions.add(new FailPosition(_currentSourceFile.getFileName(), lineNum, columnNum + 1));
+			}
+		}
+	}
 
 
 	/**
@@ -186,7 +253,7 @@ public class TestCase {
 
 
 	/**
-	 * Compiles all packages of this testcase.
+	 * Compiles all packages of this testcase except it is listed in the dontcompile-collection.
 	 * 
 	 * @exception	TestSuiteException	TODO
 	 * @exception	CompilerBugException	TODO
@@ -305,7 +372,8 @@ public class TestCase {
 	
 	
 	/**
-	 * TODO
+	 * Called by a specific testcase if the testcase succeeds.
+	 * This is the place for output messages.
 	 * 
 	 */
 	public void pass() {
@@ -314,8 +382,8 @@ public class TestCase {
 	}
 	
 	/**
-	 * TODO
-	 * 
+	 * Called by a specific testcase if the testcase fails..
+	 * This is the place for output messages.
 	 */
 	public void fail() {
 		TestNice.increaseFailed();
@@ -351,13 +419,19 @@ public class TestCase {
 		}
 		
 		//	compiler messages
-		TestNice.getOutput().log("nicec", _compilerMessagesStream.toString());
+		TestNice.getOutput().log("nicec", getCompilerMessages());
 		TestNice.getOutput().endTestCase(false);
 		
 		//	move contents of temp folder to a new folder in the fail folder
 		TestNice.moveFilesToFailFolder();
 	}
 	
+	/**
+		Returns the compiler messages as String
+	*/
+	protected String getCompilerMessages() {
+		return _compilerMessagesStream.toString();
+	}
 	
 	
 	/**
@@ -396,6 +470,35 @@ public class TestCase {
 	}
 
 
+
+
+
+	/**
+		InnerClass that holds a user defined failure position.
+	*/
+	protected class FailPosition {
+		private String _fileName;
+		private int _line;
+		private int _column;
+		
+		FailPosition(String fileName, int line, int column) {
+			_fileName = fileName;
+			_line = line;
+			_column = column;
+		}
+		
+		protected String getFileName() {
+			return _fileName;
+		}
+		
+		protected int getLine() {
+			return _line;
+		}
+		
+		protected int getColumn() {
+			return _column;
+		}
+	}
 
 }
 

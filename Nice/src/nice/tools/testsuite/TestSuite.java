@@ -92,16 +92,16 @@ public class TestSuite {
 			while((line = reader.readLine()) != null) {
 				if (line.trim().length() == 0)	//	ignore empty lines
 					continue;
-					
+
 				testsuiteKeywordLine = line.startsWith(TestNice.KEYWORD_SIGN);
 				if (testsuiteKeywordLine)
 					isGlobalSource = line.toLowerCase().indexOf(KEYWORD_GLOBAL) != -1;
-				
+
 				if (isGlobalSource) {
 					getGlobalSource().consumeLine(line);
 					continue;
 				}
-				
+
 				if (testsuiteKeywordLine  &&  consumeComment(line))
 					continue;
 				
@@ -110,7 +110,7 @@ public class TestSuite {
 					_testCases.add(testCase);
 					continue;
 				}
-					
+
 				testCase.consumeLine(line);
 			}
 		} catch(IOException e) {
@@ -158,6 +158,7 @@ public class TestSuite {
 			return new PassTestCase(this);
 		else if (TESTCASE_TYPE_FAIL.equalsIgnoreCase(type))
 			return new FailTestCase(this);
+
 		throw new TestSuiteException("Unknown testcase type: " + type);
 	}
 

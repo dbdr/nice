@@ -61,12 +61,12 @@ public class NiceSourceFile {
 	 * TODO
 	 * 
 	 */
-	private final String _className = "main";
+	//private final String _className = "main";
 	/**
 	 * TODO
 	 * 
 	 */
-	private final String _fileName = _className + ".nice";
+	//private final String _fileName = _className + ".nice";
 
 
 	/**
@@ -195,19 +195,23 @@ public class NiceSourceFile {
 	
 	/**
 	 * Returns the file name.
+	 * The file name is calculated prom the package name suffixed with
+	 * <code>_main.nice</code>
 	 * 
 	 */
 	public String getFileName() {
-		return _fileName;
+		//return _fileName;
+		return _package + "_main.nice";
 	}
 	
 	/**
 	 * Returns the class name.
 	 * 
 	 */
-	public String getClassName() {
+	/*public String getClassName() {
 		return _className;
 	}
+	*/
 	
 	/**
 	 * Writes the nice source file to disc if it is not empty.
@@ -222,7 +226,7 @@ public class NiceSourceFile {
 		if (! packageFolder.exists()  &&  ! packageFolder.mkdirs())
 			throw new TestSuiteException("could not create folder: " + packageFolder);
 			
-		File sourceFile = new File(packageFolder, _fileName);
+		File sourceFile = new File(packageFolder, getFileName());
 		BufferedWriter writer = null;
 		try {
 			StringWriter debugWriter = new StringWriter();
@@ -332,6 +336,14 @@ public class NiceSourceFile {
 		return (_mainMethodContent.length() == 0)
 			&&  (_topLevelContent.length() == 0);
 	}
+	
+	/**
+		Returns the number of import statements
+	*/
+	int getCountImports() {
+		return _imports.size();
+	}
+	
 }
 
 

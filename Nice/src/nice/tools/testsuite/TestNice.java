@@ -62,6 +62,12 @@ public class TestNice {
 	 */
 	static final String KEYWORD_DONTCOMPILE = "dontcompile";
 
+	/**
+	 * Keyword.
+	 * 
+	 */
+	static final String KEYWORD_FAILHERE = "fail here";
+
 
 
 

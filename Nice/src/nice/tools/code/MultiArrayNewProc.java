@@ -82,10 +82,10 @@ public class MultiArrayNewProc extends gnu.mapping.ProcedureN
 
   private static boolean hasPrimitiveComponents(ArrayType array)
   {
-    while (array.getComponentType() instanceof ArrayType)
-      array = (ArrayType) array.getComponentType();
+    Type componentType = array.getComponentType();
 
-    return array.getComponentType() instanceof PrimType;
+    return componentType instanceof ArrayType 
+        || componentType instanceof PrimType;
   }
 
   public Type getReturnType(Expression[] args)

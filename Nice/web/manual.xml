@@ -431,7 +431,13 @@ numberOfWheels(Motorcycle mc) = 2;
       </para>
 
       <para>
-        There is an <link linkend="ex:copy">example</link> where 
+        Specializing on the exact class of an argument is useful in situations
+	where an implementation is correct for a certain class, but you know
+	that each subclass will require a different implementation.	
+      </para>
+
+      <para>
+        There is also an <link linkend="ex:copy">example</link> where 
 	exact matching is required to
 	type-check a method with a precise polymorphic type.
       </para>
@@ -478,7 +484,7 @@ lastItem(coll)
         <para>
          Note that it is not possible to dispatch a method call on an array 
          type, nor to specialize a method on the subtype of a type parameter. 
-         This means that methods of the form:
+         This means that method implementations of the form:
         </para>
         <para>
          <literal><![CDATA[foo(Collection<String> string){}]]></literal>
@@ -586,6 +592,12 @@ copy(from: f1, to: f2, bufferSize: 4000);</programlisting>
        <literal> T[] slice(T[] array, int from = 0, 
        int to = array.length - 1);</literal>
       </para>
+
+      <para>
+        Method implementations must still bind all parameters,
+	including the optional ones, and can dispatch on them.
+      </para>
+
     </section>
   </chapter>
 

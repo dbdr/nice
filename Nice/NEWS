@@ -17,6 +17,8 @@ nice (0.9.8)
     several Java interfaces declaring that same method, like
     java.io.ObjectOutputStream.flush()
   * Reduced compilation time and memory consumption.
+  * Fixed native compilation using gcj. It used to block when gcj produced
+    too much output.
 
  --
 

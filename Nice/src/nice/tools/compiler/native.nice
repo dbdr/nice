@@ -42,13 +42,14 @@ void compileWithGcj(?String gcj, String pkg, String output, String jar)
 	"--classpath=", // We set the classpath to null to ignore nice.jar
 	"--main=" + pkg + ".fun", 
         "-o", output, jar ]);
-    p.waitFor();
-    if (p.exitValue() != 0)
+    let CharArrayWriter output = new CharArrayWriter();
+    let exitValue = waitFor(p, output); 
+    if (exitValue != 0)
       {
 	fail();
 
-	// Print the content of stderr.
-	let in = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+	// Print the output of the process
+	let in = new BufferedReader(new CharArrayReader(output.toCharArray));
 	try {
 	  for (?String line = in.readLine(); line != null; 
 	       line = in.readLine())
@@ -72,4 +73,32 @@ void fail(?String msg = null)
     println(": " + msg);
   else
     java.lang.System.out.println();
+}
+
+int waitFor(Process p, Writer w)
+{
+  let out = new BufferedReader(new InputStreamReader(p.getInputStream()));
+  let err = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+
+  let printer = new PrintWriter(w);
+
+  while (true)
+    {
+      if (out.ready)
+	for (?String line = out.readLine(); line != null; 
+	     line = out.readLine())
+	  printer.println(line);
+
+      if (err.ready)
+	for (?String line = err.readLine(); line != null; 
+	     line = err.readLine())
+	  printer.println(line);
+
+      try {
+	return p.exitValue();
+      }
+      catch(IllegalThreadStateException e) {
+	// The process is not finished yet.
+      }
+    }
 }

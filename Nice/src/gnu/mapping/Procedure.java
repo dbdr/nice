@@ -42,11 +42,6 @@ public abstract class Procedure implements Named
 
   public abstract Object apply0 () throws Throwable;
 
-  public final void apply() throws Throwable
-  {
-    apply0();
-  }
-
   public abstract Object apply1 (Object arg1) throws Throwable;
 
   public abstract Object apply2 (Object arg1,Object arg2) throws Throwable;
@@ -156,7 +151,6 @@ public abstract class Procedure implements Named
       return new Setter1(this);
     return new Setter(this);
   }
-  */
 
   public void setSetter (Procedure setter)
   {

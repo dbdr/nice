@@ -10,13 +10,22 @@ import gnu.lists.*;
  * faster virtual method calls instead of slower interface calls).
  */
 
-// NICE: Avoid being dependant of gnu.mapping.MethodProc.
+// NICE: Avoid being dependent of gnu.mapping.MethodProc.
 // NICE: This is bad because this class is needed at runtime.
 public class ModuleBody extends ProcedureN// implements Runnable
 {
   /*
   public void apply (CallContext stack)
   {
+  }
+
+  /** For backwards compatibily.
+   * Earlier versions of Kawa used this to initialize a module.
+   * Allows run(Consumer) to call those methods. */
+  /*
+  public Object run (Environment env)
+  {
+    return Values.empty;
   }
 
   public void run ()
@@ -26,16 +35,26 @@ public class ModuleBody extends ProcedureN// implements Runnable
 
   public void run(Consumer out)
   {
-    CallContext ctx = new CallContext();
-    ctx.consumer = out;
-    ctx.values = Values.noArgs;
-    ctx.proc = this;
-    ctx.run();
+    CallContext ctx = CallContext.getInstance();
+    // For backwards compatibility - see run(Environment).
+    run(ctx.getEnvironment());
+    Consumer save = ctx.consumer;
+    try
+      {
+	ctx.consumer = out;
+	ctx.values = Values.noArgs;
+	ctx.proc = this;
+	ctx.run();
+      }
+    finally
+      {
+	ctx.consumer = save;
+      }
   }
 
   public Object apply0 () throws Throwable
   {
-    CallContext ctx = new CallContext();
+    CallContext ctx = CallContext.getInstance();
     ctx.values = Values.noArgs;
     ctx.proc = this;
     return applyV(ctx);
@@ -60,18 +79,18 @@ public class ModuleBody extends ProcedureN// implements Runnable
   /*
   public final void runAsMain (String[] args)
   {
-    //NICE: removes spurious dependancy
-    //kawa.repl.setArgs(args, 0);
+    kawa.repl.setArgs(args, 0);
     gnu.text.WriterManager.instance.registerShutdownHook();
     try
       {
-	CallContext ctx = new CallContext();
+	CallContext ctx = CallContext.getInstance();
 	ctx.values = Values.noArgs;
 	ctx.proc = this;
+	ClassMemberConstraint.defineAll(this, ctx.getEnvironment());
 	if (getMainPrintValues())
 	  {
 	    OutPort out = OutPort.outDefault();
-	    ctx.consumer = Interpreter.getInterpreter().getOutputConsumer(out);
+	    ctx.consumer = kawa.Shell.getOutputConsumer(out);
 	    ctx.runUntilDone();
 	    out.freshLine();
 	  }
@@ -82,6 +101,7 @@ public class ModuleBody extends ProcedureN// implements Runnable
 	  }
 	// Redundant if registerShutdownHook succeeded (e.g on JDK 1.3).
 	gnu.mapping.OutPort.runCleanups();
+	kawa.repl.exitDecrement();
       }
     catch (Throwable ex)
       {
@@ -109,7 +129,7 @@ public class ModuleBody extends ProcedureN// implements Runnable
 
   public Object apply0(ModuleMethod method)
   {
-    return applyN(method, new Object[0]);
+    return applyN(method, Values.noArgs);
   }
 
   public Object apply1(ModuleMethod method, Object arg1)

@@ -24,9 +24,12 @@ public class VoidConstantExp extends ConstantExp
 {
   public VoidConstantExp()
   {
-    className="void";
+    className = voidName;
     value = gnu.mapping.Values.empty;
   }
+
+  private static LocatedString voidName = 
+    new LocatedString("void", Location.nowhere());
 
   public String toString()
   {

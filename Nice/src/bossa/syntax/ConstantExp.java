@@ -43,30 +43,9 @@ public class ConstantExp extends Expression
     setLocation(location);
   }
   
-  void resolve()
-  {
-    if(type!=null)
-      return;
-    
-    TypeSymbol s = typeScope.lookup(className);
-    
-    if(s==null)
-      Internal.error("Base class "+className+
-		     " was not found in the standard library");
-
-    if(!(s instanceof TypeConstructor))
-      Internal.error("Base class "+className+
-		     " is not a class !");
-    
-    TypeConstructor tc = (TypeConstructor) s;
-    type = new mlsub.typing.Polytype
-      (mlsub.typing.Constraint.True, 
-       new MonotypeConstructor(tc,null));
-  }
-
   void computeType()
   {
-    //Already done in resolve()
+    //Already done during resolution
   }
 
   /****************************************************************
@@ -81,7 +60,7 @@ public class ConstantExp extends Expression
     return new gnu.expr.QuoteExp(value);
   }
   
-  protected String className = "undefined class name";
+  protected LocatedString className = null;
   
   protected Object value;
   private String representation;

@@ -24,9 +24,12 @@ public class StringConstantExp extends ConstantExp
 {
   public StringConstantExp(String value)
   {
-    className="java.lang.String";
+    className = stringName;
     this.value=unescape(value);
   }
+
+  private static LocatedString stringName = 
+    new LocatedString("java.lang.String", Location.nowhere());
 
   // cf. JLS 3.10.6
   public static String unescape(String s)

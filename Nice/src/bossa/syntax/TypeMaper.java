@@ -31,9 +31,9 @@ public class TypeMaper implements TypeMap
   nice.tools.ast.SymbolTable inner;
   TypeScope global;
   
-  public TypeSymbol lookup(String name)
+  public TypeSymbol lookup(LocatedString name)
   {
-    TypeSymbol res = null;//(TypeSymbol) nice.tools.ast.dispatch.get$0(inner, name);
+    TypeSymbol res = (TypeSymbol) nice.tools.ast.dispatch.get$0(inner, name.toString());
     if (res != null)
       return res;
     else

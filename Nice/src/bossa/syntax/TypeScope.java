@@ -88,14 +88,24 @@ public class TypeScope implements TypeMap
       addMapping(((LocatedString) in.next()).toString(), symbols[n++]);
   }
   
-  public TypeSymbol lookup(String name)
+  public final TypeSymbol lookup(String name)
   {
-    TypeSymbol res;
-    if(map.containsKey(name))
-      return (TypeSymbol)map.get(name);
+    return lookup(name, null);
+  }
+  
+  public final TypeSymbol lookup(LocatedString name)
+  {
+    return lookup(name.toString(), name.location());
+  }
+
+  TypeSymbol lookup(String name, Location loc)
+  {
+    TypeSymbol res = (TypeSymbol) map.get(name);
+    if (res != null)
+      return res;
 
     if(outer!=null)
-      return outer.lookup(name);
+      return outer.lookup(name, loc);
     else
       // This is the global type scope
       {
@@ -109,11 +119,20 @@ public class TypeScope implements TypeMap
 		String pkg = ((LocatedString) i.next()).toString();
 		String fullName = pkg + "." + name;
 		
-		if (map.containsKey(fullName))
-		  return (TypeSymbol) map.get(fullName);
+		TypeSymbol sym = (TypeSymbol) map.get(fullName);
+		if (sym != null)
+		  if (res == null)
+		    res = sym;
+		  else
+		    User.error(loc, "Ambiguity for symbol " + name + 
+			       ":\n" + res + " and " + sym +
+			       " both exist");
 	      }
 	  else
 	    Internal.warning("null module in TypeScope");
+	
+	if (res != null)
+	  return res;
 
 	// Now try as a java class
 	TypeConstructor tc = JavaClasses.lookup(name);
@@ -128,12 +147,17 @@ public class TypeScope implements TypeMap
 	      String fullName = pkg + "." + name;
 
 	      tc = JavaClasses.lookup(fullName);
-	      if(tc!=null)
-		return tc;
+	      if (tc != null)
+		  if (res == null)
+		    res = tc;
+		  else
+		      User.error(loc, "Ambiguity for native class " + name + 
+				 ":\n" + res + " and " + tc +
+				 " both exist");
 	    }
       }
     
-    return null;
+    return res;
   }
 
   /****************************************************************

@@ -179,3 +179,6 @@ PrintStream stderr () = native System.err;
 */
 
 class StringTokenizer = native java.util.StringTokenizer;
+
+<T> void update(Observer, Observable, T) = 
+  native void Observer.update(Observable, Object);

@@ -997,7 +997,8 @@ public class LambdaExp extends ScopeExp
                 // Make sure the name is unique.
                 name = comp.generateUniqueName(name);
                 frameType = new ClassType(name);
-                frameType.setSourceFile(outerClass.getFile());
+                if (outerClass.getFile() != null)
+                  frameType.setSourceFile(outerClass.getFile());
               }
 	    else
 	      frameType = new ClassType(comp.generateClassName("frame"));

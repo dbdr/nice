@@ -23,8 +23,17 @@ class C<T>
 f4(x@C, y)
 {
   f4(x, y);
-  return x; 
+  return x;
 }
+
+/// PASS
+  /// Toplevel
+abstract class A
+{
+  alike foo(List<alike> bar);
+}
+
+<A T> T bla(T a) = a.foo([a]);
 
 /// FAIL
   /// TOPLEVEL

@@ -279,6 +279,17 @@ public class OverloadedSymbolExp extends Expression
     if (res != null)
       return res;
 
+    LinkedList globalvars = new LinkedList();
+    for(Iterator i = symbols.iterator(); i.hasNext();)
+      {
+	VarSymbol sym = (VarSymbol) i.next();
+	if (sym instanceof GlobalVarDeclaration.GlobalVarSymbol)
+	  globalvars.add(sym);
+      }
+
+    if (globalvars.size() > 0)
+      return new OverloadedSymbolExp(globalvars, ident).noOverloading();
+
     if (symbols.size() != 0)
       throw new AmbiguityError();
 

@@ -1,5 +1,6 @@
-/// FAIL
+/// PASS
   let i = foo;
+  assert i == 0;
   /// Toplevel
   var int foo = 0;
   int foo() = 1;

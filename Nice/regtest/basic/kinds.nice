@@ -1,0 +1,22 @@
+
+package regtest.basic;
+
+abstract interface I {}
+
+class KA implements I {}
+class KB extends KA {}
+class KC extends KB implements I {}
+
+<I T> T kf(T);
+
+kf(k@KA) = k;
+kf(k#KA) = new KA();
+
+kf(k#KB) = new KA();
+kf(k@KB) = k;
+
+void test_kinds()
+{
+  KA a = kf(new KB());
+  KC c = kf(new KC());
+}

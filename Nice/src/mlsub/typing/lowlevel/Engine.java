@@ -783,30 +783,49 @@ public abstract class Engine
     
     public Element lowestInstance(Element e)
     {
-      //FIXME: We don't really fulfill the contract.
-      // We should make sure we really return an instance.
+      //FIXME: Suboptimal: doesn't always return an instance when there is one.
       // Maybe this should be done by enumeration of the solutions 
       // of the constraint. 
-      // The current code works in simple cases, though...
       
-      int id = e.getId();
+      final int id = e.getId();
       int res = -1;
       
-      for (int i = 0; i < k0.initialContextSize(); i++)
-	// we use wasEntered, since id is assumed not to be rigid
+      for (int elem = 0; elem < k0.initialContextSize(); elem++)
+	// We use wasEntered, since id is assumed not to be rigid
 	// i and res are rigid, so we use isLeq.
 	// an alternative would be to (require) rigidify 
 	// (at least a closure of leq relation + other axioms)
 	// and use isLeq.
-	// could be more precise in presence of interfaces.
-	if (k0.wasEntered(id, i) && (res == -1 || k0.isLeq(i, res)))
-	  res = i;
+	// Could be more precise in presence of interfaces.
+	if (k0.wasEntered(id, elem) && (res == -1 || k0.isLeq(elem, res)))
+	  res = elem;
 
       if (res == -1)
-	for (int i = 0; i < k0.initialContextSize(); i++)
-	  if (k0.wasEntered(i, id) && (res == -1 || k0.isLeq(res, i)))
-	    res = i;
-      
+	for (int elem = 0; elem < k0.initialContextSize(); elem++)
+	  if (k0.wasEntered(elem, id) && (res == -1 || k0.isLeq(res, elem)))
+	    res = elem;
+
+      if (res != -1)
+	// Check we really found an instance.
+	{
+	  final boolean[] ok = { true };
+	  final int candidate = res;
+
+	  try {
+	  k0.ineqIter(new K0.IneqIterator() {
+	      protected void iter(int x1, int x2) {
+		if (x1 == id)
+		  ok[0] &= k0.isLeq(candidate, x2);
+		else if (x2 == id)
+		  ok[0] &= k0.isLeq(x1, candidate);
+	      }
+	    });
+	  } catch(Unsatisfiable ex) { throw new Error("assert false"); }
+
+	  if (! ok[0])
+	    res = -1;
+	}
+
       if (res == -1)
 	return null;
       else

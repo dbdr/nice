@@ -1,2 +1,10 @@
 /// PASS
   [ 0 ];
+
+/// PASS
+  [ new A2(), new A3() ].println();
+
+  /// Toplevel
+abstract class A1 {}
+class A2 extends A1 {}
+class A3 extends A1 {}

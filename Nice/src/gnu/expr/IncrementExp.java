@@ -5,7 +5,7 @@ import gnu.bytecode.*;
 /**
  * Pre/post incrementation of a local variable.
  * 
- * @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
+ * @author Daniel Bonniot (bonniot@users.sf.net)
  */
 
 public class IncrementExp extends Expression
@@ -44,7 +44,7 @@ public class IncrementExp extends Expression
 	if (!pre && needValue)
 	  code.emitLoad(var);
 
-	if (var.getType().promote() == Type.int_type)
+	if (var.getType() == Type.int_type)
 	  code.emitInc(var, increment);
 	else
 	  // The variable has a non-int type, but we know it must be 

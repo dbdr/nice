@@ -1,0 +1,13 @@
+#! /bin/sh
+
+CVSROOT=:pserver:anoncvs@oss.software.ibm.com:/usr/cvs/jikes
+
+echo "Getting JACKS from CVS"
+
+if grep 'anoncvs@oss.software.ibm.com' $HOME/.cvspass >/dev/null 2>&1; then
+  true
+else
+  echo "Password is 'anoncvs' $CVSROOT"
+  cvs -d$CVSROOT login
+fi
+cvs -d$CVSROOT -z 3 export -r HEAD jacks

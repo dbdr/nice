@@ -59,7 +59,7 @@ public class InlinedMethod extends MethodDeclaration
 
     Class refClass = null;
     try{
-      refClass = Class.forName(inlineProcedure.toString());
+      refClass = findClass(inlineProcedure.toString());
     }
     catch(ClassNotFoundException e){
       User.error(inlineProcedure, 
@@ -106,6 +106,60 @@ public class InlinedMethod extends MethodDeclaration
 		   " cannot be inlined, but will be called anyway");
 
     this.procedure = (gnu.mapping.Procedure) o;
+  }
+
+  private Class findClass(String name) throws ClassNotFoundException
+  {
+    if (loader == null)
+      return Class.forName(name);
+    else
+      return loader.loadClass(name);
+  }
+
+  static ClassLoader loader;
+
+  static
+  {
+    String inlinedMethodsRepository = System.getProperty("nice.inlined");
+    if (inlinedMethodsRepository != null)
+      try {
+        inlinedMethodsRepository = "file://" + 
+          new java.io.File(inlinedMethodsRepository).getAbsolutePath() + '/';
+        loader = new java.net.URLClassLoader
+          (new java.net.URL[]{ new java.net.URL(inlinedMethodsRepository) })
+          {
+            protected Class loadClass(String name, boolean resolve)
+              throws ClassNotFoundException
+            {
+              /* Change the default behviour, which is to look up the 
+                 parent classloader first. Instead, look it up after this one,
+                 so that the inlined methods are found here, but the
+                 interfaces they implement are found in the system classloader,
+                 so that the casts for using them succeed.
+              */
+              Class res = findLoadedClass(name);
+
+              if (res == null)
+                try {
+                  res = this.findClass(name);
+                } 
+                catch (ClassNotFoundException ex) {}
+
+              if (res == null)
+                res = getParent().loadClass(name);
+
+              if (resolve && res != null)
+                resolveClass(res);
+
+              return res;
+            }
+          };
+      }
+      catch (java.net.MalformedURLException ex) {
+        bossa.util.Internal.warning
+          ("Incorrect location for inlined methods: " + 
+           inlinedMethodsRepository);
+      }
   }
 
   protected gnu.expr.Expression computeCode()

@@ -1,0 +1,82 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2003                         */
+/*                                                                        */
+/*  This package is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU Lesser General Public License as        */
+/*  published by the Free Software Foundation; either version 2 of the    */
+/*  License, or (at your option) any later version.                       */
+/*                                                                        */
+/**************************************************************************/
+
+package nice.lang.reflect;
+
+/**
+   Nicer way of calling methods by reflection.
+
+   @author Daniel Bonniot (bonniot@users.sourceforge.net)
+ */
+
+/****************************************************************
+ * Arbitrary number of arguments
+ ****************************************************************/
+
+public <!T, R> R call(T obj, String methodName, Object[] args)
+{
+  let cl = obj.getClass();
+  let method = cl.getMethod(methodName, args.map(canonicalClass));
+  return cast( method.invoke(object(obj), args) );
+}
+
+// Testcases
+
+void _testCall()
+{
+  java.io.File f1 = new java.io.File(".");
+  java.io.File f2 = new java.io.File(".");
+
+  int res = f1.call("compareTo", [object(f2)]);
+  assert res == 0;
+}
+
+/****************************************************************
+ * No arguments
+ ****************************************************************/
+
+public <!T, R> R call(T obj, String methodName)
+{
+  let method = obj.getClass().getMethod(methodName, null);
+  return cast( method.invoke(object(obj), null) );
+}
+
+// Testcases
+
+void _testCall0()
+{
+  java.io.File f = new java.io.File(".");
+
+  String res = f.call("getCanonicalPath");
+  assert res.equals(".");
+}
+
+/****************************************************************
+ * One argument
+ ****************************************************************/
+
+public <!T, !A1, R> R call(T obj, String methodName, A1 arg1)
+{
+  let method = obj.getClass().getMethod(methodName, [canonicalClass(arg1)]);
+  return cast( method.invoke(object(obj), [object(arg1)]) );
+}
+
+// Testcases
+
+void _testCall1()
+{
+  java.io.File f1 = new java.io.File(".");
+  java.io.File f2 = new java.io.File(".");
+  
+  int res = f1.call("compareTo", f2);
+  assert res == 0;
+}

@@ -1,0 +1,118 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2003                         */
+/*                                                                        */
+/*  This package is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU Lesser General Public License as        */
+/*  published by the Free Software Foundation; either version 2 of the    */
+/*  License, or (at your option) any later version.                       */
+/*                                                                        */
+/**************************************************************************/
+
+package nice.lang.reflect;
+
+/**
+   Creating instances by reflection.
+
+   @author Daniel Bonniot (bonniot@users.sourceforge.net)
+ */
+
+/****************************************************************
+ * Arbitrary number of arguments
+ ****************************************************************/
+
+public <T> T newInstance(String className, Object[] args) =
+  newInstance(Class.forName(className), args);
+
+public <T> T newInstance(Class cl, Object[] args)
+{
+  Class[] argTypes = args.map(canonicalClass);
+  let constructor = cl.getConstructor(argTypes);
+  return cast(constructor.newInstance(args));
+}
+
+// Testcases
+
+class _TestS { String s; }
+
+class _TestI { int i; }
+
+void _testInstances()
+{
+  _TestS tS = newInstance("nice.lang.reflect._TestS", [object("ABC")]);
+  assert tS.s.equals("ABC");
+
+  _TestI tI = newInstance("nice.lang.reflect._TestI", [object(int(42))]);
+  assert tI.i == 42;
+}
+
+/****************************************************************
+ * No arguments
+ ****************************************************************/
+
+public <T> T newInstance(Class) = native Object Class.newInstance();
+
+public <T> T newInstance(String className) =
+  newInstance(Class.forName(className));
+
+// Testcases
+
+class _Test {}
+
+void _testInstances0()
+{
+  _Test t = newInstance("nice.lang.reflect._Test");
+  assert t instanceof _Test;
+}
+
+/****************************************************************
+ * One argument
+ ****************************************************************/
+
+public <T, !A1> T newInstance(String className, A1 arg1) =
+  newInstance(Class.forName(className), arg1);
+
+public <T, !A1> T newInstance(Class cl, A1 arg1)
+{
+  Class argClass1 = arg1.canonicalClass();
+  let constructor = cl.getConstructor([argClass1]);
+  return cast(constructor.newInstance([object(arg1)]));
+}
+
+// Testcases
+
+void _testInstances1()
+{
+  _TestS tS = newInstance("nice.lang.reflect._TestS", "ABC");
+  assert tS.s.equals("ABC");
+
+  _TestI tI = newInstance("nice.lang.reflect._TestI", int(42));
+  assert tI.i == 42;
+}
+
+/****************************************************************
+ * Two arguments
+ ****************************************************************/
+
+public <T, !A1, !A2> T newInstance(String className, A1 arg1, A2 arg2) =
+  newInstance(Class.forName(className), arg1, arg2);
+
+public <T, !A1, !A2> T newInstance(Class cl, A1 arg1, A2 arg2)
+{
+  Class argClass1 = arg1.canonicalClass();
+  Class argClass2 = arg2.canonicalClass();
+  let constructor = cl.getConstructor([argClass1, argClass2]);
+  return cast(constructor.newInstance([object(arg1),object(arg2)]));
+}
+
+// Testcases
+
+class _TestSI { String s; int i; }
+
+void _testInstances2()
+{
+  _TestSI t = newInstance("nice.lang.reflect._TestSI", "ABC", int(42));
+  assert t.s.equals("ABC");
+  assert t.i == 42;
+}

@@ -72,6 +72,11 @@ public class GlobalVarDeclaration extends Definition
     
       return res;
     }
+    
+    Expression getValue()
+    {
+      return GlobalVarDeclaration.this.value;
+    }
   }
 
   public Collection associatedDefinitions()

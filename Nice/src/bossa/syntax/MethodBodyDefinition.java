@@ -256,7 +256,7 @@ public class MethodBodyDefinition extends Definition
   {
     //Resolution of the body is delayed to enable overloading
 
-    Pattern.resolveTC(typeScope, formals);
+    Pattern.resolve(typeScope, getGlobalScope(), formals);
   }
   
   void lateBuildScope()

@@ -125,11 +125,44 @@ public class Pattern implements Located
     constraint = def.getResolvedConstraint();
     patternType = new MonotypeConstructor(tc, def.getTypeParameters());
   }
-  
-  static void resolveTC(TypeScope scope, Pattern[] patterns)
+ 
+  void resolveGlobalConstants(VarScope scope)
   {
-    for(int i = 0; i < patterns.length; i++)
-      patterns[i].resolveTC(scope);
+    if (name != null && tc == null & typeConstructor == null)
+      {
+        GlobalVarDeclaration.GlobalVarSymbol symbol = null;
+        for (Iterator it = scope.lookup(name).iterator(); it.hasNext();)
+	  {
+	    Object sym = it.next();
+            if (sym instanceof GlobalVarDeclaration.GlobalVarSymbol)
+	      symbol = (GlobalVarDeclaration.GlobalVarSymbol)sym;
+           }
+
+        if (symbol != null && symbol.constant && 
+		symbol.getValue() instanceof ConstantExp)
+	  {
+	    ConstantExp val = (ConstantExp)symbol.getValue();
+
+	    if (val.tc == PrimitiveType.floatTC)
+              return;
+
+	    if (val instanceof StringConstantExp)
+              this.typeConstructor = new TypeIdent(
+			new LocatedString("java.lang.String", location));
+
+	    this.tc = val.tc;
+            name = null;
+            atValue = val;
+	  }
+      } 
+  }
+
+  static void resolve(TypeScope tscope, VarScope vscope, Pattern[] patterns)
+  {
+    for(int i = 0; i < patterns.length; i++) {
+      patterns[i].resolveGlobalConstants(vscope);
+      patterns[i].resolveTC(tscope);
+    }
   }
   
   /****************************************************************

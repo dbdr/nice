@@ -1,0 +1,44 @@
+/// PASS
+  /// Toplevel
+  let int ONE = 1;
+  let int TWO = 2;
+  int fib(int n);
+  fib(n@int) = fib(n-2) + fib(n-1);
+  fib(ONE) = 1;
+  fib(TWO) = 1;
+
+/// PASS
+  assert(foo("abc"));
+  /// Toplevel
+  let String abc = "abc";
+  let String xyz = "xyz";
+  boolean foo(String);
+  foo(s) = false;
+  foo(abc) = true;
+  foo(xyz) = false;
+
+/// FAIL
+  /// Toplevel
+  let int xxx = 10;
+  void foo(int);
+  foo(n) {}
+  foo(xxx) {}
+  foo(10) {}
+
+/// FAIL
+  /// Toplevel
+  var int xxx = 10;
+  void foo(int);
+  foo(n) {}
+  foo(xxx) {}
+
+/// PASS
+  assert(foo("abc"));
+  /// Toplevel
+  let String abc = "abc";
+  class A {
+    String abc = "";
+  }
+  boolean foo(String);
+  foo(s) = false;
+  foo(abc) = true;

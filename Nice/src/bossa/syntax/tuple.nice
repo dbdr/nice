@@ -15,9 +15,34 @@ package bossa.syntax;
 import bossa.util.*;
 
 /**
+   A tuple of types.
+*/
+public class TupleType extends bossa.syntax.Monotype
+{
+  List<Monotype> types;
+  Location location;
+
+  rawResolve(typeMap) = new mlsub.typing.TupleType
+      (bossa.syntax.Monotype.rawResolve(notNull(typeMap), types));
+
+  substitute(map)
+  {
+    bossa.syntax.Monotype res = new bossa.syntax.TupleType
+      ( types : bossa.syntax.Monotype.substitute(map, types), location : location);
+    res.nullness = this.nullness;
+    return res;
+  }
+
+  containsAlike() = bossa.syntax.Monotype.containsAlike(types);
+  
+  location() = location;
+  
+  toString() = Util.map("(", ", " ,")", types);
+}
+
+/**
    Creation of a tuple.
 */
-
 public class TupleExp extends bossa.syntax.Expression
 {
   final bossa.syntax.Expression[] expressions;

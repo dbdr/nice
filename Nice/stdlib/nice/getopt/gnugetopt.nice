@@ -41,7 +41,7 @@ private int optind = 0;
 private int longind = 0;
 private int first_nonopt = 1;
 private int last_nonopt = 1;
-private const int ordering = 2;//== PERMUTE
+private final int ordering = 2;//== PERMUTE
 
 private String progname;
 private String[] argv;

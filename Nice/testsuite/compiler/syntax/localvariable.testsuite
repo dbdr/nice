@@ -1,0 +1,67 @@
+/// PASS bug
+  let int i;
+  i = 0;
+
+/// PASS
+  let int i = 0;
+
+/// PASS
+  var int i;
+  i = 0;
+
+/// PASS
+  var int i = 0;
+
+/// FAIL
+  let int i;
+  i = 0;
+  i = 1;
+
+/// FAIL
+  let int i = 0;
+  i = 1;
+
+/// PASS
+  var int i;
+  i = 0;
+  i = 1;
+
+/// PASS
+  var int i = 0;
+  i = 1;
+
+/// PASS bug
+  let i;
+  i = 0;
+
+/// PASS
+  let i = 0;
+
+/// PASS bug 
+/// COMMENT: not implemented yet
+  var i;
+  i = 0;
+
+/// PASS bug 
+/// COMMENT: not implemented yet
+  var i = 0;
+
+/// FAIL bug
+  let i;
+  i = 0;
+  i = 1;
+
+/// FAIL
+  let i = 0;
+  i = 1;
+
+/// PASS bug 
+/// COMMENT: not implemented yet
+  var i;
+  i = 0;
+  i = 1;
+
+/// PASS bug 
+/// COMMENT: not implemented yet
+  var i = 0;
+  i = 1;

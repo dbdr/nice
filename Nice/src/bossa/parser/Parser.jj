@@ -190,6 +190,7 @@ TOKEN: /* Keywords */
 // Statements
 | < RETURN:     "return"     	>
 | < VARIABLE:   "var"   	> /* Nice specific */
+| < LET:   	"let"   	> /* Nice specific */
 
 // modifiers
 | < PUBLIC:     "public"     	>
@@ -973,13 +974,20 @@ void getField(NiceClass c, List fields):
   MonoSymbol field;
   boolean isFinal=false, isTransient = false, isVolatile = false;
   Expression value = null;
+  Token t = null;
 }
 {
   ( 
     "public-read" [ "private-write" ]
   | "private-write"
   | ( ("public" | "private" | {} ) 
-    [ ( "final" | "const" ) { isFinal=true; } ]
+    [ ( "final" | t="const" ) 
+      { isFinal=true;
+	if (t!=null) 
+          User.warning(new Location(t),
+		"'const' is deprecated use 'final' instead.");
+      }
+    ]
     )
   ) 
   [ "transient" { isTransient = true; } ]
@@ -2329,13 +2337,8 @@ Statement BlockStatement(List statements) :
 { Statement res; }
 {
   (
-  LOOKAHEAD( "final" | "const" | monotype() <IDENT>)
-  (
-    LOOKAHEAD( ( "final" | "const" ) <IDENT> "=" )
-    res = LocalConstant()
-  |
+  LOOKAHEAD( "final" | "const" | "var" | "let" | monotype() <IDENT>)
     res = LocalDeclaration() 
-  )
 |
   // There are two cases for tuples (declaring a variable or not). 
   // Since it seems we cannot have a lookahead inside another we 
@@ -2358,46 +2361,56 @@ Statement BlockStatement(List statements) :
 
 Statement LocalDeclaration() :
 {
-  Monotype t = null;
+  Monotype type = null;
   LocatedString id;
   FormalParameters parameters;
   Statement body;
   Expression e=null;
-  boolean constant = false;
+  boolean constant = true;
+  Token t = null;
 }
 {
-  [ ( "final" | "const" ) { constant = true; } ]
-  t = monotype()
-  id=ident()
-  (
-    "(" parameters = formalParameters(false) ")" body = code() 
-    { return Block.LocalFunction.make(id, t, parameters, body); }
-  | 
-    [ "=" e=Expression() ] 
-    { Block.LocalVariable res = new Block.LocalVariable(id,t,constant,e); }
-    ( "," id=ident() {e=null;} [ "=" e=Expression() ] { res.addNext(id,e); } )*
+  (  LOOKAHEAD( [ ("final"|"const"|"let"|"var") ] monotype() ident() )
+    (
+      (t="final" | t="const")
+        {User.warning(new Location(t),
+		"'"+t.toString()+"' is deprecated use 'let' instead.");
+        }
+    | "let"
+    | "var" {constant = false;}
+    | {constant = false;}
+    )
+    type = monotype()
+    id=ident()
+    (
+    "(" parameters=formalParameters(false) ")" body=code() 
+      { return Block.LocalFunction.make(id, type, parameters, body); }
+    | 
+      [ "=" e=Expression() ] 
+      { Block.LocalVariable res = new Block.LocalVariable(id,type,constant,e); }
+      ( "," id=ident() {e=null;} [ "=" e=Expression() ] { res.addNext(id,e); } )*
+      ";" 
+      { return res; }
+    )
+  |
+    (
+      (t="final" | t="const") 
+        {User.warning(new Location(t),
+		"'"+t.toString()+"' is deprecated use 'let' instead.");
+	}
+    | "let"
+    | t="var" {constant = false;}
+    )
+    id=ident()
+    [ "=" e=Expression() ]
+    { Block.LocalConstant res;
+      if (constant) {res = new Block.LocalConstant(id,e);}
+      else {throw new UserError(new Location(t), "'var' without type not implemented yet");}
+    }
+    ( "," id=ident() "=" e=Expression() { res.addNext(id,e); } )*
     ";" 
     { return res; }
   )
-}
-
-Statement LocalConstant() :
-{
-  LocatedString id;
-  FormalParameters parameters;
-  Statement body;
-  Expression e=null;
-  boolean constant = false;
-}
-{
-  ( "final" | "const" )
-  id=ident()
-  "=" 
-  e=Expression()
-  { Block.LocalConstant res = new Block.LocalConstant(id,e); }
-  ( "," id=ident() "=" e=Expression() { res.addNext(id,e); } )*
-  ";" 
-  { return res; }
 }
 
 Statement LocalTupleDeclaration(List statements) :

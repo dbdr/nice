@@ -33,7 +33,7 @@ class Content
     this.compiled = compiled;
 
     if (source == null && compiled == null) 
-      User.error(pkg, pkg.getName() + " is not available." +
+      User.error(pkg, "Package " + pkg.getName() + " is not available." +
 		 "\nThe source  path is: " + str(pkg.compilation.sourcePath) + 
 		 "\nThe package path is: " + str(pkg.compilation.packagePath));
     

@@ -12,7 +12,7 @@
 
 // File    : MonotypeConstructor.java
 // Created : Thu Jul 22 09:15:17 1999 by bonniot
-//$Modified: Mon Oct 25 14:59:55 1999 by bonniot $
+//$Modified: Mon Oct 25 19:30:16 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -97,7 +97,8 @@ public class MonotypeConstructor extends Monotype
   public Kind getKind() 	{ return tc.variance; }
   public void setKind(Kind value)
   {
-    Internal.error("Variance set in MonotypeConstructor "+this);
+    Internal.error(value!=tc.variance,"Variance ["+value+"] set in MonotypeConstructor "+this
+		   +" instead of "+tc.variance);
   }
   
   /****************************************************************

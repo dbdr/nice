@@ -12,7 +12,7 @@
 
 // File    : parser.jj
 // Created : Thu Jul 01 10:27:05 1999 by bonniot
-//$Modified: Mon Oct 25 15:04:06 1999 by bonniot $
+//$Modified: Mon Oct 25 19:08:53 1999 by bonniot $
 // Description : Parseur JavaCC pour Bossa
 //   Tokens based on the Jazz parser
 
@@ -844,7 +844,7 @@ MethodDefinition methodDefinition():
     MethodDefinition res;
 }
 {
-    returnType=monotype()
+  returnType=monotype()
     name=string()
     cst=constraint()
     "("
@@ -857,12 +857,12 @@ MethodDefinition methodDefinition():
 Definition globalVariable():
 {
   LocatedString name;
-  Polytype t;
+  Monotype t;
   Expression value=null;
 }
 {
   "variable"
-  t=polytype()
+  t=monotype()
   name=string()
   [ "=" value=expression() ]
   ";"
@@ -1132,12 +1132,12 @@ AffectationStmt affectation(Expression left):
 
 LocalDeclarationStmt localDeclaration():
 {
-  Polytype t;
+  Monotype t;
   LocatedString id;
   Expression e=null;
 }
 {
-  t=polytype()
+  t=monotype()
   id=string()
   [ "=" e=expression() ]
   { return new LocalDeclarationStmt(id,t,e,false); }

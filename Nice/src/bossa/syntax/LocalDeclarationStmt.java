@@ -12,7 +12,7 @@
 
 // File    : LocalDeclarationStmt.java
 // Created : Tue Jul 06 12:06:20 1999 by bonniot
-//$Modified: Mon Oct 25 13:10:43 1999 by bonniot $
+//$Modified: Mon Oct 25 19:34:06 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -27,16 +27,15 @@ import java.util.*;
 public class LocalDeclarationStmt extends Statement
   implements Definition
 {
-  public LocalDeclarationStmt(LocatedString name, Polytype type, Expression value, boolean global)
+  public LocalDeclarationStmt(LocatedString name, Monotype type, Expression value, boolean global)
   {
     if(global)
       this.propagate=Node.global;
     
-    this.left=new PolySymbol(name,type);
-    addSymbol(left);
-    this.type=type;
-    addChild(type);
-
+    this.left=new MonoSymbol(name,type);
+    //addSymbol(left);
+    addChild(left);
+    
     if(value!=null)
       this.value=expChild(value);
   }
@@ -79,12 +78,11 @@ public class LocalDeclarationStmt extends Statement
 
   public String toString()
   {
-    return type+" "+left+
+    return left.type+" "+left+
       (value==null?"":" = "+value);
   }
 
-  protected Polytype type;
   protected ExpressionRef value=null;
   // "name" after scoping
-  VarSymbol left;
+  MonoSymbol left;
 }

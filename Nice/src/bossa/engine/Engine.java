@@ -12,7 +12,7 @@
 
 // File    : Engine.java
 // Created : Tue Jul 27 15:34:53 1999 by bonniot
-//$Modified: Mon Oct 25 15:40:44 1999 by bonniot $
+//$Modified: Wed Oct 27 14:35:44 1999 by bonniot $
 
 package bossa.engine;
 
@@ -456,9 +456,6 @@ public abstract class Engine
       boolean toCheck=false;
       boolean absOk=false; // Set to true if some surinterface of i is abstracted at n 
 
-      if(node==18)
-	node=18;
-      
       for(Iterator it=itfGeqIter(i);it.hasNext();)
 	{
 	  InterfaceDefinition j=(InterfaceDefinition)it.next();

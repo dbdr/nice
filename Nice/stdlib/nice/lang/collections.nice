@@ -9,7 +9,9 @@ interface Collection<T>
 {
   int size();
   boolean empty();
-  void iter(T->void);
+  void foreach(T->void);
+  // Backward compatibility. `iter` will probably be removed sometime.
+  void iter(T->void f) = this.foreach(f);
 
   alike<T> filter(T->boolean);
   <Any U> alike<U> map(T->U);
@@ -20,7 +22,7 @@ empty(c@Collection) = c.size() == 0;
 /**
    Equivalent definitions outside the interface:
 <Any T> int size(Collection<T>);
-<Any T> void iter(Collection<T>, T->void);
+<Any T> void foreach(Collection<T>, T->void);
 
 <Collection C, Any T, Any U> C<U> map(C<T>, T->U);
 <Collection C, Any T> C<T> filter(C<T>, T->boolean);
@@ -52,7 +54,7 @@ interface Sequence<T>
   <Any U> U foldLeft((U, T)->U, U);
 }
 
-iter(l@Sequence, f)
+foreach(l@Sequence, f)
 {
   for(int i=0; i<l.size; i++)
     f(l.get(i));
@@ -91,7 +93,7 @@ top(l@List) = l.get(l.size() - 1);
 //    L<T> res;
 //    res=emptyCollection(l);
 
-//    l.iter(fun(T elem) => if (test(elem)) res.add(elem) );
+//    l.foreach(T elem => if (test(elem)) res.add(elem));
 
 //   return res;
 //  }

@@ -5,6 +5,8 @@ nice (0.5.4) unstable; urgency=low
     (some expressions can). This is good since an anonymous function which 
     is not called cannot have side-effects, and therefore this case was
     meaningless and probably buggy.
+  * Renamed `iter` to `foreach`. `iter` is still accepted, 
+    but will probably be removed sometime in the future.
   * Other bugfixes (valid error message when trying to implement a function).
 
  --

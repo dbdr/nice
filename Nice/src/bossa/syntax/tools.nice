@@ -49,7 +49,7 @@ localVariable(e@SymbolExp)
 		sym.isAssignable())
       return null;
 
-    // no type inference on captured varibles
+    // no type inference on captured variables
     if (sym.captured)
       return null;
 

@@ -31,14 +31,12 @@ public class MonoSymbol extends VarSymbol
   {
     super(name);
     this.syntacticType=type;
-    this.captured = false;
   }
   
   public MonoSymbol(LocatedString name, mlsub.typing.Monotype type)
   {
     super(name);
     this.type = type;
-    this.captured = false;
   }
   
   public Polytype getType()
@@ -160,7 +158,7 @@ public class MonoSymbol extends VarSymbol
     return type+" "+name;
   }
 
-  boolean captured;
+  boolean captured = false;
 
   Monotype syntacticType;
   mlsub.typing.Monotype type;

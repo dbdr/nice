@@ -65,7 +65,10 @@ public class ConstantExp extends Expression
   {
     if(value == null)
       Internal.warning(this+"["+this.getClass()+" has no value");
-    
+
+    if (value instanceof VarSymbol)
+      return ((VarSymbol)value).compile();
+
     return new gnu.expr.QuoteExp(value, nice.tools.code.Types.javaType(type));
   }
   

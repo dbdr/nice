@@ -84,5 +84,5 @@ public class NewExp extends CallExp
   }
 
   private TypeIdent ti;
-  private mlsub.typing.TypeConstructor tc;
+  mlsub.typing.TypeConstructor tc;
 }

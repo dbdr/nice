@@ -77,6 +77,11 @@ public class GlobalVarDeclaration extends Definition
     {
       return GlobalVarDeclaration.this.value;
     }
+
+    Definition getDefinition()
+    {
+      return GlobalVarDeclaration.this;
+    }
   }
 
   public Collection associatedDefinitions()

@@ -39,6 +39,13 @@ public class Gen
   		QuoteExp.nullExp);
   }
 
+  public static Expression referenceEqualsExp(Expression value1,
+			Expression value2)
+  {
+    return Inline.inline(nice.lang.inline.ReferenceOp.create("=="), value1,
+  		value2);
+  }
+
   public static Expression boolNotExp(Expression value)
   {
     return Inline.inline(nice.lang.inline.BoolNotOp.instance, value);

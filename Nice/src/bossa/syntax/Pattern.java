@@ -126,7 +126,7 @@ public class Pattern implements Located
     patternType = new MonotypeConstructor(tc, def.getTypeParameters());
   }
  
-  void resolveGlobalConstants(VarScope scope)
+  void resolveGlobalConstants(VarScope scope, TypeScope typeScope)
   {
     if (name != null && tc == null & typeConstructor == null)
       {
@@ -138,21 +138,36 @@ public class Pattern implements Located
 	      symbol = (GlobalVarDeclaration.GlobalVarSymbol)sym;
            }
 
-        if (symbol != null && symbol.constant && 
-		symbol.getValue() instanceof ConstantExp)
-	  {
-	    ConstantExp val = (ConstantExp)symbol.getValue();
+        if (symbol != null && symbol.constant )
+          {
+	    if (symbol.getValue() instanceof ConstantExp)
+	      {
+		ConstantExp val = (ConstantExp)symbol.getValue();
 
-	    if (val.tc == PrimitiveType.floatTC)
-              return;
+		if (val.tc == PrimitiveType.floatTC)
+		  return;
 
-	    if (val instanceof StringConstantExp)
-              this.typeConstructor = new TypeIdent(
+		if (val instanceof StringConstantExp)
+		  typeConstructor = new TypeIdent(
 			new LocatedString("java.lang.String", location));
 
-	    this.tc = val.tc;
-            name = null;
-            atValue = val;
+		tc = val.tc;
+		name = null;
+		atValue = val;
+	      }
+	    else if (symbol.getValue() instanceof NewExp)
+              {
+                NewExp val = (NewExp)symbol.getValue();
+
+		symbol.getDefinition().resolve();
+                if (val.tc != null) 
+		  {
+		    tc = val.tc;
+		    atValue = new ConstantExp(null, tc, symbol,
+				name.toString(), location);
+		    name = null;
+		  }
+	      }
 	  }
       } 
   }
@@ -160,7 +175,7 @@ public class Pattern implements Located
   static void resolve(TypeScope tscope, VarScope vscope, Pattern[] patterns)
   {
     for(int i = 0; i < patterns.length; i++) {
-      patterns[i].resolveGlobalConstants(vscope);
+      patterns[i].resolveGlobalConstants(vscope, tscope);
       patterns[i].resolveTC(tscope);
     }
   }
@@ -397,6 +412,9 @@ public class Pattern implements Located
         if (atValue.value instanceof Number)
           return "@" + (atValue.longValue() >= 0 ? "+" : "") + atValue;
 
+	if (atValue.value instanceof VarSymbol)
+          return "@=" + atValue;
+
 	return "@" + atValue;
       }
 
@@ -449,6 +467,10 @@ public class Pattern implements Located
         if (name.charAt(0) == '\"')
           return new Pattern(ConstantExp.makeString(new LocatedString(
 		name.substring(1,name.length()-1), Location.nowhere())));
+
+        if (name.charAt(0) == '=')
+	  return new Pattern(new LocatedString(name.substring(1),
+		Location.nowhere()), null);
       }
 
     if (name.equals("_"))
@@ -499,6 +521,9 @@ public class Pattern implements Located
     if (atString())
       return Gen.stringEquals((String)atValue.value, parameter);
 
+    if (atReference())
+      return Gen.referenceEqualsExp(atValue.compile(), parameter);
+
     gnu.bytecode.Type ct = Types.javaType(tc);
     if (exactlyAt)
       return Gen.isOfClass(parameter, ct);
@@ -541,4 +566,8 @@ public class Pattern implements Located
   public boolean atTrue() { return atValue != null && atValue.isTrue(); }
   public boolean atFalse() { return atValue != null && atValue.isFalse(); }
   public boolean atString() { return atValue instanceof StringConstantExp; }
+  public boolean atReference()
+  { 
+    return atValue != null && atValue.value instanceof VarSymbol;
+  }
 }

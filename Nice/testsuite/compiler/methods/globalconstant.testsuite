@@ -42,3 +42,36 @@
   boolean foo(String);
   foo(s) = false;
   foo(abc) = true;
+
+/// PASS
+  assert(foo(xxx));
+  /// Toplevel
+  class A {}
+  let A xxx = new A();
+  let A yyy = new A();
+  boolean foo(A);
+  foo(a) = false;
+  foo(xxx) = true;
+  foo(yyy) = false;
+
+/// PASS bug
+  /// package a
+  /// Toplevel
+  class A {}
+  let A xxx = new A();
+  let A yyy = new A();
+  boolean foo(A);
+  foo(a) = false;
+  foo(xxx) = true;
+  foo(yyy) = false;
+  /// package b import a
+  assert(foo(xxx));
+
+/// FAIL
+  /// Toplevel
+  class A {}
+  let A xxx = new A();
+  void foo(A);
+  foo(a) {}
+  foo(xxx) {}
+  foo(xxx) {}

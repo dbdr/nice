@@ -8,6 +8,13 @@ if [ ! -r Nice ]; then
   wget --cache=no -O Nice/external/nice-bootstrap.jar http://nice.sf.net/nice.jar || exit 3
 fi
 
+if [ "$ANT_BOOTSTRAP" ]; then
+  mkdir -p Nice/share/java
+  cp Nice/external/nice-bootstrap.jar Nice/share/java/nice.jar
+  cd Nice && ant jar
+  exit 0
+fi
+
 # In benchmark mode, don't run the testsuite
 if [ "$CVS_DATE" ]; then
   cd Nice && make

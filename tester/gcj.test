@@ -13,7 +13,7 @@ cat OUT
 
 NUM_PREFIX="  regressions: "
 NUM=`tail -10 OUT | grep "$NUM_PREFIX"`
-NUM=`expr match "$NUM" "$NUM_PREFIX"'\(.*\)'`
+NUM=`expr "$NUM" : "$NUM_PREFIX"'\(.*\)'`
 
 # Number of errors is encoded as 10+number (since smaller numbers have
 # other meanings)

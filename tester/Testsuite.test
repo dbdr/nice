@@ -2,7 +2,11 @@
 
 cd Nice
 
-/usr/bin/time -o TIME make check > OUT
+if [ "$ANT_BOOTSTRAP" ]; then
+  /usr/bin/time -o TIME ant check > OUT
+else
+  /usr/bin/time -o TIME make check > OUT
+fi
 RES=$?
 
 # print for the log
@@ -10,7 +14,7 @@ cat OUT
 
 NUM_PREFIX="number of testcases: "
 NUM=`tail -10 OUT | grep "$NUM_PREFIX"`
-NUM=`expr match "$NUM" "$NUM_PREFIX"'\(.*\)'`
+NUM=`expr "$NUM" : "$NUM_PREFIX"'\(.*\)'`
 
 echo num_tests $NUM time `cat TIME` > ../METRICS
 

@@ -51,7 +51,7 @@ ORIGINAL_PATH="$PATH"
 # to really rebuild the application.
 
 for conffile in ../config.*; do
-    name="`expr match $conffile '../config\.\(.*\)'`"
+    name="`expr $conffile : '../config\.\(.*\)'`"
 
     # Blank the variable, so it does not keep the previous value if it
     # is not reset to a new value.
@@ -79,7 +79,7 @@ for conffile in ../config.*; do
 
 
     for test in ../*.test; do
-	testname="`expr match $test '../\(.*\)\.test'`"
+	testname="`expr $test : '../\(.*\)\.test'`"
 	echo "<a name='$testname'>"
 	echo ""
 	echo "======================"

@@ -12,7 +12,7 @@
 
 // File    : TypeSymbol.java
 // Created : Fri Jul 09 11:20:46 1999 by bonniot
-//$Modified: Mon Jul 12 11:26:34 1999 by bonniot $
+//$Modified: Thu Jul 22 10:26:43 1999 by bonniot $
 // Description : Used to lookup Type names
 //   Separed from VarSymbol since it can only appear in types 
 //   (and New expression)
@@ -20,18 +20,36 @@
 
 package bossa.syntax;
 
+import java.util.*;
 import bossa.util.*;
 
 public class TypeSymbol extends Node
+  implements Located
 {
-  public TypeSymbol(Ident name)
+  public TypeSymbol(LocatedString name)
   {
     this.name=name;
   }
 
-  public boolean hasName(IdentType i)
+  /**
+   * Construct the list of TypeIdents
+   * contained in a collection of TypeSymbols
+   *
+   * @param typeSymbols the collection
+   * @return the collection of TypeIdents
+   */
+  static Collection toLocatedString(Collection typeSymbols)
   {
-    return this.name.equals(i.name.content);
+    Collection res=new ArrayList(typeSymbols.size());
+    Iterator i=typeSymbols.iterator();
+    while(i.hasNext())
+      res.add(((TypeSymbol)i.next()).name);
+    return res;
+  }
+
+  public boolean hasName(LocatedString name)
+  {
+    return this.name.equals(name);
   }
 
   void resolveScope()
@@ -45,10 +63,28 @@ public class TypeSymbol extends Node
     return null;
   }
     
+  /****************************************************************
+   * Type checking
+   ****************************************************************/
+
+  void typecheck()
+  {
+    
+  }
+
+  /****************************************************************
+   * Printing
+   ****************************************************************/
+
+  public Location location()
+  {
+    return name.location();
+  }  
+  
   public String toString()
   {
     return name.toString();
   }
 
-  Ident name;
+  LocatedString name;
 }

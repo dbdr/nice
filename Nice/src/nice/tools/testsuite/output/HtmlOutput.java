@@ -54,6 +54,9 @@ public class HtmlOutput extends AbstractOutput {
 		log("</tr><tr>");
 		log("<td width=30>&nbsp;</td>");
 		log("<td>failed:</td><td>" + TestNice.getTestCasesFailed() + "</td>");
+		log("</tr><tr>");
+		log("<td width=30>&nbsp;</td>");
+		log("<td>warnings:</td><td>" + TestNice.getTestCasesWarning() + "</td>");
 		log("</tr></table>");
 
 		log("</body></html>");

@@ -145,7 +145,7 @@ public class TestCase {
 	/**
 	 * Checks whether the line is a keyword line and sets the status new
 	 * if it is a keyword line. Packages are also recorded in the dontcompile-collection
-	 if the word "dontcompile" occures in the keyword-line. Comments are delegated to the testsuite.
+	 * if the word "dontcompile" occures in the keyword-line. Comments are delegated to the testsuite.
 	 * 
 	 * @param	line	TODO
 	 * @exception	TestSuiteException	TODO
@@ -206,6 +206,9 @@ public class TestCase {
 				while(Character.isWhitespace(line.charAt(columnNum)))
 					columnNum++;
 				int lineNum = _lineCounter + _currentSourceFile.getCountImports() + 2;
+				if (_currentSourceFile.getStatus() == NiceSourceFile.STATUS_MAIN)
+					lineNum += 2;
+				//System.out.println("_lineCounter: " + _lineCounter + "      _currentSourceFile.getCountImports(): " + _currentSourceFile.getCountImports());
 				_failPositions.add(new FailPosition(_currentSourceFile.getFileName(), lineNum, columnNum + 1));
 			}
 		}
@@ -382,7 +385,7 @@ public class TestCase {
 	}
 	
 	/**
-	 * Called by a specific testcase if the testcase fails..
+	 * Called by a specific testcase if the testcase fails.
 	 * This is the place for output messages.
 	 */
 	public void fail() {

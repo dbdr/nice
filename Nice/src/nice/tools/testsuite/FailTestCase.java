@@ -30,8 +30,13 @@ public class FailTestCase extends TestCase {
 		try {
 			compilePackages();
 		} catch(TestSuiteException e) {
-			pass();
 			checkFailPositions();
+			if (getFailPositions().isEmpty())
+				pass();
+			else {
+				fail();
+				TestNice.increaseWarning();
+			}
 			return;
 		} catch(CompilerBugException e) {
 			fail();
@@ -69,7 +74,7 @@ public class FailTestCase extends TestCase {
 		
 		}
 		
-		if (getFailPositions().size() != 0)
+		if (! getFailPositions().isEmpty())
 			TestNice.getOutput().log("warning", "more expected failures than compiler failures");
 		
 		/*

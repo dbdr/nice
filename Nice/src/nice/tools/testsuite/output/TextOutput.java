@@ -74,6 +74,7 @@ public class TextOutput extends AbstractOutput {
 		log("number of testcases: " + (TestNice.getTestCasesSucceeded() + TestNice.getTestCasesFailed()));
 		log("  succeeded: " + TestNice.getTestCasesSucceeded());
 		log("  failed   : " + TestNice.getTestCasesFailed());
+		log("  warnings : " + TestNice.getTestCasesWarning());
 		logAndFlush("");
 	}
 	

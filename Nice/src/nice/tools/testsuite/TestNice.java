@@ -103,6 +103,12 @@ public class TestNice {
 	private static int _testCasesFailed = 0;
 
 	/**
+	 * Number of testcases with warnings. These are ahndled as failed testcases.
+	 * 
+	 */
+	private static int _testCasesWarning = 0;
+
+	/**
 	 * The Output where log statements should be written.
 	 * ConsoleOutput is the default Output.
 	 * 
@@ -367,6 +373,14 @@ public class TestNice {
 		++_testCasesFailed;
 	}
 
+	/**
+	 * Increases the number of warning testcases.
+	 * 
+	 */
+	public static void increaseWarning() {
+		++_testCasesWarning;
+	}
+
 
 
 	/**
@@ -403,6 +417,14 @@ public class TestNice {
 	 */
 	static public int getTestCasesFailed() {
 		return _testCasesFailed;
+	}
+
+	/**
+	 * Returns the number of warning testcases.
+	 * 
+	 */
+	static public int getTestCasesWarning() {
+		return _testCasesWarning;
 	}
 
 

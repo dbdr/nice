@@ -80,6 +80,15 @@ public class NiceSourceFile {
 
 
 	/**
+	 * Returns the status.
+	 * 
+	 */
+	public int getStatus() {
+		return _status;
+	}
+
+
+	/**
 	 * Consumes a read line from the testsuite file.
 	 * Sets the status if necessary.
 	 * 

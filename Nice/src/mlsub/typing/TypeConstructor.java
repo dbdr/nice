@@ -81,15 +81,6 @@ public class TypeConstructor
   protected void setVariance(Variance v)
   {
     setKind(v.getConstraint());
-    
-//    if(variance!=null)
-//        {
-//  	if(!(variance.equals(v)))
-//  	  User.error(this,"Incorrect variance for "+this);
-//  	return;
-//        }
-//      this.variance=v;
-//      this.kind=Engine.getConstraint(v);
   }
 
   public int arity()
@@ -121,14 +112,15 @@ public class TypeConstructor
   
   public void setKind(Kind value)
   {
-    if(kind!=null)
-      if(kind==value)
+    if(kind != null)
+      if(kind == value)
 	return;
       else
-	throw new InternalError("Variance already set in type constructor "+this);
+	throw new InternalError
+	  ("Variance already set in type constructor " + this);
 
-    variance=(Variance)((Engine.Constraint)value).associatedKind;
-    kind=value;
+    variance = (Variance) ((Engine.Constraint) value).associatedKind;
+    kind = value;
   }
   
   /****************************************************************

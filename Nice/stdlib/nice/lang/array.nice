@@ -136,7 +136,7 @@ override <T> T[] slice(T[] array, int from = 0, int to = array.length - 1) =
 
    It is important that no reference to the array is kept,
    because that would make it possible to store null values in it.
-   There is no danger as long as the array is created inside the call, 
+   There is no danger as long as the array is created inside the call,
    like in the above example.
 */
 <T, U | U <: T> U[] fill(T[] array, int->U value)
@@ -145,7 +145,36 @@ override <T> T[] slice(T[] array, int from = 0, int to = array.length - 1) =
 {
   for (int i = 0; i < array.length; i++)
     array[i] = value(i);
-  return cast(array);
+  return cast(array); // all values have been initialized, the cast is safe
+}
+
+/**
+   Fills a newly created bidimensional array with non-null values.
+
+   A typical usage is to allocate a new array and set its values at the same time:
+   <code>
+     String[][] coords = new String[10][10].fill((int i, int j) => ""i","j);
+   </code>
+
+   The equivalent code in Java would be:
+   <code>
+     String[][] coords = new String[10][10];
+     for (int i = 0; i < 10; i++)
+       for (int j = 0; j < 10; i++)
+         coords[i] = i + "," + j;
+   </code>
+
+   It is important that no reference to the array is kept,
+   because that would make it possible to store null values in it.
+   There is no danger as long as the array is created inside the call,
+   like in the above example.
+*/
+<T, U | U <: T> U[][] fill(T[][] array, (int,int)->U value)
+{
+  for (int i = 0; i < array.length; i++)
+    for (int j = 0; j < array[i].length; j++)
+      array[i][j] = value(i,j);
+  return cast(array); // all values have been initialized, the cast is safe
 }
 
 /** 

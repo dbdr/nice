@@ -1175,9 +1175,6 @@ public class Main
   </chapter>
 
   <chapter><title>Types</title>
-    <para>
-    </para>
-
     <section id="optionTypes"><title>Option types</title>
       <para>
         Nice (unlike Java) makes a distinction between a type that may be &NULL;, 
@@ -1212,8 +1209,7 @@ public class Main
         aren't &NULL; again, unless you actually want to allow &NULL;s.
       </para>
 
-      <section id="notNull"><title>The <literal>notNull</literal> function</title>
-	<para>
+	<para id="notNull">
 	  Sometimes, you know that a value cannot be &NULL;,
 	  although it has an option type.
 	  You can then use the <literal>notNull</literal> function to
@@ -1238,7 +1234,6 @@ public class Main
 	  if the value is &NULL;, and it is used as
 	  if it was not &NULL;. 
 	</para>
-      </section>
 
       <para>
 	There are (rare) situations where it is necessary to allow a 
@@ -1308,9 +1303,9 @@ public class Main
           Simple type parameters of the form
         </para>
         <para>
-          <type>&LT;<replaceable>type-variable</replaceable>
-	  <optional>, <replaceable>type-variable</replaceable> ...
-	  </optional>&GT;</type>
+          <type>&LT;<replaceable>type-variable</replaceable></type>
+	  <optional><type>, <replaceable>type-variable</replaceable> ...</type>
+	  </optional><type>&GT;</type>
         </para>
         <para>
           are commonly encountered in Nice, but are a simplified form of a more

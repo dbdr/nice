@@ -1837,8 +1837,8 @@ Expression ConditionalOrExpression() :
 { Expression e1,e2; Token t; }
 {
   e1=ConditionalAndExpression() 
-    ( t="||" e2=ConditionalAndExpression() 
-      { e1=CallExp.create(symb(t), e1, e2); } )*
+    ( t="||" e2=ConditionalOrExpression() 
+      { e1=CallExp.create(symb(t), e1, e2); } )?
   { return e1; }
 }
 
@@ -1846,8 +1846,8 @@ Expression ConditionalAndExpression() :
 { Expression e1,e2; Token t; }
 {
   e1=InclusiveOrExpression() 
-    ( t="&&" e2=InclusiveOrExpression() 
-      { e1=CallExp.create(symb(t), e1, e2); } )*
+    ( t="&&" e2=ConditionalAndExpression()
+      { e1=CallExp.create(symb(t), e1, e2); } )?
   { return e1; }
 }
 

@@ -52,7 +52,7 @@ typecheck(e@AssignExp)
 	  // It is OK to assign the variable with a null value.
 	  variable.setVarType(now: unsureType,
 			      otherBranch: variable.type,
-			      brothers: unsureType);
+			      out: unsureType);
 	  return;
 	}
       catch (TypingEx newError) { t = newError; }
@@ -95,10 +95,77 @@ void typecheckArgs(Arguments args)
     typecheck(args.getExp(i));
 }
 
+void typecheckAndArgs(Arguments args)
+{
+  if (args.size() != 2)
+    {
+      typecheckArgs(args);
+      return;
+    }
+
+  enterIf();
+  try {
+    typecheck(args.getExp(0));
+
+    ?List<MonoSymbol> l = variablesNotNullIfTestSucceeds(args.getExp(0));
+    if (l != null)
+      l.foreach(MonoSymbol variable => {
+	mlsub.typing.Monotype type = notNull(variable.type);
+	mlsub.typing.Monotype sureType = makeSure(type);
+	setVarType(variable, now: sureType, out: type);
+      });
+
+    typecheck(args.getExp(1));
+    args.getExp(1).computeType();
+  }
+  finally {
+    // There is no else part, but this call is necessary to pop off
+    // conditional type information (from assignments) from the stack.
+    enterElse();
+    exitIf();
+  }
+}
+
+void typecheckOrArgs(Arguments args)
+{
+  if (args.size() != 2)
+    {
+      typecheckArgs(args);
+      return;
+    }
+
+  enterIf();
+  try {
+    typecheck(args.getExp(0));
+
+    ?List<MonoSymbol> l = variablesNotNullIfTestFails(args.getExp(0));
+    if (l != null)
+      l.foreach(MonoSymbol variable => {
+	mlsub.typing.Monotype type = notNull(variable.type);
+	mlsub.typing.Monotype sureType = makeSure(type);
+	setVarType(variable, now: sureType, out: type);
+      });
+
+    typecheck(args.getExp(1));
+    args.getExp(1).computeType();
+  }
+  finally {
+    // There is no else part, but this call is necessary to pop off
+    // conditional type information (from assignments) from the stack.
+    enterElse();
+    exitIf();
+  }
+}
+
 typecheck(e@CallExp)
 {
   typecheck(e.function);
-  e.arguments.typecheckArgs();
+  if (e.isCallTo("&&"))
+    e.arguments.typecheckAndArgs();
+  else if (e.isCallTo("||"))
+    e.arguments.typecheckOrArgs();
+  else
+    e.arguments.typecheckArgs();
 
   // forces computation of the type if not done.
   mlsub.typing.Polytype t = e.getType();
@@ -214,6 +281,13 @@ private ?List<MonoSymbol> combine(?List<MonoSymbol> l1, ?List<MonoSymbol> l2)
   return notNullIfTrue;
 }
 
+?List<MonoSymbol> variablesNotNullIfTestFails(Expression test)
+{
+  (?List<MonoSymbol> notNullIfTrue, ?List<MonoSymbol> notNullIfFalse) = 
+    nullnessInfo(test);
+  return notNullIfFalse;
+}
+
 /** 
     Collects knowledge about more precise type in branches of conditionals.
     
@@ -254,7 +328,7 @@ void pushBranchType(MonoSymbol variable, mlsub.typing.Monotype baseType)
   conditionalTypes.push((variable, baseType));
 }
 
-void pushBrotherType(MonoSymbol variable, mlsub.typing.Monotype baseType)
+void pushOuterType(MonoSymbol variable, mlsub.typing.Monotype baseType)
 {
   levels.push(2 * ifLevel + 1);
   conditionalTypes.push((variable, baseType));
@@ -288,7 +362,7 @@ typecheck(e@IfExp)
       notNullInThen.foreach(MonoSymbol variable => {
 	mlsub.typing.Monotype type = notNull(variable.type);
 	mlsub.typing.Monotype sureType = makeSure(type);
-	setVarType(variable, now: sureType, brothers: type);
+	setVarType(variable, now: sureType, otherBranch: type);
       });
 
     e.thenExp = thenExp = notNull(thenExp.noOverloading());
@@ -303,7 +377,7 @@ typecheck(e@IfExp)
       notNullInElse.foreach(MonoSymbol variable => {
 	mlsub.typing.Monotype type = notNull(variable.type);
 	mlsub.typing.Monotype sureType = makeSure(type);
-	setVarType(variable, now: sureType, brothers: type);
+	setVarType(variable, now: sureType, out: type);
       });
 
     e.elseExp = elseExp = notNull(elseExp.noOverloading());
@@ -329,16 +403,16 @@ typecheck(e@IfExp)
 
    @param now type to be used in the next branch.
    @param otherBranch type to be used in the other branches
-   @param brothers type to be used in the block containing the conditional
-   @param later type to be used when returning to the parent block
+   @param out type to be used after returning to the outer block
 */
 private void setVarType(MonoSymbol variable, 
 			mlsub.typing.Monotype now, 
 			?mlsub.typing.Monotype otherBranch = null,
-			mlsub.typing.Monotype brothers)
+			?mlsub.typing.Monotype out = null)
 {
   variable.type = now;
-  pushBrotherType(variable, brothers);
+  if (out != null)
+    pushOuterType(variable, out);
   if (otherBranch != null)
     pushBranchType(variable, otherBranch);
 }
@@ -498,7 +572,7 @@ typecheck(l@LoopStmt)
 	  variables.foreach (MonoSymbol variable => 
 			     setVarType(variable, 
 					now: makeSure(variable.type), 
-					brothers: variable.type));
+					out: variable.type));
       }
 
   typecheck(l.loopBody);

@@ -23,6 +23,7 @@ package bossa.syntax;
 identString(e) = null;
 identString(e@IdentExp) = e.ident;
 identString(e@SymbolExp) = e.getName();
+identString(e@OverloadedSymbolExp) = e.ident;
 
 boolean isCallTo(CallExp e, String name) 
 {

@@ -12,6 +12,13 @@
     x++;
 
 
+/// FAIL
+  ?int x = null;
+  if (x != null)
+    x++;
+  else
+    /* /// FAIL HERE */ x++;
+
 /// PASS
   ?int x = null;
   if (x == null)
@@ -300,3 +307,56 @@
   ?String x1 = null;
   while ( (x1 = null) == null)
     x1 = x1 + "";
+
+
+/// COMMENT && expressions
+
+/// PASS
+  ?String x = null;
+  boolean b = x != null && x.length() > 3 && x.length() > 4;
+
+/// FAIL
+  ?String x = null;
+  boolean b = x != null && x.length() > 3;
+  b = x.length() > 3;
+
+/// PASS
+  ?String x = null;
+  if (x != null && x.length() > 3 && x.length() > 4)
+    x.length();
+
+/// PASS
+  ?String x = null;
+  boolean b = x != null && x.length() > 3 && (x = null) == null;
+
+/// FAIL
+  ?String x = null;
+  boolean b = x != null && (x = null) == null && x.length() > 3;
+  
+
+/// COMMENT || expressions
+
+/// PASS
+  ?String x = null;
+  boolean b = x == null || x.length() > 3 || x.length() > 4;
+
+/// FAIL
+  ?String x = null;
+  boolean b = x == null || x.length() > 3;
+  b = x.length() > 3;
+
+/// PASS
+  ?String x = null;
+  if (x == null || x.length() > 3 || x.length() > 4)
+    ;
+  else
+    x.length();
+
+/// PASS
+  ?String x = null;
+  boolean b = x == null || x.length() > 3 || (x = null) == null;
+
+/// FAIL
+  ?String x = null;
+  boolean b = x == null || (x = null) == "" || x.length() > 3;
+  

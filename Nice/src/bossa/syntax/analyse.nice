@@ -22,7 +22,7 @@ import mlsub.typing.*;
 // Interface
 
 Statement analyse(Statement, VarScope, TypeScope, boolean mustReturnAValue);
-?Expression analyse(Expression, VarScope, TypeScope);
+Expression analyse(Expression, VarScope, TypeScope);
 
 TypeMaper typeMaper(SymbolTable<TypeSymbol>,TypeScope) = 
   native new TypeMaper(SymbolTable, TypeScope);
@@ -227,7 +227,9 @@ void checkInitialized(Block.LocalVariable.Symbol sym, Info info,
     throw error(loc, "Variable " + sym.name + " is not initialized");
 }
 
-?Expression analyse(?Expression, Info);
+?Expression analyse(?Expression, Info) = null;
+override Expression analyse(Expression, Info);
+
 void analyse(?Statement, Info);
 
 /****************************************************************
@@ -235,7 +237,6 @@ void analyse(?Statement, Info);
  ****************************************************************/
 
 analyse(e@Expression, i) = e;
-analyse(null(Expression), info) = null;
 
 void setInitialized (Block.LocalVariable.Symbol v, Info info, 
 		     bossa.util.Location loc)
@@ -413,7 +414,7 @@ Expression analyseQualifiedCall(CallExp e, Info info)
   return e;
 }
 
-?Expression analyse(Expression e, Info info, boolean noEscape) =
+Expression analyse(Expression e, Info info, boolean noEscape) =
   analyse(e, info);
 
 analyse(e@FunExp, info) = analyse(e, info, false);

@@ -247,7 +247,7 @@ typecheck(e@IncrementExp)
 				 notNull(e.variable));
   }
   catch(TypingEx t){
-    if (notNullError(t, e, e.description()))
+    if (notNullError(t, e, e.toString()))
       throw new bossa.util.UserError
       (e, 
        notNull(e.description()) + " is only valid on integers.\n" + 

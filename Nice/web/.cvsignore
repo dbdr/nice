@@ -6,6 +6,8 @@ manual.html
 research.html
 roadmap.html
 safety.html
+send_manual_pdf
+send_manual_ps
 testimonials.html
 *.pdf
 *.ps

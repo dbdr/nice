@@ -277,6 +277,26 @@ public class CallExp extends Expression
 
   protected gnu.expr.Expression compile()
   {
+    gnu.expr.Expression res;
+    if (function.isFieldAccess())
+      res = function.getFieldAccessMethod().compileAccess(compileParams());
+    else
+      res = new gnu.expr.ApplyExp(function.generateCode(), compileParams());
+
+    gnu.bytecode.Type expectedType;
+    if ("notNull".equals(function.toString()))
+      {
+	expectedType = Types.javaType(getType());
+	//System.out.println(this + ", " + res.getType() + "; " + expectedType + "^" + getType());
+	expectedType = Types.javaType(getType());
+	//System.out.println(this + ", " + res.getType() + "; " + expectedType + "^" + getType());
+      }
+    expectedType = Types.javaType(getType());
+    return EnsureTypeProc.ensure(res, expectedType);
+  }
+
+  private gnu.expr.Expression[] compileParams()
+  { 
     gnu.expr.Expression[] params = 
       Expression.compile(arguments.computedExpressions);
 
@@ -290,25 +310,10 @@ public class CallExp extends Expression
 	      params[i] = ((gnu.expr.PrimProcedure) q.getValue()).wrapInLambda();
 	    }
 	}
-    
-    gnu.expr.Expression res;
-    if (function.isFieldAccess())
-      res = function.getFieldAccessMethod().compileAccess(params);
-    else
-      res = new gnu.expr.ApplyExp(function.generateCode(), params);
 
-    gnu.bytecode.Type expectedType;
-    if ("notNull".equals(function.toString()))
-      {
-	expectedType = Types.javaType(getType());
-	//System.out.println(this + ", " + res.getType() + "; " + expectedType + "^" + getType());
-	expectedType = Types.javaType(getType());
-	//System.out.println(this + ", " + res.getType() + "; " + expectedType + "^" + getType());
-      }
-    expectedType = Types.javaType(getType());
-    return EnsureTypeProc.ensure(res, expectedType);
+    return params;
   }
-  
+
   gnu.expr.Expression compileAssign(gnu.expr.Expression value)
   {
     if (!function.isFieldAccess())

@@ -45,3 +45,9 @@ int test0(int z) {
   int test(int x, int y = z) = y;
   return test(0);
 }
+
+/// PASS
+  /// Toplevel
+// Forward reference to a function with a default value copying a previous argument.
+void foo() { f(0); }
+void f(int x, int y = x) {}

@@ -1,5 +1,16 @@
 nice (0.9.0) unstable; urgency=low
 
+  * Implemented dispatch by integer comparison. An example:
+    int abs(int n);
+    abs(n>=0) = n;
+    abs(n<0) = -n;
+    The compiler knows that method abs is covered for all int values.
+    It's also possible to compare with globalconstants:
+    let int bar = 5;
+    String foo(int n);
+    foo(n<bar) = "smaller than bar";
+    foo(bar) = "equal to bar";
+    foo(n>bar) = "larger than bar";
   * The names of the arguments of a default implementation of a method should
     be the same as the names in the declaration.
       void foo(int number);

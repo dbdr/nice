@@ -180,3 +180,13 @@ foo(1) {}
   foo(n) {}
   foo(n>5) {}
   foo(n>5) {}
+
+/// PASS
+  assert foo(6) == 6;
+  assert foo(5) == 1;
+  /// Toplevel
+  int foo(int n);
+  foo(n<=3) = 0;
+  foo(n>3) = n;
+  foo(4) = 0;
+  foo(5) = 1;

@@ -111,10 +111,10 @@ class JarCompiledContent extends CompiledContent
     java.util.List res = new java.util.LinkedList();
     String pkgPrefix = pkg.getName().replace('.', '/') + "/";
 
-    java.util.Enumeration enum = jar.entries();
-    while(enum.hasMoreElements())
+    java.util.Enumeration en = jar.entries();
+    while(en.hasMoreElements())
       {
-	JarEntry e = (JarEntry) enum.nextElement();
+	JarEntry e = (JarEntry) en.nextElement();
 	String fullname = e.getName();
 	if (fullname.startsWith(pkgPrefix)
 	    && fullname.indexOf('/', pkgPrefix.length()) == -1

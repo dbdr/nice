@@ -145,6 +145,11 @@ public class MethodBodyDefinition extends MethodImplementation
 	}
       
       MethodDeclaration m = s.getMethodDeclaration();
+      if (m.isIgnored())
+        {
+          i.remove();
+          continue;
+        }
 
       if (m.getArity() != formals.length
           || !(m instanceof NiceMethod || m instanceof JavaMethod))

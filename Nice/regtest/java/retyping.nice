@@ -1,0 +1,16 @@
+package regtest.java;
+
+// We define an invalid retyping.
+// Then we override a method with the same name, so that the retyped
+// method should normally be considered.
+
+void init(regtest.java.J.J, Map<int, int>) = 
+  native void regtest.java.J.J.init(WrongName);
+
+class Ret1 {
+  void init(String) {}
+}
+
+class Ret2 extends Ret1 {
+  init(m) {}
+}

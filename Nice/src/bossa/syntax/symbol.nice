@@ -61,9 +61,9 @@ public class PolySymbol extends VarSymbol
   }
 }
 
-new PolySymbol( MonoSymbol sym )
+new PolySymbol(MonoSymbol sym)
 {
- this(sym.name, syntacticType : new Polytype(sym.syntacticType));
+ this(sym.name, syntacticType : new Polytype(Node.down, monotype: notNull(sym.syntacticType)));
 }
 
 /**
@@ -137,7 +137,7 @@ new FunSymbol(LocatedString name, Constraint constraint,
 				FormalParameters parameters, Monotype returnType)
 {
   this(name, parameters: parameters, arity: parameters.size, syntacticType:
-	new Polytype(constraint, createFunType(parameters.types(), returnType)));
+	new Polytype(Node.down, constraint: constraint, monotype: createFunType(parameters.types(), returnType)));
 }
 
 /**
@@ -199,7 +199,7 @@ new MethodSymbol(MethodDeclaration declaration, LocatedString name,
 {
   FormalParameters parameters = notNull(declaration.formalParameters());
   this(name, declaration: declaration, parameters: parameters, arity: parameters.size,
-	syntacticType: new Polytype(constraint, createFunType(parameters.types(), returnType)));
+	syntacticType: new Polytype(Node.down, constraint: constraint, monotype: createFunType(parameters.types(), returnType)));
 }
 
 new MethodSymbol(MethodDeclaration declaration, LocatedString name,

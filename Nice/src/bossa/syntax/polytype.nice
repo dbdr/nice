@@ -1,0 +1,46 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2004                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package bossa.syntax;
+
+import bossa.util.*;
+
+/**
+   A constrained monotype.
+
+*/
+public class Polytype extends Node
+{
+  private Constraint constraint = Constraint.True;
+  private Monotype monotype;
+
+  {
+    this.addChild(constraint);
+  }
+
+  mlsub.typing.Polytype resolveToLowlevel()
+  {
+    return new mlsub.typing.Polytype(constraint.resolveToLowlevel(),
+				     monotype.resolve(typeScope));
+  }
+
+  mlsub.typing.Polytype resolve(TypeMap s)
+  {
+    // this does probably not work if constraint is non-trivial
+    return new mlsub.typing.Polytype(constraint.resolveToLowlevel(),
+				     monotype.resolve(s));
+  }
+
+  toString() = constraint + " " + monotype.toStringExtern();
+}
+
+ 

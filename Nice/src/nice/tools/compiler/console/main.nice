@@ -49,8 +49,8 @@ int compile(String[] args)
   ?String classpath = null;
   boolean editorMode = false;
 
-  ConsoleOutput output = new ConsoleOutput();
-  Compilation compilation = new Compilation(listener: output);
+  ConsoleOutput consOutput = new ConsoleOutput();
+  Compilation compilation = new Compilation(listener: consOutput);
 
   Program prg = new Program
     (name: "nicec", longName: "The Nice Compiler",
@@ -168,7 +168,7 @@ int compile(String[] args)
   mainPackage = mainPackage.deleteAtEnd("/").replace('/', ".");
 
   compile(compilation, mainPackage, nativeProgram, nativeCompiler, editorMode);
-  int res = output.statusCode;
+  int res = consOutput.statusCode;
 
   if (memInfo) printMemoryUsage();
 

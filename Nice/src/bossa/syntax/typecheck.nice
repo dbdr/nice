@@ -609,7 +609,6 @@ typecheck(l@LoopStmt)
 
   enterIf();
 
-  ?Expression whileExp = l.whileExp;
   if (whileExp != null)
     if (l.isTestFirst)
       {

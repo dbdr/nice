@@ -42,10 +42,12 @@ public class AssignExp extends Expression
 	"get".equals(((CallExp) to).function.toString()))
       {
 	CallExp call = (CallExp) to;
-	((IdentExp) call.function).ident.content = "set";
-	call.arguments.add(value);
-
-	return call;
+	
+	return CallExp.create
+	  (new IdentExp(new LocatedString("set", call.function.location())),
+	   call.arguments.getExp(0),
+	   call.arguments.getExp(1),
+	   value);
       }
     
     return new AssignExp(to, value);

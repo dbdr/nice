@@ -77,6 +77,19 @@ public class CallExp extends Expression
     return res;
   }
   
+  public static CallExp create(Expression function, 
+			       Expression param1, Expression param2,
+			       Expression param3)
+  {
+    List params = new ArrayList(2);
+    params.add(new Arguments.Argument(param1));
+    params.add(new Arguments.Argument(param2));
+    params.add(new Arguments.Argument(param3));
+    CallExp res = new CallExp(function, new Arguments(params));
+    res.setLocation(function.location());
+    return res;
+  }
+  
   /****************************************************************
    * Type checking
    ****************************************************************/

@@ -44,7 +44,7 @@ test:
 	cd regtest; /usr/bin/time ./regtest
 
 clean:
-	rm -rf classes lib/nice src/bossa/parser/{Parse*.java,Token*.java,ASCII_*.java}
+	-rm -rf classes lib/nice src/bossa/parser/{Parse*.java,Token*.java,ASCII_*.java}
 	find "${TOP}" \( -name "*.class" -o -name "*.nicei" -o -name "*~" \) -exec rm {} \;
 
 

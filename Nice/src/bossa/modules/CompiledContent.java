@@ -42,7 +42,14 @@ abstract class CompiledContent
      package denoted by this source.
   */
   abstract Content.Stream[] getClasses();
-  
+
+  /**
+     Read a compiled class.
+
+     @param name the fully qualified name of the class
+  */
+  abstract gnu.bytecode.ClassType readClass(String name);
+
   /** return a short name to display this package source
       (typically a file name, an URL, ...) */
   abstract public String getName();

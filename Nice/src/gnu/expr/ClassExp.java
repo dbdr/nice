@@ -13,9 +13,6 @@ public class ClassExp extends LambdaExp
   public void setAccessFlags(int value) 
   { 
     accessFlags = value;
-    // Access.SUPER mut be set on all non-interface classes
-    if (! isInterface())
-      accessFlags |= Access.SUPER;
   }
   public boolean isInterface() 
   { 
@@ -53,6 +50,16 @@ public class ClassExp extends LambdaExp
     setCanRead(true);
   }
 
+  /**
+     Create a ClassExp object to represent an existing class.
+     This ClassExp will not be compiled to a new class.
+  */
+  public ClassExp (ClassType type)
+  {
+    this();
+    this.type = this.instanceType = type;
+  }
+
   public Declaration addField(String name, Type type)
   {
     Declaration res = addDeclaration(name, type);
@@ -61,6 +68,11 @@ public class ClassExp extends LambdaExp
     res.setCanRead(true);
     res.setCanWrite(true);
     res.noteValue(null);
+
+    // If the class already exists, find the corresponding field there.
+    if (instanceType != null)
+      res.field = instanceType.getDeclaredField(name);
+
     return res;
   }
 
@@ -220,6 +232,9 @@ public class ClassExp extends LambdaExp
 	instanceType = type = new ClassType(getName());
 	type.setSuper(superType);
       }
+    // Access.SUPER mut be set on all non-interface classes
+    if (! isInterface())
+      accessFlags |= Access.SUPER;
     instanceType.setModifiers(accessFlags);
 
     if (j > 0)

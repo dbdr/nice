@@ -59,9 +59,10 @@ class DirectoryCompiledContent extends CompiledContent
     return new Content.Unit[]{ new Content.Unit(read(itf), itf.toString()) };
   }
 
-  private ClassType readClass(String name)
+  ClassType readClass(String name)
   {
-    InputStream s = getFileStream(name);
+    name = bossa.util.Util.simpleName(name);
+    InputStream s = getFileStream(name + ".class");
     if (s == null)
       return null;
     
@@ -81,8 +82,8 @@ class DirectoryCompiledContent extends CompiledContent
     if (!itf.exists())
       return null;
     
-    bytecode = readClass("package.class");
-    dispatch = readClass("dispatch.class");
+    bytecode = readClass("package");
+    dispatch = readClass("dispatch");
 
     if (bytecode == null || dispatch == null)
       return null;

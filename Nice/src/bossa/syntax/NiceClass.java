@@ -159,7 +159,6 @@ public class NiceClass extends ClassDefinition
 	}
 
     setJavaType(classe.getType());
-    classe.declareParts();
   }
 
   /****************************************************************
@@ -184,21 +183,24 @@ public class NiceClass extends ClassDefinition
 
   private void prepareCodeGeneration()
   {
-    createClass();
+    // The module will lookup the existing class if it is already compiled
+    // and call createClassExp if not.
+    classe = module.getClassExp(this);
     createConstructor();
   }
 
   gnu.expr.ClassExp classe;
 
-  private void createClass()
+  public gnu.expr.ClassExp createClassExp()
   {
-    classe = new gnu.expr.ClassExp();
+    gnu.expr.ClassExp classe = new gnu.expr.ClassExp();
     classe.setName(name.toString());
     classe.setFile(location().getFile());
     classe.setSimple(true);
     classe.setAccessFlags((isInterface ? Access.INTERFACE : 0) |
 			  (isAbstract ? Access.ABSTRACT : 0) |
 			  (isFinal ? Access.FINAL : 0));
+    return classe;
   }
 
   private void createConstructor()

@@ -114,4 +114,14 @@ public class Util
       res += String.valueOf(c[i]) + delim;
     return res + c[c.length-1] + end;
   }
+
+  /****************************************************************
+   * Names
+   ****************************************************************/
+
+  public static String simpleName(String fullyQualifiedName)
+  {
+    int lastDot = fullyQualifiedName.lastIndexOf('.');
+    return fullyQualifiedName.substring(lastDot + 1);
+  }
 }

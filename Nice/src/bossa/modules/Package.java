@@ -745,6 +745,18 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     return classe.addMethod(method);
   }
 
+  public ClassExp getClassExp(NiceClass def)
+  {
+    if (compiling())
+      return def.createClassExp();
+
+    ClassType classe = source.readClass(def.getName().toString());
+    if (classe == null)
+      Internal.error("Compiled class " + def + " was not found");
+    ClassExp res = new ClassExp(classe);
+    return res;
+  }
+
   public String bytecodeName()
   {
     return name.toString();

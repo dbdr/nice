@@ -132,6 +132,14 @@ class Content
       return compiled.dispatch;
   }
 
+  gnu.bytecode.ClassType readClass(String name)
+  {
+    if (sourceRead)
+      return null;
+    else
+      return compiled.readClass(name);
+  }
+
   /** @return the directory in which to place generated files 
       of this package. 
 

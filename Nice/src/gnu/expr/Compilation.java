@@ -1524,6 +1524,9 @@ public class Compilation
     ChainLambdas.chainLambdas(pkg, this);
     FindTailCalls.findTailCalls(pkg);
     FindCapturedVars.findCapturedVars(pkg);
+
+    for (LambdaExp c = pkg.firstClass; c != null; c = c.nextSibling)
+      ((ClassExp) c).declareParts();
   }
 
   /** Create a new Compilation environment.

@@ -15,6 +15,7 @@ package bossa.modules;
 import bossa.util.*;
 import java.io.*;
 import java.util.jar.*;
+import gnu.bytecode.ClassFileInput;
 
 /**
    A compiled package located in a jar file.
@@ -68,9 +69,9 @@ class JarCompiledContent extends CompiledContent
       res = new BufferedReader
 	(new InputStreamReader(jar.getInputStream(itfEntry)));
 
-      bytecode = gnu.bytecode.ClassFileInput.readClassType
+      bytecode = ClassFileInput.readClassType
 	(jar.getInputStream(bytecodeEntry));
-      dispatch = gnu.bytecode.ClassFileInput.readClassType
+      dispatch = ClassFileInput.readClassType
 	(jar.getInputStream(dispatchEntry));
     }
     catch(IOException e){
@@ -79,6 +80,20 @@ class JarCompiledContent extends CompiledContent
     }
     
     return new Content.Unit[]{ new Content.Unit(res, pkg.name.toString()) };
+  }
+
+  gnu.bytecode.ClassType readClass(String name)
+  {
+    JarEntry entry = jar.getJarEntry(name.replace('.', '/') + ".class");
+    if (entry == null)
+      return null;
+
+    try {
+      return ClassFileInput.readClassType(jar.getInputStream(entry));
+    }
+    catch (IOException e) {
+      return null;
+    }
   }
 
   Content.Stream[] getClasses()

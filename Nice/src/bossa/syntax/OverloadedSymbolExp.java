@@ -73,6 +73,8 @@ public class OverloadedSymbolExp extends Expression
     if(Debug.overloading) 
       Debug.println("Overloading resolution for \n" + this +
 		    "\nwith parameters " + arguments);
+
+    // FIRST PASS: only checks the number of parameters
     
     // We remember if some method was discarded
     // in order to enhance the error message
@@ -105,23 +107,29 @@ public class OverloadedSymbolExp extends Expression
 	  }
 	else
 	  { 
-	    Internal.warning("Unknown OR case: " + s.getClass()); 
+	    Internal.warning("Unknown O.R. case: " + s.getClass()); 
 	    i.remove(); continue; 
 	  }
       }
 
-    if(symbols.size() == 0)
+    if (symbols.size() == 0)
       User.error(this, 
 		 removedSomething ?
 		 "No method with name " + ident + 
 		 " matches call " + arguments :
 		 "No method has name " + ident);
 
+    // SECOND PASS: check argument types
+
+    // remembers removed symbols, 
+    // to list possibilities if none matches
+    LinkedList removed = new LinkedList();    
+
     //if(symbols.size() == 1) return uniqueExpression();
 
     Polytype[] types = new Polytype[symbols.size()];
     VarSymbol[] syms = new VarSymbol[symbols.size()];
-    int symNum = 0;
+    int sym = 0, good = 0;
     for(Iterator i = symbols.iterator();i.hasNext();)
       {
 	VarSymbol s = (VarSymbol) i.next();
@@ -135,20 +143,30 @@ public class OverloadedSymbolExp extends Expression
 	// and we check that cloneType() is not called twice
 	// before the clone type is released
 	s.makeClonedType();
-	Polytype t = CallExp.wellTyped(s.getClonedType(), 
-				       Expression.getType(arguments.getExpressions(symNum)));
+	Polytype[] argsType = Expression.getType(arguments.getExpressions(sym));
+	Polytype t = CallExp.wellTyped(s.getClonedType(), argsType);
+
 	if (t == null)
 	  {
+	    removed.add(s);
 	    i.remove();
 	    s.releaseClonedType();
 	  }
 	else
 	  {
-	    types[symNum] = t;
-	    syms[symNum] = s;
-	    symNum++;
+	    types[good] = t;
+	    syms[good] = s;
+	    good++;
 	  }
+	sym++;
       }
+
+    if (symbols.size() == 0)
+      User.error(this, 
+		 "No possible call for " + ident + 
+		 ".\nArguments: " + arguments.printTypes() + 
+		 "\nPossibilities:\n" + 
+		 Util.map("", "\n", "", removed));
 
     removeNonMinimal();
     
@@ -157,8 +175,8 @@ public class OverloadedSymbolExp extends Expression
 	VarSymbol res = (VarSymbol) symbols.get(0);
 	res.releaseClonedType();
 
-	for(int i = 0;;i++)
-	  if(syms[i]==res)
+	for (int i = 0;; i++)
+	  if (syms[i] == res)
 	    {
 	      callExp.type = types[i];
 	      // store the expression (including default arguments)
@@ -168,10 +186,6 @@ public class OverloadedSymbolExp extends Expression
 	    }
       }
     
-    if(symbols.size()==0)
-      User.error(this, 
-		 "No alternative matches the parameters while resolving overloading for "+ident);
-
     //There is ambiguity
     User.error(this,"Ambiguity for symbol "+ident+". Possibilities are :\n"+
 	       Util.map("","\n","",symbols));

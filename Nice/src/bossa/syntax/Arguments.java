@@ -168,7 +168,7 @@ public class Arguments extends Node
   }
   
   /**
-     return true if there are arity, non tagged arguments.
+     return true if there are arity non-tagged arguments.
   */
   boolean plainApplication(int arity)
   {
@@ -200,5 +200,15 @@ public class Arguments extends Node
     return res.append(")").toString();
   }
 
+  public String printTypes()
+  {
+    StringBuffer res = new StringBuffer("(");
+    for (int i = 0; i<arguments.length; i++)
+      res.append((arguments[i].name == null ? "" : arguments[i].name + ":") + 
+		 arguments[i].value.getType() + 
+		 (i + 1 < arguments.length ? ", " : ""));
+    return res.append(")").toString();
+  }
+  
   private Argument[] arguments;
 }

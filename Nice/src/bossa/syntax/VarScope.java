@@ -57,6 +57,17 @@ final class VarScope
   }
   
   /**
+     Adds a collection of VarSymbols
+   */
+  void addSymbols(VarSymbol[] s)
+  {
+    if (s == null) return;
+
+    for(int i = 0; i < s.length; i++)
+      addSymbol(s[i]);
+  }
+  
+  /**
    * The lookup method to call when you need to get a VarSymbol
    * from its name
    *

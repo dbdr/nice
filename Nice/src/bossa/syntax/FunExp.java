@@ -30,7 +30,14 @@ public class FunExp extends Expression implements Function
 {
   public FunExp(bossa.syntax.Constraint cst, List formals, Statement body)
   {
-    this.formals=addChildren(formals);
+    this.formals = new MonoSymbol[formals.size()];
+    for (int i = 0; i < this.formals.length; i++)
+    {
+      MonoSymbol m = (MonoSymbol) formals.get(i);
+      this.formals[i] = m;
+      addChild(m);
+    }
+    
     this.constraint=cst;
     this.body = child(body);
   }
@@ -101,16 +108,15 @@ public class FunExp extends Expression implements Function
     blockExp = new gnu.expr.BlockExp
       (nice.tools.code.Types.javaType(getType()));
 
-    res.min_args = res.max_args = formals.size();
+    res.min_args = res.max_args = formals.length;
     
     res.setCanRead(true);
     res.outer = Statement.currentScopeExp;
     Statement.currentScopeExp = res;       // push
     
-    for(Iterator i=formals.iterator();
-	i.hasNext();)
+    for(int i = 0; i < formals.length; i++)
       {
-	MonoSymbol s = (MonoSymbol) i.next();
+	MonoSymbol s = formals[i];
 	
 	gnu.expr.Declaration decl = 
 	  res.addDeclaration(s.name.toString(), 
@@ -148,7 +154,7 @@ public class FunExp extends Expression implements Function
       ;
   }
   
-  List /* of MonoSymbol */ formals;
+  MonoSymbol[] formals;
   bossa.syntax.Constraint constraint;
   Constraint cst;
   Statement body;

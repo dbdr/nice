@@ -73,7 +73,7 @@ public class MethodBodyDefinition extends Definition
     return null;
   }
   
-  private Collection buildSymbols(Collection names, Monotype[] types)
+  private MonoSymbol[] buildSymbols(Collection names, Monotype[] types)
   {
     if(names.size() != types.length)
       switch(types.length){
@@ -83,13 +83,12 @@ public class MethodBodyDefinition extends Definition
 			 "Method "+name+" has "+types.length+" parameters");
       }
     
-    Collection res = new ArrayList(names.size());
+    MonoSymbol[] res = new MonoSymbol[names.size()];
     int tn = 0;
-    for(Iterator n = names.iterator();
-	n.hasNext();)
+    for(Iterator n = names.iterator(); n.hasNext(); tn++)
       {
 	Pattern p = (Pattern)n.next();
-	Monotype domt = types[tn++];
+	Monotype domt = types[tn];
 
 	LocatedString typeName = p.name.cloneLS();
 	typeName.prepend("type of ");
@@ -98,7 +97,7 @@ public class MethodBodyDefinition extends Definition
 	if(!p.isSharp())
 	  type.rememberToImplementTop();
 	
-	res.add(new MonoSymbol(p.name, type));
+	res[tn] = new MonoSymbol(p.name, type);
       }
     return res;
   }
@@ -311,12 +310,11 @@ public class MethodBodyDefinition extends Definition
 	User.error(name,"The patterns are not correct", e);
       }
       
-      for(Iterator f = formals.iterator(), 
-	    p = parameters.iterator();
-	  f.hasNext();)
+      int n = 0;
+      for(Iterator f = formals.iterator(); f.hasNext(); n++)
 	{
 	  Pattern pat = (Pattern)f.next();
-	  MonoSymbol sym = (MonoSymbol) p.next();
+	  MonoSymbol sym = parameters[n];
 	  
 	  Monotype type = pat.getType();
 	  if(type==null)
@@ -389,15 +387,10 @@ public class MethodBodyDefinition extends Definition
   
   private Type[] javaArgTypes()
   {
-    Type[] res = new Type[parameters.size()];
+    Type[] res = new Type[parameters.length];
 
-    Iterator p;
-    int n = 0;
-    for(p = parameters.iterator(); p.hasNext(); n++)
-      {
-	MonoSymbol param = (MonoSymbol) p.next();
-	res[n] = nice.tools.code.Types.javaType(param.getMonotype());
-      }
+    for(int n = 0; n < parameters.length; n++)
+      res[n] = nice.tools.code.Types.javaType(parameters[n].getMonotype());
 
     return res;
   }
@@ -433,13 +426,11 @@ public class MethodBodyDefinition extends Definition
       module.setMainAlternative(lexp.getMainMethod());
 
     // Parameters
-    lexp.min_args = lexp.max_args = parameters.size();
+    lexp.min_args = lexp.max_args = parameters.length;
 
-    Iterator p;
-    int n = 0;
-    for(p = parameters.iterator(); p.hasNext(); n++)
+    for(int n = 0; n < parameters.length; n++)
       {
-	MonoSymbol param = (MonoSymbol) p.next();
+	MonoSymbol param = (MonoSymbol) parameters[n];
 	
 	gnu.expr.Declaration d = lexp.addDeclaration(param.name.toString());
 	d.setParameter(true);
@@ -501,7 +492,7 @@ public class MethodBodyDefinition extends Definition
   }
 
   private NiceMethod definition;
-  protected Collection /* of FieldSymbol */  parameters;
+  protected MonoSymbol[] parameters;
   protected List       /* of Patterns */   formals;
   Collection /* of LocatedString */ binders; // Null if type parameters are not bound
   private Statement body;

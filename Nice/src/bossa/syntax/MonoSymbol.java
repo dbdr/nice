@@ -56,39 +56,17 @@ public class MonoSymbol extends VarSymbol
     return type;
   }
 
-  public bossa.syntax.Monotype getSyntacticMonotype()
-  {
-    return syntacticType;
-  }
-
   /**
-   * Maps getMonotype over a collection of MonoSymbols
+   * Maps getMonotype over an array of MonoSymbols
    *
-   * @param varsymbols the collection of MonoSymbols
-   * @return the list of their Monotypes
+   * @param symbols the array of MonoSymbols
+   * @return the array of their Monotypes
    */
-  static mlsub.typing.Monotype[] getMonotype(Collection c)
+  static mlsub.typing.Monotype[] getMonotype(MonoSymbol[] symbols)
   {
-    mlsub.typing.Monotype[] res =
-      new mlsub.typing.Monotype[c.size()];
-
-    int n = 0;
-    for(Iterator i=c.iterator();i.hasNext();)
-      res[n++] = ((MonoSymbol)i.next()).getMonotype();
-    return res;
-  }
-
-  /**
-   * Maps getSyntacticMonotype over a collection of MonoSymbols
-   *
-   * @param varsymbols the collection of MonoSymbols
-   * @return the list of their Monotypes
-   */
-  static List getSyntacticMonotype(Collection c)
-  {
-    List res=new ArrayList(c.size());
-    for(Iterator i=c.iterator();i.hasNext();)
-      res.add(((MonoSymbol)i.next()).syntacticType);
+    mlsub.typing.Monotype[] res = new mlsub.typing.Monotype[symbols.length];
+    for(int i = 0; i < symbols.length; i++)
+      res[i] = symbols[i].getMonotype();
     return res;
   }
 

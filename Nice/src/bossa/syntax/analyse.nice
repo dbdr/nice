@@ -151,7 +151,7 @@ class Info
     this.vars[symbol.name.toString()] = symbol;
   }
 
-  void addVars(List<MonoSymbol>);
+  void addVars(Sequence<MonoSymbol>);
   addVars(symbols) = symbols.iter(fun(MonoSymbol s)=>this.addVar(s));
   
   void addTypeVars(List<TypeSymbol>);
@@ -263,7 +263,7 @@ analyse(e@FunExp, info)
 {
   info.beginInner(true);
   info.begin();
-  addVars(info, javaList(e.formals));
+  addVars(info, e.formals);
   analyse(e.body, info);
   if (!info.getUnreachable() 
       && !e.inferredReturnType().toString().equals("nice.lang.void"))

@@ -929,7 +929,7 @@ ClassDefinition classDefinition():
      res=new NiceClass
      (name,
       isFinal,isAbstract,isInterface,
-      false,parameters,typeParametersVariances,
+      parameters,typeParametersVariances,
       ext,imp,abs);
    }
    // internal fields and methods
@@ -1015,20 +1015,18 @@ Pattern anonymousPattern(LocatedString name):
 {
   TypeIdent tc=null, additional = null;
   Monotype type=null;
-  boolean atNull = false; 
+  Expression val = null;
+  boolean exactlyAt = false;
 }
 {
   (
-    "@" ( "null" { atNull = true; } | tc=typeIdent() )
+    "@" ( val=Literal() | tc=typeIdent() )
   | 
-    "#" tc=typeIdent()
-    { tc.name.prepend("#"); }
+    "#" tc=typeIdent() { exactlyAt = true; }
   )
   [ "(" additional = typeIdent() ")" ]
-  [
-    ":" type=monotype()
-  ]
-  { return new Pattern(name, tc, atNull, additional, type); }
+  [ ":" type=monotype() ]
+  { return new Pattern(name, tc, val, exactlyAt, additional, type); }
 }
 
 void methodBodyDefinitionLookahead():
@@ -1265,6 +1263,15 @@ IdentExp identExp():
   { return new IdentExp(i); }
 }
 
+IdentExp backquotedIdentExp():
+{
+  Token t;
+}
+{
+  t=<BACKQUOTEDSTRING> 
+  { return symb(t.image.substring(1,t.image.length()-1),t); }
+}
+
 Expression newExp():
 {
   TypeIdent t;
@@ -1384,7 +1391,7 @@ LocatedString readImports(List imports, Collection opens):
  ****************************************************************/
 
 LocatedString module(List definitions,
-	             List imports,
+		     List imports,
 	             Collection opens):
 {
   LocatedString pkgName;
@@ -1511,15 +1518,11 @@ Expression AndExpression() :
 }
 
 Expression EqualityExpression() :
-{ Expression e1,e2; Token t, first; }
+{ Expression e1,e2; Token t; }
 {
   e1=InstanceOfExpression() 
-    ( ( t="==" | t="!=" ) 
-      { first = getToken(1); }
-      e2=InstanceOfExpression() 
-      { e2.setLocation(new Location(first, getToken(0)));
-        e1=CallExp.create(symb(t),e1,e2); 
-      }
+    ( ( t="==" | t="!=" ) e2=InstanceOfExpression() 
+      { e1=CallExp.create(symb(t),e1,e2); }
       )*
   { return e1; }
 }
@@ -1710,6 +1713,10 @@ Expression PrimaryPrefix() :
 |
   //Name()
   res=identExp()
+
+|
+  res = backquotedIdentExp()
+
 )
   { return res; }
 }
@@ -1761,7 +1768,7 @@ Expression Literal() :
 }
 {
   (
-  "null" { res=NullExp.instance; }
+  "null" { res = NullExp.instance; }
 | res=intConstantExp() 
 | res=floatConstantExp()
 | t=<CHARACTER_LITERAL> 
@@ -1770,8 +1777,6 @@ Expression Literal() :
 			 new Location(t)));
     }
 | res=stringConstantExp()
-| t=<BACKQUOTEDSTRING> 
-    { res = symb(t.image.substring(1,t.image.length()-1),t); }
   )
 { return res; }
 }

@@ -17,7 +17,7 @@ public abstract class ProcedureN extends Procedure
       super(n);
   }
 
-  private static final Object[] noArgs = new Object[0];
+  public static final Object[] noArgs = new Object[0];
 
   public Object apply0 () throws Throwable
   {

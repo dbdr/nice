@@ -129,7 +129,7 @@ public class ModuleBody extends ProcedureN// implements Runnable
 
   public Object apply0(ModuleMethod method)
   {
-    return applyN(method, Values.noArgs);
+    return applyN(method, ProcedureN.noArgs);
   }
 
   public Object apply1(ModuleMethod method, Object arg1)

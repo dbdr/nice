@@ -46,6 +46,9 @@ test_exceptions()
   }
   catch (MyEx e) {
   }
+
+  testFinally(true);
+  testFinally(false);  
 }
 
 int exnRaiser(boolean b) 
@@ -54,4 +57,21 @@ int exnRaiser(boolean b)
     throw new MyEx();
   else
     return 1;
+}
+
+void testFinally(boolean callReturn)
+{
+  try{
+    try{
+      if (callReturn)
+	return;
+    }
+    finally{
+      println("Finally is executed if return is called from try");
+    }
+    return;
+  }
+  finally{
+    println("Outer finally blocks must be executed too");
+  }
 }

@@ -127,4 +127,32 @@
   for (int i = 0; i<t.length; i++)
     p("" + t[i]);
   
+  //   EXCEPTIONS
+
+  try{
+    try{
+      return;
+    }
+    finally{
+      p("Finally is executed if return is called from try");
+    }
+  }
+  finally{
+    p("Outer finally blocks must be executed too");
+
+    try{
+      try{
+	if (false)
+	  return;
+      }
+      finally{
+	p("Finally is executed if return is called from try");
+      }
+      return;
+    }
+    finally{
+      p("Outer finally blocks must be executed too");
+    }
+
+  }
 }

@@ -72,6 +72,10 @@ Instance field is: 3
 finally
 NullPointerException
 MyEx: info=woula
+Finally is executed if return is called from try
+Outer finally blocks must be executed too
+Finally is executed if return is called from try
+Outer finally blocks must be executed too
 ID
 LAMBDA
 LAMBDA

@@ -63,7 +63,13 @@ public class NewExp extends CallExp
     
     LinkedList constructors = TypeConstructors.getConstructors(tc);
     if (constructors == null)
-      User.error(this, "Class " + tc + " has no constructor");
+      {
+	if (tc.arity() > 0)
+	  User.error(this, "Class " + tc + " has no constructor with the correct number of " +
+		tc.arity() + " type parameters.\nA retyping is needed to use this constructor.");
+	else
+	  User.error(this, "Class " + tc + " has no constructor");
+      }
 
     // the list of constructors must be cloned, as
     // OverloadedSymbolExp removes elements from it

@@ -353,9 +353,18 @@ public class Method implements AttrContainer {
   public String toString()
   {
     StringBuffer sbuf = new StringBuffer(100);
+    if (isConstructor())
+      sbuf.append("new");
+    else
+      sbuf.append(return_type.getName());
+
+    sbuf.append(" ");
     sbuf.append(getDeclaringClass().getName());
-    sbuf.append('.');
-    sbuf.append(name);
+    if (!isConstructor())
+      {
+      sbuf.append('.');
+      sbuf.append(name);
+    }
     if (arg_types != null)
       {
 	int args_count = arg_types.length; 
@@ -367,7 +376,6 @@ public class Method implements AttrContainer {
 	    sbuf.append (arg_types[i].getName());
 	  }
 	sbuf.append(')');
-	sbuf.append(return_type.getName());
       }
     return sbuf.toString();
   }

@@ -135,13 +135,29 @@ public class RetypedJavaMethod extends JavaMethod
     reflectMethod = 
       ((ClassType) holder).getDeclaredMethod (methodName, javaArgType);
     
-    if(reflectMethod == null)
-      User.error(className, 
-                 (methodName.equals("<init>") 
-                  ? "Constructor"
-                  : "Method " + methodName) + 
-		 " was not found in class " + holder.getName());
+    if (reflectMethod == null)
+      {
+	try {
+          reflectMethod = 
+        	((ClassType) holder).getDeclaredMethod (methodName,
+			javaArgType.length);
+        } catch (Error e) {
+          User.error(this, "The types of the arguments don't exactly match any of the declarations");
+	}
+	if (reflectMethod == null)
+	  {
+            if (methodName.equals("<init>"))
+              User.error(className, "class " + holder.getName() + " has no constructor with " + javaArgType.length + " arguments");
+	    else
+              User.error(className, "No method named " + methodName + " with " +
+		javaArgType.length +" arguments was not found in class " +
+		holder.getName());
+	  }
 
+        User.error(className, "The types of the arguments don't match the declaration:\n"
+			 + reflectMethod);
+
+      }
     // use the following, or the Type.flushTypeChanges() in SpecialTypes
     //reflectMethod.arg_types = javaArgType;
     //if(!methodName.equals("<init>"))

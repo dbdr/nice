@@ -51,3 +51,21 @@ equals(this@A, that@B) = true;
 class B extends A { int b; }
 
 class A { int a; }
+
+/// PASS
+  /// package a
+  /// Toplevel
+class SymbolTable<Sym>
+{
+  ?Binder topBinder = null;
+}
+
+class Binder {}
+
+<Sym> SymbolTable<Sym> symbolTable() = new SymbolTable();
+
+  /// package b import a
+  /// Toplevel
+void foo() {
+  let SymbolTable<String> t = new SymbolTable();
+}

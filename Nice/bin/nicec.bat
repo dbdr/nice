@@ -15,7 +15,7 @@ rem -- try some standard places
 set NICE=c:\nice
 if exist %NICE%\nice.jar goto gotNice
 
-set NICE=c:\Program Files\nice
+set NICE="c:\Program Files\nice"
 if exist %NICE%\nice.jar goto gotNice
 
 set NICE=c:\programs\nice
@@ -24,7 +24,7 @@ if exist %NICE%\nice.jar goto gotNice
 set NICE=d:\nice
 if exist %NICE%\nice.jar goto gotNice
 
-set NICE=d:\Program Files\nice
+set NICE="d:\Program Files\nice"
 if exist %NICE%\nice.jar goto gotNice
 
 set NICE=d:\programs\nice

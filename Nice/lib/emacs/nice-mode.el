@@ -71,7 +71,7 @@
   (package "\\<\\w+\\>\\(\\.\\<\\w+\\>\\)*")
   (opt-package-prefix (concat "\\(" package "\\.\\)?"))
 
-  (class-type "\\<_?[A-Z][a-zA-Z][a-zA-Z_'0-9]*\\>")
+  (class-type "\\<_?[A-Z][a-zA-Z_'0-9]*\\>")
   (prim-type "\\<\\(void\\|double\\|float\\|long\\|int\\|char\\|short\\|byte\\|boolean\\)\\>")
   (type-parameters-opt 
    ;"\\(<\\(\\s-\\|\\w\\|,\\)+>\\s-*\\)?" ; stack-overflows!

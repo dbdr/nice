@@ -20,7 +20,7 @@ package nice.tools.ast;
 
 <Any Sym> SymbolTable<Sym> symbolTable();
 
-class SymbolTable<Sym> // implements Map<String, Sym>
+class SymbolTable<Sym>
 {
   public Sym get(String name);
   public void set(String name, Sym sym);

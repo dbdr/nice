@@ -5,6 +5,14 @@
   abstract interface I {}
   class java.lang.Object implements I;
 
+/// PASS
+  /// package a
+  /// Toplevel
+  abstract interface I {}
+  class java.lang.Object implements I;
+  /// package b import a
+  true;
+
 /// FAIL
   /// package a
   /// Toplevel

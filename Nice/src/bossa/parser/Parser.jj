@@ -1139,8 +1139,7 @@ AbstractInterfaceImplementation abstractInterfaceImplementation():
   "class" className=fullyQualifiedName()
   "implements" interfaceName=ident()
   ";"
-  { return new AbstractInterfaceImplementation
-      (new TypeIdent(className), new TypeIdent(interfaceName)); }
+  { return new AbstractInterfaceImplementation(className, interfaceName); }
 }
 
 Pattern pattern():

@@ -26,16 +26,16 @@ import bossa.util.User;
 
 public class AbstractInterfaceImplementation extends Definition
 {
-  TypeIdent className;
-  TypeIdent interfaceName;
+  LocatedString className;
+  LocatedString interfaceName;
 
-  public AbstractInterfaceImplementation(TypeIdent className, TypeIdent interfaceName)
+  public AbstractInterfaceImplementation
+    (LocatedString className, LocatedString interfaceName)
   {
-    super(className.name, Node.none);
+    super(className, Node.none);
 
     this.className = className;
     this.interfaceName = interfaceName;
-    interfaceName.name.content = module.getName() + '.' + interfaceName.name.content;
   }
 
   TypeConstructor classTC;
@@ -43,8 +43,11 @@ public class AbstractInterfaceImplementation extends Definition
 
   public void resolve()
   {
-    classTC = className.resolveToTC(typeScope);
-    interfaceITF = interfaceName.resolveToItf(typeScope);
+    classTC = new TypeIdent(className).resolveToTC(typeScope);
+    TypeIdent ident = new TypeIdent
+      (new LocatedString(module.getName() + '.' + interfaceName.content, 
+			 interfaceName.location()));
+    interfaceITF = ident.resolveToItf(typeScope);
 
     createContext();
   }
@@ -67,6 +70,7 @@ public class AbstractInterfaceImplementation extends Definition
     w.print(classTC);
     w.print(" implements ");
     w.print(interfaceName);
+    w.println(";");
   }
 
   public void compile()

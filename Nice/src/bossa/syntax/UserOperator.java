@@ -90,7 +90,7 @@ abstract class UserOperator extends MethodDeclaration
        because it is not usefull for all subclasses.
        
        XXX: Note that this is a waste if this is a method declaration
-            and there is no contract. The performance loos should be mesured,
+            and there is no contract. The performance loss should be mesured,
 	    to see if optimisation is necessary.
     */
     mlsub.typing.Typing.implies();

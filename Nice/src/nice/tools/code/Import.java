@@ -90,8 +90,8 @@ public class Import
 					 typeParameters, niceTP);
 	  }
 
-	boolean strictImport =  bossa.modules.Package.currentCompilation.
-					strictJavaTypes;
+	boolean strictImport = 
+          bossa.modules.Package.currentCompilation.strictJavaTypes;
 
         boolean nonNullArgs = strictPackages.contains
           (m.getDeclaringClass().getPackageName());

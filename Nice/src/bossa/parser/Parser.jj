@@ -908,13 +908,7 @@ void getField(NiceClass c, List fields):
     "public-read" [ "private-write" ]
   | "private-write"
   | ( ("public" | "private" | {} ) 
-    [ ( "final" | t="const" ) 
-      { isFinal=true;
-	if (t!=null) 
-          User.warning(Location.make(t),
-		"'const' is deprecated. Use 'final' instead.");
-      }
-    ]
+      [ "final" { isFinal=true; } ]
     )
   ) 
   [ "transient" { isTransient = true; } ]
@@ -1362,28 +1356,18 @@ Definition globalVariable():
   LocatedString name;
   Monotype t;
   Expression value=null;
-  boolean constant;
+  boolean constant = true;
 }
 {
-  (
-    "var" {constant = false;} 
-    t=monotype() name=ident() 
-    [ "=" 
-      ( 
-        LOOKAHEAD(funExpLookahead()) value=funExp() 
-      |	
-        value=SideEffectFreeExpression()
-      )
-    ]
-  | 
-    "let" {constant = true;}
-    t=monotype() name=ident() "="
-    ( 
-      LOOKAHEAD(funExpLookahead()) value=funExp() 
+  ( "var" {constant = false;} | "let" )
+  t=monotype() name=ident() 
+  [ "=" 
+    ( LOOKAHEAD(funExpLookahead()) 
+      value=funExp() 
     | 
       value=SideEffectFreeExpression()
     )
-  )
+  ]
   ";"
   { return new GlobalVarDeclaration(name,t,value,constant); }
 }
@@ -2227,9 +2211,9 @@ Statement BlockStatement(List statements) :
 { Statement res; }
 {
 (
-  LOOKAHEAD( "final" | "const" | "var" | "let" | monotype() <IDENT>)
+  LOOKAHEAD( "var" | "let" | monotype() <IDENT>)
   ( 
-    LOOKAHEAD( [ "final" | "const" | "var" | "let" ] monotype() <IDENT> "(" )
+    LOOKAHEAD( [ "var" | "let" ] monotype() <IDENT> "(" )
     res = LocalFunctionDeclaration() 
   |
     res = LocalDeclaration() ";"
@@ -2251,44 +2235,23 @@ Statement LocalDeclaration() :
   Monotype type = null;
   LocatedString id;
   Expression e = null;
-  boolean constant = true;
+  boolean constant = false;
   Token t = null;
   Block.LocalValue res;
 }
 {
-  ( LOOKAHEAD ( monotype() ident() )
+  (
     type=monotype()
-    id=ident()
-    [ "=" e=Expression() ] 
-    { res = new Block.LocalVariable(id,type,false,e); }
-    ( LOOKAHEAD( "," <IDENT> ( "=" | ";" | ",") ) 
-      "," id=ident() {e=null;} [ "=" e=Expression() ] { res.addNext(id,e); } )*
   |
-    (
-      (t="final" | t="const") 
-        {User.warning(Location.make(t),
-		"'"+t.toString()+"' is deprecated. Use 'let' instead.");
-	}
-    | "let"
-    | "var" {constant = false;}
-    )
-    (  LOOKAHEAD ( <IDENT> "=" )
-      id=ident()
-      "=" e=Expression()
-      { if (constant) { res = new Block.LocalConstant(id,e);}
-        else { res = new Block.LocalVariable(id, null, constant, e);}
-      }
-      ( LOOKAHEAD( "," <IDENT> "=" ) 
-	"," id=ident() "=" e=Expression() { res.addNext(id,e); } )*
-    |
-      type=monotype()
-      id=ident()
-      [ "=" e=Expression() ] 
-      { res = new Block.LocalVariable(id,type,constant,e); }
-      ( LOOKAHEAD( "," <IDENT> ( "=" | ";" | ",") ) 
-        "," id=ident() {e=null;} [ "=" e=Expression() ] { res.addNext(id,e); } )*
-    )
+    ( "var" | "let" {constant = true;} )
+    [ LOOKAHEAD ( monotype() <IDENT> ) type=monotype() ]
   )
+  id=ident()
+  [ "=" e=Expression() ] 
+  { res = Block.createLocalVariable(id,type,constant,e); }
+  ( LOOKAHEAD( "," <IDENT> ( "=" | ";" | ",") ) 
+    "," id=ident() {e=null;} [ "=" e=Expression() ] { res.addNext(id,e); } )*
+
   { return res; }
 }
 
@@ -2298,26 +2261,17 @@ Statement LocalFunctionDeclaration() :
   LocatedString id;
   FormalParameters parameters;
   Statement body;
-  boolean constant = true;
+  boolean constant = false;
   Token t = null;
   List statements = new LinkedList();
 }
 {
-  (
-    (t="final" | t="const")
-      {User.warning(Location.make(t),
-	"'"+t.toString()+"' is deprecated. Use 'let' instead.");
-      }
-  | "let"
-  | "var" {constant = false;}
-  | {constant = false;}
-  )
+  [ "let" {constant = true;} | "var" ]
   type = monotype()
   id=ident()
   "(" parameters=formalParameters(false, statements) ")" 
   body=code() { statements.add(body); } 
   { return Block.LocalFunction.make(id, type, parameters, body!=null?new Block(statements):null); }
-
 }
 
 Statement LocalTupleDeclaration(List statements) :
@@ -2506,7 +2460,7 @@ Statement ForStatement() :
   (  
     LOOKAHEAD( monotype() <IDENT> ":" ) loop=ForInStatement()
   | (
-      LOOKAHEAD( "final" | "const" | "var" | "let" | monotype() <IDENT>) 
+      LOOKAHEAD( "var" | "let" | monotype() <IDENT>) 
       init=LocalDeclarationList() 
     | statexp=StatementExpression() ";" {init.add(statexp);}
     | ";"

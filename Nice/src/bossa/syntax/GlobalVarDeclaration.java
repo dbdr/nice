@@ -32,14 +32,15 @@ public class GlobalVarDeclaration extends Definition
   public GlobalVarDeclaration(LocatedString name, Monotype type, Expression value, boolean constant)
   {
     super(name, Node.global);
+    if (constant && value == null)
+      User.error(name,"A global constant needs a default value");
     
     this.left = new GlobalVarSymbol(name,type,constant);
     this.constant = constant;
 
     addChild(left);
     
-    if (value != null)
-      this.value = value;
+    this.value = value;
   }
 
   class GlobalVarSymbol extends MonoSymbol 

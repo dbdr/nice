@@ -162,6 +162,9 @@ public class Block extends Statement
 
     public void addNext(LocatedString name, Expression value)
     {
+      if (left.syntacticType == null && value == null)
+	User.error(name,"A local variable requires a type or a default value");     
+
       last.next = new LocalVariable(name, left.syntacticType, 
 				    ! left.isAssignable(), value);
       last = last.next;
@@ -195,6 +198,9 @@ public class Block extends Statement
 
     public void addNext(LocatedString name, Expression value)
     {
+      if (value == null)
+	User.error(name,"A local constant requires a type or a default value");     
+
       last.next = new LocalConstant(name, value);
       last = last.next;
     }
@@ -240,6 +246,18 @@ public class Block extends Statement
 
     FunSymbol left;
     FormalParameters parameters;
+  }
+
+  public static LocalValue createLocalVariable(LocatedString name,
+	Monotype type, boolean constant, Expression value)
+  {
+    if (type == null && value == null)
+      User.error(name,"A local variable requires a type or a default value");     
+
+    if (constant && type == null)
+      return new Block.LocalConstant(name,value);
+
+    return new Block.LocalVariable(name, type, constant, value);
   }
 
   ArrayList /* of LocalDeclaration */ locals = new ArrayList();

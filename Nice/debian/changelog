@@ -1,5 +1,10 @@
 nice (0.9.0) unstable; urgency=low
 
+  * The names of the arguments of a default implementation of a method should
+    be the same as the names in the declaration.
+      void foo(int number);
+      foo(number) { ... } //correct
+      //void foo(n) { ... } //not valid
   * Added dispatch on String literals. This can be used as a switch on Strings.
       void foo(String color);
       foo("blue") { ... }
@@ -7,23 +12,23 @@ nice (0.9.0) unstable; urgency=low
       foo(color) { println("unknown color: " + color); }
   * Added dispatch on global constants whose value is a literal. Example:
       let int specialValue = 7;
-      void foo(int);
+      void foo(int n);
       foo(n) { /*do something*/ }
-      foo(=specialValue) { /*do something else*/ }
+      foo(specialValue) { /*do something else*/ }
   * Dispatch on global constants works also for unique references(new objects).
       class Color {}
-      let Color red = new Color();
-      let Color blue = new Color();
-      String name(Color);
+      let Color Red = new Color();
+      let Color Blue = new Color();
+      String name(Color color);
       name(color) = "unknown color";
-      name(=red) = "red";
-      name(=blue) = "blue";
+      name(Red) = "red";
+      name(Blue) = "blue";
   * Implemented simple enums. The above color example can be simplified to:
-      enum Color { red, blue, green }
+      enum Color { Red, Blue, Green }
       String name(Color);
-      name(=red) = "red";
-      name(=blue) = "blue";
-      name(=green) = "green";
+      name(Red) = "red";
+      name(Blue) = "blue";
+      name(Green) = "green";
     The compiler knows now that the method "name" is completely covered.
   * Added operator ** to calculate powers of longs, doubles and BigIntegers.
   * The 'char' type is no longer a subtype of int. The integer unicode 

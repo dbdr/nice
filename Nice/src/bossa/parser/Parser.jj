@@ -1913,8 +1913,11 @@ Statement Statement() :
 */
   )
   { 
-    last = getToken(0);
-    res.setLocation(new Location(first, last));
+    if (res != null)
+      {
+        last = getToken(0);
+        res.setLocation(new Location(first, last));
+      }
     return res; 
   }
 }

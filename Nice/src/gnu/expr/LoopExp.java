@@ -10,6 +10,9 @@ import gnu.bytecode.*;
 
 public class LoopExp extends Expression
 {
+  /**
+     @param loopBody can be null to mean "do nothing"
+  */
   public LoopExp(Expression whileExp,
 		 Expression loopBody,
 		 Expression beforeNextIteration)
@@ -24,7 +27,8 @@ public class LoopExp extends Expression
   Object walk(ExpWalker w)
   {
     whileExp.walk(w);
-    loopBody.walk(w);
+    if (loopBody != null)
+      loopBody.walk(w);
     beforeNextIteration.walk(w);
     return this;
   }
@@ -45,7 +49,8 @@ public class LoopExp extends Expression
     code.emitGoto(test);
 
     start.define(code);
-    loopBody.compile(comp, Target.Ignore);
+    if (loopBody != null)
+      loopBody.compile(comp, Target.Ignore);
     beforeNextIteration.compile(comp, Target.Ignore);
 
     test.define(code);
@@ -90,7 +95,8 @@ public class LoopExp extends Expression
     pw.print("(#%loop (");
     whileExp.print(pw);
     pw.print(", ");
-    loopBody.print(pw);
+    if (loopBody != null)
+      loopBody.print(pw);
     pw.print(", ");
     beforeNextIteration.print(pw);
     pw.print(")");

@@ -85,9 +85,10 @@ public class LoopStmt extends Statement
     else
       iteration = iterationStatements.generateCode();
     
-    return new gnu.expr.LoopExp(test,
-				loopBody.generateCode(), 
-				iteration);
+    return new gnu.expr.LoopExp
+      (test, 
+       loopBody != null ? loopBody.generateCode() : null, 
+       iteration);
   }
   
   /****************************************************************
@@ -97,7 +98,8 @@ public class LoopStmt extends Statement
   public String toString()
   {
     return 
-      "for(;" + whileExp + "; " + iterationStatements+ ")\n" + loopBody;
+      "for(;" + whileExp + "; " + iterationStatements+ ")\n" + 
+      loopBody == null ? ";" : loopBody.toString();
   }
 
   /****************************************************************

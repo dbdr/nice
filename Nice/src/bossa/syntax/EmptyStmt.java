@@ -31,4 +31,9 @@ public class EmptyStmt extends Statement
   {
     return gnu.expr.QuoteExp.voidExp;
   }
+
+  public String toString()
+  {
+    return ";\n";
+  }
 }

@@ -128,7 +128,7 @@ class A
 {
   boolean[] x = [false, false];
 
-  { //test correct printing of looping constructs
+  { //test correct printing of various constructs
 
     for(int i = 0, boolean q = false; i<x.length; i++, q=true)
      x[i] = true;
@@ -138,6 +138,16 @@ class A
     int k = 0;
     do k++;
     while (k<5);
+
+    ;
+
+    try {
+      k = 1;
+    } catch(Exception e) {
+      let x = e;
+    } finally {
+      k = 5;
+    }
   }
 }
   /// package b import a

@@ -71,7 +71,18 @@ public class TryStmt extends Statement
   
   public String toString()
   {
-    return "try ...";
+    String res = "try\n" + body;
+
+    for(Iterator i = catches.iterator(); i.hasNext();)
+      {
+	Catch c = (Catch) i.next();
+        res += "catch (" + c.t + " " + c.var + ")\n" + c.body;
+      }
+
+    if (finallyBody != null)
+      res += "finally " + finallyBody;
+
+    return res;
   }
 
   Statement body;

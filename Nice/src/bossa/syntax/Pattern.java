@@ -50,6 +50,7 @@ public class Pattern implements Located
    */
   public Pattern(LocatedString name,
 		 TypeIdent tc, ConstantExp atValue,
+		 LocatedString refName,
 		 boolean exactlyAt, int kind,
 		 TypeIdent additional,
 		 TypeConstructor runtimeTC,
@@ -62,6 +63,7 @@ public class Pattern implements Located
     this.atValue = atValue;
     this.exactlyAt = exactlyAt;
     this.compareKind = kind;
+    this.refName = refName;
     this.location = location;
 
     if (atValue != null) 
@@ -76,7 +78,7 @@ public class Pattern implements Located
 
   Pattern(LocatedString name, TypeIdent tc)
   {
-    this(name, tc, null, false, NONE, null, null, name.location());
+    this(name, tc, null, null, false, NONE, null, null, name.location());
   }
 
   Pattern(TypeConstructor tc, boolean exactlyAt)
@@ -87,18 +89,18 @@ public class Pattern implements Located
 
   Pattern(ConstantExp atValue)
   {
-    this(null, null, atValue, false, NONE, null, null, 
+    this(null, null, atValue, null, false, NONE, null, null, 
 	atValue!=null ? atValue.location() : Location.nowhere() );    
   }
 
   Pattern(int kind, ConstantExp atValue)
   {
-    this(null, null, atValue, false, kind, null, null, atValue.location());    
+    this(null, null, atValue, null, false, kind, null, null, atValue.location());    
   }
 
   Pattern(LocatedString name)
   {
-    this(name, null, null, false, NONE, null, null, name.location());
+    this(name, null, null, null, false, NONE, null, null, name.location());
   }
 
   final TypeConstructor getRuntimeTC()
@@ -153,6 +155,26 @@ public class Pattern implements Located
 
   void resolveGlobalConstants(VarScope scope, TypeScope typeScope)
   {
+    if (refName != null)
+      {
+	VarSymbol sym = findRefSymbol(refName);
+	if (sym instanceof GlobalVarDeclaration.GlobalVarSymbol)
+	  {
+	    GlobalVarDeclaration.GlobalVarSymbol symbol = (GlobalVarDeclaration.GlobalVarSymbol)sym;
+	    if (symbol.getValue() instanceof ConstantExp && symbol.constant)
+	      {
+		ConstantExp val = (ConstantExp)symbol.getValue();
+		if (Typing.testRigidLeq(val.tc, PrimitiveType.longTC))
+		  {
+		    tc = val.tc;
+		    atValue = val;
+                    return;
+		  }
+	      }
+	  }
+	User.error(refName, refName.toString() + " is not a global constant with an integer value."); 
+      }
+
     if (name == null)
       return;
 
@@ -727,7 +749,7 @@ public class Pattern implements Located
    * Fields
    ****************************************************************/
   
-  LocatedString name;
+  LocatedString name,refName;
   TypeIdent typeConstructor, additional;
   public TypeConstructor tc;
   TypeConstructor tc2;

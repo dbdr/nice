@@ -1248,6 +1248,7 @@ EnumDefinition enumDefinition():
 Pattern pattern():
 {
   LocatedString name = null;
+  LocatedString refName = null;
   TypeIdent tc=null, additional = null;
   TypeConstructor runtimeTC = null;
   ConstantExp val = null;
@@ -1289,6 +1290,7 @@ Pattern pattern():
            new LocatedString("-"+val.toString(), val.location()));
         }
       | val=intConstantExp() 
+      | refName=ident()
       )
     |
      {} //name only
@@ -1297,7 +1299,7 @@ Pattern pattern():
   )
   [ "(" additional=typeIdent() ")" ]
   {
-    return new Pattern(name, tc, val, exactlyAt, kind, additional, runtimeTC, loc);
+    return new Pattern(name, tc, val, refName, exactlyAt, kind, additional, runtimeTC, loc);
   }
 }
 

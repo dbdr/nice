@@ -92,3 +92,34 @@
   assert red.name().equals("red");
   assert blue.name().equals("blue");
   assert green.name().equals("green");
+
+/// PASS
+  assert foo(2)==2;
+  assert foo(3)==1;
+  assert foo(4)==0;
+  /// Toplevel
+  let int xyz = 3;
+  int foo(int n);
+  foo(n>xyz) = 0;
+  foo(xyz) = 1;  
+  foo(n<xyz) = 2;
+
+/// FAIL
+  /// Toplevel
+  var int xyz = 3;
+  void foo(int n);
+  foo(n) {}
+  foo(n>xyz) {}  
+
+/// FAIL
+  /// Toplevel
+  var String xyz = "xyz";
+  void foo(int n);
+  foo(n) {}
+  foo(n>xyz) {}  
+
+/// FAIL
+  /// Toplevel
+  void foo(int n);
+  foo(n) {}
+  foo(n>xyz) {}  

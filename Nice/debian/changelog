@@ -20,6 +20,8 @@ nice (0.9.1) unstable; urgency=low
 	  // Initialization code goes here.
 	}
       }
+  * Package-level constants and variables are now automatically initialized
+    in the correct order when they directly depend on each other.
 
  --
 

@@ -100,7 +100,7 @@ pkg_ok=0
 pkg_broken=0
 
 for subdir in *; do
-  [ "`find $subdir -name '*.nice'`" -o -e $subdir/Makefile ] || continue
+  [ -r $subdir/main.nice -o -r $subdir/Makefile ] || continue
 
   pkg=`expr $pkg + 1`
 

@@ -69,7 +69,7 @@ extends Procedure3 implements Inlineable
   }
 
   private static Method reflectSet = 
-    ClassType.make("java.lang.reflect.Array").getDeclaredMethod("set", 3);
+    ClassType.make("nice.lang.rawArray").getDeclaredMethod("Array_set", 3);
 
   public Type getReturnType (Expression[] args)
   {

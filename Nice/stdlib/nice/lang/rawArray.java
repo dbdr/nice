@@ -92,7 +92,7 @@ public class rawArray extends java.util.AbstractList
   public Object set (int index, Object element)
   {
     Object res = get(index);
-    Array.set(value, index, element);
+    Array_set(value, index, element);
     return res;
   }
 

@@ -117,3 +117,7 @@ void foo(Object[] oo)
   (List<int> la, String s2) = t3;
   assert la[0] == 1;
   assert la[1] == 2;
+
+/// PASS
+  let a = new byte[6].fill(int i => byte(i));
+  assert a[5] == 5;

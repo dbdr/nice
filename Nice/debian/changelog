@@ -5,6 +5,10 @@ nice (0.9.4) unstable; urgency=low
     unused, without needing to return a dummy value when the method does not
     return void.
   * Added source-level debugging information for recent debuggers (jsr 45).
+  * Constraints on class type parameters can be written as a prefix of 
+    class declarations:
+      <Bound T> class MyClass<T> { ... }
+    This syntax is required when Bound is an abstract interface.
   * Generate more efficient code for anonymous functions that do not capture
     the environment. This also avoids a memory leak.
   * Retypings of classes and methods that can't be found by the compiler only
@@ -13,7 +17,7 @@ nice (0.9.4) unstable; urgency=low
   * Bug fixes (error reporting for certain overloading by expected type,
     recompilation of overloaded methods with the same bytecode types).
 
- --
+ -- Daniel Bonniot <bonniot@users.sourceforge.net>  Thu, 20 Nov 2003 00:18:02 +0100
 
 nice (0.9.3) unstable; urgency=low
 

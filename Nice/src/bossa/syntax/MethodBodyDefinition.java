@@ -202,9 +202,7 @@ public class MethodBodyDefinition extends Definition
 	try{
 	  mlsub.typing.Polytype t = m.getType();
 	  Constraint.enter(t.getConstraint());
-	  tagLeq(tags, t.domain());
-          if (hasAdditionalTags) //optimization
-	    tagLeq(additionalTags, t.domain());
+          Pattern.inDomain(formals, t.domain());
 	}
 	finally{
 	  if(Typing.leave() != level)
@@ -295,17 +293,6 @@ public class MethodBodyDefinition extends Definition
        "Try to use more patterns.\n\n" +
        "Possible methods:\n" +
        methods);
-  }
-
-  private void tagLeq(TypeConstructor[] tags, Monotype[] types)
-  throws TypingEx
-  {
-    for (int i = 0; i<tags.length; i++)
-      {
-	Types.setMarkedKind(types[i]);
-	Monotype type = types[i].equivalent();
-	Typing.leq(tags[i], ((MonotypeConstructor) type).getTP()[0]);
-      }
   }
 
   private void domainMonotypeLeq(Monotype m1, Monotype m2) throws TypingEx

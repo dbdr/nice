@@ -63,7 +63,7 @@
   foo(@Y,@Y) {}
   foo(@X,@Y) {}
 
-/// FAIL bug
+/// FAIL
   ///Toplevel
   class A{}                                         
   class B extends A{}                               
@@ -71,5 +71,5 @@
   class X<+T | A <: T> implements I<T>{}            
 
   void foo(I<B>);                                   
-  foo(@X){} 
+  /*/// FAIL HERE */ foo(@X){} 
   //@X is not in the domain of foo 

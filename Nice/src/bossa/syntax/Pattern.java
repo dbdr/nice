@@ -245,6 +245,30 @@ public class Pattern implements Located
       }
   }
   
+  static void inDomain(Pattern[] patterns, Monotype[] types) throws TypingEx
+  {
+    for (int i = 0; i < patterns.length; i++)
+      Types.setMarkedKind(types[i]);
+
+    for (int i = 0; i < patterns.length; i++)
+      patterns[i].inDomain(Types.rawType(types[i]));
+  }
+
+  private void inDomain(Monotype type) throws TypingEx
+  {
+    if (constraint != null)
+      {
+	constraint.enter();
+	Typing.leq(patternType, type);
+      }
+    else
+      {
+	Typing.leq(tc, type);
+      }
+
+    if (tc2 != null)
+      Typing.leq(tc2, type);
+  }
 
   /**
    * Iterates getTypeConstructor on a collection of Pattern.

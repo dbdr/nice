@@ -15,6 +15,11 @@ export NICE_TOP
 
 JAVA=${JAVA-java}
 
+printf()
+{
+  /usr/bin/printf "$@"
+}
+
 echo()
 {
   /bin/echo "$@"
@@ -41,24 +46,24 @@ compile_error()
 {
   pkg_compile_error=`expr $pkg_compile_error + 1`
   
-  echo "\n\n\n$1 produced a compilation error"
+  printf "\n\n\n%s produced a compilation error\n" $1
   echo "Compiler output is:"
   echo
   echo "###############"
   cat $1/compile.out
-  echo "###############\n"
+  printf "###############\n\n"
 }
 
 newpkg()
 {
   pkg_new=`expr $pkg_new + 1`
 
-  echo "\n\n\n$1 is a NEW package"
+  printf "\n\n\n%s is a NEW package\n" $1
   echo "Program output is:"
   echo
   echo "###############"
   cat $1/current.out
-  echo "###############\n"
+  printf "###############\n\n"
   echo -n "Is that correct? (y/n) "
   read correct
   if [ "$correct" = "y" -o "$correct" = "yes" ]; then
@@ -70,11 +75,11 @@ newpkg()
 exec_error()
 {
   pkg_broken=`expr $pkg_broken + 1`
-  echo "$1 produced messages on stderr. It must be BROKEN."
+  printf "%s produced messages on stderr. It must be BROKEN.\n" $1
   echo
   echo "###############"
   cat $1/current.err
-  echo "###############\n"
+  printf "###############\n\n"
 }
 
 different_output()

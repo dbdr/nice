@@ -212,3 +212,9 @@ foo(1) {}
   int g(int m, int n);
   g(m<0, n) = 1;
   g(m>=0, n) = 1;
+
+/// FAIL
+  /// Toplevel
+  void foo(int n);
+  foo(n<=1) {}
+  foo(n>=0) {}

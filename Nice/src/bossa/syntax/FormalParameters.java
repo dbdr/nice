@@ -92,10 +92,13 @@ public class FormalParameters extends Node
     super(Node.down);
     if (parameters != null)
       {
-	addChildren(parameters);
 	this.parameters = 
 	  (Parameter[]) parameters.toArray(new Parameter[parameters.size()]);
 	this.size = this.parameters.length;
+
+	for (int i = 0; i<size; i++)
+	  if (this.parameters[i] != null)
+	    addChild(this.parameters[i]);
       }
     else
       this.size = 0;
@@ -107,6 +110,7 @@ public class FormalParameters extends Node
       Internal.error("No room for \"this\"");
     
     parameters[0] = new Parameter(type);
+    addChild(parameters[0]);
   }
   
   /****************************************************************

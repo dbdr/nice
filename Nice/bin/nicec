@@ -95,7 +95,7 @@ fi
 case $progname in
   nicec) 
     if [ $experimental = true ]; then
-	NICE=${NICE_TOP}/src/nice/tools/compiler.jar:${NICE_TOP}/src:${NICE_TOP}/classes
+	NICE=${NICE_TOP}/src/nice/tools/.compiler.jar:${NICE_TOP}/src:${NICE_TOP}/classes
 	NICEJAR=${NICE_TOP}/stdlib
     fi
     CLASSPATH=${NICE}:${CLASSPATH}

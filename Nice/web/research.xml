@@ -14,15 +14,28 @@ Nice originates in academic research on object-orientation.
 It all started with the 
 <ulink url="http://www.exentis.com/Francois.Bourdoncle/popl97.html">
 ML-Sub type system</ulink>, presented at the 
-Principles Of Programming Languages 1997 conference by Francois Bourdoncle 
-and Stephan Merz.
+<ulink url="http://www.cs.umd.edu/~pugh/popl97/">
+Principles Of Programming Languages 1997 conference
+</ulink> 
+by 
+<ulink url="http://www.exentis.com/Francois.Boudoncle">
+Francois Bourdoncle
+</ulink>
+and
+<ulink url="http://siskin.pst.informatik.uni-muenchen.de/~merz/">
+Stephan Merz
+</ulink>.
+
 This article present the core type system, and proves its safety property.
 </para>
 
 <para>
 A <ulink url="http://cristal.inria.fr/~bonniot/bonniot02.ps">
 new version of the type system</ulink> was presented at the 
-Foundations of Object-Oriented Languages 2002 workshop by Daniel Bonniot.
+<ulink url="http://www.cis.upenn.edu/~bcpierce/FOOL/FOOL9.html">
+Foundations of Object-Oriented Languages 2002 workshop
+</ulink>
+by Daniel Bonniot.
 The presentation is much simpler, and it includes type inference, which is not
 yet present in Nice.
 </para>

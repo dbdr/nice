@@ -33,6 +33,8 @@ class Scope<Sym>
 
   void addImplicitOpen(Scope<Sym>);
 
+  toString() = name;
+
   private MultiMap<String, Sym> map = new MultiMap();
   private MultiMap<String, Sym> publicMap = new MultiMap();
 

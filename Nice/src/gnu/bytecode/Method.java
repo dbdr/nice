@@ -52,6 +52,34 @@ public class Method implements AttrContainer {
 
   CodeAttr code;
   public final CodeAttr getCode () { return code; }
+  public final void eraseCode ()
+  { 
+    if (code == null)
+      return;
+    
+    // The method must be in a dirty state, since code is not null,
+    // but it let's recover
+    if (attributes == null)
+      {
+	code = null;
+	return;
+      }
+    
+    if (attributes == code)
+      {
+	attributes = attributes.getNext();
+	code = null;
+	return;
+      }
+    
+    for(Attribute a = attributes; a.getNext() != null; a = a.getNext())
+      if (a.getNext() == code)
+	{
+	  a.setNext(code.getNext());
+	  code = null;
+	  return;
+	}
+  }
 
   Method (ClassType clfile, int flags)
   {

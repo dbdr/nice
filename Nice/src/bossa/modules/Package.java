@@ -690,7 +690,11 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     for (Method m = source.dispatch.getDeclaredMethods();
 	 m != null; m = m.getNext())
       if (m.getName().equals(methodName))
-	return m;
+	{
+	  // The dispatch code will have to be regenerated anyway
+	  m.eraseCode();
+	  return m;
+	}
 
     return null;
   }

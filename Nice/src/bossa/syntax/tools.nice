@@ -187,6 +187,7 @@ void _printStackTraceWithSourceInfo(Throwable t) =
  ****************************************************************/
 
 LocatedString name(VarSymbol) = native VarSymbol.name;
+Arguments.Argument[] arguments(Arguments) = native Arguments.arguments;
 mlsub.typing.Polytype getType(Expression) = 
   native mlsub.typing.Polytype Expression.getType();
 mlsub.typing.Monotype type(MonoSymbol) = native MonoSymbol.type;

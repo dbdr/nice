@@ -2262,9 +2262,12 @@ Expression PrimarySuffix(Expression start) :
   Arguments args = null;
 }
 {
-  { Token t; }
-  t="[" res=Expression() "]"
-  { return bossa.syntax.dispatch.createCallExp(symb("get",t,false),start,res); }
+  { Token t; List bracketArgs = new ArrayList();
+    bracketArgs.add(new Arguments.Argument(start)); }
+  t="[" res=Expression() {bracketArgs.add(new Arguments.Argument(res));} 
+    ( "," res=Expression() {bracketArgs.add(new Arguments.Argument(res));} )*
+  "]"
+  { return bossa.syntax.dispatch.createCallExp(symb("get",t,false),new Arguments(bracketArgs)); }
 |
   "." res=identExp()
   [ LOOKAHEAD(1) // a.f(x) is parsed as f(a, x), not as (f(a))(x)

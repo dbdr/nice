@@ -37,13 +37,16 @@ public class AssignExp extends Expression
  */
 public Expression createAssignExp(Expression to, Expression value)
 {
-  // Rewrite "get(e, i) = v" into "set(e, i, v)"
+  // Rewrite "get(e, i, ...) = v" into "set(e, i, ... , v)"
   if (to instanceof CallExp && "get".equals(notNull(to.function).toString()))
-    return createCallExp(
+    {
+      List<Arguments.Argument> args = new ArrayList(to.arguments.arguments);
+      args.add(new Arguments.Argument(value)); 
+
+      return createCallExp(
 	new IdentExp(new LocatedString("set", notNull(to.function).location())),
-	to.arguments.getExp(0),
-	to.arguments.getExp(1),
-	value);
-  
+        new Arguments(args.toArray()));
+    }  
+
   return new AssignExp(to: to, value: value);
 }

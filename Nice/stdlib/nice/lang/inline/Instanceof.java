@@ -37,18 +37,31 @@ public class Instanceof extends Procedure2 implements Inlineable
   
   public void compile (ApplyExp exp, Compilation comp, Target target)
   {
-    gnu.bytecode.CodeAttr code = comp.getCode();
     Expression[] args = exp.getArgs();
     Expression value = args[0];
-    Type type = (Type) ((QuoteExp) args[1]).getValue();
+    Expression typeExp = args[1];
+
+    if (typeExp instanceof QuoteExp &&
+        ((QuoteExp) typeExp).getValue() instanceof Type)
+      compile(value, (Type) ((QuoteExp) typeExp).getValue(), comp, exp);
+    else
+      compile(value, typeExp, comp);
+
+    target.compileFromStack(comp, Type.boolean_type);
+  }
+
+  private void compile(Expression value, Type type, Compilation comp,
+                       Expression applyExp)
+  {
+    gnu.bytecode.CodeAttr code = comp.getCode();
 
     // instanceof on boolean can make sense
     if (type == Type.boolean_type)
       type = Type.boolean_ctype;
-      
+
     if (type instanceof PrimType)
       throw new bossa.util.UserError
-	(exp, "instanceof cannot be used with primitive types");
+	(applyExp, "instanceof cannot be used with primitive types");
 
     value.compile(comp, Target.pushObject);
 
@@ -67,7 +80,16 @@ public class Instanceof extends Procedure2 implements Inlineable
       }
     else
       code.emitInstanceof(type);
-    target.compileFromStack(comp, Type.boolean_type);
+  }
+
+  private void compile(Expression value, Expression type, Compilation comp)
+  {
+    gnu.bytecode.CodeAttr code = comp.getCode();
+
+    type.compile(comp, Target.pushObject);
+    value.compile(comp, Target.pushObject);
+    code.emitInvoke
+      (ClassType.make("java.lang.Class").getDeclaredMethod("isInstance", 1));
   }
 
   public Type getReturnType (Expression[] args)

@@ -44,3 +44,9 @@
 
   Object l = [""];
   assert l instanceof String[];
+
+/// PASS
+  assert   "".isa(java.lang.String);
+  assert ! "".isa(java.io.File);
+  /// Toplevel
+<T,U> boolean isa(T value, Class<U> type) = `instanceof`(value, type);

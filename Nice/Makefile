@@ -48,7 +48,7 @@ jdoc:
 	-d ${TOP}/doc -private -author -version \
 	nice.tools.code \
 	mlsub.typing mlsub.typing.lowlevel mlsub.compilation \
-	bossa.syntax bossa.util bossa.link \
+	bossa.syntax bossa.util bossa.link bossa.modules \
 	gnu.bytecode gnu.expr gnu.math gnu.mapping gnu.kawa.reflect
 
 tags:

@@ -48,11 +48,11 @@ public class ReferenceOp extends Procedure2 implements Branchable, bossa.syntax.
   {
     Expression[] args = exp.getArgs();
     CodeAttr code = comp.getCode();
-    Target stack = new StackTarget(Type.pointer_type);
+    Target stack = Target.pushObject;
     Label _else = new Label(code);
     Label _end = new Label(code);
-    
-    if (args[0] instanceof QuoteExp && 
+
+    if (args[0] instanceof QuoteExp &&
        ((QuoteExp)args[0]).getType() == Type.nullType)
     {
       args[1].compile(comp, stack);
@@ -62,7 +62,7 @@ public class ReferenceOp extends Procedure2 implements Branchable, bossa.syntax.
 	code.emitGotoIfNull(_else);
 
     }
-    else if (args[1] instanceof QuoteExp && 
+    else if (args[1] instanceof QuoteExp &&
        ((QuoteExp)args[1]).getType() == Type.nullType)
     {
       args[0].compile(comp, stack);
@@ -84,20 +84,20 @@ public class ReferenceOp extends Procedure2 implements Branchable, bossa.syntax.
     }
     code.emitPushBoolean(true);
     code.emitGoto(_end);
-    code.popType(); //simulate 'else' otherwise gnu.bytecode don't like it
+    code.popType(); // simulate 'else' otherwise gnu.bytecode doesn't like it
     _else.define(code);
     code.emitPushBoolean(false);
     _end.define(code);
-        
+
     target.compileFromStack(comp, retType);
   }
 
   public void compileJump (Compilation comp, Expression[] args, Label to)
   {
     CodeAttr code = comp.getCode();
-    Target stack = new StackTarget(Type.pointer_type);
+    Target stack = Target.pushObject;
 
-    if (args[0] instanceof QuoteExp && 
+    if (args[0] instanceof QuoteExp &&
        ((QuoteExp)args[0]).getType() == Type.nullType)
     {
       if (args[1].getType() instanceof PrimType)
@@ -115,7 +115,7 @@ public class ReferenceOp extends Procedure2 implements Branchable, bossa.syntax.
 	code.emitGotoIfNotNull(to);
 
     }
-    else if (args[1] instanceof QuoteExp && 
+    else if (args[1] instanceof QuoteExp &&
        ((QuoteExp)args[1]).getType() == Type.nullType)
     {
       if (args[0].getType() instanceof PrimType)
@@ -148,9 +148,9 @@ public class ReferenceOp extends Procedure2 implements Branchable, bossa.syntax.
   public void compileJumpNot (Compilation comp, Expression[] args, Label to)
   {
     CodeAttr code = comp.getCode();
-    Target stack = new StackTarget(Type.pointer_type);
+    Target stack = Target.pushObject;
 
-    if (args[0] instanceof QuoteExp && 
+    if (args[0] instanceof QuoteExp &&
        ((QuoteExp)args[0]).getType() == Type.nullType)
     {
       if (args[1].getType() instanceof PrimType)
@@ -168,7 +168,7 @@ public class ReferenceOp extends Procedure2 implements Branchable, bossa.syntax.
 	code.emitGotoIfNull(to);
 
     }
-    else if (args[1] instanceof QuoteExp && 
+    else if (args[1] instanceof QuoteExp &&
        ((QuoteExp)args[1]).getType() == Type.nullType)
     {
       if (args[0].getType() instanceof PrimType)
@@ -199,7 +199,7 @@ public class ReferenceOp extends Procedure2 implements Branchable, bossa.syntax.
   }
 
   private static final Type retType = Type.boolean_type;
-  
+
   public Type getReturnType (Expression[] args)
   {
     return retType;
@@ -213,7 +213,6 @@ public class ReferenceOp extends Procedure2 implements Branchable, bossa.syntax.
     else if (arguments[1].isNull())
       exp = arguments[0];
 
- 
     if (exp != null && nice.tools.typing.Types.isSure(exp.getType().getMonotype()))
       bossa.util.User.warning(exp, "Comparing a non-null value with null");
   }

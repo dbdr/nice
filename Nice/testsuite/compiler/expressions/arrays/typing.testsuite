@@ -16,3 +16,6 @@
   /// Toplevel
 <T> ?T[] foo(!T x) = new T[1];
 <T> ?T[] foo2(int length) = new T[length];
+
+/// PASS
+  ?List<String>[] myArray = new List[10];

@@ -79,6 +79,8 @@ public class NewArrayExp extends Expression
     else
       nullVars = null;
 
+    MonotypeVar[] typeVars = null;
+
     // Whether the element are surely not null
     boolean sure = false;
 
@@ -101,7 +103,9 @@ public class NewArrayExp extends Expression
 	  User.error(ident, ident + " should be a class");
 
 	TypeConstructor tc = (TypeConstructor) resolvedType;
-	monotype = new MonotypeConstructor(tc, MonotypeVar.news(tc.arity()));
+
+        typeVars = MonotypeVar.news(tc.arity());
+	monotype = new MonotypeConstructor(tc, typeVars);
 
 	if (Types.isPrimitive(tc))
           sure = true;
@@ -116,7 +120,21 @@ public class NewArrayExp extends Expression
       {
         monotype = MonotypeConstructor.apply
           (nullVars[nullVars.length - 1], monotype);
-        cst = new Constraint(nullVars, null);
+      }
+
+    if (nullVars != null || typeVars != null)
+      {
+        if (nullVars == null)
+          cst = new Constraint(typeVars, null);
+        else if (typeVars == null)
+          cst = new Constraint(nullVars, null);
+        else
+          {
+            TypeSymbol[] binders = new TypeSymbol[nullVars.length + typeVars.length];
+            System.arraycopy(nullVars, 0, binders, 0, nullVars.length);
+            System.arraycopy(typeVars, 0, binders, nullVars.length, typeVars.length);
+            cst = new Constraint(binders, null);
+          }
       }
 
     for (int i = 0; i < unknownDimensions; i++)

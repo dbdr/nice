@@ -1,0 +1,228 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2004                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package bossa.syntax;
+
+import bossa.util.*;
+
+/*
+import nice.tools.typing.Types;
+import nice.tools.code.Gen;
+import mlsub.typing.Typing;
+import mlsub.typing.TypeConstructor;
+import mlsub.typing.Monotype;
+import mlsub.typing.MonotypeVar;
+import gnu.bytecode.*;
+import bossa.util.Debug;
+import bossa.util.User;
+*/
+
+/**
+   An implementation of a method
+
+ */
+public abstract class MethodImplementation extends Definition
+  implements Function
+{
+  Pattern[] formals;
+  Statement body;
+  ?MethodDeclaration declaration = null;
+  MonoSymbol[?] parameters = null;
+
+  private ?bossa.link.Alternative alternative = null;
+
+  ?gnu.expr.ReferenceExp ref = null;
+  ?gnu.expr.LambdaExp compiledMethod = null;
+
+  public MethodDeclaration getDeclaration() = notNull(declaration);
+
+  public Pattern[] getPatterns() = formals;
+
+  boolean hasThis() = notNull(declaration).formalParameters().hasThis();
+
+  void buildSymbols()
+  {
+    mlsub.typing.Monotype[] types = notNull(declaration).getArgTypes();
+    if (formals.length != types.length)
+      {
+        if (types.length == 0)
+          User.error(this, "Method "+name+" has no parameters");
+        else if (types.length == 1)
+          User.error(this, "Method "+name+" has 1 parameter");
+        else
+          User.error(this, "Method "+name+" has "+types.length+" parameters");
+      }
+    
+    MonoSymbol[] res = cast(new MonoSymbol[formals.length]);
+    for (int tn = 0; tn < formals.length; tn++)
+      {
+	Pattern p = formals[tn];
+
+	mlsub.typing.Monotype type;
+
+        if (p.atAny())
+          {
+            // When a parameter is not dispatched on, it has the declared type
+            // of that parameter in the method declaration.
+            type = types[tn];
+          }
+        else if (p.getRuntimeTC() != null)
+	  {
+	    let v = notNull(p.tc).variance;
+	    notNull(p.getRuntimeTC()).setVariance(v);
+	    type = new mlsub.typing.MonotypeConstructor(notNull(p.getRuntimeTC()), cast(mlsub.typing.MonotypeVar.news(notNull(v).arity())));
+	    type.setKind(notNull(v));
+
+	    type = bossa.syntax.Monotype.sure(type);
+	  }
+	else
+	  {
+	    if (p.name == null)
+	      // anonymous pattern
+	      type = new mlsub.typing.MonotypeVar(types[tn].toString()+ "(argument_" + tn+")");
+	    else
+	      type = new mlsub.typing.MonotypeVar(types[tn].toString()+ "(" + p.name + ")");
+	  }
+
+        LocatedString argName = p.getName() != null ? notNull(p.getName()) : new LocatedString("argument_"+tn, bossa.util.Location.nowhere());
+	res[tn] = new MonoSymbol(argName, type);
+      }
+    notNull(scope).addSymbols(res);
+    parameters = res;
+  }
+
+  /** Where no patterns are present, add those corresponding to the method
+      declaration.
+  */
+  void addPatterns()
+  {
+    mlsub.typing.Monotype[] parameters = notNull(nice.tools.typing.Types.parameters(notNull(declaration).getType()));
+    for (int i = 0; i < formals.length; i++)
+      if (formals[i].tc == null)
+        formals[i] = createPattern(formals[i].name,
+		nice.tools.typing.Types.concreteConstructor(parameters[i]),
+		nice.tools.typing.Types.isSure(parameters[i]));
+  }
+
+  resolveBody()
+  {
+    if (this.hasThis())
+      Node.thisExp = createSymbolExp(notNull(parameters)[0], this.location());
+
+    try {
+      body = analyseMethodBody(body, notNull(scope), notNull(typeScope), notNull(parameters),
+	!nice.tools.typing.Types.isVoid(notNull(declaration).getReturnType()));
+    }
+    finally {
+      Node.thisExp = null;
+    }
+
+    // Register this alternative for the link test
+    alternative = createSourceAlternative(this);
+  }
+
+  bossa.link.Alternative getAlternative() = notNull(alternative);
+
+  getExpectedType() = notNull(declaration).getReturnType();
+
+  checkReturnedType(returned)
+  {
+    try {
+      mlsub.typing.Typing.leq(returned, notNull(declaration).getReturnType());
+    }
+    catch (mlsub.typing.TypingEx e) {
+      throw new Function.WrongReturnType(e, notNull(declaration).getReturnType());
+    }
+  }
+
+  gnu.bytecode.Type[] javaArgTypes();
+
+  public gnu.expr.ReferenceExp getRefExp()
+  {
+    if (ref == null)
+      {
+        ref = this.createRef();
+        nice.tools.code.Gen.setMethodBody(compiledMethod, body.generateCode());
+      }
+
+    return notNull(ref);
+  }
+
+  compile()
+  {
+    if (bossa.util.Debug.codeGeneration)
+      bossa.util.Debug.println("Compiling method body " + this);
+
+    this.getRefExp();
+
+    this.createSerializationMethod();
+  }
+
+  private gnu.expr.ReferenceExp createRef()
+  {
+    this.createMethod(name.toString());
+    gnu.expr.ReferenceExp ref = module.addMethod(compiledMethod, true);
+
+    return ref;
+  }
+
+  private void createMethod(String bytecodeName)
+  {
+    compiledMethod = 
+      nice.tools.code.Gen.createMethod(bytecodeName, 
+		       this.javaArgTypes(),
+		       notNull(declaration).javaReturnType(),
+		       parameters,
+		       true, false);
+
+    notNull(compiledMethod).addBytecodeAttribute
+      (new gnu.bytecode.MiscAttr("definition", notNull(declaration).getAllFullNames().getBytes()));
+    notNull(compiledMethod).addBytecodeAttribute
+      (new gnu.bytecode.MiscAttr("patterns", 
+		    Pattern.bytecodeRepresentation(formals).getBytes()));
+  }
+
+  TypeConstructor firstArgument();
+
+  /**
+     If the method implemented corresponds to readObject or writeObject,
+     create private member methods in the class of the first argument,
+     so that the Java serialization process picks them up.
+  */
+  private void createSerializationMethod()
+  {
+    let arity = formals.length;
+    let name = this.name.toString();
+
+    if (arity != 2 || !(name.equals("writeObject")||name.equals("readObject")))
+      return;
+
+    let def = getTypeDefinition(this.firstArgument());
+    if (def == null || ! (def.getImplementation() instanceof NiceClass))
+      return;
+
+    NiceClass c = cast(def.getImplementation());
+
+    gnu.expr.Expression[] params = cast(new gnu.expr.Expression[arity]);
+    gnu.expr.LambdaExp method = nice.tools.code.Gen.createMemberMethod
+          (name.toString(), 
+           c.getClassExp().getType(),
+           arity==2 ? [notNull(declaration).javaArgTypes()[1]] : null,
+           notNull(declaration).javaReturnType(),
+           params);
+
+    nice.tools.code.Gen.setMethodBody(method, new gnu.expr.ApplyExp(this.getRefExp(), params));
+
+    c.getClassExp().addMethod(method, true);
+  }
+
+}

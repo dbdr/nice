@@ -126,8 +126,8 @@ DefaultMethodImplementation createDefaultMethodImplementation
      Contract contract, boolean isOverride,
      Statement body)
 {
-  let res = new DefaultMethodImplementation(name, body,
-	parameters.asList().mapToArray(FormalParameters.Parameter param =>
+  let res = new DefaultMethodImplementation(name, Node.down, body: body,
+	formals: parameters.asList().mapToArray(FormalParameters.Parameter param =>
         createPattern(param.getName() || new LocatedString("_", name.location()))));
   res.declaration = new MethodWithDefault(name, constraint, returnType,
 	parameters, contract, isOverride, implementation: res);

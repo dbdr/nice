@@ -12,9 +12,6 @@ import java.util.List;
 
 public class dispatch
 {
-  public static bossa.link.Alternative createSourceAlternative(MethodImplementation implementation)
-  { return null; }
-
   static String getAlikeID()
   { return null; }
 

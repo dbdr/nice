@@ -262,7 +262,6 @@ MethodContainer.Constraint MethodContainer$Constraint(TypeSymbol[], List<AtomicC
 ?gnu.bytecode.Type TypeImport_lookup(LocatedString) = native gnu.bytecode.Type nice.tools.code.TypeImport.lookup(LocatedString);
 ?FormalParameters getFormalParameters(VarSymbol) = native FormalParameters VarSymbol.getFormalParameters();
 List<Node> children(Node) = native Node.children;
-Pattern[] formals(MethodImplementation) = native MethodImplementation.formals;
 LocatedString name(Definition) = native Definition.name;
 void addMappingsLS(TypeScope, Collection<LocatedString>, TypeSymbol[]) = native void TypeScope.addMappingsLS(Collection, TypeSymbol[]);
 Stack<gnu.bytecode.Variable> copies(FormalParameters.Parameter.Symbol) = native FormalParameters.Parameter.Symbol.copies;

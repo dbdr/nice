@@ -484,8 +484,8 @@ public MethodBodyDefinition createMethodBodyDefinition(?NiceClass container,
 			      List<Pattern> formals, 
 			      Statement body)
 {
-  let res = new MethodBodyDefinition(name, body, 
-	makeFormals(formals, container, notNull(name.location())),
+  let res = new MethodBodyDefinition(name, Node.down, body: body, 
+	formals: makeFormals(formals, container, notNull(name.location())),
         binders: binders);
 
   res.declaration = null;

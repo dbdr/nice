@@ -1,3 +1,14 @@
+
+/**************************************************************************/
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+
 package nice.ui.common;
 
 
@@ -7,11 +18,11 @@ package nice.ui.common;
  * DECLARATION of methods to add nice.ui.beans.NiceListeners to nice.ui.beans.NiceListenerHandlers
  */
 
-public <PropertyChangeListenerHandler H> void addNPropertyChangeListener(H,NPropertyChangeListener);
-public <VetoableChangeListenerHandler H> void addNVetoableChangeListener(H,NVetoableChangeListener);
-public <MappablePropertyChangeListenerHandler H, PropertyChangeKey K> void addNPropertyChangeListener(H,K,NPropertyChangeListener);
-public <MappableVetoableChangeListenerHandler H, PropertyChangeKey K> void addNVetoableChangeListener(H,K,NVetoableChangeListener);
-//JDK1.4  public <ExceptionListenerHandler H> void addNExceptionListener(H,NExceptionListener);
+public <PropertyChangeListenerHandler H> void addNicePropertyChangeListener(H,NPropertyChangeListener);
+public <VetoableChangeListenerHandler H> void addNiceVetoableChangeListener(H,NVetoableChangeListener);
+public <MappablePropertyChangeListenerHandler H, PropertyChangeKey K> void addNicePropertyChangeListener(H,K,NPropertyChangeListener);
+public <MappableVetoableChangeListenerHandler H, PropertyChangeKey K> void addNiceVetoableChangeListener(H,K,NVetoableChangeListener);
+//JDK1.4  public <ExceptionListenerHandler H> void addExceptionListener(H,NExceptionListener);
 
 
 
@@ -19,50 +30,50 @@ public <MappableVetoableChangeListenerHandler H, PropertyChangeKey K> void addNV
  * DEFINITION of methods to add NiceListener to NiceListenerHandlers
  */
 
-addNPropertyChangeListener(this@PropertyEditorSupport,listener)
+addNicePropertyChangeListener(this@PropertyEditorSupport,listener)
 {
 	this.addPropertyChangeListener(listener);
 	this.addInAccessibleListener(listener,propertyChangeListeners);
 }
 
-addNPropertyChangeListener(this@PropertyChangeSupport,listener)
+addNicePropertyChangeListener(this@PropertyChangeSupport,listener)
 {
 	this.addPropertyChangeListener(listener);
 	this.addInAccessibleListener(listener,propertyChangeListeners);
 }
 
-addNVetoableChangeListener(this@VetoableChangeSupport,listener)
+addNiceVetoableChangeListener(this@VetoableChangeSupport,listener)
 {
 	this.addVetoableChangeListener(listener);
 	this.addInAccessibleListener(listener,vetoableChangeListeners);
 }
 
-addNPropertyChangeListener(this@PropertyChangeSupport,key@String,listener)
+addNicePropertyChangeListener(this@PropertyChangeSupport,key@String,listener)
 {
 	this.addPropertyChangeListener(key,listener);
 	this.addMappableListener(key,listener,mappablePropertyChangeListeners);
 }
 
-addNPropertyChangeListener(this@BeanContextChildSupport,key@String,listener)
+addNicePropertyChangeListener(this@BeanContextChildSupport,key@String,listener)
 {
 	this.addPropertyChangeListener(key,listener);
 	this.addMappableListener(key,listener,mappablePropertyChangeListeners);
 }
 
-addNVetoableChangeListener(this@VetoableChangeSupport,key@String,listener)
+addNiceVetoableChangeListener(this@VetoableChangeSupport,key@String,listener)
 {
 	this.addVetoableChangeListener(key,listener);
 	this.addMappableListener(key,listener,mappableVetoableChangeListeners);
 }
 
-addNVetoableChangeListener(this@BeanContextChildSupport,key@String,listener)
+addNiceVetoableChangeListener(this@BeanContextChildSupport,key@String,listener)
 {
 	this.addVetoableChangeListener(key,listener);
 	this.addMappableListener(key,listener,mappableVetoableChangeListeners);
 }
 
-//JDK1.4  addNExceptionListener(this@XMLDecoder,listener) = this.setExceptionListener(listener);
-//JDK1.4  addNExceptionListener(this@Encoder,listener) = this.setExceptionListener(listener);
+//JDK1.4  addNiceExceptionListener(this@XMLDecoder,listener) = this.setExceptionListener(listener);
+//JDK1.4  addNiceExceptionListener(this@Encoder,listener) = this.setExceptionListener(listener);
 
 
 
@@ -74,14 +85,14 @@ public <PropertyChangeListenerHandler T> void addPropertyChangeListener
   (T this,
    PropertyChangeEvent -> void propertyChange 
    )
-  = this.addNPropertyChangeListener(new NPropertyChangeListener(propertyChange: propertyChange));
+  = this.addNicePropertyChangeListener(new NPropertyChangeListener(propertyChange: propertyChange));
 
 
 public <VetoableChangeListenerHandler H> void addVetoableChangeListener
   (H this,
    PropertyChangeEvent -> void vetoableChange 
    )
-  = this.addNVetoableChangeListener(new NVetoableChangeListener(vetoableChange: vetoableChange));
+  = this.addNiceVetoableChangeListener(new NVetoableChangeListener(vetoableChange: vetoableChange));
 
 
 public <MappablePropertyChangeListenerHandler T> void addPropertyChangeListener
@@ -91,7 +102,7 @@ public <MappablePropertyChangeListenerHandler T> void addPropertyChangeListener
    )
 {   
 	NPropertyChangeListener listener = new NPropertyChangeListener(propertyChange: propertyChange);  
-	this.addNPropertyChangeListener(propertyName,listener);                                      
+	this.addNicePropertyChangeListener(propertyName,listener);                                      
 }
 
 
@@ -102,5 +113,5 @@ public <MappableVetoableChangeListenerHandler T> void addVetoableChangeListener
    )
 { 
   NVetoableChangeListener listener = new NVetoableChangeListener(vetoableChange: vetoableChange);   
-  this.addNVetoableChangeListener(propertyName,listener);                                             
+  this.addNiceVetoableChangeListener(propertyName,listener);                                             
 }

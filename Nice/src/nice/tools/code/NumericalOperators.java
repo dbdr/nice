@@ -32,9 +32,12 @@ public class NumericalOperators extends Procedure2 implements Inlineable
     Div = 4,
     Rem = 5, // remainder (modulus)
     Neg = 6, // negation (unary -)
-    Shl = 7, // left shift (<<)
-    Shr = 8, // right shift (>>)
-    uShr= 9; // unsigned right shift (>>>)
+    And = 7,
+    IOr = 8,
+    XOr = 9,
+    Shl =10, // left shift (<<)
+    Shr =11, // right shift (>>)
+    uShr=12; // unsigned right shift (>>>)
   
 
   public static NumericalOperators create(String param)
@@ -68,6 +71,12 @@ public class NumericalOperators extends Procedure2 implements Inlineable
       kind = Rem;
     else if ("Neg".equals(param))
       kind = Neg;
+    else if ("And".equals(param))
+      kind = And;
+    else if ("IOr".equals(param))
+      kind = IOr;
+    else if ("XOr".equals(param))
+      kind = XOr;
     else if ("Shl".equals(param))
       kind = Shl;
     else if ("Shr".equals(param))
@@ -121,6 +130,9 @@ public class NumericalOperators extends Procedure2 implements Inlineable
 	case Mul: code.emitMul();     break;
 	case Div: code.emitDiv();     break;
 	case Rem: code.emitRem();     break;
+	case And: code.emitAnd();     break;
+	case IOr: code.emitIOr();     break;
+	case XOr: code.emitXOr();     break;
 	}
       }
     

@@ -113,3 +113,12 @@ long `>>`(long, long) = inline nice.tools.code.NumericalOperators("jShr");
 
 int  `>>>`(int , long) = inline nice.tools.code.NumericalOperators("iuShr");
 long `>>>`(long, long) = inline nice.tools.code.NumericalOperators("juShr");
+
+// bitwise operators
+int `&`(int, int) = inline nice.tools.code.NumericalOperators("iAnd");
+int `|`(int, int) = inline nice.tools.code.NumericalOperators("iIOr");
+int `^`(int, int) = inline nice.tools.code.NumericalOperators("iXOr");
+
+long `&`(long, long) = inline nice.tools.code.NumericalOperators("jAnd");
+long `|`(long, long) = inline nice.tools.code.NumericalOperators("jIOr");
+long `^`(long, long) = inline nice.tools.code.NumericalOperators("jXOr");

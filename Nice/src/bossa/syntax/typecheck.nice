@@ -61,8 +61,7 @@ typecheck(e@AssignExp)
       catch (TypingEx newError) { t = newError; }
     }
 
-    CallExp callto = cast(to);    
-    ?FieldAccess field = callto.getField();
+    ?FieldAccess field = to.getField();
     String toName;
     if (field == null)
       toName = to.toString();

@@ -744,12 +744,12 @@ public class Compilation
    */
   public String generateUniqueName (String hint)
   {
-    if (findNamedClass (hint) == null)
+    if (currentPackage.findNamedClass (hint) == null)
       return hint;
     for (int i = 0;  ; i++)
       {
 	String new_hint = hint + i;
-	if (findNamedClass (new_hint) == null)
+	if (currentPackage.findNamedClass (new_hint) == null)
 	  return new_hint;
       }
   }

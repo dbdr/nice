@@ -68,6 +68,19 @@ public class Package extends Expression
     classes.add(c);
   }
 
+  /** Search this package for a class with a given name.
+   * @param name the name of the class desired
+   * @return the matching ClassType, or null if none is found */
+  public ClassType findNamedClass (String name)
+  {
+    for (int i = classes.size();  --i >= 0;)
+      {
+	if (name.equals (((ClassType) classes.get(i)).getName ()))
+	  return (ClassType) classes.get(i);
+      }
+    return null;
+  }
+
   private java.util.Vector classes = new java.util.Vector(10);
 
   public Package next;

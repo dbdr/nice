@@ -39,7 +39,7 @@ public class MonotypeConstructor extends Monotype
   {
     this.tc = tc;
     if(parameters==null)
-      this.parameters = new TypeParameters(null);
+      this.parameters = new TypeParameters((Monotype[]) null);
     else
       this.parameters = parameters;
     this.loc = loc;
@@ -96,7 +96,7 @@ public class MonotypeConstructor extends Monotype
     
     return new MonotypeConstructor
       (newTC,
-       new TypeParameters(Monotype.substitute(map,parameters.content)),
+       new TypeParameters(Monotype.substitute(map, parameters.content)),
        loc);
   }
 
@@ -127,15 +127,6 @@ public class MonotypeConstructor extends Monotype
       return loc;
   }
 
-  public boolean equals(Object o)
-  {
-    if(!(o instanceof MonotypeConstructor))
-      return false;
-    MonotypeConstructor that = (MonotypeConstructor) o;
-    
-    return tc.equals(that.tc) && parameters.equals(that.parameters);
-  }
-  
   public String toString()
   {
     return (lowlevelTC != null ? lowlevelTC.toString() : tc.toString()) + parameters;

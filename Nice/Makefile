@@ -5,7 +5,7 @@ DESTDIR=
 INSTALLDIR= ${DESTDIR}${PREFIX}
 DOCDIR= ${INSTALLDIR}/share/doc/nice
 MANDIR= ${INSTALLDIR}/share/man/man1
-LISPDIR= ${INSTALLDIR}/share/emacs/site-lisp/nice
+LISPDIR=${INSTALLDIR}/share/emacs/site-lisp/nice
 
 SHELL = /bin/zsh
 TOP=${PWD}
@@ -23,6 +23,9 @@ NICEC1=${TOP}/bin/nicec ${NICEC_ARGS} --sourcepath="${TOP}/stdlib:${TOP}/src"
 
 # Get the version from the debian changelog.
 VERSION = ${shell dpkg-parsechangelog | sed -n 's/^Version: //p'}
+DEB = nice_${VERSION}_all.deb
+TARFILE = Nice-`date +"%Y.%m.%d"`.tar
+CVSBUILDDIR = /tmp/cvs-build
 
 
 all: clean bootstrap compiler1 share/java/nice.jar compiler2 archive
@@ -48,13 +51,13 @@ setDate:
 
 deb:
 	@echo Creating Debian package version ${VERSION}
-	env CVSROOT=:pserver:anonymous@cvs.nice.sourceforge.net:/cvsroot/nice cvs-buildpackage -MNice -W/tmp/cvs-build -us -uc -rfakeroot -THEAD -d
+	env CVSROOT=:pserver:anonymous@cvs.nice.sourceforge.net:/cvsroot/nice cvs-buildpackage -MNice -W${CVSBUILDDIR} -us -uc -rfakeroot -THEAD
 
 dist:
 	rm -rf ${TOP}/dist
 	mkdir ${TOP}/dist
 	$(MAKE) install DESTDIR=${TOP}/dist PREFIX="" 
-	cd ${TOP}/dist && tar -cf ../Nice-`date +"%Y.%m.%d"`.tar . --owner=0 --group=0
+	cd ${TOP}/dist && tar -cf ../${TARFILE} . --owner=0 --group=0
 
 install: share/java/nice.jar
 	mkdir -p ${INSTALLDIR}/bin ${INSTALLDIR}/share/java \
@@ -87,9 +90,10 @@ release: release-file web
 
 release-file:
 	(echo user anonymous bonniot@users.sf.net; \
-         echo binary; echo cd incoming; echo put Nice-`date +"%Y.%m.%d"`.tar)\
+         echo binary; echo cd incoming; echo put ${TARFILE}; \
+         echo lcd ${CVSBUILDDIR}; echo put ${DEB} )\
         | ftp -n upload.sourceforge.net
-	echo "Redirect /Nice.tar http://prdownloads.sourceforge.net/nice/Nice-`date +'%Y.%m.%d'`.tar" > web/.htaccess
+	echo "Redirect /Nice.tar http://prdownloads.sourceforge.net/nice/${TARFILE}" > web/.htaccess
 
 .PHONY: web
 web:

@@ -510,25 +510,6 @@ public final class JavaClasses
    * Scoping
    ****************************************************************/
 
-  /****************************************************************
-   * List of TCs for java.lang.Object: one per variance.
-   ****************************************************************/
-
-  private static final Vector objects = new Vector(5);
-  
-  static TypeConstructor object(int arity)
-  {
-    if(arity>=objects.size())
-      objects.setSize(arity+1);
-    
-    TypeConstructor res = (TypeConstructor) objects.get(arity);
-    if(res==null)
-      {
-	res = make(compilation, "java.lang.Object", gnu.bytecode.Type.pointer_type);
-      }
-    return res;
-  }
-  
   /** The current compilation. This is not thread safe! */
   static bossa.modules.Compilation compilation;
 

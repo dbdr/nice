@@ -135,18 +135,19 @@ public class SuperExp extends Expression
             }
             catch(Types.NotIntroducedClassException ex ) {}
 
-	    if (superTC == null)
+	    if (superTC != null)
+              constraint = addLeq
+                (type.getConstraint(), 
+                 new Pattern[]{new Pattern(superTC, false)}, 
+                 monotype.domain());
+            else
 	      {
-		// Our safe bet is to assert that the argument is 
-		// above Object
-		superTC = JavaClasses.object
-		  (currentMethod.firstArgument().variance.arity());
+		// Our safe bet is to assert that the argument is Object.
+                Monotype[] domain = (Monotype[]) monotype.domain().clone();
+                domain[0] = bossa.syntax.Monotype.sure(TopMonotype.instance);
+                monotype = new FunType(domain, monotype.codomain());
+                constraint = type.getConstraint();
 	      }
-
-	    constraint = addLeq
-	      (type.getConstraint(), 
-	       new Pattern[]{new Pattern(superTC, false)}, 
-	       monotype.domain());
 	  }
       }
     else

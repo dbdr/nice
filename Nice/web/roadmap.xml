@@ -20,6 +20,20 @@ it is possible to discuss its design and its implementation.
 </para>
 
 <para>
+You can see the features that have been implemented recently by looking
+at the 
+<ulink
+url="http://cvs.sourceforge.net/viewcvs.py/nice/Nice/NEWS?rev=HEAD">
+news file</ulink>. These features are available when using the
+<ulink url="install.html">
+latest released version of the compiler</ulink>, or for most recent ones, 
+by installing the
+<ulink
+url="http://nice.sourceforge.net/cgi-bin/twiki/view/Dev/DevelopmentVersion">
+latest development version</ulink>.
+</para>
+
+<para>
 <variablelist>
 <varlistentry><term>1.0</term>
 <listitem>

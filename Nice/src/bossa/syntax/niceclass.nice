@@ -244,20 +244,24 @@ public class NiceClass extends ClassImplementation
     if (initializers.isEmpty())
       return;
 
-    VarScope scope = notNull(definition.scope);
     mlsub.typing.Monotype thisType =
       sureMonotype(new mlsub.typing.MonotypeConstructor(definition.getTC(),
 			definition.getTypeParameters()));
     thisSymbol = new ThisSymbol(thisName, type: thisType, declaringClass: this);
 
     Node.thisExp = createSymbolExp(notNull(thisSymbol), definition.location());
-    scope.addSymbol(thisSymbol);
+
+    SymbolTable<VarSymbol> vars = new SymbolTable();
+    vars["this"] = notNull(thisSymbol);
 
     for (int i = 0; i < initializers.size(); i++)
-      initializers[i] = analyse(initializers[i], notNull(definition.scope), notNull(localScope), false);
+      {
+	vars.begin();
+	initializers[i] = analyse(initializers[i], notNull(definition.scope), notNull(localScope), false, vars);
+	vars.end();
+      }
 
     Node.thisExp = null;
-    scope.removeSymbol(thisSymbol);
   }
 
   ?gnu.expr.Expression getInitializer()

@@ -20,14 +20,15 @@ import nice.tools.ast;
 
 // Interface
 
-Statement analyse(Statement, VarScope, TypeScope, boolean mustReturnAValue);
+Statement analyse(Statement, VarScope, TypeScope, boolean mustReturnAValue,
+		  SymbolTable<VarSymbol> vars = new SymbolTable());
 Expression analyse(Expression, VarScope, TypeScope,
 		   SymbolTable<VarSymbol> vars = new SymbolTable());
 
 // Implementation
 
 Info buildInfo(VarScope varScope, TypeScope typeScope,
-	       SymbolTable<VarSymbol> vars = new SymbolTable())
+	       SymbolTable<VarSymbol> vars)
 {
   let SymbolTable<mlsub.typing.TypeSymbol> t = new SymbolTable();
   return new Info(vars: vars, typeVars: t,
@@ -35,9 +36,9 @@ Info buildInfo(VarScope varScope, TypeScope typeScope,
 		  typeMap: new TypeMaper(inner: t, global: typeScope));
 }
 
-analyse(Statement s, varScope, typeScope, mustReturnAValue)
+analyse(Statement s, varScope, typeScope, mustReturnAValue, vars)
 {
-  Info info = buildInfo(varScope, typeScope);
+  Info info = buildInfo(varScope, typeScope, vars);
 
   analyse(s, info);
     
@@ -50,7 +51,7 @@ analyse(Statement s, varScope, typeScope, mustReturnAValue)
 Statement analyseMethodBody(Statement s, VarScope varScope, TypeScope typeScope,
 		MonoSymbol[] params, boolean mustReturnAValue)
 {
-  Info info = buildInfo(varScope, typeScope);
+  Info info = buildInfo(varScope, typeScope, new SymbolTable());
 
   info.addVars(params);
 

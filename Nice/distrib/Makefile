@@ -1,8 +1,10 @@
 # Get the version from the debian changelog.
-VERSION = ${shell expr "`head -1 ../debian/changelog`" : '.*(\(.*\))'}
-TAG = $(shell echo -n "version_$(VERSION)" | tr -c -- "-_a-zA-Z0-9" "_")
+FULL_DEB_VERSION = ${shell expr "`head -1 ../debian/changelog`" : '.*(\(.*\))'}
+VERSION = ${shell expr "$(FULL_DEB_VERSION)" : '\(.*\)-[^-]*'}
+DEBIAN_REVISION = ${shell expr "$(FULL_DEB_VERSION)" : '.*-\([^-]*\)'}
 
-DEBVERSION = ${shell expr "$(VERSION)" : '.*-\([0-9]\)'}
+CVS_TAG = $(shell echo -n "version_$(VERSION)" | tr -c -- "-_a-zA-Z0-9" "_")
+
 DEB = nice_${VERSION}_all.deb
 
 BUILDROOT = nice-$(VERSION)
@@ -28,8 +30,8 @@ all: deb tar zip rpm
 deb $(DEB):
 	@echo Creating Debian package version ${VERSION}
 	rm -rf $(BUILDROOT) $(BUILDROOT).orig
-	cd .. && cvs tag -F $(TAG)
-	CVSROOT=$(CVSROOT) cvs export -d $(BUILDROOT).orig -r $(TAG) Nice
+	cd .. && cvs tag -d $(CVS_TAG) && cvs tag $(CVS_TAG)
+	CVSROOT=$(CVSROOT) cvs export -d $(BUILDROOT).orig -r $(CVS_TAG) Nice
 	mv -f $(BUILDROOT).orig/debian $(BUILDROOT).orig-debian
 	find $(BUILDROOT).orig -name '.cvsignore' | xargs rm
 	cp ../share/java/nice.jar $(BUILDROOT).orig/external/nice-bootstrap.jar

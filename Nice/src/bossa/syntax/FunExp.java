@@ -38,25 +38,12 @@ public class FunExp extends Expression implements Function
       addChild(m);
     }
     
-    this.constraint=cst;
+    this.constraint = cst;
     this.body = child(body);
   }
 
-  void resolve()
-  {
-    cst = constraint.resolveToLowlevel();
-    constraint = null;
-  }
-  
   void computeType()
   {
-    try{
-      Constraint.assert(cst);
-    }
-    catch(mlsub.typing.TypingEx e){
-      User.error(this,"functional expression is ill-typed");
-    }
-    
     if(body instanceof ReturnStmt)
       inferredReturnType = ((ReturnStmt) body).returnType();
     else if(body instanceof Block)
@@ -69,8 +56,7 @@ public class FunExp extends Expression implements Function
       }
     else
       {
-	Internal.error(this,
-		       "Body of lambda expression is not of known form");
+	Internal.error(this, "Body of lambda expression is not of known form");
 	inferredReturnType = null;
       }
     

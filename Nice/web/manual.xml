@@ -324,7 +324,7 @@ void main(String[] args)
        To say even this much is still to think of interfaces in Java terms,
        however. In Nice, an interface
        doesn't really "contain" anything at all, it's just a marker.
-       Just as <literal>java.util.Serializable</literal> is just a tag
+       Just as <literal>java.io.Serializable</literal> is just a tag
        to tell Java that it's okay to use serialization on instances of
        a class, all Nice interfaces are really tags.
      </para>
@@ -669,7 +669,7 @@ greet(BOB p)
 
 <T> int containsHowMany(?List<T> list);
 
-<T> containsHowMany(list) = list.notNull.size();
+<T> containsHowMany(List list) = list.size();
 containsHowMany(null) = 0;
 
 ]]></programlisting>

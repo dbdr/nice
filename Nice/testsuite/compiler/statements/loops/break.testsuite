@@ -1,0 +1,21 @@
+/// PASS
+  while (true) break;
+
+/// PASS
+  /// COMMENT: do not confuse loops
+  boolean ok = false;
+  while (true)
+    {
+      while (true) break;
+      ok = true;
+      break;
+    }
+  assert(ok);
+
+/// PASS
+  /// COMMENT: do not confuse loops
+  boolean ok = false;
+  while (true) break;
+  ok = true;
+  while (true) break;
+  assert(ok);

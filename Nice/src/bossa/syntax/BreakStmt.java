@@ -31,8 +31,6 @@ public class BreakStmt extends Statement
 
   gnu.expr.Expression generateCode()
   {
-    return new gnu.expr.ExitExp(loop.block);
+    return new gnu.expr.ExitExp(LoopStmt.currentLoopBlock);
   }
-
-  LoopStmt loop;
 }

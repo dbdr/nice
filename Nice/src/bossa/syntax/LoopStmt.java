@@ -70,7 +70,8 @@ public class LoopStmt extends Statement
    ****************************************************************/
 
   gnu.expr.LoopExp code;
-  gnu.expr.BlockExp block;
+  
+  static gnu.expr.BlockExp currentLoopBlock;
 
   void createBlock()
   {
@@ -94,15 +95,17 @@ public class LoopStmt extends Statement
       iteration = iterationStatements.generateCode();
 
     code = new gnu.expr.LoopExp(test, iteration, testFirst);
+
+    gnu.expr.BlockExp savedBlock = currentLoopBlock;
     if (mustCreateBlock)
-      res = block = new gnu.expr.BlockExp(code);
+      res = currentLoopBlock = new gnu.expr.BlockExp(code);
     else
       res = code;
 
     code.setBody(loopBody != null ? loopBody.generateCode() : null);
 
     code = null;
-    block = null;
+    currentLoopBlock = savedBlock;
     return res;
   }
   
@@ -114,7 +117,7 @@ public class LoopStmt extends Statement
   {
     return 
       "for(;" + whileExp + "; " + iterationStatements+ ")\n" + 
-      loopBody == null ? ";" : loopBody.toString();
+      (loopBody == null ? ";" : loopBody.toString());
   }
 
   /****************************************************************

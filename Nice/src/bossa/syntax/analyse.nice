@@ -554,7 +554,6 @@ analyse(b@BreakStmt, info)
   if (loop == null)
     throw error(b, "continue must only occur inside loops");
 
-  b.loop = loop;
   loop.createBlock();
   info.setUnreachable();
 }

@@ -1,6 +1,7 @@
 nice (0.9.10)
 
-  * 
+  * Better error messages for wrong constructor calls and method
+    implementations with wrong parameter names.
 
  --
 

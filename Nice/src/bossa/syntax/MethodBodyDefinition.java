@@ -114,7 +114,27 @@ public class MethodBodyDefinition extends MethodImplementation
     buildSymbols();
   }
 
-  /** 
+  private static class ErrorList
+  {
+    private List errors = null;
+    boolean multipleErrors = false;
+
+    void add(MethodDeclaration method, UserError error)
+    {
+      if (errors == null)
+        errors = new ArrayList();
+
+      errors.add(error);
+    }
+
+    void report()
+    {
+      if (errors != null && errors.size() == 1)
+        throw (UserError) errors.get(0);
+    }
+  }
+
+  /**
       Returns the symbol of the method this declaration belongs to.
    */
   private VarSymbol findSymbol(List symbols)
@@ -129,8 +149,7 @@ public class MethodBodyDefinition extends MethodImplementation
         hasAdditionalTags = true;
 
     // Try to remember what caused the error when no symbol could be found.
-    UserError error = null;
-    boolean multipleErrors = false;
+    ErrorList errorList = new ErrorList();
 
     for(Iterator i = symbols.iterator(); i.hasNext();){
       VarSymbol s = (VarSymbol)i.next();
@@ -171,12 +190,11 @@ public class MethodBodyDefinition extends MethodImplementation
               formals[p].inDomain(domain[p]);
             }
             catch (TypingEx e) {
-              if (error == null)
-                error = new UserError(formals[p],
-                                      "Pattern " + formals[p] +
-                                      " is incompatible with " + domain[p]);
-              else
-                multipleErrors = true;
+              errorList.add
+                (m,
+                 new UserError(formals[p],
+                               "Pattern " + formals[p] +
+                               " is incompatible with " + domain[p]));
 
               throw e;
             }
@@ -198,7 +216,7 @@ public class MethodBodyDefinition extends MethodImplementation
     /* If the method are ambigious and the implementation has additional tc's
      * then try to find the most specific declaration(s) using these tc's
      * TODO: combine this code with removeNonMinimal in OverloadedSymbolExp
-     */   
+     */
     if (symbols.size() > 1 && hasAdditionalTags)
       {
         MethodDeclaration.Symbol[] tempSymbols = new MethodDeclaration.Symbol[symbols.size()];
@@ -254,6 +272,10 @@ public class MethodBodyDefinition extends MethodImplementation
 	for (int i = params.hasThis() ? 1 : 0; i < formals.length; i++)
           if (formals[i].atAny() && formals[i].name != null && params.getName(i) != null &&
 		!formals[i].name.toString().equals(params.getName(i).toString())) {
+            errorList.add(m,
+                          new UserError(formals[i], "Parameter " + formals[i] +
+                                        " should be called " +
+                                        params.getName(i)));
 	    it.remove();
 	    continue outer;
           }
@@ -267,12 +289,12 @@ public class MethodBodyDefinition extends MethodImplementation
 
     if (symbols.size() == 0)
       {
-        if (error != null && ! multipleErrors)
-          throw error;
-        else
-          User.error(this,
-                     "No method called " + name +
-                     " is compatible with these patterns");
+        errorList.report();
+
+        // Default message in case we could not produce a better one.
+        User.error(this,
+                   "No method called " + name +
+                   " is compatible with these patterns");
       }
 
     String methods = "";

@@ -49,7 +49,7 @@ public void printStackTraceWithSourceInfo(Throwable t, PrintWriter w,
     let Object[] elements = cast(getSTMethod.invoke(t, null));
     elements.foreach(Object e => {
       (?String file, int line) =
-        getSourceLocation__(e.call__("getClassName"), e.call__("getLineNumber"), loader)
+        getSourceLocation(e.call__("getClassName"), e.call__("getLineNumber"), loader)
         || (e.call__("getFileName"), e.call__("getLineNumber"));
       let location =
         file == null ? (e.call__("isNativeMethod") ? "Native Method" : "Unknown Source")
@@ -214,8 +214,8 @@ private (int,int,int,int,int) parseLine__(String line, int defaultId)
   return (start, id, repeat, outStart, outInc);
 }
 
-?(String,int) getSourceLocation__(String className, int lineNumber,
-				  ?ClassLoader loader)
+public ?(String,int) getSourceLocation(String className, int lineNumber,
+				       ?ClassLoader loader)
 {
   let map = sourceDebugExtension__(className, loader);
   if (map == null)

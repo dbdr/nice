@@ -4,5 +4,5 @@ interface TestListener
 {
   void start(String test);
   void end(String test);
-  void failure(String test, Throwable cause);
+  void failure(String test, Throwable cause, ClassLoader loader);
 }

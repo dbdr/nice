@@ -33,7 +33,8 @@ public void runTests(Class packageClass, TestListener listener)
 }
 
 public boolean iterLocations
-  (String testName, Throwable t, (?String, String, int)->void handleLocation)
+  (String testName, Throwable t, (?String, String, int)->void handleLocation,
+   ClassLoader loader)
 {
   let stack = nice.tools.util.JDK.getStackTrace(t);
 
@@ -45,8 +46,9 @@ public boolean iterLocations
       String file = nice.tools.util.JDK.stackFileName(stackTraceElement);
       String method = nice.tools.util.JDK.stackMethodName(stackTraceElement);
       String className = nice.tools.util.JDK.stackClassName(stackTraceElement);
-      int lineNumber = nice.tools.util.JDK.stackLineNumber(stackTraceElement);
-      handleLocation(file, method, lineNumber);
+      int line = nice.tools.util.JDK.stackLineNumber(stackTraceElement);
+      (file, line) = getSourceLocation(className, line, loader) || (file,line);
+      handleLocation(file, method, line);
       // We stop when we reach the start of the test. Going deeper
       // only shows the internals of the test engine, which are not
       // relevant.
@@ -72,7 +74,7 @@ void runTestMethod(Method m, TestListener listener)
   catch (InvocationTargetException e)
   {
     let cause = e.getTargetException();
-    listener.failure(name, cause);
+    listener.failure(name, cause, m.getDeclaringClass().getClassLoader());
   }
   finally
   {

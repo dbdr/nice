@@ -42,11 +42,14 @@ class Listener implements TestListener
 {
   start(test) = println(test);
   end(test) {}
-  failure(test, cause)
+  failure(test, cause, loader)
   {
     println("Test failed:\n " + cause);
     if (!(iterLocations(test, cause, (?String file, String method, int line) =>
-          println("Location: "file" method "method + (line < 0 ? "" : " line "line)))))
+			println(""file +
+				(line < 0 ? "" : ":"line) +
+				" method "method),
+			loader)))
       cause.printStackTrace();
   }
 }

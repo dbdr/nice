@@ -53,7 +53,7 @@ class TestListener extends nice.tools.unit.console.Listener
 {
   boolean failed = false;
 
-  failure(test, cause)
+  failure(test, cause, loader)
   {
     super;
     failed = true;

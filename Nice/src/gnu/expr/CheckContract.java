@@ -40,18 +40,29 @@ public class CheckContract extends Expression
   {
     CodeAttr code = comp.getCode();
     ClassExp currentClass = (ClassExp)comp.topLambda;
-    code.preparePostcondition(currentClass.getAssertionEnabledField());
+    code.preparePostcondition(currentClass.getAssertionEnabledField(), post.length>0);
+    if (pre.length > 0) 
+    {
+      code.startPrecondition();
+      for (int i = 0; i < pre.length; i++)
+        pre[i].compileWithPosition(comp, Target.Ignore);
 
-    for (int i = 0; i < pre.length; i++)
-      pre[i].compileWithPosition(comp, Target.Ignore);
+      code.endPrecondition();
+    }
 
     body.compileWithPosition(comp, target);
+
+    if (post.length > 0)
+    {
+      code.startPostcondition();
+      for (int i = 0; i < post.length; i++)
+        post[i].compileWithPosition(comp, Target.Ignore);
     
-    code.startPostcondition();
-    for (int i = 0; i < post.length; i++)
-      post[i].compileWithPosition(comp, Target.Ignore);
-    
-    code.endPostcondition();
+      code.endPostcondition();
+    }
+    else
+      code.pushRetType();	
+
   }
 
   protected void walkChildren (ExpWalker walker)

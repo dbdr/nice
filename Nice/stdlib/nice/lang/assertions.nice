@@ -11,3 +11,9 @@ void `assert`(boolean condition) =
 
 void `assert`(boolean condition, String message) = 
   inline nice.lang.inline.Assert();
+
+void `contractAssert`(boolean condition) = 
+  inline nice.lang.inline.Assert("contract");
+
+void `contractAssert`(boolean condition, String message) = 
+  inline nice.lang.inline.Assert("contract");

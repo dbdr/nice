@@ -28,12 +28,22 @@ import gnu.bytecode.*;
 
 public class Assert extends ProcedureN implements Inlineable
 {
-  public static Assert create(String param)
+  public Assert(boolean assertEnableCheck)
   {
-    return instance;
+    this.assertEnableCheck = assertEnableCheck;
   }
 
-  private static Assert instance = new Assert();
+  public static Assert create(String param)
+  {
+    if (param == null)
+      return instance;
+    return contractInstance;
+  }
+  
+  private boolean assertEnableCheck;
+
+  private static Assert instance = new Assert(true);
+  private static Assert contractInstance = new Assert(false);
 
   public void compile (ApplyExp exp, Compilation comp, Target target)
   {
@@ -41,8 +51,9 @@ public class Assert extends ProcedureN implements Inlineable
     CodeAttr code = comp.getCode();
     Label end = new Label(code);
     
-    code.ifAssertionsDisabledGoto
-      (((ClassExp)comp.topLambda).getAssertionEnabledField(), end);
+    if (this.assertEnableCheck)
+	code.ifAssertionsDisabledGoto
+             (((ClassExp)comp.topLambda).getAssertionEnabledField(), end);
 
     args[0].compile(comp, Type.boolean_type);
     code.emitGotoIfIntNeZero(end); // The assertion is true.

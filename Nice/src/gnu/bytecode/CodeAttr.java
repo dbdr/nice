@@ -1629,8 +1629,8 @@ public class CodeAttr extends Attribute implements AttrContainer
   public final void emitReturn ()
   {
     callFinallyBlocks();
-    checkPostcondition();
-    emitRealReturn();
+    if (!checkPostcondition())
+      emitRealReturn();
   }
 
   private void emitRealReturn()
@@ -2365,29 +2365,53 @@ public class CodeAttr extends Attribute implements AttrContainer
    * Postcondition
    ****************************************************************/
 
-  public void preparePostcondition(Field assertionEnabled)
+  public void preparePostcondition(Field assertionEnabled, boolean hasPostCond)
   {
     this.assertionEnabled = assertionEnabled;
-    postconditionStart = new Label(this);
+    if (hasPostCond)
+      postconditionStart = new Label(this);
+  }
+
+  public void startPrecondition()
+  {
+    preconditionEnd = new Label(this);
+    ifAssertionsDisabledGoto(assertionEnabled, preconditionEnd);
+  }
+
+  public void endPrecondition()
+  {
+    preconditionEnd.define(this);
   }
 
   public void startPostcondition()
   {
+    postconditionEnd = new Label(this);
     postconditionStart.define(this);
     Type type = getMethod().getReturnType();
     if (! type.isVoid())
-      {
-	// We expect the returned value on the stack.
-	pushType(type);
-	resultVar = addLocal(type);
-	emitStore(resultVar);
-      }
+    {
+      // We expect the returned value on the stack.
+      pushType(type);
+      ifAssertionsDisabledGoto(assertionEnabled, postconditionEnd);
+      resultVar = addLocal(type);
+      emitStore(resultVar);
+    }
+    else
+      ifAssertionsDisabledGoto(assertionEnabled, postconditionEnd);
   }
+  
+  public void pushRetType(){
+    Type type = getMethod().getReturnType();
+    if (! type.isVoid())
+      pushType(type);
+  }
+
 
   public void endPostcondition()
   {
     if (resultVar != null)
       loadResult();
+    postconditionEnd.define(this);
     emitRealReturn();
   }
 
@@ -2396,15 +2420,12 @@ public class CodeAttr extends Attribute implements AttrContainer
     emitLoad(resultVar);
   }
 
-  void checkPostcondition()
+  boolean checkPostcondition()
   {
     if (postconditionStart == null)
-      return;
-
-    Label end = new Label(this);
-    ifAssertionsDisabledGoto(assertionEnabled, end);
+      return false;
     emitGoto(postconditionStart);
-    end.define(this);
+    return true;
   }
 
   public void ifAssertionsDisabledGoto(Field assertionEnabled, Label l)
@@ -2413,7 +2434,7 @@ public class CodeAttr extends Attribute implements AttrContainer
     emitGotoIfIntEqZero(l);
   }
 
-  private Label postconditionStart, postCondtionEnd;
+  private Label postconditionStart, postconditionEnd, preconditionEnd;
   private Variable resultVar;
   private Field assertionEnabled;
 }

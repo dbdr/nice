@@ -89,12 +89,18 @@ boolean `==`(char, char) = inline nice.lang.inline.CompOp("iEq");
 boolean `!=`(char, char) = inline nice.lang.inline.CompOp("iNe");
 
 
-<Any T> boolean equals(T,T) = native boolean Object.equals(Object);
-<T> int hashCode(!T) = native int Object.hashCode();
+<Any T> boolean equals(!T,!T) = native boolean Object.equals(Object);
+<Any T> boolean equals(?T a, ?T b)
+{
+  if (a != null && b != null)
+    return a.equals(b);
+  else
+    return a==b;  // true iff both null
+}
 
-// can be overriden in nice
-<Any T> boolean eq(T,T);
-eq(o1, o2) = equals(o1, o2);
+
+
+<T> int hashCode(!T) = native int Object.hashCode();
 
 <Any T> String toString(!T) = native String Object.toString();
 <Any T> String valueOf(T) = native String String.valueOf(Object);

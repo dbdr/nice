@@ -48,6 +48,7 @@ public class AST extends Node
     ArrayList methods = new ArrayList(children.size());
     ArrayList globals = new ArrayList(10);
     ArrayList customConstructors = new ArrayList(10);
+    ArrayList methodImplementations = new ArrayList(10);
 
     for(Iterator i = children.iterator(); i.hasNext();)
       {
@@ -61,6 +62,8 @@ public class AST extends Node
           }
         else if (node instanceof MethodDeclaration)
           methods.add(node);
+        else if (node instanceof MethodBodyDefinition)
+          methodImplementations.add(node);
         else if (node instanceof EnumDefinition)
           classes.add(((EnumDefinition)node).classDef);
         else if (node instanceof GlobalVarDeclaration)
@@ -80,6 +83,9 @@ public class AST extends Node
 
     this.customConstructors = (CustomConstructor[])
       customConstructors.toArray(new CustomConstructor[customConstructors.size()]);
+
+    this.methodImplementations = (MethodBodyDefinition[])
+      methodImplementations.toArray(new MethodBodyDefinition[methodImplementations.size()]);
   }
   
   public void buildScope()
@@ -122,16 +128,12 @@ public class AST extends Node
   {
     Node.setModule(module);
 
-    for(Iterator i = children.iterator(); i.hasNext();)
-      {
-	Object o = i.next();
-	if (o instanceof MethodBodyDefinition)
-	  try{
-	    ((MethodBodyDefinition) o).lateBuildScope();
-	  }
-	  catch(UserError ex){
-            module.compilation().error(ex);
-	  }
+    for (int i = 0; i < methodImplementations.length; i++)
+      try{
+        methodImplementations[i].lateBuildScope();
+      }
+      catch(UserError ex){
+        module.compilation().error(ex);
       }
 
     for (int i = 0; i < methods.length; i++)
@@ -229,6 +231,7 @@ public class AST extends Node
   private Module module;
   private ClassDefinition[] classes;
   private MethodDeclaration[] methods;
+  private MethodBodyDefinition[] methodImplementations;
   private GlobalVarDeclaration[] globals;
   private CustomConstructor[] customConstructors;
 }

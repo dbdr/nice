@@ -45,7 +45,7 @@ public class Alternative
   /**
    * When read from a source file.
    */
-  public Alternative(NiceMethod m, TypeConstructor[] patterns, 
+  public Alternative(NiceMethod m, Pattern[] patterns, 
 		     ClassType c, Method method)
   {
     this.definitionClass = c;
@@ -59,72 +59,66 @@ public class Alternative
   /**
    * When read from a bytecode file.
    */
-  public Alternative(String s, ClassType c, Method method)
+  public static void read(ClassType c, Method method)
+    {
+      String methodName = nice.tools.code.Strings.unescape(method.getName());
+
+      if (
+	  // main is not an alternative
+	  methodName.equals("main")
+
+	  // Class initialization
+	  || methodName.equals("<clinit>")
+
+	  // Instance initialization
+	  || methodName.equals("<init>")
+	  )
+	return;
+
+      MiscAttr attr = (MiscAttr) Attribute.get(method, "definition");
+      if (attr == null)
+	// this must be a toplevel function
+	return;
+      else
+	new Alternative(c, method, attr);
+    }
+
+  private Alternative(ClassType c, Method method, MiscAttr attr)
   {
+    methodName = new String(attr.data);
+
+    attr = (MiscAttr) Attribute.get(method, "patterns");
+    if (attr == null)
+      Internal.error("Method " + method.getName() + 
+		     " in class " + c.getName() + " has no patterns");
+    String rep = new String(attr.data);
+
     this.definitionClass = c;
     this.primProcedure = new PrimProcedure(method);
     
-    int numCode = s.indexOf('$');
-    if (numCode == -1)
-      Internal.error("Method " + s + " in class " + c.getName() +
-		     " has no valid name");
+    int[]/*ref*/ at = new int[]{ 0 };
 
-    int at = s.indexOf(Pattern.AT_encoding, numCode+1);
-    if (at == -1)
-      // This is valid if this method has no parameter
-      at = s.length();
-    
-    MiscAttr attr = (MiscAttr) Attribute.get(method, "definition");
-    if (attr == null)
-      Internal.error("Method " + s + " in class " + c.getName() +
-		     " has no definition");
-    
-    methodName = new String(attr.data);
-    
-    //System.out.println("Read " + methodName + " : " + s);
-    
     ArrayList patterns = new ArrayList(5);
 
-    while(at<s.length())
+    Pattern p;
+    while ((p = Pattern.read(rep, at, methodName)) != null)
       {
-	int next = s.indexOf(Pattern.AT_encoding,at+Pattern.AT_len);
-	if (next == -1)
-	  next = s.length();
-	
-	String name = s.substring(at+Pattern.AT_len,next);
-	//Debug.println("pattern=" + name);
-	if (name.equals("_"))
-	  patterns.add(null);
-	else if (name.equals("NULL"))
-	  patterns.add(Pattern.nullTC);
-	else
+	if (p.tc == bossa.syntax.ConstantExp.arrayTC)
+	  /* Special treatment for arrays:
+	     they are compiled into Object,
+	     but we want a SpecialArray in the method bytecode type.
+	  */
 	  {
-	    TypeSymbol tc = Node.getGlobalTypeScope().lookup(name);
-
-	    if (tc == null)
-	      User.error("Pattern " + name +
-			 " of method " + methodName + 
-			 " is not known");
-
-	    if (tc == bossa.syntax.ConstantExp.arrayTC)
-	      /* Special treatment for arrays:
-		 they are compiled into Object,
-		 but we want a SpecialArray in the method bytecode type.
-	      */
-	      {
-		int argnum = patterns.size();
-		if (method.arg_types[argnum] == Type.pointer_type)
-		  method.arg_types[argnum] = SpecialArray.unknownTypeArray();
-	      }
-	    
-	    patterns.add((TypeConstructor) tc);
+	    int argnum = patterns.size();
+	    if (method.arg_types[argnum] == Type.pointer_type)
+	      method.arg_types[argnum] = SpecialArray.unknownTypeArray();
 	  }
-	
-	at = next;
+
+	patterns.add(p);
       }
     
-    this.patterns = (TypeConstructor[]) 
-      patterns.toArray(new TypeConstructor[patterns.size()]);
+    this.patterns = (Pattern[]) 
+      patterns.toArray(new Pattern[patterns.size()]);
     
     add();
   }
@@ -151,24 +145,8 @@ public class Alternative
   static boolean leq(Alternative a, Alternative b)
   {
     for(int i = 0; i<a.patterns.length; i++)
-      {
-	TypeConstructor tb = b.patterns[i];
-	if (tb == null)
-	  continue;
-	
-	TypeConstructor ta = a.patterns[i];
-	if (ta == null)
-	  return false;
-	
-	if (ta == tb)
-	  continue;
-
-	if (ta == Pattern.nullTC || tb == Pattern.nullTC)
-	  return false;
-
-	if (!Typing.testRigidLeq(ta, tb))
-	  return false;
-      }
+      if (!a.patterns[i].leq(b.patterns[i]))
+	return false;
     return true;
   }
 
@@ -178,26 +156,15 @@ public class Alternative
   boolean matches(TypeConstructor[] tags)
   {
     for(int i = 0; i<patterns.length; i++)
-      {
-	TypeConstructor td = patterns[i];
-	if (td == null)
-	  continue;
-	
-	// @null matches no class
-	if (td == Pattern.nullTC)
-	  return false;
-
-	TypeConstructor tc = tags[i];
-	// a null tc is an unmatchable argument (e.g. function)
-	if (tc == null)
-	  return false;
-	
-	if (!Typing.testRigidLeq(tc, td))
-	  return false;
-      }
+      if (!patterns[i].matches(tags[i]))
+	return false;
 
     return true;
   }
+
+  /****************************************************************
+   * Code generation
+   ****************************************************************/
 
   /**
    * @return the expression that represents the method body.
@@ -221,52 +188,11 @@ public class Alternative
     Expression result = QuoteExp.trueExp;
     
     for(int n = parameters.length; --n >= 0; )
-      result = new gnu.expr.IfExp(matchTest(patterns[n], parameters[n]),
+      result = new gnu.expr.IfExp(patterns[n].matchTest(parameters[n]),
 				  result,
 				  QuoteExp.falseExp);
     
     return result;
-  }
-  
-  private static Expression matchTest(TypeConstructor dom, 
-				      Expression parameter)
-  {
-    if (dom == null)
-      return QuoteExp.trueExp;
-
-    if (dom == Pattern.nullTC)
-      return Inline.inline(IsNullProc.instance, parameter);
-
-    Type ct = nice.tools.code.Types.javaType(dom);
-    
-    /* 
-       This is not correct if the parameter is null:
-       we don't want @C to match a null value 
-       OPTIM: produce a '!is_null' in this case
-    */
-    //if (parameter.getType().isSubtype(ct))
-    //return QuoteExp.trueExp;
-    
-    return instanceOfExp(parameter, ct);
-  }
-
-  static Expression instanceOfExp(Expression value, Type ct)
-  {
-    // If matching against primitive types, 
-    // we know the runtime type will be the corresponding object class.
-    if (ct instanceof PrimType)
-      ct = Types.equivalentObjectType(ct);
-    
-    return Inline.inline(new InstanceOfProc(ct), value);
-  }
-  
-  /** Procedure to emit <code>or</code>. Shared since it is not parametrized.*/
-  private static final Expression orProc = 
-    new gnu.expr.QuoteExp(new nice.tools.code.OrProc());
-  
-  private static Expression orExp(Expression e1, Expression e2)
-  {
-    return new ApplyExp(orProc, new Expression[]{ e1, e2 });
   }
   
   public String toString()
@@ -280,7 +206,7 @@ public class Alternative
   private PrimProcedure primProcedure;
   
   String methodName;
-  TypeConstructor[] patterns;
+  Pattern[] patterns;
 
   boolean visiting;
   

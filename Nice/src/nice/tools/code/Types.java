@@ -450,18 +450,6 @@ public final class Types
   }
 
   /****************************************************************
-   * Bytecode representation
-   ****************************************************************/
-
-  public static String bytecodeRepresentation(TypeConstructor tc)
-  {
-    if (tc == null) return "_";
-    if (tc == bossa.syntax.Pattern.nullTC) return "NULL";
-    /* Hack for inner classes: we replace '$' with '.' */
-    return Strings.escape(tc.toString().replace('$','.'));
-  }
-
-  /****************************************************************
    * Default values
    ****************************************************************/
 

@@ -47,6 +47,8 @@ Nothing
 (x=0, y=0, c=0)
 Origin
 String, Null string
+true
+false
 ### Testing methods
 C1
 C2

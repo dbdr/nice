@@ -30,6 +30,10 @@ isNull(@null) = true;
 
 pToString(@null(Point)) = "Origin";
 
+boolean isSimplePoint(Point);
+isSimplePoint(#Point) = true;  // takes precedence on point
+isSimplePoint(@Point) = false; // matches all non-null point
+
 void test_classes();
 test_classes()
 {
@@ -41,5 +45,8 @@ test_classes()
 
   String s = null;
   println(pToString("titi") + ", " + pToString(s));
+
+  println(isSimplePoint(new Point()));
+  println(isSimplePoint(new ColoredPoint()));
 }
 

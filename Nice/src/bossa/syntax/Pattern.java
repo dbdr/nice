@@ -24,6 +24,9 @@ import mlsub.typing.MonotypeConstructor;
 import mlsub.typing.Typing;
 import mlsub.typing.TypingEx;
 
+import gnu.expr.*;
+import nice.tools.code.*;
+
 /**
    Represents the information about one argument of a method body.
    
@@ -73,67 +76,18 @@ public class Pattern
     this(name, null, null, false, null, null);
   }
 
+  Pattern(TypeConstructor tc, Expression atValue, boolean exactlyAt)
+  {
+    this.tc = tc;
+    this.atValue = atValue;
+    this.exactlyAt = exactlyAt;
+  }
+
   final mlsub.typing.Monotype getType()
   {
     return t;
   }
 
-  /**
-     Assert that the monotypes belong the the patterns.
-   */
-  static void in(Monotype[] monotypes, Pattern[] patterns)
-  throws TypingEx
-  {
-    for (int i = 0; i < monotypes.length; i++)
-      {
-	Pattern p = patterns[i];
-	if (p.tc == null) continue;
-
-	Typing.leq(monotypes[i], p.tc);
-	if (p.exactlyAt)
-	  Typing.leq(p.tc, monotypes[i]);
-      }
-  }
-
-  /**
-   * Iterates getTypeConstructor on a collection of Pattern.
-   */
-  static TypeConstructor[] getTC(Pattern[] patterns)
-  {
-    TypeConstructor[] res = new TypeConstructor[patterns.length];
-
-    for (int i = 0; i < patterns.length; i++)
-      res[i] = patterns[i].tc;
-
-    return res;
-  }
-  
-  public static final TypeConstructor nullTC = 
-    new TypeConstructor("null", null, false, true);
-
-  static TypeConstructor[] getLinkTC(Pattern[] patterns)
-  {
-    TypeConstructor[] res = new TypeConstructor[patterns.length];
-
-    for (int i = 0; i < patterns.length; i++)
-      if (patterns[i].atNull())
-	res[i] = nullTC;
-    else
-	res[i] = patterns[i].tc;
-
-    return res;
-  }
-  
-  static TypeConstructor[] getAdditionalTC(Pattern[] patterns)
-  {
-    TypeConstructor[] res = new TypeConstructor[patterns.length];
-
-    for (int i = 0; i < patterns.length; i++)
-      res[i] = patterns[i].tc2;
-
-    return res;
-  }
-  
   /****************************************************************
    * Scoping
    ****************************************************************/
@@ -174,6 +128,92 @@ public class Pattern
   }
   
   /****************************************************************
+   * Type checking
+   ****************************************************************/
+  
+  /**
+     Assert that the monotypes belong the the patterns.
+   */
+  static void in(Monotype[] monotypes, Pattern[] patterns)
+  throws TypingEx
+  {
+    for (int i = 0; i < monotypes.length; i++)
+      {
+	Pattern p = patterns[i];
+	if (p.tc == null) continue;
+
+	Typing.leq(monotypes[i], p.tc);
+	if (p.exactlyAt)
+	  Typing.leq(p.tc, monotypes[i]);
+      }
+  }
+
+  /**
+   * Iterates getTypeConstructor on a collection of Pattern.
+   */
+  static TypeConstructor[] getTC(Pattern[] patterns)
+  {
+    TypeConstructor[] res = new TypeConstructor[patterns.length];
+
+    for (int i = 0; i < patterns.length; i++)
+      res[i] = patterns[i].tc;
+
+    return res;
+  }
+  
+  static TypeConstructor[] getAdditionalTC(Pattern[] patterns)
+  {
+    TypeConstructor[] res = new TypeConstructor[patterns.length];
+
+    for (int i = 0; i < patterns.length; i++)
+      res[i] = patterns[i].tc2;
+
+    return res;
+  }
+
+  public boolean leq(Pattern that)
+  {
+    if (that.atAny() || this == that)
+      return true;
+    
+    if (this.atAny())
+      return false;
+
+    if (that.atNull() && this.atNull())
+      return true;
+    
+    if (that.atNull() || this.atNull())
+      return false;
+
+    if (!that.exactlyAt)
+      return Typing.testRigidLeq(this.tc, that.tc); 
+    else if (this.exactlyAt)
+      return Typing.testRigidLeq(this.tc, that.tc) 
+	&& Typing.testRigidLeq(that.tc, this.tc);
+    else 
+      return false;
+  }
+
+  public boolean matches(TypeConstructor tag)
+  {
+    if (atAny())
+      return true;
+
+    if (atNull())
+      // @null matches no class
+      return false;
+
+    // a null tc is an unmatchable argument (e.g. function)
+    if (tag == null)
+      return false;
+
+    if (exactlyAt)
+      return Typing.testRigidLeq(tag, tc) && Typing.testRigidLeq(tc, tag);
+    else
+      return Typing.testRigidLeq(tag, tc);
+  }
+
+  /****************************************************************
    * Printing
    ****************************************************************/
 
@@ -191,8 +231,9 @@ public class Pattern
     return res.toString();
   }
 
-  public final static String AT_encoding = "$";
-  public final static int AT_len = AT_encoding.length();
+  /****************************************************************
+   * Bytecode representation
+   ****************************************************************/
   
   /**
    * Returns a string used to recognize this pattern in the bytecode.
@@ -201,10 +242,13 @@ public class Pattern
    */
   public String bytecodeRepresentation()
   {
-    String enc = 
-      atNull() ? "NULL" : nice.tools.code.Types.bytecodeRepresentation(tc);
-
-    return AT_encoding + enc;
+    if (atAny())
+      return "@_";
+    
+    return 
+      (exactlyAt ? "#" : "@") 
+      +
+      (atNull() ? "NULL" : tc.toString().replace('$','.'));
   }
   
   public static String bytecodeRepresentation(Pattern[] patterns)
@@ -215,9 +259,89 @@ public class Pattern
     return res.toString();
   }
   
+  public static Pattern read(String rep, int[]/*ref*/ pos, String methodName)
+  {
+    if (pos[0] >= rep.length())
+      return null;
+
+    if (rep.charAt(pos[0]) != '@' && rep.charAt(pos[0]) != '#')
+      Internal.error("Invalid pattern representation at character " + pos[0] +
+		     ": " + rep);
+
+    boolean exact = rep.charAt(pos[0]) == '#';
+
+    int start = ++pos[0];
+      
+    try{
+      while(rep.charAt(pos[0]) != '@' && rep.charAt(pos[0]) != '#')
+	pos[0]++;
+    }
+    catch(StringIndexOutOfBoundsException ex) {
+      // reached the ned of the string
+    }
+
+    String name = rep.substring(start, pos[0]);
+
+    TypeConstructor tc = null;
+    Expression atValue = null;
+
+    if (name.equals("_"))
+      tc = null;
+    else if (name.equals("NULL"))
+      atValue = NullExp.instance;
+    else
+      {
+	mlsub.typing.TypeSymbol sym = Node.getGlobalTypeScope().lookup(name);
+
+	if (sym == null)
+	  User.error("Pattern " + name +
+		     " of method " + methodName + 
+		     " is not known");
+
+	tc = (TypeConstructor) sym;
+      }
+    return new Pattern(tc, atValue, exact);
+  }
+
+  /****************************************************************
+   * Code generation
+   ****************************************************************/
+
+  /**
+     Returns code that tests if the parameter is matched.
+  */
+  public gnu.expr.Expression matchTest(gnu.expr.Expression parameter)
+  {
+    if (atNull())
+      return Inline.inline(IsNullProc.instance, parameter);
+
+    if (atAny())
+      return QuoteExp.trueExp;
+
+    gnu.bytecode.Type ct = nice.tools.code.Types.javaType(tc);
+
+    if (exactlyAt)
+      return Gen.isOfClass(parameter, ct);
+    else
+      /* 
+	 This is not correct if the parameter is null:
+	 we don't want @C to match a null value 
+	 OPTIM: produce a '!is_null' in this case
+      */
+      //if (parameter.getType().isSubtype(ct))
+      //return QuoteExp.trueExp;
+      
+      return InstanceOfProc.instanceOfExp(parameter, ct);
+  }
+
+  /****************************************************************
+   * Fields
+   ****************************************************************/
+  
   LocatedString name;
   TypeIdent typeConstructor, additional;
-  TypeConstructor tc, tc2;
+  public TypeConstructor tc;
+  TypeConstructor tc2;
   private bossa.syntax.Monotype type;
   private mlsub.typing.Monotype t;
 
@@ -225,4 +349,5 @@ public class Pattern
   private Expression atValue;
 
   public boolean atNull() { return atValue instanceof NullExp; }
+  public boolean atAny()  { return atValue == null && tc == null; }
 }

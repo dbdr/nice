@@ -421,12 +421,15 @@ public class MethodBodyDefinition extends Definition
       Internal.error(this, this+" has no definition");
 
     Method primMethod = module.addPackageMethod
-      (definition.getBytecodeName() + Pattern.bytecodeRepresentation(formals),
+      (definition.getBytecodeName() + 
+       nice.tools.code.Strings.escape(Pattern.bytecodeRepresentation(formals)),
        javaArgTypes(), definition.javaReturnType());
     new MiscAttr("definition", 
 		 definition.getFullName().getBytes())
       .addToFrontOf(primMethod);
-
+    new MiscAttr("patterns", 
+		 Pattern.bytecodeRepresentation(formals).getBytes())
+      .addToFrontOf(primMethod);
 
     gnu.expr.LambdaExp lexp = 
       nice.tools.code.Gen.createMethod(primMethod, parameters);
@@ -440,7 +443,7 @@ public class MethodBodyDefinition extends Definition
 
     //Register this alternative for the link test
     new bossa.link.Alternative(this.definition,
-			       Pattern.getLinkTC(this.formals),
+			       this.formals,
 			       module.getOutputBytecode(),
 			       primMethod);
   }

@@ -34,9 +34,10 @@ public abstract class Strings
   */
   public static String escape(String s)
   {
-    if(s==null || s.length()==0)
+    if (s == null)
       return null;
-    if(s.equals("<init>") || s.equals("<clinit>"))
+
+    if (s.length() == 0 || s.equals("<init>") || s.equals("<clinit>"))
       return s;
     
     char[] chars = s.toCharArray();

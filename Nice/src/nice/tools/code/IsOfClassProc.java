@@ -16,19 +16,9 @@ import gnu.bytecode.*;
 import gnu.mapping.*;
 import gnu.expr.*;
 
-public class InstanceOfProc extends Procedure1 implements Inlineable
+public class IsOfClassProc extends Procedure1 implements Inlineable
 {
-  public static Expression instanceOfExp(Expression value, Type ct)
-  {
-    // If matching against primitive types, 
-    // we know the runtime type will be the corresponding object class.
-    if (ct instanceof PrimType)
-      ct = Types.equivalentObjectType(ct);
-    
-    return Inline.inline(new InstanceOfProc(ct), value);
-  }
-  
-  public InstanceOfProc(Type type)
+  public IsOfClassProc(Type type)
   {
     this.type = type;
   }
@@ -41,9 +31,21 @@ public class InstanceOfProc extends Procedure1 implements Inlineable
     CodeAttr code = comp.getCode();
 
     args[0].compile(comp, Target.pushObject);
-    type.emitIsInstance(code);
+    code.emitInvokeVirtual(getClassMethod);
+    code.emitInvokeVirtual(getNameMethod);
+    code.emitPushString(type.getName());
+    code.emitInvokeVirtual(equalsMethod);
     target.compileFromStack(comp, Type.boolean_type);
   }
+
+  private static final Method getClassMethod = 
+    Type.pointer_type.getDeclaredMethod("getClass", 0);
+
+  private static final Method getNameMethod = 
+    ClassType.make("java.lang.Class").getDeclaredMethod("getName", 0);
+
+  private static final Method equalsMethod = 
+    Type.pointer_type.getDeclaredMethod("equals", 1);
 
   public Type getReturnType (Expression[] args)
   {

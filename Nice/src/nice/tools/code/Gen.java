@@ -22,6 +22,37 @@ import bossa.syntax.MonoSymbol;
 public class Gen
 {
   /**
+     Code that returns true if either expression is true.
+     Evaluates both expressions.
+  */ 
+  public static Expression or(Expression e1, Expression e2)
+  {
+    return new ApplyExp(orProc, new Expression[]{ e1, e2 });
+  }
+  
+  /** 
+      Procedure to emit <code>or</code>. 
+      Shared since it is not parametrized.
+  */
+  private static final Expression orProc = 
+    new gnu.expr.QuoteExp(new nice.tools.code.OrProc());
+
+  public static Expression instanceOfExp(Expression value, Type ct)
+  {
+    // If matching against primitive types, 
+    // we know the runtime type will be the corresponding object class.
+    if (ct instanceof PrimType)
+      ct = Types.equivalentObjectType(ct);
+    
+    return Inline.inline(new InstanceOfProc(ct), value);
+  }
+  
+  public static Expression isOfClass(Expression value, Type ct)
+  {
+    return Inline.inline(new IsOfClassProc(ct), value);
+  }
+
+  /**
      Create a lambda expression to generate code for the method.
      @param args can be null if there are no parameters.
   */

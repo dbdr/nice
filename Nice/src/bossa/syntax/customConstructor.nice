@@ -150,7 +150,7 @@ public CustomConstructor createCustomConstructor(LocatedString className, Constr
 
 private Monotype getCCReturnType(LocatedString className, Constraint cst)
 {
-  let classe = new TypeIdent(className);
+  let classe = new TypeIdent(name: className);
   classe.nullness = Monotype.sure;
 
   if (cst == Constraint.True)

@@ -12,6 +12,9 @@ import java.util.List;
 
 public class dispatch
 {
+  public static Monotype createTypeIdent(LocatedString name)
+  { return null;}
+
   public static Definition createMethodWithDefault(LocatedString name, Constraint constraint, Monotype returnType, FormalParameters parameters, Statement body, Contract contract, boolean isOverride)
   { return null; }
 

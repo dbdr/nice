@@ -44,7 +44,7 @@ implements Located
   
   static Monotype fresh(LocatedString associatedVariable)
   {
-    return new TypeIdent(associatedVariable);
+    return dispatch.createTypeIdent(associatedVariable);
   }
   
   static Monotype[] freshs(int arity, LocatedString associatedVariable)
@@ -197,6 +197,12 @@ implements Located
       res[i] = m[i].substitute(map);
 
     return res;
+  }
+
+  //temporarily method to call on TypeIdent's
+  public mlsub.typing.TypeSymbol resolveToTypeSymbol(TypeMap scope)
+  {
+    return null;
   }
 
   /****************************************************************

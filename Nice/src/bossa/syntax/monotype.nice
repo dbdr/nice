@@ -33,7 +33,7 @@ public class MonotypeConstructor extends Monotype
   {
     if (lowlevelTC == null)
       {
-	let newTC = notNull(this.tc).resolveToTC(typeMap);
+	let newTC = notNull(this.tc).resolveToTC(notNull(typeMap));
 	if (! (newTC instanceof TypeConstructor))
 	  throw User.error(notNull(this.tc), notNull(this.tc)+" should be a type constructor");
 	lowlevelTC = newTC;

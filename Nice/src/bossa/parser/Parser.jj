@@ -673,7 +673,7 @@ Monotype monotypeConstructor():
     { if(p==null) p=new ArrayList(0);
       last=getToken(0);
 
-      return bossa.syntax.dispatch.createMonotypeConstructor(t,new TypeParameters(p),
+      return bossa.syntax.fun.createMonotypeConstructor(t,new TypeParameters(p),
 				     makeLocation(first, last)); 
     }
 }
@@ -760,7 +760,7 @@ Monotype arrayMonotype(Monotype res):
     List tp = new LinkedList();
     tp.add(res);
     Location loc = res.location();
-    res = bossa.syntax.dispatch.createMonotypeConstructor
+    res = bossa.syntax.fun.createMonotypeConstructor
       (new TypeIdent(new LocatedString("nice.lang.Array", loc)),
        new TypeParameters(tp),
        loc);
@@ -934,7 +934,7 @@ MonotypeConstructor superClass():
     // ignore type parameters
     // they should be checked
     [ "<" params = monotypes() ">" ]
-  { return bossa.syntax.dispatch.createMonotypeConstructor(name, params == null ? null : new TypeParameters(params), name.location()); }
+  { return bossa.syntax.fun.createMonotypeConstructor(name, params == null ? null : new TypeParameters(params), name.location()); }
 }
 
 List interfaces():
@@ -1278,12 +1278,12 @@ Pattern pattern():
     "(" additional=typeIdent() ")"
   ]  
   name=ident()
-  { return bossa.syntax.dispatch.createPattern(tc, name, false, additional, runtimeTC); }
+  { return bossa.syntax.fun.createPattern(tc, name, false, additional, runtimeTC); }
 |
   "#" tc=typeIdent() 
   [ "(" additional=typeIdent() ")" ] 
   [ name=ident() ] 
-  { return bossa.syntax.dispatch.createPattern(tc, name, true, additional, null); }
+  { return bossa.syntax.fun.createPattern(tc, name, true, additional, null); }
 |
   ( 
     val=patternLiteral() 
@@ -1293,7 +1293,7 @@ Pattern pattern():
     "@" tc=typeIdent() 
     [ "(" additional=typeIdent() ")" ]
     { User.warning(tc.location(), "This syntax is deprecated, use 'Type paramName' instead.");
-      return bossa.syntax.dispatch.createPattern(tc, null, false, additional, null);
+      return bossa.syntax.fun.createPattern(tc, null, false, additional, null);
     }
   |
     name=ident()
@@ -1302,12 +1302,12 @@ Pattern pattern():
       tc=typeIdent()
       [ ":" runtimeTC=typeConstructor() ]
       [ "(" additional=typeIdent() ")" ]
-      { return bossa.syntax.dispatch.createPattern(tc, name, false, additional, runtimeTC); }
+      { return bossa.syntax.fun.createPattern(tc, name, false, additional, runtimeTC); }
     |
       "#" tc=typeIdent() 
       [ "(" additional=typeIdent() ")" ] 
       { User.warning(name.location(), "This syntax is deprecated, use '#Type paramName' instead.");
-        return bossa.syntax.dispatch.createPattern(tc, name, true, additional, null);
+        return bossa.syntax.fun.createPattern(tc, name, true, additional, null);
       }
     |
       ( t=">" | t=">=" | t="<" | t="<=" )
@@ -1689,7 +1689,7 @@ Expression newExp():
   ( 
     { Arguments arguments; }
     arguments = arguments(false)
-    { e = bossa.syntax.dispatch.createNewExp(classe, arguments); 
+    { e = bossa.syntax.fun.createNewExp(classe, arguments); 
       e.setLocation(makeLocation(t));
       return e;
     }

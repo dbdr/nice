@@ -100,7 +100,7 @@ public class AbstractInterfaceImplementation extends Definition
 
   resolve()
   {
-    classTC = new TypeIdent(className).resolveToTC(typeScope);
+    classTC = new TypeIdent(name: className).resolveToTC(notNull(typeScope));
 
     if (TypeConstructors.isInterface(classTC))
       {
@@ -112,9 +112,9 @@ public class AbstractInterfaceImplementation extends Definition
       }
 
     let ident = new TypeIdent
-      (new LocatedString(module.getName() + '.' + interfaceName.content, 
+      (name: new LocatedString(module.getName() + '.' + interfaceName.content, 
 			 interfaceName.location()));
-    interfaceITF = ident.resolveToItf(typeScope);
+    interfaceITF = ident.resolveToItf(notNull(typeScope));
 
     let def = getTypeDefinition(notNull(classTC));
 

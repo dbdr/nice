@@ -63,7 +63,7 @@ public Pattern createPattern(ConstantExp value, ?TypeIdent additional)
     return new NullPattern(value.tc, additional, value.location());
 
   if (value instanceof StringConstantExp)
-    return new StringPattern(null, new TypeIdent(new LocatedString("java.lang.String", value.location())),
+    return new StringPattern(null, new TypeIdent(name: new LocatedString("java.lang.String", value.location())),
 				additional, value.location(), atValue: value);
 
   if (value.tc == nice.tools.typing.PrimitiveType.boolTC)

@@ -500,7 +500,7 @@ private Pattern[] makeFormals(List<Pattern> formals, ?NiceClass container,
 
   List<Pattern> res = new ArrayList();
   res.add(createPattern(new LocatedString("this", loc), 
-		 new TypeIdent(container.getName())));
+		 new TypeIdent(name: container.getName())));
   res.addAll(formals);
   return res.toArray();
 }

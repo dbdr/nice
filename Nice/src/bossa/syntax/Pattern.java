@@ -34,8 +34,8 @@ import nice.tools.typing.PrimitiveType;
 public abstract class Pattern implements Located
 {
   LocatedString name;
-  TypeIdent typeConstructor;
-  private TypeIdent additional;
+  /*TypeIdent*/bossa.syntax.Monotype typeConstructor;
+  private /*TypeIdent*/bossa.syntax.Monotype additional;
   TypeConstructor tc;
   TypeConstructor tc2;
   mlsub.typing.Interface itf2;
@@ -59,14 +59,14 @@ public abstract class Pattern implements Located
     this.loc = loc;
   }
 
-  Pattern(TypeConstructor tc, TypeIdent add, Location loc)
+  Pattern(TypeConstructor tc, /*TypeIdent*/bossa.syntax.Monotype add, Location loc)
   {
     this.tc = tc;
     this.additional = add;
     this.loc = loc;
   }
 
-  Pattern(LocatedString name, TypeIdent ti, TypeIdent add, Location loc)
+  Pattern(LocatedString name, /*TypeIdent*/bossa.syntax.Monotype ti, /*TypeIdent*/bossa.syntax.Monotype add, Location loc)
   {
     this.name = name;
     this.typeConstructor = ti;

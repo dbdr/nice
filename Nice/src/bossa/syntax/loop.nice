@@ -134,7 +134,7 @@ public Statement createForInLoop(?Monotype vartype, LocatedString varName, Locat
     {
       List<Monotype> tparams = new ArrayList(1);
       tparams.add(vartype);	
-      itertype = createMonotypeConstructor(new TypeIdent(new LocatedString("Iterator", loc)),
+      itertype = createMonotypeConstructor(new TypeIdent(name: new LocatedString("Iterator", loc)),
 	new TypeParameters(tparams), loc);
       notNull(itertype).nullness = Monotype.sure;
     }

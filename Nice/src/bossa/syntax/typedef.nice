@@ -302,7 +302,7 @@ public abstract class CTypeDefinition extends TypeDefinition
         this.useInheritanceParams(this.resolveParams(parent, notNull(this.getLocalScope())));
 
         let name = notNull(parent.tc);
-        let s = name.resolvePreferablyToItf(typeScope);
+        let s = name.resolvePreferablyToItf(notNull(typeScope));
 
 	if (s instanceof mlsub.typing.Interface)
 	  {
@@ -483,7 +483,7 @@ class ClassDefinition extends CTypeDefinition
     if (s != null) 
       {
         this.useInheritanceParams(this.resolveParams(s, this.getLocalScope()));
-        let superClass = notNull(s.tc).resolveToTC(typeScope);
+        let superClass = notNull(s.tc).resolveToTC(notNull(typeScope));
         let name = notNull(this.name);
 
         this.superClass = superClass;

@@ -1,3 +1,10 @@
+nice (0.9.2) unstable; urgency=low
+
+  * Classes that implement java.lang.Cloneable now automatically support 
+    the clone method.
+
+ --
+
 nice (0.9.1) unstable; urgency=low
 
   * Final fields can be overriden in sub-classes with a more precise type

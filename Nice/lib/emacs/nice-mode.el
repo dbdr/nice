@@ -509,14 +509,14 @@ Mode for editing/compiling Nice programs.
 
     ;; Build process command
     (setq cmd
-          (concat
-           (if nice-xprogram nice-xprogram nice-program)
-	   " "
-           (if nice-experimental-flag "-e ")
-           (if nice-recompile-flag
-	       (if (equal nice-recompile-flag 'all) "-R " "-r "))
-           (if nice-static-flag "-s ")
-           (nice-buffer-pkg-name))
+	  (let ((prog (if nice-xprogram nice-xprogram
+		       (concat
+			nice-program
+			(if nice-experimental-flag " -e")
+			(if nice-recompile-flag
+			    (if (equal nice-recompile-flag 'all) " -R" " -r"))
+			(if nice-static-flag " -s")))))
+	    (concat prog " " (nice-buffer-pkg-name)))
     )
     
     ;; Save the current directory

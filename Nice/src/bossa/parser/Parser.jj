@@ -193,6 +193,9 @@ TOKEN: /* Keywords */
 | < BREAK:	"break"		>
 | < CONTINUE:	"continue"	>
 
+// switch is an unused keyword to improve error message
+| < SWITCH:	"switch"	>
+
 // Statements
 | < RETURN:     "return"     	>
 | < VARIABLE:   "var"   	> /* Nice specific */

@@ -550,10 +550,10 @@ public class CNiceClass extends NiceClass
 	FormalParameters values = new FormalParameters(params.toArray());
 
 	notNull(constructorMethod)[i] = new DefaultConstructor
-	  (this, true, definition.location(), values, cst,
+	  (new LocatedString("<init>",definition.location()), values, cst,
 	   Monotype.resolve(definition.getLocalScope(), values.types()),
 	   Monotype.sure(new mlsub.typing.MonotypeConstructor(definition.getTC(), definition.getTypeParameters())),
-           fields: fields, parent: parent);
+           classe: this, isDefault: true, fields: fields, parent: parent);
 	TypeConstructors.addConstructor(definition.getTC(), notNull(constructorMethod)[i]);
       }
   }

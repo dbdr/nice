@@ -216,7 +216,6 @@ int[?] getUsedArguments(Arguments, VarSymbol) = native int[] Arguments.getUsedAr
 ?mlsub.typing.Constraint getConstraint(mlsub.typing.Polytype) = native mlsub.typing.Constraint mlsub.typing.Polytype.getConstraint();
 MonoSymbol[?] getMonoSymbols(FormalParameters) = native MonoSymbol[] FormalParameters.getMonoSymbols();
 mlsub.typing.AtomicConstraint[?] AtomicConstraint_substitute(java.util.Map<mlsub.typing.TypeSymbol,mlsub.typing.TypeSymbol>, AtomicConstraint[?]) = native mlsub.typing.AtomicConstraint[] mlsub.typing.AtomicConstraint.substitute(java.util.Map, mlsub.typing.AtomicConstraint[]);
-NiceClass classe(Constructor) = native Constructor.classe;
 FormalParameters parameters(MethodDeclaration) = native MethodDeclaration.parameters;
 ?gnu.expr.Expression getInitializer(NiceClass) = native gnu.expr.Expression NiceClass.getInitializer();
 void addConstructorCallSymbol(NiceClass, VarSymbol) = native void NiceClass.addConstructorCallSymbol(VarSymbol);
@@ -256,6 +255,10 @@ bossa.syntax.Monotype substitute(bossa.syntax.Monotype,Map<String,bossa.syntax.M
 List<bossa.syntax.Monotype> substitute(Map<String,bossa.syntax.Monotype>,Collection<bossa.syntax.Monotype>) = native List bossa.syntax.Monotype.substitute(Map,Collection);
 boolean containsAlike(List<bossa.syntax.Monotype>) = native boolean bossa.syntax.Monotype.containsAlike(List);
 mlsub.typing.Monotype[] rawResolve(TypeMap,Collection<bossa.syntax.Monotype>) = native mlsub.typing.Monotype[] bossa.syntax.Monotype.rawResolve(TypeMap, Collection);
+List<String> noMatchByName(Arguments, FormalParameters) = native List Arguments.noMatchByName(FormalParameters);
+List<FormalParameters.Parameter> missingArgs(Arguments, FormalParameters) = native List Arguments.missingArgs(FormalParameters);
+List<FormalParameters.Parameter> getRequiredParameters(FormalParameters) = native List FormalParameters.getRequiredParameters();
+List<FormalParameters.Parameter> asList(FormalParameters) = native List FormalParameters.asList();
 
 // Retypings needed since java types are not strict.
 mlsub.typing.Polytype boolPolytype() = native nice.tools.typing.PrimitiveType.boolPolytype;

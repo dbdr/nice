@@ -1,7 +1,7 @@
 /**************************************************************************/
 /*                                N I C E                                 */
 /*             A high-level object-oriented research language             */
-/*                        (c) Daniel Bonniot 2002                         */
+/*                        (c) Daniel Bonniot 2004                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -12,76 +12,42 @@
 
 package bossa.syntax;
 
-import java.util.*;
 import bossa.util.*;
-import bossa.util.Location;
-import mlsub.typing.Constraint;
-import mlsub.typing.Monotype;
-import nice.tools.typing.PrimitiveType;
+//import mlsub.typing.Constraint;
+//import mlsub.typing.Monotype;
 
 /**
    An object constructor.
 
-   @author Daniel Bonniot (bonniot@users.sourceforge.net)
  */
-
 abstract class Constructor extends MethodDeclaration
 {
-  Constructor(NiceClass classe,
-              boolean isDefault,
-              Location location,
-              FormalParameters formals,
-              Constraint cst,
-              Monotype[] parameters,
-              Monotype returnType)
-  {
-    super(new LocatedString("<init>", location), formals,
-	  cst, parameters, returnType);
+  NiceClass classe;
+  final boolean isDefault;
 
-    this.classe = classe;
-    this.isDefault = isDefault;
-  }
-
-  Constructor(NiceClass classe,
-              boolean isDefault,
-              Location location,
-              FormalParameters formals,
-              bossa.syntax.Constraint cst,
-              bossa.syntax.Monotype returnType)
-  {
-    super(new LocatedString("<init>", location), cst, returnType, formals);
-
-    this.classe = classe;
-    this.isDefault = isDefault;
-  }
-
-  protected NiceClass classe;
-  final protected boolean isDefault;
-
-  abstract gnu.expr.Expression getInitializationCode(boolean implicitThis);
+  gnu.expr.Expression getInitializationCode(boolean implicitThis);
 
   void addConstructorCallSymbol()
   {
-    mlsub.typing.Polytype type = new mlsub.typing.Polytype
-      (getType().getConstraint(),
-       new mlsub.typing.FunType(getArgTypes(), PrimitiveType.voidType));
-    classe.addConstructorCallSymbol(
-	dispatch.createConstructorCallSymbol(this, name, type));
+    let type = new mlsub.typing.Polytype(this.getType().getConstraint(),
+       new mlsub.typing.FunType(this.getArgTypes(), nice.tools.typing.PrimitiveType.voidType));
+    classe.addConstructorCallSymbol(createConstructorCallSymbol(this, name, type));
   }
 
-  public void printInterface(java.io.PrintWriter s)
-  { throw new Error("Should not be called"); }
+  printInterface(s)
+  { 
+    throw new Error("Should not be called");
+  }
 
-  String explainWhyMatchFails(Arguments arguments)
+  explainWhyMatchFails(arguments)
   {
     if (! isDefault)
-      return super.explainWhyMatchFails(arguments);
+      return super;
 
     String name = classe.getName().toString();
 
     StringBuffer res = new StringBuffer();
     res.append("Class ").append(name);
-
 
     //Arguments where none expected
     if (parameters.size == 0)
@@ -91,10 +57,10 @@ abstract class Constructor extends MethodDeclaration
       }
 
     //No such field
-    List nonmatching = arguments.noMatchByName(parameters);
+    List<String> nonmatching = notNull(arguments).noMatchByName(parameters);
     if (!nonmatching.isEmpty())
       {
-        res.append(" has no field named "+nonmatching.get(0));
+        res.append(" has no field named "+nonmatching[0]);
         return res.toString();
       }
 
@@ -102,14 +68,14 @@ abstract class Constructor extends MethodDeclaration
     // - three different messages depending on whether
     //an explanation of the syntax is necessary
     res = new StringBuffer();
-    List missing = arguments.missingArgs(parameters);
-    List fieldsToList;
+    List<FormalParameters.Parameter> missing = notNull(arguments).missingArgs(parameters);
+    List<FormalParameters.Parameter> fieldsToList;
 
-    if (arguments.size() == 0)
+    if (notNull(arguments).size() == 0)
       {
         res.append("Fields of class ").append(name)
           .append(" require initial values.\n");
-        res.append(syntaxExample())
+        res.append(this.syntaxExample())
           .append("Class ").append(name).append(" has the following fields:\n");
         fieldsToList = parameters.asList();
       }
@@ -126,11 +92,10 @@ abstract class Constructor extends MethodDeclaration
           .append("The constructor accepts the following arguments:\n" );
         fieldsToList = parameters.asList();
       }
-    Iterator fieldsIt = fieldsToList.iterator();
-    while (fieldsIt.hasNext())
+    for (field : fieldsToList)
       {
         res.append("  ")
-          .append(fieldsIt.next())
+          .append(field)
           .append("\n");
       }
     return res.toString();
@@ -144,13 +109,12 @@ abstract class Constructor extends MethodDeclaration
     res.append("Use the following syntax:\n")
       .append("  new ").append(name).append("(");
 
-    Iterator params = parameters.getRequiredParameters().iterator();
+    let Iterator<FormalParameters.Parameter> params = parameters.getRequiredParameters().iterator();
     int paramCount = 0;
     int len = name.length();
     while(params.hasNext())
       {
-        FormalParameters.Parameter param =
-          (FormalParameters.Parameter)params.next();
+        FormalParameters.Parameter param = params.next();
         if (paramCount != 0)
           res.append(", ");
         if (paramCount == 3 && params.hasNext())

@@ -101,12 +101,13 @@ public ?ImportedConstructor loadImportedConstructor(NiceClass def, gnu.bytecode.
   let constraint = classDef.classConstraint == null ?
           null : notNull(classDef.classConstraint).shallowClone();
 
-  let res = new ImportedConstructor(def,
-          gnu.bytecode.Attribute.get(method, "default") != null,
-          def.getDefinition().location(),
+  let res = new ImportedConstructor(
+          new LocatedString("<init>",def.getDefinition().location()),
+          constraint, returnType,
           FormalParameters.readBytecodeAttribute(attr, 
 		notNull(JavaClasses.compilation).parser),
-          constraint, returnType, method: method);
+	  classe: def, isDefault: gnu.bytecode.Attribute.get(method, "default") != null,
+	  method: method);
 
   TypeConstructors.addConstructor(res.classe.getDefinition().getTC(), res);
   return res;

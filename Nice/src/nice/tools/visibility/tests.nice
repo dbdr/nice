@@ -229,6 +229,12 @@ void _testNestedVisibility()
   assert res.size == 1 && res[0] == 'g';
   res = root2.get("g");
   assert res.size == 1 && res[0] == 'g';
+
+  inner1.remove("g", 'g');
+  res = inner2.get("g");
+  assert res.size == 0;
+  res = root2.get("g");
+  assert res.size == 0;
 }
 
 void _testGeneralVisibility()

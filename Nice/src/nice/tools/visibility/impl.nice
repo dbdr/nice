@@ -45,7 +45,11 @@ add(Scope this, key, value, general)
 remove(Scope this, key, value)
 {
   map.remove(key, value);
-  publicMap.remove(key, value);
+
+  if (parent != null)
+    notNull(parent).remove(key, value);
+  else
+    publicMap.remove(key, value);
 }
 
 addImplicitOpen(Scope this, Scope scope) = opens.add(scope);

@@ -1,0 +1,4 @@
+/// PASS
+  byte[] b = f(new byte[2]);
+  /// Toplevel
+  <int T> T[] f(T[] t) = t; 

@@ -50,6 +50,9 @@ public class MultiArrayNewProc extends gnu.mapping.ProcedureN
     for (int i=0; i<nbDimensions; i++)
       args[i].compile(comp, Type.int_type);
 
+    if (target.getType() instanceof ArrayType)
+      arrayType = (ArrayType) target.getType();
+
     comp.getCode().emitNewArray(arrayType.getComponentType(), nbDimensions);
     target.compileFromStack(comp, arrayType);
   }

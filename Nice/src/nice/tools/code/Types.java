@@ -295,8 +295,8 @@ public final class Types
   public static TypeConstructor typeConstructor (Type javaType)
     throws NotIntroducedClassException
   {
-    TypeConstructor tc = bossa.syntax.Node.getGlobalTypeScope().
-      globalLookup(javaType.getName(), null);
+    TypeConstructor tc = bossa.syntax.Node.globalTypeScopeLookup(
+	javaType.getName(), null);
 
     if (tc == null)
       {
@@ -411,8 +411,7 @@ public final class Types
     if (javaType == Type.pointer_type)
       return TopMonotype.instance;
 
-    TypeConstructor tc = bossa.syntax.Node.getGlobalTypeScope().
-      globalLookup(javaType.getName(), null);
+    TypeConstructor tc = bossa.syntax.Node.globalTypeScopeLookup(javaType.getName(), null);
 
     if (tc == null)
       {
@@ -515,8 +514,7 @@ public final class Types
     if (type.equals("Object") || type.equals("java.lang.Object"))
       return Type.pointer_type;
 
-    TypeConstructor sym = bossa.syntax.Node.getGlobalTypeScope().
-      globalLookup(type, loc);
+    TypeConstructor sym = bossa.syntax.Node.globalTypeScopeLookup(type, loc);
 
     return get(sym);
   }

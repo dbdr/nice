@@ -30,6 +30,12 @@ public class TypeScope implements TypeMap
     this.map = new HashMap();
   }
 
+  // only for GlobalTypeScope
+  void setModule(Module mod) {}
+  Module getModule() { return null; }
+  public mlsub.typing.TypeConstructor globalLookup(String name, Location loc)
+  { return null; }
+
   void addSymbol(TypeSymbol s)
   throws DuplicateName
   {

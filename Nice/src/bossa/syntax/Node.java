@@ -133,10 +133,20 @@ abstract public class Node
     return globalScope;
   }
   
-  private static GlobalTypeScope globalTypeScope;
-  public static final GlobalTypeScope getGlobalTypeScope()
+  private static TypeScope globalTypeScope;
+  public static final TypeScope getGlobalTypeScope()
   {
     return globalTypeScope;
+  }
+
+  public static final Module getGlobalTypeScopeModule()
+  {
+    return globalTypeScope.getModule();
+  }
+
+  public static mlsub.typing.TypeConstructor globalTypeScopeLookup(String name, Location loc)
+  {
+    return globalTypeScope.globalLookup(name, loc);
   }
 
   public static bossa.modules.Compilation compilation = null;
@@ -149,9 +159,9 @@ abstract public class Node
       {
         compilation = module.compilation();
 	globalScope = dispatch.createGlobalVarScope();
-	globalTypeScope = new GlobalTypeScope();
+	globalTypeScope = dispatch.createGlobalTypeScope();
       }
-    globalTypeScope.module = module;
+    globalTypeScope.setModule(module);
   }
 
   void buildScope(Module module)
@@ -309,7 +319,7 @@ abstract public class Node
           ((Node)i.next()).doTypecheck();
         }
         catch(UserError ex){
-          globalTypeScope.module.compilation().error(ex);
+          globalTypeScope.getModule().compilation().error(ex);
 	}
   }
 

@@ -12,6 +12,9 @@ import java.util.List;
 
 public class dispatch
 {
+  static TypeScope createGlobalTypeScope()
+  { return null; }
+
   public static void resetConstructorsMap() {}
 
   static boolean instantiableTC(mlsub.typing.TypeConstructor tc)

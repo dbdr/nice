@@ -253,7 +253,7 @@ boolean instantiable(gnu.bytecode.Type javaType)
        gnu.bytecode.Access.INTERFACE)) == 0;
 }
 
-?TypeConstructor lookupJavaClass(String className, Location loc)
+?TypeConstructor lookupJavaClass(String className, ?Location loc)
 {
   ?gnu.bytecode.Type classType = nice.tools.code.TypeImport.lookup(className, loc);
 

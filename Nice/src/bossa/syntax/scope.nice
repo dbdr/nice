@@ -31,3 +31,98 @@ VarScope createGlobalVarScope()
 {
   return new GlobalVarScope(null);
 }
+
+/**
+   The global, toplevel type scope.
+
+ */
+public class GlobalTypeScope extends TypeScope
+{
+  public Module module = cast(null);
+  private Set<String> set;
+
+  setModule(mod)
+  {
+    module = notNull(mod);
+  }
+
+  getModule() = module;
+
+  addMapping(name, s)
+  {
+    super;
+
+    if (!set.add(notNull(name).toLowerCase()))
+      throw new TypeScope.DuplicateName(this, name);
+  }
+
+  public mlsub.typing.TypeConstructor globalLookup(LocatedString name)
+  {
+    return this.globalLookup(name.toString(), name.location());
+  }
+
+  globalLookup(name, loc)
+  {
+    mlsub.typing.TypeSymbol res = this.lookup(name, loc);
+
+    if (res instanceof mlsub.typing.TypeConstructor)
+      return res;
+
+    if (res != null)
+      Internal.warning("Non type-constructor found in global type scope");
+
+    return cast(null);
+  }
+
+  lookup(name, loc)
+  {
+    ?mlsub.typing.TypeSymbol res = super;
+    if (res != null)
+      return res;
+
+    boolean notFullyQualified = notNull(name).indexOf('.') == -1;
+	
+    if (notFullyQualified)
+      {
+	/* Try first to find the symbol in Nice definitions.
+	   The first package is the current package.
+	   If the symbol is not found there, we check there is no 
+	   ambiguity with another symbol from another package.
+	*/
+	boolean first = true;
+	String[] pkgs = module.listImplicitPackages();
+	for (int i = 0; i < pkgs.length; i++)
+	  {
+	    String fullName = pkgs[i] + "." + name;
+	    ?mlsub.typing.TypeSymbol sym = this.get(fullName);
+	    if (sym != null)
+	      if (res == null)
+		{
+		  res = sym;
+		  if (first) break;
+		}
+	      else
+		User.error(loc, "Ambiguity for symbol " + name + 
+			   ":\n" + res + " and " + sym +
+			   " both exist");
+	    first = false;
+	  }
+      }
+
+    if (res != null)
+      return res;
+
+    return cast(lookupJavaClass(notNull(name), loc));
+  }
+}
+
+TypeScope createGlobalTypeScope()
+{
+  let res = new GlobalTypeScope(null, set: new HashSet());
+
+  try {
+    res.addMapping("java.lang.Object", mlsub.typing.TopMonotype.instance);
+  } catch (TypeScope.DuplicateName ex) {}
+
+  return res;
+}

@@ -64,7 +64,7 @@ public class TypeImport
     if (res != null)
       return res;
 
-    String[] pkgs = bossa.syntax.Node.getGlobalTypeScope().module.listImplicitPackages();
+    String[] pkgs = bossa.syntax.Node.getGlobalTypeScopeModule().listImplicitPackages();
     for (int i = 0; i < pkgs.length; i++)
       {
 	Type found = lookupQualified(pkgs[i] + "." + className);
@@ -121,7 +121,7 @@ public class TypeImport
     if (res != null)
       return res;
     
-    String[] pkgs = bossa.syntax.Node.getGlobalTypeScope().module.listImplicitPackages();
+    String[] pkgs = bossa.syntax.Node.getGlobalTypeScopeModule().listImplicitPackages();
     for (int i = 0; i < pkgs.length; i++)
 	{
 	  res = lookupQualifiedJavaClass(pkgs[i] + "." + className);

@@ -1,0 +1,67 @@
+package nice.lang;
+
+/**
+   Support for native arrays.
+   Make them elements of the collection hierarchy.
+*/
+
+class Array<T> 
+  implements Sequence
+  finally implements Collection 
+  = native rawArray;
+
+<Any T> T[] resize(T[], int) = native Object rawArray.resize(Object,int);
+
+<Any T> int length(T[]) = native int java.lang.reflect.Array.getLength(Object);
+
+<Any T> T _get(T[], int) = native Object java.lang.reflect.Array.get(Object,int);
+boolean _get(boolean[], int) = native boolean java.lang.reflect.Array.getBoolean(Object,int);
+byte _get(byte[], int) = native byte java.lang.reflect.Array.getByte(Object,int);
+short _get(short[], int) = native short java.lang.reflect.Array.getShort(Object,int);
+int _get(int[], int) = native int java.lang.reflect.Array.getInt(Object,int);
+long _get(long[], int) = native long java.lang.reflect.Array.getLong(Object,int);
+char _get(char[], int) = native char java.lang.reflect.Array.getChar(Object,int);
+float _get(float[], int) = native float java.lang.reflect.Array.getFloat(Object,int);
+double _get(double[], int) = native double java.lang.reflect.Array.getDouble(Object,int);
+
+<Any T> void _set(T[], int, T) = native void java.lang.reflect.Array.set(Object,int,Object);
+void _set(boolean[], int, boolean) = native void java.lang.reflect.Array.setBoolean(Object,int,boolean);
+void _set(byte[], int, byte) = native void java.lang.reflect.Array.setByte(Object,int,byte);
+void _set(short[], int, short) = native void java.lang.reflect.Array.setShort(Object,int,short);
+void _set(int[], int, int) = native void java.lang.reflect.Array.setInt(Object,int,int);
+void _set(long[], int, long) = native void java.lang.reflect.Array.setLong(Object,int,long);
+void _set(char[], int, char) = native void java.lang.reflect.Array.setChar(Object,int,char);
+void _set(float[], int, float) = native void java.lang.reflect.Array.setFloat(Object,int,float);
+void _set(double[], int, double) = native void java.lang.reflect.Array.setDouble(Object,int,double);
+
+<Any T> Array<T> value(Array<T>) = native Object rawArray.value();
+
+get(a@Array, n) = _get(a.value, n);
+set(a@Array, n, e) = _set(a.value,n,e);
+size(a@Array) = a.value.length;
+
+map<C,T,U>(a@Array, f)
+{
+  int l = size(a);
+
+  U[] res = new U[l];
+
+  for(int i=0; i<l; i=i+1)
+    res[i] = f(a[i]);
+
+  return res;
+}
+
+filter<C, T>(a@Array, test)
+{
+  int l = size(a);
+  int found = 0;
+
+  T[] res = new T[l];
+  
+  a.iter(fun(T elem) => 
+	{ if(test(elem)) { res.set(found,elem); found=found+1; }} );
+
+  return resize(res,found);
+}
+

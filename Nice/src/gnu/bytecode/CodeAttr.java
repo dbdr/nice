@@ -1568,6 +1568,15 @@ public class CodeAttr extends Attribute implements AttrContainer
    */
   public final void emitReturn ()
   {
+    TryState stack = try_stack;
+    while (stack != null)
+      {
+	if (stack.finally_subr != null         // there is a finally block
+	    && stack.finally_ret_addr == null) // 'return' is not inside it
+	  emitJsr(stack.finally_subr);
+	stack = stack.previous;
+      }
+
     if (getMethod().getReturnType().size == 0)
       {
 	reserve(1);

@@ -264,10 +264,14 @@ public final class Polytype
       Engine.simplify(binders, atoms);
     }
     catch(mlsub.typing.lowlevel.Unsatisfiable e){
-      throw new InternalError("Simplifying ill-formed polytype");
+      // Avoid looping.
+      simplified = true;
+      throw new InternalError("Simplifying ill-formed polytype: " + this);
     }
     catch(TypingEx e){
-      throw new InternalError("Simplifying ill-formed polytype");
+      // Avoid looping.
+      simplified = true;
+      throw new InternalError("Simplifying ill-formed polytype: " + this);
     }
     finally{
       Engine.stopSimplify();
@@ -285,6 +289,19 @@ public final class Polytype
     simplified = true;
   }
   
+  /** Try to simplify this type.
+      @return false if the type is ill-formed. 
+  */
+  public boolean trySimplify()
+  {
+    try {
+      simplify();
+      return true;
+    } catch(InternalError e) {
+      return false;
+    }
+  }
+
   /****************************************************************
    * Misc
    ****************************************************************/

@@ -5,3 +5,16 @@
 
 nonnull(x@String) {}
 nonnull(x) {}
+
+/// PASS
+  /// Toplevel
+
+<java.awt.Component T> T init
+  (T this,
+   ?String propertyName = null,
+   java.awt.event.ComponentEvent ?-> void componentHidden = null)
+{                            
+  return this;
+}
+
+void callInit(javax.swing.JFrame f) { f.init(); }

@@ -247,7 +247,8 @@ public class CallExp extends Expression
        However, it is probably not perfect. setByteCodetype should be usefull.
        FIXME and test me with regtest case.
     */
-    type.simplify();
+    if (! type.trySimplify())
+      User.warning(this, "This call might have a type error, or this might be a bug in the compiler. \nPlease contact bonniot@users.sourceforge.net");
     //Types.setBytecodeType(type);
   }
 

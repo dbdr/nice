@@ -82,7 +82,8 @@ jar:
 	cd stdlib; jar uf ../lib/nice/Nice.jar nice/*/*.nice*
 
 dist: jar
-	jar cfM lib/nice/Nice-`date +"%Y.%m.%d"`.jar bin/nicer bin/nicec lib/nice/Nice.jar lib/emacs/nice-mode.el
+	tar cf lib/nice/Nice-`date +"%Y.%m.%d"`.tar bin/nicer bin/nicec lib/nice/Nice.jar lib/emacs/nice-mode.el
+
 
 #****************************************************************
 # CVS

@@ -1,0 +1,39 @@
+#! /bin/sh
+
+### The Nice compiler
+###
+### Wrapper for the native compiler, compiled by gcj.
+### This script must be placed in a directory with 
+###   ../share/java/nice.jar (for the standard library 
+###                           and the ressources for gnu.getopt)
+###   ./nicec.bin            (the binary executable produced by gcj)
+###
+### Copyright 2002 Daniel Bonniot
+
+## Locating nice home
+
+find_home()
+{
+  PRG="$0"
+  # Resolve symlinks.
+  while [ -h "$PRG" ]; do
+    lsResult=`ls -ld "$PRG"`
+    # d'apres /usr/bin/expr sous linux, ^ est implicite 
+    # au debut de la deuxieme chaine et il ne faut pas le mettre
+    link=`/usr/bin/expr "$lsResult" : '.*-> \(.*\)$'`
+    if /usr/bin/expr "$link" : '/.*' > /dev/null; then
+        PRG="$link"
+    else
+        PRG="`dirname $PRG`/$link"
+    fi
+  done
+
+  APPHOME="`dirname $PRG`"
+}
+
+scriptName="$0"
+find_home "$scriptName"
+cd "$APPHOME"
+CLASSPATH=../share/java/nice.jar:$CLASSPATH
+export CLASSPATH
+exec ./nicec.bin "$@"

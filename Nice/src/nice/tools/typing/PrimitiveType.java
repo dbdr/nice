@@ -35,14 +35,14 @@ public final class PrimitiveType
     if(name.equals("nice.lang.char"))
       {
 	charTC = tc;
-	charType = sureMonotype(new MonotypeConstructor(tc, null));
+	charType = Types.sureMonotype(new MonotypeConstructor(tc, null));
 	return SpecialTypes.charType;
       }
     
     if(name.equals("nice.lang.byte"))
       {
 	byteTC = tc;
-	byteType = sureMonotype(new MonotypeConstructor(tc, null));
+	byteType = Types.sureMonotype(new MonotypeConstructor(tc, null));
 	bytePolytype = new Polytype(byteType);
 	return SpecialTypes.byteType;
       }
@@ -50,7 +50,7 @@ public final class PrimitiveType
     if(name.equals("nice.lang.short"))
       {
 	shortTC = tc;
-	shortType = sureMonotype(new MonotypeConstructor(tc, null));
+	shortType = Types.sureMonotype(new MonotypeConstructor(tc, null));
 	shortPolytype = new Polytype(shortType);
 	return SpecialTypes.shortType;
       }
@@ -58,7 +58,7 @@ public final class PrimitiveType
     if(name.equals("nice.lang.int"))
       {
 	intTC = tc;
-	intType = sureMonotype(new MonotypeConstructor(tc, null));
+	intType = Types.sureMonotype(new MonotypeConstructor(tc, null));
 	intPolytype = new Polytype(intType);
 	return SpecialTypes.intType;
       }
@@ -66,7 +66,7 @@ public final class PrimitiveType
     if(name.equals("nice.lang.long"))
       {
 	longTC = tc;
-	longType = sureMonotype(new MonotypeConstructor(tc, null));
+	longType = Types.sureMonotype(new MonotypeConstructor(tc, null));
 	longPolytype = new Polytype(longType);
 	return SpecialTypes.longType;
       }
@@ -74,7 +74,7 @@ public final class PrimitiveType
     if(name.equals("nice.lang.boolean"))
       {
 	boolTC = tc;
-	boolType = sureMonotype(new MonotypeConstructor(tc, null));
+	boolType = Types.sureMonotype(new MonotypeConstructor(tc, null));
 	boolPolytype = new Polytype(boolType);
 	return SpecialTypes.booleanType;
       }
@@ -82,14 +82,14 @@ public final class PrimitiveType
     if(name.equals("nice.lang.double"))
       {
 	doubleTC = tc;
-	doubleType = sureMonotype(new MonotypeConstructor(tc, null));
+	doubleType = Types.sureMonotype(new MonotypeConstructor(tc, null));
 	return SpecialTypes.doubleType;
       }
     
     if(name.equals("nice.lang.float"))
       {
 	floatTC = tc;
-	floatType = sureMonotype(new MonotypeConstructor(tc, null));
+	floatType = Types.sureMonotype(new MonotypeConstructor(tc, null));
 	return SpecialTypes.floatType;
       }
     
@@ -97,7 +97,7 @@ public final class PrimitiveType
       {
 	voidTC = tc;
 	mlsub.typing.lowlevel.Engine.setTop(tc);
-	voidType = sureMonotype(new MonotypeConstructor(tc, null));
+	voidType = Types.sureMonotype(new MonotypeConstructor(tc, null));
 	voidPolytype = new Polytype(Constraint.True, voidType);
 	return SpecialTypes.voidType;
       }
@@ -140,12 +140,6 @@ public final class PrimitiveType
     return null;
   }
   
-  private static mlsub.typing.Monotype sureMonotype(mlsub.typing.Monotype type)
-  {
-    return new mlsub.typing.MonotypeConstructor
-      (PrimitiveType.sureTC, new mlsub.typing.Monotype[]{type});
-  }
-
   public static TypeConstructor byteTC, charTC, intTC, longTC, boolTC, shortTC, doubleTC, floatTC, arrayTC, voidTC;
 
   public static mlsub.typing.Monotype byteType, charType, intType, longType, boolType, shortType, doubleType, floatType, voidType;
@@ -156,7 +150,7 @@ public final class PrimitiveType
   {
     if (objectPolytype == null)
       objectPolytype = new Polytype(mlsub.typing.Constraint.True, 
-                                    sureMonotype(TopMonotype.instance));
+                                    Types.sureMonotype(TopMonotype.instance));
 
     return objectPolytype;
   }
@@ -176,7 +170,7 @@ public final class PrimitiveType
       {
 	throwableType = new Polytype
 	  (Constraint.True, 
-	   sureMonotype(new MonotypeConstructor(throwableTC, null)));
+	   Types.sureMonotype(new MonotypeConstructor(throwableTC, null)));
       }
     return throwableType;
   }

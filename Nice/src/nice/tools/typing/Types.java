@@ -110,6 +110,12 @@ public final class Types
     return mc.getTP()[0];
   }
 
+  public static mlsub.typing.Monotype sureMonotype(mlsub.typing.Monotype type)
+  {
+    return new mlsub.typing.MonotypeConstructor
+      (PrimitiveType.sureTC, new mlsub.typing.Monotype[]{type});
+  }
+
   /****************************************************************
    * Functional types
    ****************************************************************/
@@ -148,7 +154,7 @@ public final class Types
   {
     return new Polytype
       (type.getConstraint(), 
-       bossa.syntax.Monotype.sure(type.getMonotype()));
+       Types.sureMonotype(type.getMonotype()));
   }
 
   /****************************************************************

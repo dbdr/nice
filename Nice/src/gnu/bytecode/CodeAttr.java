@@ -1833,6 +1833,19 @@ public class CodeAttr extends Attribute implements AttrContainer
       pushType(Type.throwable_type);
   }
 
+  public void emitCatchStart(ClassType type)
+  {
+    emitTryEnd();
+    SP = 0;
+    if (try_stack.try_type != null)
+      emitCatchEnd();
+    try_stack.try_type = type;
+    readPC = PC;
+    addHandler(try_stack.start_pc, try_stack.end_pc,
+	       PC, type, getConstants());
+    pushType(type);
+  }
+
   public void emitCatchEnd()
   {
     if (reachableHere())
@@ -1858,7 +1871,7 @@ public class CodeAttr extends Attribute implements AttrContainer
     pushScope();
     Type except_type = Type.pointer_type;
     Variable except = addLocal(except_type);
-    emitCatchStart(null);
+    emitCatchStart((Variable) null);
     emitStore(except);
     emitGoto(try_stack.finally_subr, 168); // jsr
     emitLoad(except);

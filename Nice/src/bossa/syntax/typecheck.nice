@@ -445,11 +445,8 @@ notNullError(ex@MonotypeLeqEx, resp, value)
 
   if (tc1 == ConstantExp.maybeTC &&
       (tc2 != ConstantExp.maybeTC || tc2 != null))
-    {
-      //throw new bossa.util.UserError(resp, "" + value + " may be null");
-      bossa.util.User.warning(resp, "" + value + " may be null");
-      return false;
-    }
+    throw new bossa.util.UserError(resp, "" + value + " might be null");
+
   return true;
 }
 

@@ -47,3 +47,24 @@ foo(x) = 1;
 long foo(int x);
 foo(0) { assert false; }
 foo(x) = 1;
+
+/// PASS
+  // testcase for compilation of bug #1113263
+  boolean af = false;
+  try {
+    (new AssertCaseFail()).aMethod();
+  } catch(AssertionFailed e) { af = true; }
+  assert af; 
+  /// Toplevel
+  class AssertCaseFail {
+    void?->void _aFirstPointer = null;
+    void?->void _aSecondPointer = null;
+    void aMethod(){
+      let void->void fun;
+      let first = _aFirstPointer; let second = _aSecondPointer;
+      if ( null != first ) fun = first;
+      else if( null != second ) fun = second;
+      else assert false;
+      fun();
+    }
+  }

@@ -82,6 +82,11 @@ public class IncrementExp extends Expression
       return (increment ? "++" : "--") + variable.toString();
   }
 
+  String description()
+  {
+    return increment ? "Incrementation" : "Decrementation";
+  }
+
   Expression variable;
   private boolean returnOld, increment;
 }

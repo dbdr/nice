@@ -112,15 +112,31 @@ typecheck(e@IdentExp)
 
 typecheck(e@IfExp)
 {
-  e.condition.resolveOverloading(ConstantExp.boolPolytype);
-  typecheck(e.condition);
+  try{
+    e.condition = checkAssignment(ConstantExp.boolPolytype, e.condition);
+  }
+  catch(TypingEx t){
+    throw new bossa.util.UserError
+      (e, 
+       "The condition must be a boolean.\n" + 
+       e.condition + " has type " + e.condition.getType());
+  }
+
   typecheck(e.thenExp);
   typecheck(e.elseExp);
 }
 
 typecheck(e@IncrementExp)
 {
-  typecheck(e.variable);
+  try{
+    e.variable = checkAssignment(ConstantExp.longPolytype, e.variable);
+  }
+  catch(TypingEx t){
+    throw new bossa.util.UserError
+      (e, 
+       e.description() + " is only valid on integers.\n" + 
+       e.variable + " has type " + e.variable.getType());
+  }
 }
 
 typecheck(e@LiteralArrayExp)

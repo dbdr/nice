@@ -260,6 +260,7 @@ public class ConstantExp extends Expression
       {
 	primLong = tc;
 	longType = new MonotypeConstructor(tc, null);
+	longPolytype = new mlsub.typing.Polytype(longType);
 	return SpecialTypes.longType;
       }
     
@@ -306,7 +307,7 @@ public class ConstantExp extends Expression
   
   public static TypeConstructor primByte, primChar, primInt, primLong, primBool, primShort, primDouble, primFloat, arrayTC;
   public static mlsub.typing.Monotype byteType, charType, intType, longType, boolType, shortType, doubleType, floatType, voidType;
-  static mlsub.typing.Polytype voidPolytype, boolPolytype, intPolytype;
+  static mlsub.typing.Polytype voidPolytype, boolPolytype, intPolytype, longPolytype;
 
   // syntatic types
   public static Monotype synVoidType;

@@ -33,8 +33,15 @@ void generate(Compilation compilation, String mainPackage, ?File outDirectory)
     throw new Error("Could not create the output directory " + outdir);
   }
 
+  // We want to "recompile" that is, load from source, all available
+  // packages, so that we can geenrate documentation for them.
+  compilation.recompileAll = true;
+
   try {
     List<bossa.modules.Package> packages = load(compilation, mainPackage);
+
+    // Only keep packages that we have the source of.
+    packages = packages.filter(bossa.modules.Package p => ! p.interfaceFile());
 
     // Here the real work begins
     Documenter d = new Documenter();

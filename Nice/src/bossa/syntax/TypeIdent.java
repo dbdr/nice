@@ -83,16 +83,14 @@ public final class TypeIdent extends Monotype implements Located
     if (res instanceof TypeConstructor)
       {
 	TypeConstructor tc = (TypeConstructor) res;
-	mlsub.typing.Monotype type = null;
+
 	try{
-	  type = new mlsub.typing.MonotypeConstructor(tc, null);
+	  return new mlsub.typing.MonotypeConstructor(tc, null);
 	}
 	catch(mlsub.typing.BadSizeEx e){
-	  User.error(this, name + " has " + 
-		     e.expected + 
-		     " type parameter" + (e.expected>1 ? "s" : ""));
+	  throw User.error(this, name + 
+			   Util.has(e.expected, "type parameter", e.actual));
 	}
-	return type;
       }
     
     if (res instanceof mlsub.typing.Interface)

@@ -124,4 +124,41 @@ public class Util
     int lastDot = fullyQualifiedName.lastIndexOf('.');
     return fullyQualifiedName.substring(lastDot + 1);
   }
+
+
+  /****************************************************************
+   * English
+   ****************************************************************/
+
+  public static String plural(int number, String word)
+  {
+    StringBuffer res = new StringBuffer(number == 0 ? "no" : "" + number);
+    res.append(' ');
+    res.append(word);
+    if (number != 1)
+      res.append("s");
+    return res.toString();
+  }
+
+  /**
+     returns:
+       " has no bars"
+       " has 1 bar"
+       " has n bars"
+     or, if 0 < number < not
+       " has only 1 bar"
+       " has only n bars"
+  */
+  public static String has(int number, String word, int not)
+  {
+    StringBuffer res = new StringBuffer(" has ");
+    if (0 < number && number < not)
+      res.append("only ");
+    res.append(number == 0 ? "no" : "" + number);
+    res.append(' ');
+    res.append(word);
+    if (number != 1)
+      res.append('s');
+    return res.toString();
+  }
 }

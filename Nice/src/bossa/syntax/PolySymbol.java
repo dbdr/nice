@@ -44,6 +44,12 @@ public class PolySymbol extends VarSymbol
     return type;
   }
 
+  boolean isAssignable()
+  {
+    // No polymorphic references! 
+    return false;
+  }
+
   /****************************************************************
    * Resolution
    ****************************************************************/

@@ -21,7 +21,7 @@ import mlsub.typing.AtomicConstraint;
 import java.util.*;
 
 import nice.tools.code.Types;
-import nice.tools.code.Gen;
+import nice.tools.code.*;
 
 /**
    Abstract syntax for a class definition.
@@ -195,6 +195,34 @@ public class NiceClass extends ClassDefinition.ClassImplementation
 	(sym.name.toString(), Types.javaType(sym.type));
       method.fieldDecl.setFlag(isTransient, gnu.expr.Declaration.TRANSIENT);
       method.fieldDecl.setFlag(isVolatile , gnu.expr.Declaration.VOLATILE);
+
+      String fname = sym.getName().toString();
+      String suffix = Character.toUpperCase(fname.charAt(0)) + fname.substring(1);
+      createGetter(suffix);
+      if (!isFinal)
+        createSetter(suffix);
+    }
+ 
+    void createGetter(String nameSuffix)
+    {
+      gnu.expr.Expression[] params = new gnu.expr.Expression[1];
+      gnu.expr.LambdaExp getter = Gen.createMemberMethod
+        ("get"+nameSuffix, classe.getType(), null,
+	 method.fieldDecl.getType(), params);
+      Gen.setMethodBody(getter, Inline.inline(new GetFieldProc(method.fieldDecl), params[0]));
+      classe.addMethod(getter);
+    }
+
+    void createSetter(String nameSuffix)
+    {
+      gnu.expr.Expression[] params = new gnu.expr.Expression[2];
+      gnu.bytecode.Type[] argTypes = new gnu.bytecode.Type[1];
+      argTypes[0] = method.fieldDecl.getType();
+      gnu.expr.LambdaExp setter = Gen.createMemberMethod
+        ("set"+nameSuffix, classe.getType(), argTypes,
+	 method.fieldDecl.getType(), params);
+      Gen.setMethodBody(setter, Inline.inline(new SetFieldProc(method.fieldDecl), params[0], params[1]));
+      classe.addMethod(setter);
     }
 
     void checkNoDuplicate(FormalParameters.Parameter[] fields, 

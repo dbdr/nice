@@ -189,7 +189,7 @@ ClassConstraint createClassConstraint(mlsub.typing.TypeSymbol[] binders, List<At
                 else
                   // The type parameter must be in fact a type constructor
                   // of variance zero.
-                  return new mlsub.typing.MonotypeConstructor(cast(s), null);
+		  return sureMonotype(new mlsub.typing.MonotypeConstructor(cast(s), null));
               }
 
           throw User.error(loc, binder + " is not declared in the constraint");

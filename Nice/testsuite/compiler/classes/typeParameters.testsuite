@@ -372,3 +372,33 @@ class A<T> {
   /// Toplevel
 class A<T> {}
 class B<T> extends A< /*/// FAIL HERE */ U> {}
+
+
+/// PASS
+  Foo<A> a = new Foo();
+  /// Toplevel
+abstract interface I {}
+
+class A implements I {}
+
+<T extends I> class Foo<T> {}
+
+
+/// PASS
+  Foo<A> a = new Foo();
+  /// Toplevel
+interface I {}
+
+class A implements I {}
+
+<T extends I> class Foo<T> {}
+
+
+/// PASS
+  Foo<A> a = new Foo();
+  /// Toplevel
+class I {}
+
+class A extends I {}
+
+<T extends I> class Foo<T> {}

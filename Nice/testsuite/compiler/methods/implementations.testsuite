@@ -111,3 +111,11 @@ foo(@A){}
 /// FAIL
   /// Toplevel
   void f(List<Array<String>>);
+
+/// PASS
+  f(null);
+  /// Toplevel
+class A { int i; }
+int f(?A);
+f(x@A) = x.i;
+f(null) = 0;

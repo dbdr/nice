@@ -90,13 +90,13 @@ pkg_ok=0
 pkg_broken=0
 
 for subdir in *; do
-  [ -d $subdir -a $subdir != "CVS" ] || continue
+  [ -e $subdir/*.nice || -e $subdir/prepare ] || continue
 
   pkg=`expr $pkg + 1`
 
   echo -n "Testing package \"$subdir\""
 
-  # execute package dependant script before compilation
+  # execute package dependent script before compilation
   if [ -x $subdir/prepare ]; then
     echo -n " (preparing...)"
     if 

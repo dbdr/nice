@@ -107,5 +107,10 @@ public class SymbolExp extends Expression
     return symbol.name.toString();
   }
 
+  VarSymbol getSymbol()
+  {
+    return symbol;
+  }
+
   private VarSymbol symbol;
 }

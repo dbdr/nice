@@ -93,4 +93,7 @@ public class IfExp extends Expression
   }
 
   Expression condition,thenExp, elseExp;
+
+  /** set to true if the execution of the branch never completes. */
+  boolean thenUnreachable, elseUnreachable;
 }

@@ -31,7 +31,19 @@ public class AST extends Node
     super(defs,Node.global);
     
     this.module = module;
-    this.definitions = defs;
+    findClasses();
+  }
+
+  private void findClasses()
+  {
+    ArrayList c = new ArrayList(children.size());
+    for(Iterator i = children.iterator(); i.hasNext();)
+      {
+	Object node = i.next();
+	if (node instanceof ClassDefinition)
+	  c.add((ClassDefinition) node);
+      }
+    classes = (ClassDefinition[]) c.toArray(new ClassDefinition[c.size()]);
   }
   
   public void buildScope()
@@ -58,24 +70,22 @@ public class AST extends Node
     Location.current = Location.nowhere();
 
     // Classes are resolved first, since code can depend on them
-    for(Iterator i = children.iterator();i.hasNext();)
-      {
-	Node n = (Node) i.next();
-	if (n instanceof ClassDefinition)
-	  resolve(n);
-      }
+    for(int i = 0; i < classes.length; i++)
+      resolve(classes[i]);
+
     for(Iterator i = children.iterator();i.hasNext();)
       {
 	Node n = (Node) i.next();
 	if (!(n instanceof ClassDefinition))
 	  resolve(n);
       }
+
     nice.tools.compiler.OutputMessages.exitIfErrors();
   }
   
   public void typechecking()
   {
-    for(Iterator i = definitions.iterator(); i.hasNext();)
+    for(Iterator i = children.iterator(); i.hasNext();)
       {
 	Object o = i.next();
 	if (o instanceof MethodBodyDefinition)
@@ -90,7 +100,7 @@ public class AST extends Node
 
     module.unfreezeGlobalContext();
     try{
-      for(Iterator i = definitions.iterator(); i.hasNext();)
+      for(Iterator i = children.iterator(); i.hasNext();)
 	{
 	  Definition d = (Definition) i.next();
 	  try{
@@ -104,27 +114,32 @@ public class AST extends Node
       module.freezeGlobalContext();
     }
     nice.tools.compiler.OutputMessages.exitIfErrors();
+
+    // Classes are typechecked first, since code can depend on them.
+    for(int i = 0; i < classes.length; i++)
+      classes[i].typecheckClass();
+
     doTypecheck();
   }
 
   public void printInterface(java.io.PrintWriter s)
   {
-    for(Iterator i = definitions.iterator(); i.hasNext();)
+    for(Iterator i = children.iterator(); i.hasNext();)
       ((Definition) i.next()).printInterface(s);
   }
 
   public void compile()
   {
-    for(Iterator i = definitions.iterator();i.hasNext();)
+    for(Iterator i = children.iterator();i.hasNext();)
       ((Definition)i.next()).compile();
   }
   
   public String toString()
   {
-    return "Abstract Syntax Tree ("+definitions.size()+" definitions)";
+    return "Abstract Syntax Tree ("+children.size()+" definitions)";
   }
 
   private Module module;
-  private List /* of Definition */ definitions;
+  private ClassDefinition[] classes;
 }
 

@@ -553,9 +553,14 @@ abstract public class ClassDefinition extends MethodContainer
     implementation.resolveBody();
   }
 
-  void typecheck()
+  void typecheckClass()
   {
     implementation.typecheck();
+  }
+
+  void typecheck()
+  {
+    // Typechecking is done earlier, in typecheckClass.
   }
 
   void compile()

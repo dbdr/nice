@@ -11,20 +11,18 @@ public class OrProc extends Procedure2 implements Inlineable
     Expression[] args = exp.getArgs();
     CodeAttr code = comp.getCode();
 
-    Target stack = new StackTarget(retType);
+    Target stack = new StackTarget(Type.boolean_type);
     
     args[0].compile(comp, stack);
     args[1].compile(comp, stack);
     code.emitIOr();
     
-    target.compileFromStack(comp, retType);
+    target.compileFromStack(comp, Type.boolean_type);
   }
 
-  private final Type retType = Type.boolean_type;
-  
   public Type getReturnType (Expression[] args)
   {
-    return retType;
+    return Type.boolean_type;
   }
 
   // Interpretation

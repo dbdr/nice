@@ -131,14 +131,18 @@ public final class JavaClasses
 	ClassType superClass =  classType.getSuperclass();
 	if(superClass!=null && !(excluded(blackListClass, superClass)))
 	  {
-	    TypeConstructor superTC = make(compilation, superClass.getName(), superClass);
-
 	    try{
+              TypeConstructor superTC = 
+                nice.tools.code.Types.typeConstructor(superClass);
 	      Typing.initialLeq(res, superTC);
 	    }
 	    catch(TypingEx e){
 	      Internal.warning("Invalid java super-class "+superClass+" for "+className);
 	    }
+            catch (nice.tools.code.Types.NotIntroducedClassException e) {
+              Internal.warning
+                (res + " extends " + superClass + ", which is not usable");
+              }
 	  }
 
 	ClassType[] itfs = null;
@@ -154,9 +158,9 @@ public final class JavaClasses
 	  for(int i=0; i<itfs.length; i++)
 	    if(!(excluded(blackListInterface,itfs[i])))
 	    {
-	      TypeConstructor superTC = make(compilation, itfs[i].getName(), itfs[i]);
-	      
 	      try{
+                TypeConstructor superTC = 
+                  nice.tools.code.Types.typeConstructor(itfs[i]);
 		Typing.initialLeq(res, superTC);
 	      }
 	      catch(TypingEx e){
@@ -164,6 +168,10 @@ public final class JavaClasses
 		  (res+" cannot implement " + itfs[i]
 		   /* + ": " + e.toString()*/);
 	      }
+              catch (nice.tools.code.Types.NotIntroducedClassException e) {
+                Internal.warning
+		  (res + " implements " + itfs[i] + ", which is not usable");
+              }
 	    }
 
 	// The default arity is 0.

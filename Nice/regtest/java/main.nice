@@ -1,0 +1,13 @@
+package regtest.java;
+
+import regtest.java.A;
+import regtest.java.B.*;
+
+void testExtensions() {
+  In bi = new BIj();
+  An ba = new BAj();
+}
+
+void main(String[] args)
+{
+}

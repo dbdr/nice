@@ -1,0 +1,5 @@
+package regtest.java.A;
+
+interface In {}
+
+class An {}

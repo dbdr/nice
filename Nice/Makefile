@@ -27,7 +27,7 @@ NICEC=nicec ${NICEC_ARGS} --sourcepath="${TOP}/stdlib:${TOP}/src"
 NICEC1=${TOP}/bin/nicec ${NICEC_ARGS} --sourcepath="${TOP}/stdlib.new:${TOP}/src.new" 
 
 # Get the version from the debian changelog.
-VERSION = ${shell dpkg-parsechangelog | sed -n 's/^Version: //p'}
+VERSION = ${shell expr "`head -1 debian/changelog`" : '.*(\(.*\))'}
 DEB = nice_${VERSION}_all.deb
 TARFILE = Nice-${VERSION}.tar
 ZIPFILE = Nice-${VERSION}-windows.zip

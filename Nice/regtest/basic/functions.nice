@@ -29,12 +29,17 @@ String optFun(String value, String end = ": ") = value + end;
 // Function with a parametric type
 <Any T> T identity(T x) = x;
 
+// anonymous argument is ok 
+// (it would also be acceptable for this to fail graciously)
+int quarantedeux(int) = 42;
+
 void test_functions()
 {
   println("### Testing functions");
   FunctionClass o = identity(new FunctionClass());
-  o.setX(42);
+  o.setX(quarentedeux());
   println("x = " + o.getX());
 
   println(optFun("Functions") + optFun("a Nice feature", end:"!"));
 }
+

@@ -55,8 +55,15 @@ implements Function
     this.voidReturn = returnType.toString().equals("nice.lang.void");
 
     this.parameters = parameters.getMonoSymbols();
+
+    // add the named parameters in the scope
     if (this.parameters != null)
-      addChildren(this.parameters);
+      for (int i = this.parameters.length; --i >= 0;)
+	{
+	  MonoSymbol m = this.parameters[i];
+	  if (m.name != null)
+	    addSymbol(m);
+	}
   }
 
   private Statement body;

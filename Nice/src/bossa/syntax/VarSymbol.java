@@ -30,11 +30,7 @@ abstract class VarSymbol extends Node implements Located
   {
     super(Node.upper);
     this.name = name;
-
-    // Anonymous function arguments have null names.
-    // They must not be put in the scope.
-    if (name != null)
-      addSymbol(this);
+    addSymbol(this);
   }
 
   public boolean hasName(LocatedString i)

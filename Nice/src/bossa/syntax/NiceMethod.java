@@ -237,7 +237,21 @@ public class NiceMethod extends UserOperator
         // Do we have a smaller domain?
         if (! (Typing.smaller(ourDomain, itsDomain, true))
             ||  Types.typeParameterDispatch(getType(), s.getType()))
-          continue;
+          {
+            // If the method is imported (so it has not computed what
+            // methods it specializes),
+            // check if the reverse relation holds with that method
+            if (! d.specializesMethods() &&
+                Typing.smaller(itsDomain, ourDomain, true) &&
+                ! Types.typeParameterDispatch(getType(), s.getType()))
+              {
+                // d is a specialized version of this.
+                // Therefore, all its implementations also belong to this.
+                bossa.link.Alternative.addAll(d, this);
+              }
+
+            continue;
+          }
 
         // In a compiled package, we don't need checking.
         if (module.interfaceFile())

@@ -219,6 +219,22 @@ public class Alternative implements Located
       add(fullNames[i]);
   }
 
+  public static void addAll(MethodDeclaration from, MethodDeclaration to)
+  {
+    List list = (List) alternatives.get(from.getFullName());
+
+    if (list == null)
+      return;
+
+    String fullName = to.getFullName();
+
+    for(Iterator i = list.iterator(); i.hasNext();)
+      {
+        Alternative a = (Alternative) i.next();
+        a.add(fullName);
+      }
+  }
+
   public static Stack sortedAlternatives(MethodDeclaration m)
   {
     List list = (List) alternatives.get(m.getFullName());

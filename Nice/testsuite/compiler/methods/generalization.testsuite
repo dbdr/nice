@@ -1,0 +1,40 @@
+/// COMMENT Introducing a method that is more general than an existing one.
+/// COMMENT That is, the existing one overrides the new one.
+
+/// PASS
+  /// package a
+  /// Toplevel
+class Collection
+{
+  void foo() {}
+}
+
+  /// package b import a
+  /// Toplevel
+abstract interface Fooable {}
+<Fooable F> void foo(F this);
+
+class a.Collection implements Fooable;
+
+/// PASS
+  /// package a
+  /// Toplevel
+class Collection
+{
+  void foo() {}
+}
+
+  /// package b import a
+  /// Toplevel
+abstract interface Fooable
+{
+  void foo();
+}
+
+class a.Collection implements Fooable;
+
+/// PASS bug
+  /// Toplevel
+abstract interface Addable<T> { void add(T item); }
+
+interface java.util.Collection implements Addable;

@@ -132,7 +132,10 @@ public abstract class Location implements Located
 
     public String toString()
     {
-      return nice.tools.util.System.prettyPrint(file);
+      if (file == null)
+        return "";
+      else
+        return nice.tools.util.System.prettyPrint(file);
     }
 
     public void write(gnu.expr.Expression exp)

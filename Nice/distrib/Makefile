@@ -5,7 +5,8 @@ TAG = $(shell echo -n "version_$(VERSION)" | tr -c -- "-_a-zA-Z0-9" "_")
 DEBVERSION = ${shell expr "$(VERSION)" : '.*-\([0-9]\)'}
 DEB = nice_${VERSION}_all.deb
 
-BUILDROOT = ${CURDIR}/nice-$(VERSION)
+BUILDROOT = nice-$(VERSION)
+BUILDDIR = ${CURDIR}/$(BUILDROOT)
 
 BUILTSOURCEFILE = nice_$(VERSION).orig.tar.gz
 TARFILE = Nice-${VERSION}-unix.tar.gz
@@ -61,9 +62,9 @@ zip ${ZIPFILE}: $(DEB)
 	${clean-tmp}
 	mkdir ${ZIP_ROOT}
 	../bin/nicec --man | groff -mandoc -Thtml - > ${ZIP_ROOT}/nicec.html
-	ln -sf ${BUILDROOT}/bin/nicec.bat ${BUILDROOT}/share/java/nice.jar ${BUILDROOT}/web/Readme.txt ${ZIP_ROOT}
+	ln -sf ${BUILDDIR}/bin/nicec.bat ${BUILDDIR}/share/java/nice.jar ${BUILDDIR}/web/Readme.txt ${ZIP_ROOT}
 	mkdir -p ${ZIP_ROOT}/Emacs
-	ln -sf ${BUILDROOT}/lib/emacs/*.el ${ZIP_ROOT}/Emacs
+	ln -sf ${BUILDDIR}/lib/emacs/*.el ${ZIP_ROOT}/Emacs
 	-rm ${ZIPFILE}
 	cd tmp && zip -r ../${ZIPFILE} Nice
 

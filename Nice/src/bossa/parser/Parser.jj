@@ -2444,6 +2444,8 @@ Statement ForStatement() :
 {
   "for" "(" 
   (  
+    LOOKAHEAD( <IDENT> ":" ) loop=ForInStatement()
+  |
     LOOKAHEAD( monotype() <IDENT> ":" ) loop=ForInStatement()
   | (
       LOOKAHEAD( "var" | "let" | monotype() <IDENT>) 
@@ -2465,9 +2467,14 @@ Statement ForStatement() :
 }
 
 Statement ForInStatement() :                                                
-{ Statement body; Monotype vartype; LocatedString var; Expression container; Token t; }
+{ Statement body; Monotype vartype = null; LocatedString var; Expression container; Token t; }
 {
-  vartype=monotype() var=ident() t=":" container=Expression() ")"
+  ( 
+    LOOKAHEAD( <IDENT> ":") var=ident()
+  | 
+    vartype=monotype() var=ident() 
+  ) 
+  t=":" container=Expression() ")"
   body=Statement()
   { return LoopStmt.forInLoop(vartype,var,Location.make(t),container,body); }
 }

@@ -22,6 +22,10 @@ nice (0.9.1) unstable; urgency=low
       }
   * Package-level constants and variables are now automatically initialized
     in the correct order when they directly depend on each other.
+  * The type declaration in the enhanced forloop is now optional but only if
+    the type is inferable.
+      int[] array = [1,2,3,4,5];
+      for (elem : array) println(elem);
   * Bugfixes (parameter's default value refering to previous parameters, ...)
 
  --

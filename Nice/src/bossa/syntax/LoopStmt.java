@@ -43,16 +43,20 @@ public class LoopStmt extends Statement
 
   public static Statement forInLoop(Monotype vartype, LocatedString var, Location loc, Expression container, Statement body)
   {
-    Monotype itertype;
+    Monotype itertype = null;
     LocatedString iter;
     Expression getiter,iterexp,cond,getvar;
     Statement loop,init,assign;
 
-    List tparams = new ArrayList(1);
-    tparams.add(vartype);	
-    itertype = new MonotypeConstructor(new TypeIdent(new LocatedString("Iterator", loc)),
+    if (vartype != null)
+      {
+	List tparams = new ArrayList(1);
+	tparams.add(vartype);	
+	itertype = new MonotypeConstructor(new TypeIdent(new LocatedString("Iterator", loc)),
 			new TypeParameters(tparams), loc);
-    itertype.nullness = Monotype.sure;
+	itertype.nullness = Monotype.sure;
+      }
+
     getiter = CallExp.create(new IdentExp(new LocatedString("forIterator", loc)), container); 
     iter = new LocatedString(loc.uniqueIdentifier("for_in_iter_"), loc);
     init = new Block.LocalVariable(iter, itertype, true, getiter);

@@ -35,6 +35,8 @@ public class GetFieldProc extends Procedure1 implements Inlineable
 
   private Declaration fieldDecl;
 
+  Field getField() { return fieldDecl.field; }
+
   public void compile (ApplyExp exp, Compilation comp, Target target)
   {
     Field field = fieldDecl.field;

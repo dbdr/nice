@@ -78,6 +78,24 @@
   let int i = 1;
   i[0] = false;
 
+/// FAIL
+  i[0] = false;
+  /// Toplevel
+  let int i = 1;
+
 /// COMMENT Using the result polymorphically
 /// PASS
   String s = 20[1].toString();
+
+/// PASS
+  let a = new A();
+  a.x[1] = true;
+  assert a.x == 2;
+  /// Toplevel
+class A { int x = 0; }
+
+/// PASS
+  x[1] = true;
+  assert x == 2;
+  /// Toplevel
+var int x = 0;

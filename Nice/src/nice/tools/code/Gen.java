@@ -265,4 +265,26 @@ public class Gen
   {
     return Inline.inline(nice.lang.inline.Return.instance, value);
   }
+
+  public static void store(Compilation comp, Expression destination,
+                           Target target)
+  {
+    if (destination instanceof ReferenceExp)
+      {
+        ((ReferenceExp) destination).getBinding().compileStore(comp);
+        return;
+      }
+
+    // Destination must be a field.
+    gnu.bytecode.CodeAttr code = comp.getCode();
+
+    ApplyExp apply = (ApplyExp) destination;
+    GetFieldProc fieldProc = (GetFieldProc)
+      ((QuoteExp) apply.getFunction()).getValue();
+    Field field = fieldProc.getField();
+
+    apply.getArgs()[0].compile(comp, field.getDeclaringClass());
+    code.emitSwap();
+    code.emitPutField(field);
+  }
 }

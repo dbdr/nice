@@ -145,7 +145,7 @@ public class BitOp
 
       t0.compileFromStack(comp, isLong ? Type.long_type : Type.int_type);
 
-      ((ReferenceExp) args[0]).getBinding().compileStore(comp);
+      nice.tools.code.Gen.store(comp, args[0], target);
     }
 
     public Type getReturnType (Expression[] args)

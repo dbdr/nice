@@ -15,7 +15,7 @@
   // We check that the field is indeed of bytecode type Item[], not Object[].
   assert t.a instanceof Item[];
 
-  // Check that the array is not copied to arrabge the types, which would 
+  // Check that the array is not copied to arrange the types, which would 
   // discard the side-effect.
   t.a[0] = new Item();
   assert t.a[0] != null;
@@ -27,3 +27,13 @@ class TestClass{
 // This bug originated from the class being declared after its use, and thus
 // its bytecode type not yet known.
 class Item {}
+
+/// PASS
+  double[] d = [ 0, 1 ];
+  heapsort(d);
+  assert d[1] == 0;
+  /// Toplevel
+<Any T | T <: double, int <: T >
+void heapsort(T[] ra) {
+  ra[1] = ra[0];
+}

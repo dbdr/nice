@@ -38,29 +38,35 @@ extends Procedure3 implements Inlineable
   public ArraySetOp(Type type)
   {
     this.type = type;
-    arrayTarget = new StackTarget(nice.tools.code.SpecialTypes.array(type));
   }
 
   private final Type type;
-  private final StackTarget arrayTarget;
 
   public void compile (ApplyExp exp, Compilation comp, Target target)
   {
     Expression[] args = exp.getArgs();
     CodeAttr code = comp.getCode();
-    
-    args[0].compile(comp, arrayTarget);
+
+    args[0].compile(comp, Target.pushObject);
     boolean bytecodeArray = Tools.monomorphicArray(code.topType());
     args[1].compile(comp, Tools.intTarget);
-    args[2].compile(comp, type);
+
+    Type componentType = type;
+    // Try to get bytecode type information from the target array.
+    if (type == Type.pointer_type)
+      try {
+	componentType = ((ArrayType) args[0].getType()).getComponentType();
+      }
+      catch (ClassCastException ex) {}
+    args[2].compile(comp, componentType);
     
     if (bytecodeArray)
-      code.emitArrayStore(type);
+      code.emitArrayStore(componentType);
     else
-      code.emitInvokeStatic(reflectGet);
+      code.emitInvokeStatic(reflectSet);
   }
 
-  private static Method reflectGet = 
+  private static Method reflectSet = 
     ClassType.make("java.lang.reflect.Array").getDeclaredMethod("set", 3);
 
   public Type getReturnType (Expression[] args)

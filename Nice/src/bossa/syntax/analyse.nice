@@ -313,56 +313,8 @@ analyse(e@CallExp, info)
       e.declaringClass = args.staticClass();
       
       if (e.declaringClass != null)
-	{
-	  ?LocatedString funName = identString(e.function);
-	  if (funName == null)
-	    throw notNull(bossa.util.Internal.error
-			  (e.function, "This is not a valid class member"));
-	  
-	  int arity = args.size();
+	return analyseQualifiedCall(e, info);
 
-	  if ((! e.hasBrackets) && (arity == 0))
-	    // This case is like java.lang.Byte.toString:
-	    // look for a method with that name and any arity,
-	    // since the method is not called but just referenced.
-	    {
-	      List<VarSymbol> possibilities = JavaClasses.findJavaMethods
-	        (e.declaringClass, funName.toString());
-
-	      if (possibilities.size() == 0)
-		throw error(e, "Class " + notNull(e.declaringClass).getName() +
-			    " has no static method or static field named " +
-			    funName);
-
-	      /*
-		If there is a field access, then we consider this an access
-		to the static field. Otherwise, it is a reference to
-		the method, not applied.
-	      */
-	      if (possibilities.has(VarSymbol s => s.isFieldAccess()))
-		{
-		  e.function = newOverloadedSymbolExp(possibilities, funName);
-		  return e;
-		}
-	      else
-		return newOverloadedSymbolExp(possibilities, funName);
-	    }
-
-	  List<VarSymbol> possibilities = JavaClasses.findJavaMethods
-	    (e.declaringClass, funName.toString(), arity);
-
-	  if (possibilities.size() == 0)
-	    throw error(e, "Class " + notNull(e.declaringClass).getName() +
-			(arity == 0 ? " has no static method or static field named " :
-			 arity == 1 ? " has no method or field named " : 
-			 " has no method named ") + 
-			funName);
-	  
-	  e.function = newOverloadedSymbolExp(possibilities, funName);
-
-	  return e;
-	}
-      
       ?PackageExp pkg = args.packageExp();
       if (pkg != null)
 	{
@@ -386,6 +338,59 @@ analyse(e@CallExp, info)
 
   return e;
 }
+
+Expression analyseQualifiedCall(CallExp e, Info info)
+{
+  Arguments args = e.arguments;
+
+  ?LocatedString funName = identString(e.function);
+  if (funName == null)
+    throw notNull(bossa.util.Internal.error
+		  (e.function, "This is not a valid class member"));
+	  
+  int arity = args.size();
+
+  if ((! e.hasBrackets) && (arity == 0))
+    // This case is like java.lang.Byte.toString:
+    // look for a method with that name and any arity,
+    // since the method is not called but just referenced.
+    {
+      List<VarSymbol> possibilities = JavaClasses.findJavaMethods
+      (e.declaringClass, funName.toString());
+
+      if (possibilities.size() == 0)
+	throw error(e, "Class " + notNull(e.declaringClass).getName() +
+		    " has no static method or static field named " +
+		    funName);
+
+      /*
+	If there is a field access, then we consider this an access
+	to the static field. Otherwise, it is a reference to
+	the method, not applied.
+      */
+      if (possibilities.has(VarSymbol s => s.isFieldAccess()))
+	{
+	  e.function = newOverloadedSymbolExp(possibilities, funName);
+	  return e;
+	}
+      else
+	return newOverloadedSymbolExp(possibilities, funName);
+    }
+
+  List<VarSymbol> possibilities = JavaClasses.findJavaMethods
+    (e.declaringClass, funName.toString(), arity);
+
+  if (possibilities.size() == 0)
+    throw error(e, "Class " + notNull(e.declaringClass).getName() +
+		(arity == 0 ? " has no static method or static field named " :
+		 arity == 1 ? " has no method or field named " : 
+		 " has no method named ") + 
+		funName);
+  
+  e.function = newOverloadedSymbolExp(possibilities, funName);
+
+  return e;
+}      
 
 analyse(e@FunExp, info)
 {

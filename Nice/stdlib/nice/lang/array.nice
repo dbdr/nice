@@ -82,3 +82,30 @@ filter<C, T>(a@Array, test)
   return resize(res, found);
 }
 
+/**
+   Fills a newly created array with non-null values.
+
+   A typical usage is to allocate a new array and set its values at the same time:
+   <code>
+     String[] numbers = fill(new String[10], fun(int i)=> "number " + i);
+   </code>
+
+   The equivalent code in Java would be:
+   <code>
+     String[] numbers = new String[10];
+     for (int i = 0; i < 10; i++) {
+       numbers[i] = "number " + i;
+     }
+   </code>
+
+   It is important that no reference to the array is kept,
+   because that would make it possible to store null values in it.
+   There is no danger as long as the array is created inside the call, 
+   like it the above example.
+*/
+<Any T> !T[] fill(?T[] array, int->!T value)
+{
+  for (int i = 0; i < array.length; i++)
+    array[i] = value(i);
+  return cast(array);
+}

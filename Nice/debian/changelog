@@ -2,8 +2,7 @@ nice (0.0.020300) unstable; urgency=low
 
   * Accepts constants:
       final String s1 = "Java style";
-      const String s2 = "const is a (prefered) synonym for final";
-      const s3 = "The type of constants can be omitted";
+      final s3 = "The type of constants can be omitted";
   * More compatibility with Java:
     - checks that all statements are reachable
     - checks that local variables are assigned before use
@@ -14,9 +13,9 @@ nice (0.0.020300) unstable; urgency=low
   * Arrays of void values are forbidden. They most probably originate from
     a bug in the source program.
   * Bugfixes for some polymorphic operations on arrays.
-  * Bugfixed the bitshift operators >> and <<.
+  * Bugfixed the bitshift operators >>, >>> and <<.
 
- --
+ -- Daniel Bonniot <bonniot@users.sourceforge.net>  Fri,  5 Apr 2002 13:01:17 +0200
 
 nice (0.0.020226) unstable; urgency=low
 

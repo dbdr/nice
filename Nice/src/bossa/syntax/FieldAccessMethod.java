@@ -12,7 +12,7 @@
 
 // File    : FieldAccessMethod.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Sat Mar 11 15:09:54 2000 by Daniel Bonniot $
+//$Modified: Wed May 24 14:03:39 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 

@@ -12,7 +12,7 @@
 
 // File    : TypeConstructor.java
 // Created : Thu Jul 08 11:51:09 1999 by bonniot
-//$Modified: Mon May 15 17:34:15 2000 by Daniel Bonniot $
+//$Modified: Thu May 25 18:17:59 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -42,6 +42,8 @@ public class TypeConstructor
 					  * (the id is determined here)
 					  */
     //if(!name.location().isValid()) Internal.warning(name+"");
+
+    this.resolved = true; // pas besoin de resoudre
   }
 
   /**
@@ -182,7 +184,7 @@ public class TypeConstructor
   public int arity()
   {
     if(variance==null)
-      Internal.error(this,"Variance of "+this+" not known in arity()");
+      Internal.error(this, "Variance of "+this+" not known in arity()");
     
     return variance.size;
   }

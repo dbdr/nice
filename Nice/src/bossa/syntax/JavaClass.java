@@ -12,7 +12,7 @@
 
 // File    : JavaClass.java
 // Created : Wed Feb 02 16:20:12 2000 by Daniel Bonniot
-//$Modified: Tue May 16 17:09:24 2000 by Daniel Bonniot $
+//$Modified: Fri May 26 16:19:18 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -56,6 +56,8 @@ public class JavaClass extends ClassDefinition
     super(name, true, isFinal, isAbstract, isInterface,
 	  typeParameters, extensions, implementations, abstractions);
     this.javaName = javaName;
+
+    addTypeSymbol(this.tc);
 
     if(name.toString().equals("nice.lang.Array"))
       ConstantExp.arrayTC = this.tc;

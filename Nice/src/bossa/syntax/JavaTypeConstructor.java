@@ -12,7 +12,7 @@
 
 // File    : JavaTypeConstructor.java
 // Created : Thu Jul 08 11:51:09 1999 by bonniot
-//$Modified: Tue May 02 14:29:35 2000 by Daniel Bonniot $
+//$Modified: Fri May 26 16:44:54 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -89,8 +89,8 @@ public class JavaTypeConstructor extends TypeConstructor
 
   private static final gnu.bytecode.Type[] blackListClass =
     new gnu.bytecode.Type[] {
-      gnu.bytecode.ClassType.make("java.lang.Object"),
-      gnu.bytecode.ClassType.make("java.lang.Throwable")
+      gnu.bytecode.ClassType.make("java.lang.Object")
+      //,gnu.bytecode.ClassType.make("java.lang.Throwable")
     }
   ;
   
@@ -165,6 +165,7 @@ public class JavaTypeConstructor extends TypeConstructor
       }
     Node.getGlobalTypeScope().addSymbol(this);
     fetchMethods();
+    
     javaTypeConstructors.add(this);
   }
 
@@ -225,6 +226,7 @@ public class JavaTypeConstructor extends TypeConstructor
     for(Iterator i = javaTypeConstructors.iterator(); i.hasNext();)
       {
 	JavaTypeConstructor tc = (JavaTypeConstructor) i.next();
+	
 	if(tc.getKind()==null)
 	  try{
 	    Engine.setKind(tc, Variance.make(0).getConstraint());

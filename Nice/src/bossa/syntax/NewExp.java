@@ -12,7 +12,7 @@
 
 // File    : NewExp.java
 // Created : Thu Jul 08 17:15:15 1999 by bonniot
-//$Modified: Tue May 02 14:59:56 2000 by Daniel Bonniot $
+//$Modified: Fri May 26 12:40:08 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -33,13 +33,14 @@ public class NewExp extends CallExp
   void findJavaClasses()
   {
     super.findJavaClasses();
-    tc.resolve(typeScope);
+    tc = tc.resolve(typeScope);
   }
   
   void resolve()
   {
     super.resolve();
     tc = tc.resolve(typeScope);
+    
     fun = new ExpressionRef // not necessary
       (new OverloadedSymbolExp(tc.getConstructors(),
 			       new LocatedString("new "+tc.getName(),
@@ -47,14 +48,7 @@ public class NewExp extends CallExp
 						 location()), 
 			       null));
   }
-  /*
-  void computeType()
-  {
-    TypeParameters tp = new TypeParameters(tc.name,tc.variance);
-    type = new Polytype(new Constraint(tp.content,null),
-			new MonotypeConstructor(tc,tp,tc.location()));
-  }
-  */
+
   void typecheck()
   {
     if(!tc.instantiable())
@@ -65,22 +59,8 @@ public class NewExp extends CallExp
 	User.error(this,
 		   tc+" is a type variable, it can't be instantiated");
     super.typecheck();
-  }
-  
-  /****************************************************************
-   * Code generation
-   ****************************************************************/
-  /*
-  public gnu.expr.Expression compile()
-  {
-    gnu.bytecode.ClassType ct = (gnu.bytecode.ClassType) tc.getJavaType();
-    
-    return new gnu.expr.ApplyExp
-      (new gnu.expr.QuoteExp(new gnu.expr.PrimProcedure
-			     (ct,gnu.bytecode.Type.typeArray0)),
-       new gnu.expr.Expression[0]);
-  }
-  */
+  }  
+
   /****************************************************************
    * Printing
    ****************************************************************/
@@ -90,5 +70,5 @@ public class NewExp extends CallExp
     return "new "+tc+"("+Util.map("", ", ", "", parameters)+")";
   }
 
-  TypeConstructor tc;
+  private TypeConstructor tc;
 }

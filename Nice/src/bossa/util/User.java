@@ -12,7 +12,7 @@
 
 // File    : User.java
 // Created : Wed Jul 07 18:20:58 1999 by bonniot
-//$Modified: Fri Apr 28 15:30:49 2000 by Daniel Bonniot $
+//$Modified: Fri May 26 16:03:22 2000 by Daniel Bonniot $
 
 package bossa.util;
 
@@ -27,10 +27,28 @@ package bossa.util;
  */
 public class User
 {
+  public static void error(Located responsible, Exception exn)
+  {
+    error(responsible, exn.toString());
+  }
+
+  public static void error(Exception exn)
+  {
+    error(exn.toString());
+  }
+
   public static void error(Located responsible, String message, String dbgMsg)
   {
     if(Debug.powerUser)
       error(responsible,message+dbgMsg);
+    else
+      error(responsible,message);
+  }
+
+  public static void error(Located responsible, String message, Exception dbgExn)
+  {
+    if(Debug.powerUser)
+      error(responsible,message+" ["+dbgExn+"]");
     else
       error(responsible,message);
   }
@@ -60,6 +78,9 @@ public class User
 
   public static void warning(String message)
   {
+    if(Debug.alwaysDumpStack)
+      Internal.printStackTrace();
+    
     System.out.println("[Warning]: "+message);
   }
 }

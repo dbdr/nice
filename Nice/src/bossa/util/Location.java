@@ -12,7 +12,7 @@
 
 // File    : Location.java
 // Created : Tue Jul 13 11:55:08 1999 by bonniot
-//$Modified: Tue May 02 11:48:44 2000 by Daniel Bonniot $
+//$Modified: Wed May 24 16:04:06 2000 by Daniel Bonniot $
 
 package bossa.util;
 
@@ -50,7 +50,7 @@ public class Location implements Located
 		  int startLine, int startColumn,
 		  int endLine, int endColumn)
   {
-    this(currentFile,startLine, startColumn, endLine, endColumn);
+    this(currentFile, startLine, startColumn, endLine, endColumn);
   }
 
   public Location(String fileName)
@@ -72,6 +72,11 @@ public class Location implements Located
   public static Location nowhere()
   {
     return new Location(-1,-1,-1,-1);
+  }
+
+  public static Location nowhereAtAll()
+  {
+    return new Location(null, -1,-1,-1,-1);
   }
 
   public String toString()

@@ -12,7 +12,7 @@
 
 // File    : Node.java
 // Created : Thu Jul 08 10:24:56 1999 by bonniot
-//$Modified: Thu May 11 12:04:25 2000 by Daniel Bonniot $
+//$Modified: Thu May 25 14:46:13 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -241,6 +241,9 @@ abstract public class Node
 	catch(BadSizeEx e){
 	  Internal.error(e.toString());
 	}
+	catch(TypeScope.DuplicateName e){
+	  User.error(e);
+	}
       }
     
     // builds the scope of the children
@@ -359,7 +362,7 @@ abstract public class Node
     if(value==null)
       return null;
     
-    ExpressionRef res=new ExpressionRef(value);
+    ExpressionRef res = new ExpressionRef(value);
     addChild(res);
     return res;
   }

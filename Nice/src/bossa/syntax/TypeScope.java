@@ -12,7 +12,7 @@
 
 // File    : TypeScope.java
 // Created : Fri Jul 09 11:29:17 1999 by bonniot
-//$Modified: Thu May 18 17:30:32 2000 by Daniel Bonniot $
+//$Modified: Wed May 24 16:14:34 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -27,13 +27,18 @@ class TypeScope
 {
   public TypeScope(TypeScope outer)
   {
-    this.outer=outer;
-    this.map=new HashMap();
+    this.outer = outer;
+    this.map = new HashMap();
   }
 
   void addSymbol(TypeSymbol s)
   {
-    map.put(s.getName().toString(),s);
+    try{
+      addMapping(s.getName().toString(),s);
+    }
+    catch(DuplicateName d){
+      User.error(s, d);
+    }
   }
   
   void addSymbols(Collection c)
@@ -43,12 +48,27 @@ class TypeScope
       addSymbol((TypeSymbol)i.next());
   }
 
-  void addMapping(String name, TypeSymbol s)
+  class DuplicateName extends Exception
   {
+    DuplicateName(String name, TypeSymbol old, TypeSymbol nou)
+    {
+      super(name+" is defined twice: old="+
+	    old.location()+", new="+nou.location()+" in "+TypeScope.this);
+    }
+  }
+  
+  void addMapping(String name, TypeSymbol s)
+  throws DuplicateName
+  {
+    Object old = map.get(name);
+    if(old!=null && old!=TypeSymbol.dummy)
+      throw new DuplicateName(name, (TypeSymbol) old, s);
+    
     map.put(name,s);
   }
 
-  void addMappings(Collection names, Collection symbols) throws BadSizeEx
+  void addMappings(Collection names, Collection symbols) 
+  throws BadSizeEx, DuplicateName
   {
     Iterator is;
     if(symbols==null)
@@ -101,7 +121,7 @@ class TypeScope
 
 	      if(map.containsKey(fullName))
 		return (TypeSymbol)map.get(fullName);
-
+	      
 	      tc = JavaTypeConstructor.lookup(fullName);
 	      if(tc!=null)
 		return tc;

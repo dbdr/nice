@@ -12,7 +12,7 @@
 
 // File    : JavaMethodDefinition.java
 // Created : Tue Nov 09 11:49:47 1999 by bonniot
-//$Modified: Tue May 16 15:26:22 2000 by Daniel Bonniot $
+//$Modified: Fri May 26 12:39:26 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -168,7 +168,7 @@ public class JavaMethodDefinition extends MethodDefinition
   {
     if(declaredMethods.get(m)!=null)
       return null;
-
+    
     JavaMethodDefinition md = JavaMethodDefinition.make(m, true);
     declaringClass.addConstructor(md);
     return md;
@@ -296,7 +296,10 @@ public class JavaMethodDefinition extends MethodDefinition
 
     declaredMethods.put(reflectMethod, Boolean.TRUE);
 
-    if(reflectMethod.getStaticFlag() || methodName.equals("<init>"))
+    //if (reflectMethod.isConstructor())
+    //.addConstructor(this);
+    
+    if(reflectMethod.getStaticFlag() || reflectMethod.isConstructor())
       javaArity=arity;
     else
       javaArity=arity-1;

@@ -12,7 +12,7 @@
 
 // File    : ClassDefinition.java
 // Created : Thu Jul 01 11:25:14 1999 by bonniot
-//$Modified: Tue May 16 17:08:39 2000 by Daniel Bonniot $
+//$Modified: Fri May 26 17:59:42 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -87,13 +87,12 @@ abstract public class ClassDefinition extends Definition
     else
       {
 	this.typeParameters = typeParameters;
-	addTypeSymbols(typeParameters);    
+	//addTypeSymbols(typeParameters);    
       }
 
     this.extensions=extensions;
 
     this.tc=new TypeConstructor(this);
-    addTypeSymbol(this.tc);
     
     this.implementations=addChildren(implementations);
     this.abstractions=addChildren(abstractions);
@@ -264,7 +263,13 @@ abstract public class ClassDefinition extends Definition
   
   ClassType javaSuperClass()
   {
-    Type res = javaClass(abstractClass().distinguishedSuperClass());
+    ClassDefinition abs = abstractClass();
+    Type res;
+    if(abs.extensions.size()==0)
+      res = gnu.bytecode.Type.pointer_type;
+    else
+      res = ((TypeConstructor) abs.extensions.get(0)).getJavaType();
+    
     if(!(res instanceof ClassType))
       Internal.error("Only _Array is not a class type, and it must be final");
     

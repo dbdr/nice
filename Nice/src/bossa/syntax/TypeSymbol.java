@@ -12,7 +12,7 @@
 
 // File    : TypeSymbol.java
 // Created : Fri Jul 09 11:20:46 1999 by bonniot
-//$Modified: Thu Jan 20 12:19:02 2000 by bonniot $
+//$Modified: Wed May 24 16:04:13 2000 by Daniel Bonniot $
 // Description : Used to lookup type names
 //   Separed from VarSymbol since it can only appear in types 
 //   (and New expression)
@@ -37,5 +37,5 @@ public interface TypeSymbol extends Located
    * Used for the search of java classes, as the type symbol
    * of type binders. See MethodBodyDefinition.
    */
-  static TypeSymbol dummy = new TypeConstructor(new LocatedString("dummy type symbol", Location.nowhere()));
+  static TypeSymbol dummy = new TypeConstructor(new LocatedString("dummy type symbol", Location.nowhereAtAll()));
 }

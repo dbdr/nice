@@ -12,7 +12,7 @@
 
 // File    : BossaClass.java
 // Created : Thu Jul 01 11:25:14 1999 by bonniot
-//$Modified: Fri May 19 14:32:21 2000 by Daniel Bonniot $
+//$Modified: Fri May 26 18:01:42 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -41,7 +41,6 @@ public class BossaClass extends ClassDefinition
    * @param extensions a list of TypeConstructors
    * @param implementations a list of Interfaces
    * @param abstractions a list of Interfaces
-   * @param fields a list of ClassDefinition.Field
    */
   public BossaClass(LocatedString name, 
 		    boolean isFinal, boolean isAbstract, 
@@ -52,7 +51,7 @@ public class BossaClass extends ClassDefinition
     super(name.cloneLS(), isSharp || isFinal, isFinal, isAbstract, isInterface,
 	  typeParameters, extensions, implementations, abstractions);
 
-    this.simpleName = name;    
+    this.simpleName = name;
     this.isSharp = isSharp;
     
     addTypeSymbol(this.tc);
@@ -131,7 +130,6 @@ public class BossaClass extends ClassDefinition
 	if(f.isLocal==local)
 	  {
 	    result.add(f);
-	    addChild(f.sym);
 	    f.sym.propagate=Node.none; // do not enter into global scope
 	  }
       }
@@ -171,6 +169,26 @@ public class BossaClass extends ClassDefinition
 	  new FieldAccessMethod(this,s.name,s.type,typeParameters);
 
 	addChild(m);
+      }
+  }
+
+  void resolve()
+  {
+    super.resolve();
+    
+    //optim
+    if(fields.size()==0)
+      return;
+    
+    TypeScope localScope = new TypeScope(typeScope);
+    localScope.addSymbols(typeParameters);
+    
+    for(Iterator i=fields.iterator();
+	i.hasNext();)
+      {
+	Field f=(Field)i.next();
+	
+	f.sym.type = f.sym.type.resolve(localScope);
       }
   }
   

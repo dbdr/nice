@@ -12,7 +12,7 @@
 
 // File    : ExpressionRef.java
 // Created : Tue Aug 17 16:04:40 1999 by bonniot
-//$Modified: Mon Apr 03 17:53:31 2000 by Daniel Bonniot $
+//$Modified: Fri May 26 12:38:22 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -51,7 +51,8 @@ final public class ExpressionRef extends Expression
 
   void findJavaClasses() 
   {
-    content.findJavaClasses();
+    // call fJC on the children of content too
+    content.doFindJavaClasses();
   }
 
   void resolve()

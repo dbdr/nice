@@ -12,7 +12,7 @@
 
 // File    : ConstantExp.java
 // Created : Thu Jul 08 15:36:40 1999 by bonniot
-//$Modified: Mon May 22 12:11:38 2000 by Daniel Bonniot $
+//$Modified: Fri May 26 16:19:59 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 

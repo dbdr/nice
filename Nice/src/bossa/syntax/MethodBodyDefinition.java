@@ -12,7 +12,7 @@
 
 // File    : MethodBodyDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Fri May 12 18:17:47 2000 by Daniel Bonniot $
+//$Modified: Wed May 24 16:08:35 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -208,6 +208,9 @@ public class MethodBodyDefinition extends Definition
 	catch(BadSizeEx e) {
 	  Internal.error("Should not happen");
 	}
+	catch(TypeScope.DuplicateName e) {
+	  User.error(this, e);
+	}
       }
 
     if(newTypeVars!=null)
@@ -256,6 +259,9 @@ public class MethodBodyDefinition extends Definition
       User.error(name,
 		 "Method \""+name+"\" expects "+e.expected+
 		 " type parameters");
+    }
+    catch(TypeScope.DuplicateName e) {
+      User.error(this, e);
     }
 
     // We can resolve now

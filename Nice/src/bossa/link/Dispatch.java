@@ -12,7 +12,7 @@
 
 // File    : Dispatch.java
 // Created : Mon Nov 15 10:36:41 1999 by bonniot
-//$Modified: Tue May 16 17:11:48 2000 by Daniel Bonniot $
+//$Modified: Wed May 24 15:04:37 2000 by Daniel Bonniot $
 
 package bossa.link;
 
@@ -261,7 +261,8 @@ public class Dispatch
     module.compileDispatchMethod(lexp);
   }
   
-  private static gnu.expr.Expression compileFieldAccess(FieldAccessMethod method, gnu.expr.Expression value)
+  private static gnu.expr.Expression compileFieldAccess
+    (FieldAccessMethod method, gnu.expr.Expression value)
   {
     ListIterator types = method.classTC.getJavaInstanceTypes();
     
@@ -269,14 +270,14 @@ public class Dispatch
     param[0] = value;
     
     gnu.expr.Expression res =
-      new ApplyExp(new QuoteExp(new kawa.lang.GetFieldProc((gnu.bytecode.ClassType) types.next(),method.fieldName, method.javaReturnType(), gnu.bytecode.Access.PUBLIC)),
+      new ApplyExp(new kawa.lang.GetFieldProc((gnu.bytecode.ClassType) types.next(),method.fieldName, method.javaReturnType(), gnu.bytecode.Access.PUBLIC),
 		   param);
     
     while(types.hasNext())
       {
 	gnu.bytecode.ClassType type = (gnu.bytecode.ClassType) types.next();
 	res = new gnu.expr.IfExp(Alternative.instanceOfExp(value,type),
-			new ApplyExp(new QuoteExp(new kawa.lang.GetFieldProc(type,method.fieldName)),param),
+				 new ApplyExp(new kawa.lang.GetFieldProc(type,method.fieldName),param),
 			res);
       }
     

@@ -558,7 +558,7 @@ public final class K0 {
   }
 
   /**
-   * Enter the initial assertion that x: iid
+   * Enter the initial assertion that x : iid
    **/
   public void initialImplements(int x, int iid) {
     S.assert(S.a&& !hasBeenInitialized);
@@ -566,7 +566,7 @@ public final class K0 {
   }
 
   /**
-   * Enter the initial assertion that x:: iid
+   * Enter the initial assertion that x :: iid
    * This means that no node strictly x may implement iid
    **/
   public void initialAbstracts(int x, int iid) {

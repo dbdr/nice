@@ -12,7 +12,7 @@
 
 // File    : CallExp.java
 // Created : Mon Jul 05 16:27:27 1999 by bonniot
-//$Modified: Sat May 06 16:08:41 2000 by Daniel Bonniot $
+//$Modified: Fri May 26 12:28:16 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -33,14 +33,14 @@ public class CallExp extends Expression
   public CallExp(Expression fun, 
 		 List parameters)
   {
-    this.fun=expChild(fun);
-    this.parameters=expChildren(parameters);
+    this.fun = expChild(fun);
+    this.parameters = expChildren(parameters);
   }
 
   public static CallExp create(Expression fun, 
 			       Expression param1)
   {
-    List params=new ArrayList(1);
+    List params = new ArrayList(1);
     params.add(param1);
     return new CallExp(fun,params);
   }
@@ -48,7 +48,7 @@ public class CallExp extends Expression
   public static CallExp create(Expression fun, 
 			       Expression param1, Expression param2)
   {
-    List params=new ArrayList(2);
+    List params = new ArrayList(2);
     params.add(param1);
     params.add(param2);
     return new CallExp(fun,params);
@@ -95,7 +95,7 @@ public class CallExp extends Expression
 	}
       else
 	{  
-	  String end="not within the domain of function \""+fun+"\"";
+	  String end = "not within the domain of function \""+fun+"\"";
 	  if(parameters.size()>=2)
 	    User.error(loc,"Parameters \n"+
 		       Util.map("(",", ",")",parameters) +
@@ -121,8 +121,8 @@ public class CallExp extends Expression
 				  List /* of Polytype */ parameters)
     throws TypingEx,BadSizeEx,ReportErrorEx
   {
-    Collection dom=funt.domain();
-    Monotype codom=funt.codomain();
+    Collection dom = funt.domain();
+    Monotype codom = funt.codomain();
 
     if(dom==null || codom==null)
       throw new ReportErrorEx("Not a function");
@@ -151,7 +151,7 @@ public class CallExp extends Expression
     }
     
     //computes the resulting type
-    Constraint cst=funt.getConstraint().and(Polytype.getConstraint(parameters));
+    Constraint cst = funt.getConstraint().and(Polytype.getConstraint(parameters));
     cst.and(MonotypeLeqCst.constraint(Polytype.getMonotype(parameters),dom));
     return new Polytype(cst,codom);
   }
@@ -165,7 +165,7 @@ public class CallExp extends Expression
       return;
     overloadingResolved = true;
     
-    parameters=Expression.noOverloading(parameters);
+    parameters = Expression.noOverloading(parameters);
 
     if(parameters.size()>=1)
       {
@@ -217,7 +217,7 @@ public class CallExp extends Expression
   {
     resolveOverloading();
     if(type==null)
-      type=getTypeAndReportErrors(location(),fun,parameters);
+      type = getTypeAndReportErrors(location(),fun,parameters);
   }
 
   boolean isAssignable()

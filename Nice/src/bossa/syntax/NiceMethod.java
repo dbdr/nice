@@ -160,7 +160,10 @@ public class NiceMethod extends UserOperator
     super.resolve();
 
     homonyms = Node.getGlobalScope().lookup(getName());
-    homonyms.remove(getSymbol());
+    if (homonyms.size() == 1)
+      homonyms = null;
+    else
+      homonyms.remove(getSymbol());
   }
 
   void typedResolve()
@@ -200,19 +203,13 @@ public class NiceMethod extends UserOperator
 
   public boolean specializesMethods()
   {
-    //if (homonyms != null)
-    //throw new Error(this.toString());
-
     return specializedMethods != null;
   }
 
   void findSpecializedMethods()
   {
-    if (homonyms.isEmpty())
-      {
-        homonyms = null;
-        return;
-      }
+    if (homonyms == null)
+      return;
 
     Domain ourDomain = Types.domain(getType());
 

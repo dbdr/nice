@@ -23,13 +23,8 @@ import java.util.*;
    @version $Date$
    @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
  */
-public abstract class AtomicConstraint extends Node
+public abstract class AtomicConstraint
 {
-  AtomicConstraint()
-  {
-    super(Node.down);
-  }
-  
   /****************************************************************
    * Scoping
    ****************************************************************/

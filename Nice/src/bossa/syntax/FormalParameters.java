@@ -31,9 +31,9 @@ public class FormalParameters extends Node
   /**
      An anonymous formal parameter.
    */
-  public static class Parameter extends Node
+  public static class Parameter
   {
-    public Parameter(Monotype type) { super(Node.down); this.type = type; }
+    public Parameter(Monotype type) { this.type = type; }
 
     Monotype type;
 
@@ -53,7 +53,7 @@ public class FormalParameters extends Node
 
     boolean isOverriden() { return false; }
 
-    void resolve()
+    void resolve(VarScope scope, TypeScope typeScope)
     {
       if (symbol != null)
 	symbol.state = Symbol.ARGUMENT_REFERENCE;
@@ -225,18 +225,18 @@ public class FormalParameters extends Node
       return new OptionalParameter(type, name, nameRequired, defaultValue, overriden);
     }
 
-    void resolve()
+    void resolve(VarScope scope, TypeScope typeScope)
     {
       defaultValue = dispatch.analyse(defaultValue, scope, typeScope);
       defaultValue = defaultValue.noOverloading();
-      super.resolve();
+      super.resolve(scope, typeScope);
     }
 
     void resolve(Info info)
     {
       defaultValue = dispatch.analyse(defaultValue, info);
       defaultValue = defaultValue.noOverloading();
-      super.resolve();
+      super.resolve(null, null);
     }
 
     void typecheck(mlsub.typing.Monotype domain)
@@ -266,7 +266,7 @@ public class FormalParameters extends Node
 
   public FormalParameters(java.util.List parameters)
   {
-    super(Node.down);
+    super(Node.none);
 
     if (parameters == null)
       return;
@@ -274,25 +274,17 @@ public class FormalParameters extends Node
     this.parameters = 
       (Parameter[]) parameters.toArray(new Parameter[parameters.size()]);
     this.size = this.parameters.length;
-    
-    for (int i = 0; i < size; i++)
-      if (this.parameters[i] != null)
-	addChild(this.parameters[i]);
   }
 
   FormalParameters(Parameter[] parameters)
   {
-    super(Node.down);
+    super(Node.none);
 
     if (parameters == null)
       return;
 
     this.parameters = parameters;
     this.size = parameters.length;
-    
-    for (int i = 0; i < size; i++)
-      if (parameters[i] != null)
-	addChild(parameters[i]);
   }
 
   void addThis(Monotype type)
@@ -301,9 +293,6 @@ public class FormalParameters extends Node
       Internal.error("No room for \"this\"");
     
     parameters[0] = new NamedParameter(type, thisName);
-    // We need to add it as the first child, because the order
-    // is used when refering to previous parameters inside default values.
-    addFirstChild(parameters[0]);
   }
 
   boolean hasThis()
@@ -378,9 +367,10 @@ public class FormalParameters extends Node
       parameters[i].typecheck(domain[i]);
   }
 
-  void doResolve()
+  void resolve()
   {
-    super.doResolve();
+    for (int i = 0; i<size; i++)
+      parameters[i].resolve(scope, typeScope);
 
     for (int i = 0; i<size; i++)
       if (parameters[i].symbol != null)

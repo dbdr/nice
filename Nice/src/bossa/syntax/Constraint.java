@@ -68,14 +68,16 @@ public class Constraint extends Node
   private void construct(List binders, List atomics)
   {
     if(binders==null)
-      binders = noBinders;
+      binders = Collections.EMPTY_LIST;
     else
       addTypeSymbols(binders);
     this.binders = binders;
-    this.atomics = addChildren(atomics);
-  }
 
-  private static final List noBinders = new ArrayList(0);
+    if (atomics == null)
+      this.atomics = Collections.EMPTY_LIST;
+    else
+      this.atomics = atomics;
+  }
 
   /**
    * The trivial constraint.
@@ -213,7 +215,7 @@ public class Constraint extends Node
   void addFirstBinder(TypeSymbol s)
   {
     // avoid the modification of the shared empty list
-    if (binders == noBinders)
+    if (binders == Collections.EMPTY_LIST)
       binders = new ArrayList(4);
 
     binders.add(0, s);
@@ -226,7 +228,7 @@ public class Constraint extends Node
   void addBinder(TypeSymbol s)
   {
     // avoid the modification of the shared empty list
-    if (binders == noBinders)
+    if (binders == Collections.EMPTY_LIST)
       binders = new ArrayList(4);
 
     if(!binders.contains(s))

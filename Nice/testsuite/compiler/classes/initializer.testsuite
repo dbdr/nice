@@ -3,19 +3,19 @@
   /// Toplevel
   let int cst = 42;
 
-  class A 
+  class A
   {
     int i;
 
-    { 
-      int j = i; 
+    {
+      int j = i;
       assert j == cst;
     }
   }
 
 /// FAIL
   /// Toplevel
-  class A 
+  class A
   {
     int i;
     { int j = i + true; }
@@ -30,7 +30,7 @@
   assert ok;
 
   /// Toplevel
-  class A 
+  class A
   {
     { throw new Error(); }
   }
@@ -46,7 +46,7 @@
   assert ok;
 
   /// Toplevel
-  class A 
+  class A
   {
     { throw new Error(); }
   }
@@ -60,7 +60,7 @@
   let dummy = new B();
 
   /// Toplevel
-  class A 
+  class A
   {
     void foo();
     foo() {}
@@ -89,7 +89,7 @@ class test {
   {this.doTest();}
   void doTest() {}
 }
-	
+
 class test2 {
   {this.doTest2();}
   void doTest2() {}
@@ -112,10 +112,10 @@ class A
 class A
 {
   boolean initialised = false;
-  { 
+  {
     let b1 = true, b2 = true;
     if (b1 && b2)
-      initialised = true; 
+      initialised = true;
   }
 }
   /// package b import a
@@ -178,7 +178,7 @@ class A
     {
       this.foo((String s) => {});
     }
-  
+
     void foo(String->void f) {
       (f)("xyz");
     }
@@ -190,11 +190,11 @@ class A
   // Capture of 'this' inside an initializer
   let dummy = new TestA(a: "ABC").b.equals("ABC");
   /// Toplevel
-class TestA 
+class TestA
 {
   String a;
   String b = "";
-  { 
+  {
     let f = (String l) => this;
     b = f("").a;
   }
@@ -216,3 +216,38 @@ class B extends A {
 }
 
 void fst(int i) {}
+
+/// PASS
+  // Test subclassing in a different package
+  /// package a
+  /// Toplevel
+class A {
+  boolean a = false;
+  { a = true; }
+}
+
+  /// package b import a
+  let b = new B();
+  assert b.a && b.b;
+  /// Toplevel
+class B extends A {
+  boolean b = false;
+
+  { b = true; }
+}
+
+/// PASS
+  let a = new A("foo");
+  // Check that the initializer has been executed only once
+  assert a.i == 4;
+  /// Toplevel
+class A
+{
+  int i = 0;
+
+  {
+    i++;
+  }
+}
+
+new A(String s) { this(i: s.length); }

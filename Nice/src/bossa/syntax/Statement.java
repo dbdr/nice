@@ -32,6 +32,8 @@ public abstract class Statement
     setLocation(location);
   }
 
+  public static final Statement[] noStatements = new Statement[0];
+
   /****************************************************************
    * Code generation
    ****************************************************************/

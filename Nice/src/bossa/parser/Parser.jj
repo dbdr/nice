@@ -970,8 +970,17 @@ ClassDefinition classDefinition(List definitions):
    "{"
    { NiceClass impl = new NiceClass(res); }
    // internal fields and methods
-   { List fields = new ArrayList(), methods = null; }
+   { List fields = new ArrayList(), methods = null, initializers = null; }
    (
+      // Initializer
+      { Statement init; }
+      init = Block()
+      { 
+        if (initializers == null)
+          initializers = new LinkedList();
+        initializers.add(init);
+      }
+    |
       LOOKAHEAD( getField(null, null) )
       getField(impl, fields)
     |
@@ -995,7 +1004,11 @@ ClassDefinition classDefinition(List definitions):
    "}"
    {
      impl.setFields(fields);
+     if (initializers != null)
+       impl.setInitializers(initializers);
+
      res.setImplementation(impl);
+
      if (methods != null)
        definitions.addAll(methods);
    }

@@ -1,3 +1,17 @@
+nice (0.9.1) unstable; urgency=low
+
+  * A class can now initializers, which are executed each time an instance
+    is created.
+      class A 
+      {
+        // Initializer
+        { 
+	  // Initialization code goes here.
+	}
+      }
+
+ --
+
 nice (0.9.0) unstable; urgency=low
 
   * Implemented dispatch by integer comparison. An example:
@@ -71,7 +85,7 @@ nice (0.9.0) unstable; urgency=low
     Overloading resolving of methods implementation with additional tc's, ...)
   * Improved some error messages.
   
- -- Daniel Bonniot <daniel@blanche>  Fri, 18 Jul 2003 01:40:25 +0200
+ -- Daniel Bonniot <bonniot@users.sourceforge.net>  Fri, 18 Jul 2003 01:40:25 +0200
 
 nice (0.8) unstable; urgency=low
 

@@ -281,7 +281,7 @@ public class FormalParameters extends Node
     return parameters != null && parameters[0].match("this");
   }
 
-  private LocatedString thisName = 
+  static final LocatedString thisName = 
     new LocatedString("this", Location.nowhere());
 
   /**

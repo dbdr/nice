@@ -110,7 +110,9 @@ class Constructor extends MethodDeclaration
        (Type[]) argTypes.toArray(new Type[argTypes.size()]), 
        (MonoSymbol[]) args.toArray(new MonoSymbol[args.size()]));
 
-    Expression[] body = new Expression[1 + fields.length];
+    Expression[] body = 
+      new Expression[1 + fields.length + classe.nbInitializers()];
+
     body[0] = callSuper(thisExp, fullArgs, omitDefaults);
 
     final int superArgs = fullArgs.length - fields.length;
@@ -127,8 +129,12 @@ class Constructor extends MethodDeclaration
           // Use the default value.
           fieldValue = value.compile();
 
-        body[ i + 1] = fields[i].method.compileAssign(thisExp, fieldValue);
+        body[1 + i] = fields[i].method.compileAssign(thisExp, fieldValue);
       }
+
+    classe.setThisExp(thisExp);
+    for (int i = 0; i < classe.nbInitializers(); i++)
+      body[1 + fields.length + i] = classe.compileInitializer(i);
 
     Gen.setMethodBody(lambda, new BeginExp(body));
     classe.getClassExp().addMethod(lambda);

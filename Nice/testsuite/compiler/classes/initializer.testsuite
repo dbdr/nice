@@ -1,0 +1,84 @@
+/// PASS
+  new A(i: cst);
+  /// Toplevel
+  let int cst = 42;
+
+  class A 
+  {
+    int i;
+
+    { 
+      int j = i; 
+      assert j == cst;
+    }
+  }
+
+/// FAIL
+  /// Toplevel
+  class A 
+  {
+    int i;
+    { int j = i + true; }
+  }
+
+/// PASS
+  boolean ok = false;
+  try {
+    new A();
+  }
+  catch(Error e) { ok = true; }
+  assert ok;
+
+  /// Toplevel
+  class A 
+  {
+    { throw new Error(); }
+  }
+
+
+/// PASS
+  boolean ok = false;
+  try {
+    new B();
+  }
+  catch(Error e) { ok = true; }
+  catch(Exception e) { ok = false; }
+  assert ok;
+
+  /// Toplevel
+  class A 
+  {
+    { throw new Error(); }
+  }
+  class B extends A
+  {
+    { throw new Exception(); }
+  }
+
+/// PASS bug
+  // Initializers should be executed after all the instance variables are set
+  new B();
+
+  /// Toplevel
+  class A 
+  {
+    void foo();
+    foo() {}
+
+    { this.foo(); }
+  }
+  class B extends A
+  {
+    int i = 1;
+
+    foo() { assert i == 1; }
+  }
+
+/// PASS
+  /// Toplevel
+  class A<T>
+  {
+    T x;
+
+    { T y = x; }
+  }

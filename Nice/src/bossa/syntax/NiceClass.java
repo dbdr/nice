@@ -169,6 +169,7 @@ public class NiceClass extends ClassDefinition.ClassImplementation
     classe.supers = computeSupers();
     localScope = definition.getLocalScope();
     resolveFields();
+    resolveIntitializers();
     createConstructor();
     definition.setJavaType(classe.getType());
   }
@@ -189,6 +190,58 @@ public class NiceClass extends ClassDefinition.ClassImplementation
   }
 
   /****************************************************************
+   * Initializers
+   ****************************************************************/
+
+  private Statement[] initializers = Statement.noStatements;
+
+  public void setInitializers(List inits)
+  {
+    initializers = (Statement[]) inits.toArray(new Statement[inits.size()]);
+  }
+
+  public int nbInitializers() { return initializers.length; }
+
+  private void resolveIntitializers()
+  {
+    if (initializers.length == 0)
+      return;
+
+    VarScope scope = definition.scope;
+    mlsub.typing.Monotype thisType = 
+      Monotype.sure
+      (new mlsub.typing.MonotypeConstructor
+       (definition.tc, definition.getTypeParameters()));
+    thisSymbol = 
+      new MonoSymbol(FormalParameters.thisName, thisType)
+      {
+        gnu.expr.Expression compile()
+        {
+          return NiceClass.this.thisExp;
+        }
+      };
+
+    scope.addSymbol(thisSymbol);
+
+    for (int i = 0; i < initializers.length; i++)
+      initializers[i] = bossa.syntax.dispatch.analyse
+        (initializers[i], definition.scope, localScope, false);
+  }
+
+  private MonoSymbol thisSymbol;
+  private gnu.expr.Expression thisExp;
+
+  void setThisExp(gnu.expr.Expression thisExp)
+  {
+    this.thisExp = thisExp;
+  }
+
+  gnu.expr.Expression compileInitializer(int index)
+  {
+    return initializers[index].generateCode();
+  }
+
+  /****************************************************************
    * Type checking
    ****************************************************************/
 
@@ -197,10 +250,20 @@ public class NiceClass extends ClassDefinition.ClassImplementation
     try {
       for (int i = 0; i < fields.length; i++)
 	fields[i].typecheck(this);
+
+      if (initializers.length != 0)
+        {
+          enterTypingContext();
+          Node.thisExp = new SymbolExp(thisSymbol, definition.location());
+          for (int i = 0; i < initializers.length; i++)
+            bossa.syntax.dispatch.typecheck(initializers[i]);
+        }
     }
     finally {
       if (entered) {
 	entered = false;
+
+        Node.thisExp = null;
 	try {
 	  Typing.leave();
 	}

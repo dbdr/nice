@@ -15,9 +15,10 @@ Description: Extension of Java with parametric types, multi-methods, and more.
  It extends Java with many advanced features:
    * parametric types: this is especially for containers (list, hast-tables)
      and allows for shorter and safer code.
-   * higher-order functions: functions can be manipulated as first-class
-     objects, just like in Lisp and ML. This is much lighter than Java's
-     inner classes in many situations, for instance with listeners in a GUI.
+   * anonymous functions: functions can be created and manipulated as 
+     first-class expressions, just like in Lisp and ML. 
+     This is much lighter than Java's anonymous classes in many situations, 
+     for instance with listeners in a GUI.
    * multi-methods: they allow methods to be defined outside
      classes. This means that new methods can be defined on classes that
      belong to a different package (even in java.*). 

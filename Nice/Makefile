@@ -123,7 +123,6 @@ src/bossa/parser/Parser.java: src/bossa/parser/Parser.jj
 
 bootstrap: parser
 	cd src/gnu/lists && ./withCollections
-	ln -sf nicec bin/nicer
 	mkdir -p classes
 	cd classes; jar xf ../external/gj.jar java
 	-cd src/bossa/syntax && mv -f dispatch.java.bootstrap dispatch.java
@@ -142,7 +141,7 @@ bootstrap: parser
 	rm classes/bossa/syntax/dispatch.class
 	${NICEC} -r bossa.syntax
 	cd src;\
-	${JAVAC} bossa/modules/Package.java nice/tools/runJar.java ../stdlib/nice/lang/rawArray.java gnu/bytecode/dump.java
+	${JAVAC} bossa/modules/Package.java ../stdlib/nice/lang/rawArray.java gnu/bytecode/dump.java
 
 ant:
 	@echo "Building the Ant task definition..."

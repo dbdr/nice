@@ -219,6 +219,9 @@ gnu.expr.QuoteExp QuoteExp_undefined_exp() = native gnu.expr.QuoteExp.undefined_
 GlobalVarScope scope(Module) = native Module.scope;
 GlobalVarScope javaScope() = native Module.javaScope;
 
+void addSymbol(VarScope, VarSymbol) = native void VarScope.addSymbol(Symbol);
+void removeSymbol(VarScope, VarSymbol) = native void VarScope.removeSymbol(Symbol);
+
 // Local Variables:
 // nice-xprogram: "../bin/nicec -d ../classes"
 // End:

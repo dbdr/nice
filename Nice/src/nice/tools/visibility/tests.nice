@@ -1,0 +1,234 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2005                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package nice.tools.visibility;
+
+/**
+   Tests.
+
+   @author Daniel Bonniot (bonniot@users.sf.net)
+ */
+
+void _testSingle()
+{
+  Scope<char> s = new Scope(name: "root", parent: null);
+
+  List<char> res;
+
+  res = s.get("foo");
+  assert res.size == 0;
+
+  s.add("a", 'b');
+  res = s.get("a");
+  assert res.size == 1 && res[0] == 'b';
+
+  res = s.get("root", "a");
+  assert res.size == 1 && res[0] == 'b';
+
+  s.add("a", 'c');
+  res = s.get("a");
+  assert res.size == 2 && res.contains('b') && res.contains('c');
+}
+
+void _testNesting()
+{
+  Scope<char> root = new Scope(name: "root", parent: null);
+  Scope<char> inner = new Scope(name: "inner", parent: root);
+
+  List<char> res;
+
+  res = inner.get("foo");
+  assert res.size == 0;
+
+  root.add("a", 'r');
+  res = inner.get("a");
+  assert res.size == 1 && res[0] == 'r';
+
+  inner.add("a", 'i');
+  res = inner.get("a");
+  assert res.size == 1 && res[0] == 'i';
+
+  res = inner.get("root", "a");
+  assert res.size == 1 && res[0] == 'r';
+
+  inner.add("a", 'j');
+  res = inner.get("a");
+  assert res.size == 2 && res.contains('i') && res.contains('j');
+}
+
+void _testOpen()
+{
+  Scope<char> pkg1 = new Scope(name: "pkg1", parent: null);
+  Scope<char> pkg2 = new Scope(name: "pkg2", parent: null);
+
+  pkg2.add("a", '2', general);
+
+  List<char> res;
+
+  res = pkg1.get("a");
+  assert res.size == 0;
+
+  pkg1.addImplicitOpen(pkg2);
+
+  res = pkg1.get("a");
+  assert res.size == 1 && res[0] == '2';
+
+  pkg1.add("a", '1');
+  res = pkg1.get("a");
+  assert res.size == 1 && res[0] == '1';
+
+  res = pkg1.get("pkg1", "a");
+  assert res.size == 1 && res[0] == '1';
+
+  res = pkg1.get("pkg2", "a");
+  assert res.size == 1 && res[0] == '2';
+
+  pkg1.add("a", '0');
+  res = pkg1.get("a");
+  assert res.size == 2 && res.contains('0') && res.contains('1');
+}
+
+void _testNestingOpen()
+{
+  Scope<char> root = new Scope(name: "root", parent: null);
+  Scope<char> pkg1 = new Scope(name: "pkg1", parent: root);
+  Scope<char> pkg2 = new Scope(name: "pkg2", parent: null);
+
+  root.add("a", '0');
+  pkg2.add("a", '2');
+
+  List<char> res;
+
+  res = pkg1.get("a");
+  assert res.size == 1 && res[0] == '0';
+
+  pkg1.addImplicitOpen(pkg2);
+
+  res = pkg1.get("a");
+  assert res.size == 1 && res[0] == '0';
+
+  pkg1.add("a", '1');
+  res = pkg1.get("a");
+  assert res.size == 1 && res[0] == '1';
+
+  res = pkg1.get("root", "a");
+  assert res.size == 1 && res[0] == '0';
+
+  res = pkg1.get("pkg2", "a");
+  assert res.size == 1 && res[0] == '2';
+
+  pkg1.add("a", '+');
+  res = pkg1.get("a");
+  assert res.size == 2 && res.contains('1') && res.contains('+');
+}
+
+void _testMultiOpen()
+{
+  Scope<char> cur = new Scope(name: "cur", parent: null);
+  Scope<char> pkg1 = new Scope(name: "pkg1", parent: null);
+  Scope<char> pkg2 = new Scope(name: "pkg2", parent: null);
+
+  cur.addImplicitOpen(pkg1);
+  cur.addImplicitOpen(pkg2);
+
+  pkg1.add("a", '1', general);
+
+  List<char> res;
+
+  res = cur.get("a");
+  assert res.size == 1 && res[0] == '1';
+
+  pkg2.add("a", '2', general);
+
+  res = cur.get("a");
+  assert res.size == 2 && res.contains('1') && res.contains('2');
+
+  cur.add("a", '0');
+  res = cur.get("a");
+  assert res.size == 1 && res[0] == '0';
+
+  res = cur.get("pkg1", "a");
+  assert res.size == 1 && res[0] == '1';
+
+  res = cur.get("pkg2", "a");
+  assert res.size == 1 && res[0] == '2';
+}
+
+void _testVisibility()
+{
+  Scope<char> root = new Scope(name: "root", parent: null);
+  Scope<char> inner1 = new Scope(name: "inner1", parent: root);
+  Scope<char> inner2 = new Scope(name: "inner2", parent: root);
+
+  List<char> res;
+
+  inner1.add("i", 'i', intimate);
+  res = inner1.get("i");
+  assert res.size == 1 && res[0] == 'i';
+  res = inner2.get("i");
+  assert res.size == 0;
+  res = root.get("i");
+  assert res.size == 0;
+
+  root.add("i", 'r', intimate);
+  res = inner1.get("i");
+  assert res.size == 1 && res[0] == 'i';
+  res = inner1.get("root", "i");
+  assert res.size == 1 && res[0] == 'r';
+  res = inner2.get("root", "i");
+  assert res.size == 1 && res[0] == 'r';
+
+  inner1.add("f", 'f', familial);
+  res = inner1.get("f");
+  assert res.size == 1 && res[0] == 'f';
+  res = inner2.get("f");
+  assert res.size == 1 && res[0] == 'f';
+  res = root.get("f");
+  assert res.size == 1 && res[0] == 'f';
+}
+
+void _testGeneralVisibility()
+{
+  Scope<char> pkg1 = new Scope(name: "pkg1", parent: null);
+  Scope<char> pkg2 = new Scope(name: "pkg2", parent: null);
+
+  pkg1.addImplicitOpen(pkg2);
+
+  pkg2.add("b", '4');
+  pkg2.add("c", '5', familial);
+
+  List<char> res;
+
+  res = pkg1.get("b");
+  assert res.size == 0;
+  res = pkg1.get("c");
+  assert res.size == 0;
+
+  pkg2.add("a", '2', general);
+
+  res = pkg1.get("a");
+  assert res.size == 1 && res[0] == '2';
+
+  pkg1.add("a", '1');
+  res = pkg1.get("a");
+  assert res.size == 1 && res[0] == '1';
+
+  res = pkg1.get("pkg1", "a");
+  assert res.size == 1 && res[0] == '1';
+
+  res = pkg1.get("pkg2", "a");
+  assert res.size == 1 && res[0] == '2'        ;
+
+  pkg1.add("a", '0');
+  res = pkg1.get("a");
+  assert res.size == 2 && res.contains('0') && res.contains('1');
+}

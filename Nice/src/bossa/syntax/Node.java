@@ -170,8 +170,8 @@ abstract public class Node
         this.scope = outer;
         this.typeScope = typeOuter;
         break;
-      case down: 
-	this.scope = new VarScope(outer,varSymbols);
+      case down:
+	this.scope = VarScope.create(outer, varSymbols);
 	this.typeScope = new TypeScope(typeOuter);
 	break;
 
@@ -181,10 +181,10 @@ abstract public class Node
 	typeOuter = globalTypeScope;
 	this.typeScope = typeOuter;
 	break;
-	
+
       case upper:
 	if(outer==null)
-	  outer = new VarScope(null);
+	  outer = VarScope.create(null);
 	outer.addSymbols(varSymbols);
 	this.scope = outer;
 	if(typeOuter==null)

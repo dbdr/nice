@@ -1,0 +1,41 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2005                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package nice.tools.visibility;
+
+/**
+   A generic visibility system.
+
+   @author Daniel Bonniot (bonniot@users.sf.net)
+ */
+
+enum Visibility { intimate, familial, general }
+
+class Scope<Sym>
+{
+  String name;
+  final ?Scope<Sym> parent;
+
+  void add(String, Sym, Visibility visibility = intimate);
+  void remove(String, Sym);
+
+  List<Sym> get(String root, String key);
+  List<Sym> get(String key);
+
+  void addImplicitOpen(Scope<Sym>);
+
+  private MultiMap<String, Sym> map = new MultiMap();
+  private MultiMap<String, Sym> publicMap = new MultiMap();
+
+  private List<Scope<Sym>> opens = new LinkedList();
+  private List<Sym> empty = new Sym[0];
+}

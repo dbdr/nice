@@ -21,26 +21,10 @@ import bossa.util.*;
    @version $Date$
    @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
 */
-public class VarScope
+public abstract class VarScope
 {
-  public VarScope(VarScope outer)
-  {
-    this.outer = outer;
-    this.defs = new HashMultiTable();
-  }
-  
-  public VarScope(VarScope outer, 
-		  Collection /* of VarSymbol */ defs)
-  {
-    this(outer);
-    addSymbols(defs);
-  }
+  abstract void addSymbol(/*VarSymbol*/Symbol s);
 
-  void addSymbol(/*VarSymbol*/Symbol s)
-  {
-    this.defs.put(s.name,s);
-  }
-  
   /**
      Adds a collection of VarSymbols
    */
@@ -56,7 +40,43 @@ public class VarScope
 
       }
   }
-  
+
+  abstract void removeSymbol(/*VarSymbol*/Symbol sym);
+
+  public abstract List lookup(LocatedString i);
+
+  abstract List globalLookup(LocatedString i);
+
+  static VarScope create(VarScope outer)
+  {
+    return new LocalVarScope(outer);
+  }
+
+  static VarScope create(VarScope outer, Collection /* of VarSymbol */ defs)
+  {
+    return new LocalVarScope(outer, defs);
+  }
+}
+
+class LocalVarScope extends VarScope
+{
+  public LocalVarScope(VarScope outer)
+  {
+    this.outer = outer;
+    this.defs = new HashMultiTable();
+  }
+
+  public LocalVarScope(VarScope outer, Collection /* of VarSymbol */ defs)
+  {
+    this(outer);
+    addSymbols(defs);
+  }
+
+  void addSymbol(/*VarSymbol*/Symbol s)
+  {
+    this.defs.put(s.name,s);
+  }
+
   void removeSymbol(/*VarSymbol*/Symbol sym)
   {
     defs.remove(sym.name, sym);

@@ -12,26 +12,40 @@
 
 package bossa.syntax;
 
+import nice.tools.visibility;
+
 /**
    The global scope of symbols.
-
  */
 public class GlobalVarScope extends VarScope
 {
-  lookup(i)
-  {
-    // If there is any method by that name waiting, load it.
-    loadJavaMethods(i.toString(), this);
+  private Scope<VarSymbol> impl = new Scope(name: "", parent: null);
 
-    return super;
+  addSymbol(VarSymbol sym) = impl.add(sym.getName().toString(), sym);
+
+  removeSymbol(VarSymbol sym) = impl.remove(sym.getName().toString(), sym);
+
+  lookup(LocatedString name)
+  {
+    let s = name.toString();
+
+    // If there is any method by that name waiting, load it.
+    loadJavaMethods(s, this);
+
+    let res = impl[s];
+
+    if (res == null)
+      return Collections.EMPTY_LIST;
+    else
+      return new LinkedList(res);
   }
 
-  globalLookup(i) = this.lookup(i);
+  globalLookup(name) = this.lookup(name);
 }
 
 VarScope createGlobalVarScope()
 {
-  return new GlobalVarScope(null);
+  return new GlobalVarScope();
 }
 
 /**

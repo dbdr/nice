@@ -1226,8 +1226,8 @@ Pattern pattern():
       t ="@"
       (
         val=patternLiteral() 
-	{ User.warning(val, 
-          "This syntax is deprecated.\n" +"leave '"+ name+"@' away.");}
+	{ User.warning(name, 
+          "This syntax is deprecated.\n" + "Leave '"+ name+"@' away.");}
       |
         tc=typeIdent()
         [ ":" runtimeTC = typeConstructor() ]

@@ -61,18 +61,19 @@ archive archive2 archive3 share/java/nice.jar: src/nice/tools/compiler.jar
 setDate:
 	cd src/nice/tools/compiler; ./setBuildDate ${VERSION}
 
-deb:
+deb $(CVSBUILDDIR)/$(DEB):
 	@echo Creating Debian package version ${VERSION}
 	env CVSROOT=:pserver:anonymous@cvs.nice.sourceforge.net:/cvsroot/nice cvs-buildpackage -MNice -W${CVSBUILDDIR} -us -uc -rfakeroot -F
 
-.PHONY: dist
-dist ${TARFILE}: $(CVSBUILDDIR)/$(DEB)
+.PHONY: tar
+tar ${TARFILE}: $(CVSBUILDDIR)/$(DEB)
 	rm -rf ${TOP}/dist
 	mkdir ${TOP}/dist
 	cd $(CVSBUILDDIR)/nice-$(VERSION) && $(MAKE) install DESTDIR=${TOP}/dist PREFIX="" 
 	cd ${TOP}/dist && tar -cf ../${TARFILE} . --owner=0 --group=0
 	rm -rf ${TOP}/dist
 
+.PHONY: zip
 zip ${ZIPFILE}: $(CVSBUILDDIR)/$(DEB)
 	mkdir -p /tmp/Nice
 	./bin/nicec --man | groff -mandoc -Thtml - > /tmp/Nice/nicec.html
@@ -81,6 +82,9 @@ zip ${ZIPFILE}: $(CVSBUILDDIR)/$(DEB)
 	ln -sf ${TOP}/lib/emacs/*.el /tmp/Nice/Emacs
 	-rm ${ZIPFILE}
 	cd /tmp && zip -r ${TOP}/${ZIPFILE} Nice
+
+.PHONY: dist
+dist: tar zip
 
 install: share/java/nice.jar
 	mkdir -p ${INSTALLDIR}/bin ${INSTALLDIR}/share/java \

@@ -30,8 +30,8 @@ nice (0.9.0) unstable; urgency=low
       name(=blue) = "blue";
   * Method bodies with a single statement can be written without brackets.
     example: void foo() = throw new Exception; 
-  * Implemented the enhanced syntax for tuples in function declarations:
-      String foo((String s, String t)) = s+t;
+  * It is possible to bind the values of tuple arguments to functions:
+      String foo((String s, String t)) = s + t;
     It also works for anonymous functions:
       List<(String, int)> tuples = new ArrayList();
       tuples.add(("abc", 1));

@@ -5,17 +5,12 @@ nice (0.9.0) unstable; urgency=low
     abs(n>=0) = n;
     abs(n<0) = -n;
     The compiler knows that method abs is covered for all int values.
-    It's also possible to compare with globalconstants:
+    It's also possible to compare with global constants:
     let int bar = 5;
     String foo(int n);
     foo(n<bar) = "smaller than bar";
     foo(bar) = "equal to bar";
     foo(n>bar) = "larger than bar";
-  * The names of the arguments of a default implementation of a method must
-    be the same as the names in the declaration.
-      void foo(int number);
-      foo(number) { ... } //correct
-      //foo(num) { ... } //not valid
   * Added dispatch on String literals. This can be used as a switch on Strings.
       void foo(String color);
       foo("blue") { ... }
@@ -41,10 +36,14 @@ nice (0.9.0) unstable; urgency=low
       name(Blue) = "blue";
       name(Green) = "green";
     The compiler knows now that the method "name" is completely covered.
+  * The names of the arguments of a default implementation of a method must
+    be the same as the names in the declaration.
+      void foo(int number);
+      foo(number) { ... } //correct
+      //foo(num) { ... } //not valid
+    This is important, so that a typo in a global constant or enum name 
+    in a method implementation does not lead to a default implementation.
   * Added operator ** to calculate powers of longs, doubles and BigIntegers.
-  * Added implies operator `->` "a -> b" is the same as "!a || b".
-    This is useful in assertions:
-    assert condition -> condition_that_only_needs_to_be_true_when_the_first_is;
   * The 'char' type is no longer a subtype of int. The integer unicode 
     representation of a character c can be obtained by int(c).
   * Interfaces can now implement (finally or not) abstract interfaces.
@@ -53,7 +52,7 @@ nice (0.9.0) unstable; urgency=low
     recognized, as in Java.
   * Redefining of local variables in their scope is not allowed anymore.
   * Method bodies with a single statement can be written without brackets.
-    example: void foo() = throw new Exception; 
+    example: void foo() = throw new Exception(); 
   * It is possible to bind the values of tuple arguments to functions:
       String foo((String s, String t)) = s + t;
     It also works for anonymous functions:
@@ -72,7 +71,7 @@ nice (0.9.0) unstable; urgency=low
     Overloading resolving of methods implementation with additional tc's, ...)
   * Improved some error messages.
   
- --
+ -- Daniel Bonniot <daniel@blanche>  Fri, 18 Jul 2003 01:40:25 +0200
 
 nice (0.8) unstable; urgency=low
 

@@ -507,18 +507,20 @@ public class MethodBodyDefinition extends Definition
 
   NiceClass declaringClass()
   {
-    try {
-      return (NiceClass) ClassDefinition.get(firstArgument()).implementation;
-    }
-    catch (ClassCastException e) {
-      throw User.error(this, declaration + " is a native method.\nIt can not be overriden because " + formals[0].tc + " is not a class defined in Nice");
-    }
+    ClassDefinition def = ClassDefinition.get(firstArgument());
+
+    if (def == null || ! (def.implementation instanceof NiceClass))
+      throw User.error(this, declaration + " is a native method.\n" + 
+		       "It can not be overriden because " + formals[0].tc + 
+		       " is not a class defined in Nice");
+
+    return (NiceClass) def.implementation;
   }
 
   private void compile (JavaMethod declaration)
   {
     gnu.expr.LambdaExp lexp = createMethod(declaration.getName().toString(), true);
-    
+
     // Compile as a method in the class of the first argument
     declaringClass().addJavaMethod(lexp);
   }

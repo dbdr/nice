@@ -57,3 +57,12 @@ interface A<T>
 class B<T> implements A<T> { B<T> bfield; }
 
 doSomething(b@B) { b.bfield; }
+
+/// FAIL
+  /// Toplevel
+class First {
+  void paint(java.awt.Graphics g);
+}
+paint(p@java.awt.Component, g) {
+  (notNull (g)).drawString("I love java", 20, 20);
+}

@@ -49,6 +49,14 @@ nice (0.9.11)
   * Exit the JVM with exit code 1 when the main program finishes with an
     uncaught exception.
   * Bug fixes (negative int hex literals, ...)
+  * Automatic message is generated for assertions, containing
+    the failed expression and location of the failed assertion
+    (which is useful when the code was stripped from debug symbols,
+    or printStackTraceWithSourceInfo wasn't used).
+  * Forced (always checked) assertions now are available.
+    !assert 0==1; // fails always
+    ?assert 0==1; // fails if assertions enabled
+     assert 0==1; // fails if assertions enabled
 
  --
 

@@ -1111,12 +1111,14 @@ AbstractInterface interfaceDefinition():
 AbstractInterfaceImplementation abstractInterfaceImplementation():
 {
   LocatedString className, interfaceName;
+  boolean _finally = false;
 }
 {
   "class" className=fullyQualifiedName()
+  [ "finally" { _finally = true; } ]
   "implements" interfaceName=ident()
   ";"
-  { return new AbstractInterfaceImplementation(className, interfaceName); }
+  { return new AbstractInterfaceImplementation(className, interfaceName, _finally); }
 }
 
 

@@ -26,16 +26,18 @@ import bossa.util.User;
 
 public class AbstractInterfaceImplementation extends Definition
 {
-  LocatedString className;
-  LocatedString interfaceName;
+  final LocatedString className;
+  final LocatedString interfaceName;
+  final boolean _finally;
 
   public AbstractInterfaceImplementation
-    (LocatedString className, LocatedString interfaceName)
+    (LocatedString className, LocatedString interfaceName, boolean _finally)
   {
     super(className, Node.none);
 
     this.className = className;
     this.interfaceName = interfaceName;
+    this._finally = _finally;
   }
 
   TypeConstructor classTC;
@@ -56,6 +58,8 @@ public class AbstractInterfaceImplementation extends Definition
   {
     try {
       Typing.assertImp(classTC, interfaceITF, true);
+      if (_finally)
+	Typing.assertAbs(classTC, interfaceITF);
     }
     catch(TypingEx ex) {
       User.error(this, "Class " + classTC + " cannot implement " + 

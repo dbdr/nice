@@ -41,3 +41,21 @@
   abstract interface I { void f(); }
   class java.lang.Object implements I;
   f(x@Object) {}
+
+/// PASS
+  /// Toplevel
+
+  abstract interface I {
+    alike f();
+  }
+  class java.io.File finally implements I;
+  f(f@java.io.File) = new java.io.File("foo");
+
+/// FAIL
+  /// Toplevel
+
+  abstract interface I {
+    alike f();
+  }
+  class java.io.File implements I;
+  f(f@java.io.File) = new java.io.File("foo");

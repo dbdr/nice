@@ -125,7 +125,8 @@ TOKEN: /* Operators */
   < EQ:      "="   >
 | < PLUS:    "+"   >
 | < MINUS:   "-"   >
-// | < POWER:   "**"  >
+| < RANGE:   ".."  >
+| < POWER:   "**"  >
 | < MULT:    "*"   >
 | < SLASH:   "/"   >
 | < NEQ:     "!="  >
@@ -1269,7 +1270,7 @@ Statement code():
     // An expression
     { Expression exp; }
     "=" 
-    ( "." "." "." { return null; } // toplevel function in interface file
+    ( ".." "." { return null; } // toplevel function in interface file
     |
     exp=Expression() ";"
     { 
@@ -1929,9 +1930,9 @@ Expression InstanceOfExpression() :
 Expression RelationalExpression() :
 { Expression e1, e2, e3; Token t; e3 = null; }
 {
-  e1=ShiftExpression()
+  e1=RangeExpression()
     [ (
-	( (t=">"|t=">=") e2=ShiftExpression()
+	( (t=">"|t=">=") e2=RangeExpression()
 	  {
             if(e3 == null) e1=CallExp.create(symb(t),e1,e2);
             else e1=CallExp.create(symb("&&",t),e1,CallExp.create(symb(t),e3,e2));
@@ -1939,7 +1940,7 @@ Expression RelationalExpression() :
           }
         )+
       |
-	( (t="<"|t="<=") e2=ShiftExpression()
+	( (t="<"|t="<=") e2=RangeExpression()
 	  {
             if(e3 == null) e1=CallExp.create(symb(t),e1,e2);
             else e1=CallExp.create(symb("&&",t),e1,CallExp.create(symb(t),e3,e2));
@@ -1950,6 +1951,17 @@ Expression RelationalExpression() :
     ]
   { return e1; }
 }
+
+Expression RangeExpression() :
+{ Expression e1,e2; Token t; }
+{
+  e1=ShiftExpression() 
+    ( t=".." e2=ShiftExpression() 
+      { e1=CallExp.create(symb(t),e1,e2); }
+      )*
+  { return e1; }
+}
+
 
 Expression ShiftExpression() :
 { Expression e1,e2; Token t,t1=null; boolean left=false; }
@@ -1984,10 +1996,22 @@ Expression AdditiveExpression() :
 Expression MultiplicativeExpression() :
 { Expression e1,e2; Token t; }
 {
-  e1=UnaryExpression() 
-    ( (t="*"|t="/"|t="%") e2=UnaryExpression() 
+  e1=ExponentialExpression() 
+    ( (t="*"|t="/"|t="%") e2=ExponentialExpression() 
       { e1=CallExp.create(symb(t),e1,e2); }
     )*
+  { return e1; }
+}
+
+
+Expression ExponentialExpression() :
+{ Expression e1,e2; Token t; }
+{
+  e1=UnaryExpression() 
+    // '**' has right associativity
+    [ t="**" e2=ExponentialExpression() 
+      { e1=CallExp.create(symb(t),e1,e2); }
+    ]
   { return e1; }
 }
 

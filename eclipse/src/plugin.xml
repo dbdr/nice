@@ -80,7 +80,7 @@
 		point="org.eclipse.ui.perspectives">
 		<perspective
 			id="net.sf.nice.nice_perspective"
-			name="Nice Perspective"
+			name="Nice"
 			icon="icons/full/cview16/nice.png"
 			class="nice.eclipse.ui.NicePerspectiveFactory">
 		</perspective>

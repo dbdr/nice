@@ -54,4 +54,21 @@ class Tools
       default:  return null;
       }
   }
+
+  /**
+     Decides whether a type represents a stock array type.
+     This is especially useful to decide if an array instruction
+     can be used if the array is possibly polymorphic
+     (i.e. an array that might have primitive or reference elements).
+     Polymorphic array have the bytecode type java.lang.Object
+     and can only be manipulated using the methods in 
+     java.lang.reflect.Array.
+     They are represented at compile time by a special instance of 
+     nice.tools.code.SpecialArray, a subclass of gnu.bytecode.ArrayType.
+  */
+  static boolean monomorphicArray(Type type)
+  {
+    return (type instanceof ArrayType)
+      && ! type.getSignature().equals("Ljava/lang/Object;");
+  }
 }

@@ -38,7 +38,7 @@ extends Procedure3 implements Inlineable
   private ArraySetOp(Type type)
   {
     this.type = type;
-    arrayTarget = new StackTarget(ArrayType.make(type));
+    arrayTarget = new StackTarget(nice.tools.code.SpecialTypes.array(type));
   }
 
   private final Type type;
@@ -50,11 +50,18 @@ extends Procedure3 implements Inlineable
     CodeAttr code = comp.getCode();
     
     args[0].compile(comp, arrayTarget);
+    boolean bytecodeArray = Tools.monomorphicArray(code.topType());
     args[1].compile(comp, Tools.intTarget);
     args[2].compile(comp, type);
     
-    code.emitArrayStore(type);
+    if (bytecodeArray)
+      code.emitArrayStore(type);
+    else
+      code.emitInvokeStatic(reflectGet);
   }
+
+  private static Method reflectGet = 
+    ClassType.make("java.lang.reflect.Array").getDeclaredMethod("set", 3);
 
   public Type getReturnType (Expression[] args)
   {

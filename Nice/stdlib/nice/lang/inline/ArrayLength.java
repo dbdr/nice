@@ -37,17 +37,10 @@ public class ArrayLength extends Procedure1 implements Inlineable
     CodeAttr code = comp.getCode();
     exp.getArgs()[0].compile(comp, Target.pushObject);
 
-    /* 
-       We try to use the 'arraylength'.
-       This is always possible except if we access a special array 
-       (nice.tools.code.SpecialArray) with unknown element type,
-       since this one has the bytecode type java.lang.Object
-    */
-    ArrayType type = (ArrayType) code.topType();
-    if (type.getComponentType() == Type.pointer_type)
-      code.emitInvokeStatic(reflectGetLength);
-    else
+    if (Tools.monomorphicArray(code.topType()))
       code.emitArrayLength();
+    else
+      code.emitInvokeStatic(reflectGetLength);
 
     target.compileFromStack(comp, Type.int_type);
   }

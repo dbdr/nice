@@ -53,7 +53,7 @@ public class SpecialTypes
     //Type.flushTypeChanges();
   }
 
-  static public Type makeArray(Type elements)
+  static public Type array(Type elements)
   {
     if (elements == Type.pointer_type)
       return SpecialArray.unknownTypeArray();

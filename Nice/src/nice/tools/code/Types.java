@@ -98,7 +98,7 @@ public final class Types
 
 	setBytecodeType(param);
 	if (tc != ConstantExp.arrayTC)
-	  Types.set(tc, SpecialTypes.makeArray(javaType(param)));
+	  Types.set(tc, SpecialTypes.array(javaType(param)));
       }
     else
       Types.set(tc, Types.get(rigidTC));
@@ -167,7 +167,7 @@ public final class Types
     else if (tc == ConstantExp.maybeTC)
       return javaType(mc.getTP()[0]));
       else*/ if(tc == ConstantExp.arrayTC)
-      return SpecialTypes.makeArray(javaType(mc.getTP()[0]));
+      return SpecialTypes.array(javaType(mc.getTP()[0]));
     else
       return javaType(tc);
 

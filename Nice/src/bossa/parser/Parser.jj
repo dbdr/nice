@@ -975,7 +975,7 @@ void fieldLookahead():
   ( "=" | ";" )
 }
 
-void getField(CNiceClass c, boolean storeDocString):
+void getField(NiceClass c, boolean storeDocString):
 {
   MonoSymbol field;
   boolean isFinal=false, isTransient = false, isVolatile = false;
@@ -1058,7 +1058,7 @@ TypeDefinition typeDefinition(Constraint cst, List definitions, boolean storeDoc
 )
   ( 
    "{"
-   { CNiceClass impl = new CNiceClass(res); List methods = new ArrayList();}
+   { NiceClass impl = new NiceClass(res); List methods = new ArrayList();}
    // internal fields and methods
    (
       // Initializer

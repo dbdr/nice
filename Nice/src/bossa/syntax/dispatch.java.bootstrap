@@ -47,5 +47,14 @@ public class dispatch
   public static AST createAST(Module module, List defs)
   { return null; }
 
+  public static LocatedString NiceClass_getName(Object nc)
+  { return null; }
+
+  public static gnu.expr.ClassExp NiceClass_createClassExp(Object nc)
+  { return null; }
+
+  public static Definition NiceClass_importMethod(Object nc, gnu.bytecode.Method method)
+  { return null; }
+
   public static void _printStackTraceWithSourceInfo(Throwable t) {}
 }

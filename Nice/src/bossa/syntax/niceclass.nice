@@ -15,10 +15,23 @@ package bossa.syntax;
 import bossa.util.*;
 
 /**
-   Concrete Nice Class definition.
+   Abstract superclass for NiceClass, JavaClass and PrimitiveType
+ */
+public abstract class ClassImplementation
+{
+  void resolveClass();
+  void resolveBody() {}
+  void typecheck() {}
+  void compile() {}
+  void recompile() {}
+  void printInterface(java.io.PrintWriter s);
+}
+
+/**
+   A Nice Class definition.
 
  */
-public class CNiceClass extends NiceClass
+public class NiceClass extends ClassImplementation
 {
   TypeDefinition definition;
 
@@ -56,7 +69,7 @@ public class CNiceClass extends NiceClass
     classe = notNull(definition.module).getClassExp(this);
   }
 
-  getName() = definition.getName();
+  LocatedString getName() = definition.getName();
 
   TypeDefinition getDefinition() = definition;
 
@@ -104,7 +117,7 @@ public class CNiceClass extends NiceClass
 
   public boolean isInterface() = definition instanceof InterfaceDefinition;
   
-  ?CNiceClass getParent()
+  ?NiceClass getParent()
   {
     let superTC = definition.getSuperClass();
     if (superTC == null)
@@ -362,7 +375,7 @@ public class CNiceClass extends NiceClass
     this.addJavaMethod(lambda);
   }
 
-  createClassExp()
+  gnu.expr.ClassExp createClassExp()
   {
     gnu.expr.ClassExp res = new gnu.expr.ClassExp();
     res.setName(this.getName().toString());
@@ -463,7 +476,7 @@ public class CNiceClass extends NiceClass
   {
     let supTC = definition.getSuperClass();
 
-    let ?CNiceClass sup = (supTC == null) ? null : getNiceClass(supTC);
+    let ?NiceClass sup = (supTC == null) ? null : getNiceClass(supTC);
     List<(?MethodDeclaration, List<Parameter>)> res;
     if (sup == null)
       res = this.getNativeConstructorParameters(cast(supTC));
@@ -680,7 +693,7 @@ public class CNiceClass extends NiceClass
     fieldDecl.noteValue(new gnu.expr.QuoteExp(serialVersionUIDValue, nice.tools.code.SpecialTypes.longType));
   }
 
-  importMethod(gnu.bytecode.Method method)
+  ?Definition importMethod(gnu.bytecode.Method method)
   {
     if (method.isConstructor())
       return loadImportedConstructor(this, method);
@@ -733,10 +746,10 @@ class ThisSymbol extends MonoSymbol
 {
   compile() = notNull(declaringClass.thisExp);
   
-  final CNiceClass declaringClass;
+  final NiceClass declaringClass;
 }
 
-CNiceClass createNiceClass(TypeDefinition cdef) = new CNiceClass(definition: cdef);
+NiceClass createNiceClass(TypeDefinition cdef) = new NiceClass(definition: cdef);
 
 private TypeSymbol asTypeSymbol(mlsub.typing.Monotype type)
 {
@@ -752,14 +765,14 @@ private gnu.expr.Expression typeExpression(TypeConstructor tc)
   let c = getTypeDefinition(tc);
   if (c != null && c.getImplementation() instanceof NiceClass)
     {
-      CNiceClass nc = cast(c.getImplementation());
+      NiceClass nc = cast(c.getImplementation());
       return nc.classe;
     }
   else
     return new gnu.expr.QuoteExp(nice.tools.code.Types.javaType(tc));
 }
 
-?CNiceClass getNiceClass(TypeConstructor tc)
+?NiceClass getNiceClass(TypeConstructor tc)
 {
   let res = getTypeDefinition(tc);
   if (res != null && res.getImplementation() instanceof NiceClass)
@@ -768,10 +781,28 @@ private gnu.expr.Expression typeExpression(TypeConstructor tc)
     return null;
 }
 
-public ?CNiceClass getNiceClass(mlsub.typing.Monotype type)
+public ?NiceClass getNiceClass(mlsub.typing.Monotype type)
 {
   if (! nice.tools.typing.Types.isSure(type))
     return null;
 
   return getNiceClass(nice.tools.typing.Types.constructor(type));
+}
+
+public LocatedString NiceClass_getName(Object nc)
+{
+  NiceClass niceC = cast(nc);
+  return niceC.getName();
+}
+
+public gnu.expr.ClassExp NiceClass_createClassExp(Object nc)
+{
+  NiceClass niceC = cast(nc);
+  return niceC.createClassExp();
+}
+
+public ?Definition NiceClass_importMethod(Object nc, gnu.bytecode.Method method)
+{
+  NiceClass niceC = cast(nc);
+  return niceC.importMethod(method);
 }

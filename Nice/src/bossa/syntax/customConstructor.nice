@@ -22,7 +22,7 @@ public class CustomConstructor extends UserOperator
   LocatedString className;
   Statement body;
 
-  ?CNiceClass classe = null;
+  ?NiceClass classe = null;
   private ?VarScope thisScope = null;
   private ?TypeScope thisTypeScope = null;
   ?gnu.expr.Expression initializationCode = null;

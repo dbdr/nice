@@ -607,12 +607,12 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
   **/
   static final String packageClassName = "fun";
 
-  public ClassExp getClassExp(NiceClass def)
+  public ClassExp getClassExp(Object def)
   {
     if (compiling())
-      return def.createClassExp();
+      return bossa.syntax.dispatch.NiceClass_createClassExp(def);
     
-    String name = def.getName().toString();
+    String name = bossa.syntax.dispatch.NiceClass_getName(def).toString();
     ClassType classe = source.readClass(name);
     if (classe == null)
       Internal.error("Compiled class " + def + " was not found");
@@ -624,13 +624,13 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
   }
 
   /** Load methods compiled in a class (custom constructors for now). */
-  private void importMethods(NiceClass def, ClassType classe)
+  private void importMethods(Object def, ClassType classe)
   {
     for(Method method = classe.getMethods();
 	method != null;
 	method = method.getNext())
       {
-        Definition d = def.importMethod(method);
+        Definition d = bossa.syntax.dispatch.NiceClass_importMethod(def, method);
         if (d != null)
           definitions.add(d);
       }

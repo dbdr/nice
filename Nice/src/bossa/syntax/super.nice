@@ -168,7 +168,7 @@ public class SuperExp extends Expression
       // It does not matter which method is called (the super method or
       // the base method), a call to super is emited.
       {
-        let CNiceClass nc = cast(notNull(getTypeDefinition(notNull(currentMethod).firstArgument())).getImplementation());
+        let NiceClass nc = cast(notNull(getTypeDefinition(notNull(currentMethod).firstArgument())).getImplementation());
         code = nc.callSuperMethod(notNull(superMethod));
       }
 

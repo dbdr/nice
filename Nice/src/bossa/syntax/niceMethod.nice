@@ -354,7 +354,7 @@ public gnu.expr.Expression getDispatchMethod(NiceMethod def, Module module)
     }
 
   // Try to compile the dispatch method as a member method if possible.
-  ?CNiceClass receiver;
+  ?NiceClass receiver;
   if (argTypes.length == 0)
     receiver = null;
   else

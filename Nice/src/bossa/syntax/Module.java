@@ -34,6 +34,6 @@ public interface Module extends mlsub.compilation.Module
   gnu.bytecode.Method lookupDispatchClassMethod(String name, String attribute, String value);
   gnu.expr.ReferenceExp addMethod(gnu.expr.LambdaExp method, 
 				  boolean packageMethod);
-  gnu.expr.ClassExp getClassExp(NiceClass def);
+  gnu.expr.ClassExp getClassExp(Object def);
   void addUserClass(gnu.expr.ClassExp classe);
 }

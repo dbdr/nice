@@ -20,7 +20,7 @@ import bossa.util.*;
  */
 abstract class Constructor extends MethodDeclaration
 {
-  CNiceClass classe;
+  NiceClass classe;
   final boolean isDefault;
 
   gnu.expr.Expression getInitializationCode(boolean implicitThis);

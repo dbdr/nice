@@ -197,7 +197,7 @@ public abstract class MethodImplementation extends Definition
     if (def == null || ! (def.getImplementation() instanceof NiceClass))
       return;
 
-    CNiceClass c = cast(def.getImplementation());
+    NiceClass c = cast(def.getImplementation());
 
     gnu.expr.Expression[] params = cast(new gnu.expr.Expression[arity]);
     gnu.expr.LambdaExp method = nice.tools.code.Gen.createMemberMethod

@@ -20,7 +20,7 @@ import bossa.util.*;
  */
 abstract class NiceField
 {
-  CNiceClass declaringClass;
+  NiceClass declaringClass;
   MonoSymbol sym;
   ?Expression value;
   NiceFieldAccess method = cast(null);
@@ -247,7 +247,7 @@ final class OverridenField extends NiceField
 
 public final class ValueOverride
 {
-  CNiceClass declaringClass;
+  NiceClass declaringClass;
   LocatedString name;
   Expression value;
 
@@ -287,7 +287,7 @@ public final class ValueOverride
     @return the scope that maps the type parameters of the other class
       to the corresponding symbol in the constructor of this class.
 */
-private TypeScope translationScope(CNiceClass this, CNiceClass other)
+private TypeScope translationScope(NiceClass this, NiceClass other)
 {
   let binders = other.definition.getBinders();
   let ourBinders = this.definition.getBinders();

@@ -353,7 +353,7 @@ public abstract class TypeDefinition extends MethodContainer
   void precompile()
   {
     let impl = implementation;
-    if (impl != null && impl instanceof CNiceClass)
+    if (impl != null && impl instanceof NiceClass)
       impl.precompile();
   }
 

@@ -70,8 +70,8 @@ fi
 export CLASSPATH
 
 case $progname in
-    nicedoc)	class=nice.tools.doc.fun              ;;
-    niceunit)	class=nice.tools.unit.console.fun     ;;
+    nicedoc)	class=nice.tools.doc.dispatch          ;;
+    niceunit)	class=nice.tools.unit.console.dispatch ;;
     nicec)	class=nice.tools.compiler.console.fun
 
 	system_args="--runtime=${NICEC_JAR}"

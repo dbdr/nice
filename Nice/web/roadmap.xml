@@ -25,7 +25,7 @@ or <ulink url="mailto:bonniot@users.sourceforge.net">privately</ulink>
 
 <para>
 <variablelist>
-<varlistentry><term>0.6 (May 2002)</term>
+<varlistentry><term>0.6 (June 2002)</term>
 <listitem>
 <para>
 Harmonize syntax for function types as 
@@ -43,7 +43,7 @@ class LinkedList<T>
 ...
 LinkedList<int> l = 
   new LinkedList(head: 1, 
-                 tail: new LinkedList(head: 2, null));
+                 tail: new LinkedList(head: 2, tail: null));
 ]]></programlisting>
 </para>
 </listitem>
@@ -51,7 +51,8 @@ LinkedList<int> l =
 <varlistentry><term>0.8 (June 2002)</term>
 <listitem>
 <para>
-Add Java 1.4 style assertions.
+Add various missing Java constructs: synchronized statements
+and Java 1.4 style assertions.
 Also consider more Design By Contract features: pre- and post-conditions, 
 class invariants. These might be part of a later release.
 </para>

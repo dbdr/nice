@@ -336,6 +336,7 @@ typecheck(decl@Block.LocalVariable)
 
 typecheck(decl@Block.LocalConstant)
 {
+  notNull(decl.left).type = notNull(decl.value).getType();
   typecheck(decl.value);
 }
 

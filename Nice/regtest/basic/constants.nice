@@ -16,9 +16,9 @@ package regtest.basic;
    Test local constants.
  */
 
-void test_constants();
-test_constants()
+void test_constants()
 {
   final int x = 1;
   const long y = x + 1;
+  const z = (y == x);
 }

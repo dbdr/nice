@@ -20,7 +20,7 @@ test_tuples()
   (a,b) = min_max(17, 14);
   println("" + a + " < " + b);
 
-  <int, long> t1;
+  <int, long> t1 = (a,b);
   <long, long> t2;
   t2 = t1;
 

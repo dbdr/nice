@@ -25,9 +25,9 @@ stronglyConnectedComponents<T>(start, successors)
   return res;
 }
 
-<Any T> int visit(T, fun(T)(List<T>), Ref<int>, Stack<T>, Map<T,int>,
-		  List<List<T>>);
-visit<T>(node, successors, id, stack, mark, res)
+<Any T> int visit(T node, fun(T)(List<T>) successors, 
+		  Ref<int> id, Stack<T> stack, Map<T,int> mark, 
+		  List<List<T>> res)
 {
   value(id)=value(id)+1;
 
@@ -51,13 +51,14 @@ visit<T>(node, successors, id, stack, mark, res)
   if(equals(min,mark.get(node)))
     {
       Vector<T> scc = makeVector(5);
-      T element;
-      while(element!=node)
+      T element = null;
+      do
 	{
 	  element = stack.pop();
 	  scc.add(element);
 	  mark.put(element,MAX_INT());
 	}
+      while (element != node);
       res.add(scc);
     }
   return min;

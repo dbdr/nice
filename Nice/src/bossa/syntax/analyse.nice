@@ -79,13 +79,20 @@ class Info
   Vector<LabeledStmt> labels;
 
   /* bit 0: point not reachable 
+     bit 1..63: indexed local variable is initialized
+
+     An index is used for only one variable regardless of scope.
+     This sets a hard limit of 63 uninitialized local variables per
+     method/function. 
   */
-  int flags; 
+  long flags; 
+  int varIndex;
+
   boolean getUnreachable() = (this.flags & 1) != 0;
   void setUnreachable() { this.flags |=  1; }
   void setReachable()   { this.flags &= ~1; }
 
-  Stack<int> flagsStack;
+  Stack<long> flagsStack;
 
   void beginInner(boolean reset)
   {
@@ -107,15 +114,29 @@ class Info
   
   void otherCase()
   {
-    int prevResult = this.flagsStack.pop();
-    int outer = this.flagsStack.top();
-    this.flagsStack.push(this.flags & prevResult);
+    long tempResult = this.flagsStack.pop();
+    long outer = this.flagsStack.top();
+
+    // If this branch cannot terminate, ignore it for the rest of 
+    // the computation. Otherwise merge information with previous branches.
+    if (! this.getUnreachable())
+      tempResult &= this.flags;
+    this.flagsStack.push(tempResult);
+
+    // Start the next branch with the state preceding the cases.
     this.flags = outer;
   }
 
   void endCases()
   {
-    this.flags &= this.flagsStack.pop();
+    // If this branch cannot terminate, ignore it for the rest of 
+    // the computation.
+    if (this.getUnreachable())
+      this.flags = this.flagsStack.pop();
+    else
+      this.flags &= this.flagsStack.pop();
+
+    // Discard the state preceding the cases.
     this.flagsStack.pop();
   }
 
@@ -172,9 +193,15 @@ class Info
     symbols.iter(fun(?TypeSymbol s)=>this.typeVars[notNull(s).toString()]=notNull(s));
 }
 
-void setInitialized(?Expression, Info);
-setInitialized(e, i) {}
-setInitialized(e@SymbolExp, i) {}
+void checkInitialized(Block.LocalVariable.Symbol sym, Info info,
+		      ?bossa.util.Location loc)
+{
+  if (sym.index == -1)
+    return;
+
+  if (! info.flags[sym.index])
+    throw error(loc, "Variable " + sym.name + " is not initialized");
+}
 
 ?Expression analyse(?Expression, Info);
 void analyse(?Statement, Info);
@@ -186,11 +213,27 @@ void analyse(?Statement, Info);
 analyse(e@Expression, i) = e;
 analyse(@null(Expression), info) = null;
 
+void setInitialized (Block.LocalVariable.Symbol v, Info info)
+{
+  if (v.index != -1)
+    info.flags |= 1 << v.index;
+}
+
+Expression analyseAssigned(?Expression, Info);
+analyseAssigned(e, i) = analyse(e, i);
+analyseAssigned(e@IdentExp, info) = analyseIdent(e, info, true);
+analyseAssigned(e@TupleExp, info)
+{
+  Array<?Expression> es = notNull(e.expressions);
+  for (int i = 0; i < es.length; i++)
+    es[i] = es[i].analyseAssigned(info);
+  return e;
+}
+
 analyse(e@AssignExp, i)
 {
   e.value = analyse(e.value, i);
-  e.to = analyse(e.to, i);
-  setInitialized(e.to, i);
+  e.to = analyseAssigned(e.to, i);
   return e;
 }
 
@@ -211,7 +254,7 @@ void markAsCallFun(Expression, boolean);
 markAsCallFun(e, infix) {}
 markAsCallFun(e@IdentExp, infix)
 {
-  e.infix = infix;
+  if (infix) e.setInfix();
   e.alwaysOverloadedSymbol = true;
 }
 
@@ -302,16 +345,28 @@ analyse(e@FunExp, info)
   return e;
 }
 
-analyse(e@IdentExp, info)
+analyse(e@IdentExp, info) = analyseIdent(e, info, false);
+
+Expression analyseIdent(IdentExp e, Info info, boolean assigned)
 {
   if (!e.infix) // infix symbols can only come from the global scope
     {
-      ?VarSymbol s = info.lookup(notNull(e.ident).toString());
-      if (s != null)
+      ?VarSymbol sym = info.lookup(notNull(e.ident).toString());
+      if (sym != null)
 	if (!e.alwaysOverloadedSymbol)
-	  return new SymbolExp(s, e.location());
+	  {
+	    if (sym instanceof bossa.syntax.Block$LocalVariable$Symbol)
+	      {
+		Block.LocalVariable.Symbol s = cast(sym);
+		if (assigned)
+		  setInitialized(s, info);
+		else
+		  checkInitialized(s, info, e.location());
+	      }
+	    return new SymbolExp(sym, e.location());
+	  }
 	else
-	  return new OverloadedSymbolExp(s, e.ident);
+	  return new OverloadedSymbolExp(sym, e.ident);
     }
 
   JavaList<VarSymbol> symbols;
@@ -325,15 +380,13 @@ analyse(e@IdentExp, info)
       return new SymbolExp(symbols[0]);
     else
       return new OverloadedSymbolExp(symbols.impl, e.ident);
-
   if (e.enableClassExp)
     return ClassExp.create(e.ident);
 
   //if (e.infix)
     //return e;
 
-  if (true) throw unknownIdent(notNull(e.ident));
-  return null; // work-around pb with non-reachable code
+  throw unknownIdent(notNull(e.ident));
 }
 
 analyse(e@IfExp, info)
@@ -422,6 +475,8 @@ analyse(decl@Block.LocalVariable, info)
 {
   if (decl.value != null)
     decl.value = analyse(decl.value, info);
+  else
+    decl.setIndex(++info.varIndex);
   info.addVar(notNull(decl.left));
 }
 

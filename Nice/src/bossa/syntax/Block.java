@@ -90,6 +90,20 @@ public class Block extends Statement
 
   public static class LocalVariable extends LocalValue
   {
+    static class Symbol extends MonoSymbol
+    {
+      Symbol(LocatedString name, Monotype type)
+      {
+	super(name, type);
+      }
+      
+      /* 
+	 Index to make the initialization analysis or -1 if 
+	 this variable is always initialized.
+       */
+      int index = -1;
+    }
+
     public LocalVariable(LocatedString name, Monotype type, 
 			 boolean constant, Expression value)
     {
@@ -99,7 +113,7 @@ public class Block extends Statement
 	    boolean isAssignable() { return false; }
 	  };
       else
-	this.left = new MonoSymbol(name,type);
+	this.left = new LocalVariable.Symbol(name,type);
       this.last = this;
     }
     
@@ -116,6 +130,16 @@ public class Block extends Statement
     }
 
     MonoSymbol left;
+
+    int getIndex()
+    {
+      return ((LocalVariable.Symbol) left).index;
+    }
+
+    void setIndex(int i)
+    {
+      ((LocalVariable.Symbol) left).index = i;
+    }
 
     public void addNext(LocatedString name, Expression value)
     {

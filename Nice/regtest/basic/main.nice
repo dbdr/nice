@@ -16,7 +16,7 @@ bidon()
 long returnLong();
 returnLong()
 {
-  long j;
+  long j = 1;
   return j=j;
 }
 
@@ -30,7 +30,7 @@ test_discards()
   //id (x); // x is A's field method, of type A->int
 
   A a = new A();
-  int i;
+  int i = 0;
   boolean b = false;
 
   // test how surabondant value is discarded

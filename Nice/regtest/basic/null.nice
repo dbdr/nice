@@ -50,7 +50,7 @@ String double5(?String s) = new String(s != null ? s + s : null);
 
 void f()
 {
-  ?int x;
+  ?int x = 1;
 
   if (x != null)
     x++;

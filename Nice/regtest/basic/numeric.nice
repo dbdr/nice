@@ -12,18 +12,17 @@ test_numeric()
 {
   println("### Testing native numbers ###\n");
 
-  // testing default values
-  boolean bo;
-  byte by;
-  short s;
-  int i;
-  long l;
-  char c;
-  float f;
-  double d;
-  // should do something so that c==0 returns true.
+  // setting to default values
+  boolean bo = false;
+  byte by = 0;
+  short s = 0;
+  int i = 0;
+  long l = 0;
+  char c = '0';
+  float f = 0;
+  double d = 0;
 
-  println("" + (bo==false) + (by==0) + (s==0) + (i==0) + (l==0));
+  println("" + (bo==false) + (by==0) + (s==0) + (i==0) + (l==0) + (c=='0'));
 
   println("" + 14 + " " +
 	  (14 > 17) + (14 > 14) + (17 > 14) + 

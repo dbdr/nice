@@ -103,7 +103,7 @@ main(args)
 	  fun() => { compilation.skipLink = true; }),
 
 
-   // This options is usefull for the compiler itself. 
+   // This options is usefull for compiling the compiler itself. 
    // Should not be advertised since it should not be usefull otherwise
    option('?', "exclude-runtime", 
 	  "Avoid inclusion of the runtime in the archive", 
@@ -141,6 +141,9 @@ main(args)
 
   compilation.setMainPackage(mainPackage);
   make(compilation);
+
+  if (nativeProgram != null)
+    produceNativeProgram(mainPackage, nativeProgram);
   }
   catch(bossa.util.UserError e){
     bossa.util.Internal.warning("user error only caught in main"); 
@@ -168,9 +171,6 @@ main(args)
     }
 
   OutputMessages.exitIfErrors();
-
-  if (nativeProgram != null)
-    produceNativeProgram(mainPackage, nativeProgram);
 
   if (memInfo) printMemoryUsage();
 

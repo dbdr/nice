@@ -73,5 +73,8 @@ public class IdentExp extends Expression
   boolean alwaysOverloadedSymbol;
 
   /** This ident is the function part of an infix call. */
-  boolean infix = false;
+  boolean infix() { return infix; }
+  void setInfix() { infix = true; }
+
+  private boolean infix;
 }

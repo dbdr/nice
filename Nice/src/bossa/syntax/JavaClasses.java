@@ -94,7 +94,7 @@ public final class JavaClasses
     };
   
   private static boolean excluded(gnu.bytecode.Type[] blackList, 
-			   gnu.bytecode.ClassType classType)
+				  gnu.bytecode.ClassType classType)
   {
     for(int i=0; i<blackList.length; i++)
       if(classType==blackList[i])
@@ -128,7 +128,7 @@ public final class JavaClasses
 
     Typing.introduce(res);
     
-    // Recursive searching for java super classes
+    // Recursive search for java super-classes
     if(javaType instanceof gnu.bytecode.ClassType)
       {
 	gnu.bytecode.ClassType superClass = 

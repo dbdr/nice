@@ -4,7 +4,10 @@ nice (0.9.2) unstable; urgency=low
     the clone method.
   * The deprecated 'main(args) { ... }' syntax for the main function is not
     supported anymore. Please use instead: 'void main(String[] args) { ... }'
-  * Bugfixes (incrementation of byte local variables, ...)
+  * Floating point literals are now of type double by default, adding 
+    'f' or 'F' at the end will make them of type float.
+  * Bugfixes (incrementation of byte local variables, require a default value
+    for global variables, ...)
 
  --
 

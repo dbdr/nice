@@ -91,7 +91,7 @@ public class LiteralArrayExp extends Expression
       elementType.simplify();
     else
       /* The context requires a certain element type.
-	 First check that it is compatible with the actuel elements,
+	 First check that it is compatible with the actual elements,
 	 then take it as the element type.
       */
       {
@@ -101,7 +101,6 @@ public class LiteralArrayExp extends Expression
 	} catch(TypingEx ex) {
 	  // this is an error, but it shall be reported elsewhere
 	  // so keep the computed type
-	  System.out.println("Elts: " + elementType + expectedElementType);
 	}
       }
     this.type = new Polytype

@@ -2,4 +2,4 @@
 
 /// FAIL
   int x = 0;
-  x = /*/// FAIL HERE */ x && x = x;
+  x = x /*/// FAIL HERE */ && x = x;

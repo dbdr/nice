@@ -31,7 +31,6 @@ javac = javac
 JAVAC_FLAGS = -O -g
 
 JAVAC= ${javac} -classpath "${TOP}/classes:${TOP}/classes.old" -sourcepath "${TOP}/src:${TOP}/stdlib" -d "${TOP}/classes" $(JAVAC_FLAGS)
-JAVACC= CLASSPATH="${TOP}/external/JavaCC.zip:${CLASSPATH}" ${java} COM.sun.labs.javacc.Main
 JAVADOC=javadoc
 
 NICEC_ARGS= --exclude-runtime 
@@ -151,7 +150,8 @@ web:
 
 parser: src/bossa/parser/Parser.java
 src/bossa/parser/Parser.java: src/bossa/parser/Parser.jj
-	cd src/bossa/parser; ${JAVACC} Parser.jj
+	cd src/bossa/parser; CLASSPATH=`${TOP}/external/javacc` \
+		TOP=${TOP} ${java} javacc Parser.jj
 
 bootstrap: parser
 	cd src/gnu/lists && ./withCollections

@@ -1,0 +1,22 @@
+#! /bin/sh
+
+# Find or download a version of javacc.jar, and print it.
+
+version=javacc-3.2
+
+jar=/usr/share/java/javacc.jar
+if [ -r ${jar} ]; then
+  echo ${jar}
+  exit
+fi
+
+jar=${TOP}/external/javacc.jar
+if [ ! -r ${jar} ]; then
+  
+  wget https://javacc.dev.java.net/files/documents/17/686/${version}.zip \
+    -O ${version}.zip
+  ( cd external; unzip -j ../${version}.zip ${version}/bin/lib/javacc.jar; \
+    rm ../${version}.zip )
+fi
+
+echo ${jar}

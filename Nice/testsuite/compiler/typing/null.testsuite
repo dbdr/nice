@@ -28,3 +28,9 @@ nonnull(x) {}
   f(null, null);
   /// Toplevel
 void f(?String, int ?-> int) {}
+
+/// FAIL
+  /* /// FAIL HERE */ f(null);
+  /// Toplevel
+void f(?String) {}
+void f(?java.io.File) {}

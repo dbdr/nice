@@ -174,7 +174,7 @@ Stack st = new StackImpl(); // we want a stack of strings
 st.push("Element A");
 st.push(new Object()); // invalid code, but not detected
 ...
-String s = (String) st.pop(); // throws a <javaexn name="ClassCastException"/>
+String s = (String) st.pop(); // throws a ClassCastException
 </programlisting>
 </para>
 
@@ -203,19 +203,19 @@ Here here the equivalent in &nice;, using a parameterized interface:
 </para>
 
 <para>
-<programlisting lang="nice">
-interface Stack&lt;T>
+<programlisting lang="nice"><![CDATA[
+interface Stack<T>
 {
   void push(T element);
   T pop();
 }
 
-Stack&lt;String> st = new StackImpl();
+Stack<String> st = new StackImpl();
 st.push("Element A");
 //st.push(new Object()); // type error
 ...
 String s = st.pop(); // no cast needed
-</programlisting>
+]]></programlisting>
 </para>
 
 <para>
@@ -239,7 +239,7 @@ defining the <function>equals</function> method for a user-defined class:
 </para>
 
 <para>
-<programlisting lang="java">
+<programlisting lang="java"><![CDATA[
 class Person
 {
   String name;
@@ -247,14 +247,15 @@ class Person
 
   boolean equals(Object that)
   {
-    if(!(that instanceof Person))
+    if (!(that instanceof Person))
       return false;
+
     return 
        name.equals(((Person) that).name)
-       &amp;&amp; age==((Person) that).age;
+       && age == ((Person) that).age;
   }
 }
-</programlisting>
+]]></programlisting>
 </para>
 
 <para>
@@ -271,7 +272,7 @@ which is present in &nice;. Here is the &nice; code.
 </para>
 
 <para>
-<programlisting lang="nice">
+<programlisting lang="nice"><![CDATA[
 class Person
 {
   String name;
@@ -280,11 +281,11 @@ class Person
   boolean equals(Person that)
   {
     return 
-       this.name.equals(that.name)
-       &amp;&amp; this.age == that.age;
+       name.equals(that.name)
+       && age == that.age;
   }
 }
-</programlisting>
+]]></programlisting>
 </para>
 </section>
 
@@ -325,21 +326,21 @@ null if the argument is not a container:
 </para>
 
 <para>
-<programlisting lang="nice">
-private ?List&lt;Component> children(Component);
+<programlisting lang="nice"><![CDATA[
+private ?List<Component> children(Component);
 
 children(Component c) = null;
 children(ContainerComponent c) = c.getChildren();
-</programlisting>
+]]></programlisting>
 </para>
 
 <para>
 We can now write our example with only:
-<programlisting lang="nice">
+<programlisting lang="nice"><![CDATA[
 Component c = ...;
 
-?List&lt;Component> children = children(c);
-</programlisting>
+?List<Component> children = children(c);
+]]></programlisting>
 </para>
 
 <para>
@@ -359,15 +360,15 @@ can automatically adjust the type of the variable tested to take into
 account that the test succeeded. Therefore, the cast is completely
 useless; there is no reason to ask the programmer to write
 it. Therefore, it is perfectly legal in &nice; to write:
-<programlisting lang="nice">
+<programlisting lang="nice"><![CDATA[
 Component c = ...;
 
-?List&lt;Component> children;
+?List<Component> children;
 if (c instanceof ContainerComponent)
   children = c.getChildren();
 else
   children = null;
-</programlisting>
+]]></programlisting>
 </para>
 
 <para>
@@ -493,19 +494,22 @@ Using two features of &nice;, genericity and higher order functions,
 it is possible to use and write functions that perform the most common
 tasks on arrays, and more generally collections. For instance, a
 simple iteration on the elements
-<programlisting lang="java">
-for (int i = 0; i &lt; a.length; i++)
-  doSomething;
-</programlisting>
+<programlisting lang="java"><![CDATA[
+for (int i = 0; i < a.length; i++)
+  doSomething(a[i]);
+]]></programlisting>
 can also be written in &nice;
 <programlisting lang="nice">
-a.foreach( int i => doSomething );
+a.foreach(doSomething);
 </programlisting>
-Using these functions makes the code somewhat clearer by avoiding the
+Using methods like <literal>foreach</literal> makes the code clearer by 
+avoiding the
 repetition of the loop code over and over. Moreover, it removes the
 risks of wrong indexes, forgetting to increment the index, ...
-Even if a custom looping function is needed, it only has to be checked only
-once and for all.
+It is important to note that <literal>foreach</literal> is not a built-in 
+operator but a normal method defined in the standard library. 
+Therefore, given a user-defined data structure, a new looping function
+can be written and only has to be checked once.
 </para>
 </section>
 

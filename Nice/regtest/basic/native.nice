@@ -11,7 +11,7 @@ package regtest.basic;
 
 import java.io.*;
 
-<Any T> T nop(T) = inline regtest.basic.Nop();
+//<Any T> T nop(T) = inline regtest.basic.Nop();
 
 // rebind static and non-static fields
 String stringS() = native Fields.stringS;
@@ -22,7 +22,7 @@ test_native()
 {
   println("\n### Testing native methods and classes ###\n");
 
-  File f = nop(new File("titi"));
+  File f = new File("titi");
 
   try {
     java.net.ServerSocket s = new java.net.ServerSocket(1235);

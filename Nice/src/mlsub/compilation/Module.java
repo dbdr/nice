@@ -66,5 +66,4 @@ public interface Module
   // should be "static"
   void freezeGlobalContext();
   void unfreezeGlobalContext();
-  void endOfLink();
 }

@@ -55,9 +55,6 @@ make(compilation@mlsub.compilation.Compilation)
     sccs.iter(fun(List<Module> scc) => 
       { compileComponent(scc,
 			 !compilation.skipLink); });
-  
-    if (!compilation.skipLink) 
-      compilation.root.endOfLink();
   }
   catch(bossa.util.UserError e){
     nice.tools.compiler.OutputMessages.error(e.getMessage());

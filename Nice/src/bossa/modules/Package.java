@@ -355,17 +355,29 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
 	
 	bossa.link.Dispatch.test(this);
       }
-  }
-  
-  public void endOfLink()
-  {
+
     if (jar != null)
       closeJar();
-    else if (dispatchClass != null)
-      addClass(dispatchClass);
+    else
+      finishCompilation();
+    
     nice.tools.compiler.OutputMessages.exitIfErrors();
   }
 
+  /**
+     Save the dispatch class generated during link,
+     and ask imported packages to do so too.
+  */
+  private void finishCompilation()
+  {
+    if (dispatchClass == null)
+      return;
+    
+    addClass(dispatchClass);
+    for (Iterator i = getImports().iterator(); i.hasNext();)
+      ((Package) i.next()).finishCompilation();
+  }
+  
   private void saveInterface()
   {
     // do not save the interface 
@@ -519,13 +531,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
   {
     try{
       for (Iterator i = dispatchClasses.iterator(); i.hasNext();)
-	{
-	  ClassType dispatchClass = (ClassType) i.next();
-	  JarEntry dispatchEntry = 
-	    new JarEntry(dispatchClass.getName().replace('.','/') + ".class");
-	  jar.putNextEntry(dispatchEntry);
-	  dispatchClass.writeToStream(jar);
-	}
+	addClass((ClassType) i.next(), true);
       jar.close();
       jar = null;
       jarDestFile = null;
@@ -642,7 +648,12 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     return res;
   }
 
-  public void addClass(ClassType c)
+  public final void addClass(ClassType c)
+  {
+    addClass(c, false);
+  }
+  
+  void addClass(ClassType c, boolean alwaysInJar)
   {
     // if we did not have to recompile, no class has to be regenerated
     if (!sourcesRead)
@@ -654,12 +665,12 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
       else
 	 c.setSourceFile(c.sourcefile);
 
-      boolean putInJar = jar != null && compilation.staticLink;
+      boolean putInJar = jar != null && (alwaysInJar||compilation.staticLink);
       // Jar and Zip files use forward slashes
       char sepChar = putInJar ? '/' : File.separatorChar;
       String filename = c.getName().replace('.', sepChar) + ".class";
 
-      if (jar == null || !compilation.staticLink)
+      if (!putInJar)
 	c.writeToFile(new File(rootDirectory, filename));
       else
 	{
@@ -668,7 +679,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
 	}
     }
     catch(IOException e){
-      User.error(this.name, "Could not write code for " + this, ": " + e);
+      User.error(this.name, "Could not write code for " + this + ": " + e);
     }
   }
 

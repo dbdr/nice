@@ -156,9 +156,6 @@ public abstract class Alternative implements Located
 
     int index = skipFirst ? 1 : 0;
 
-    if (parameters.length == index)
-      return QuoteExp.trueExp;
-
     Expression result = QuoteExp.trueExp;
 
     for(; index<parameters.length; index++)

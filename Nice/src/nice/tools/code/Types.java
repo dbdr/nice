@@ -43,9 +43,19 @@ public final class Types
     tcToGBType.put(tc, type);
   }
   
+  private static void set(Monotype m, Type type)
+  {
+    tcToGBType.put(m, type);
+  }
+  
   public static Type get(TypeConstructor tc)
   {
     return (Type) tcToGBType.get(tc);
+  }
+
+  public static Type get(Monotype m)
+  {
+    return (Type) tcToGBType.get(m);
   }
 
   public static Type javaType(TypeConstructor tc)
@@ -93,14 +103,16 @@ public final class Types
 	  return;
       }
     
-    // Only for arrays, we are interested in the components too
+    /* Only for arrays, we are interested in the components too.
+       It that case we associate the bytecode type to the Nice monotype,
+       not to the type constructor.
+    */
     if (rigidTC == ConstantExp.arrayTC)
       {
 	Monotype param = ((MonotypeConstructor) m).getTP()[0];
 
 	setBytecodeType(param);
-	if (tc != ConstantExp.arrayTC)
-	  Types.set(tc, SpecialTypes.array(javaType(param)));
+	Types.set(m, SpecialTypes.array(javaType(param)));
       }
     else
       Types.set(tc, Types.get(rigidTC));
@@ -160,6 +172,10 @@ public final class Types
 
   private static Type rawJavaType(Monotype m)
   {
+    Type res = get(m);
+    if (res != null)
+      return res;
+
     if (m instanceof TupleType)
       // not SpecialArray
       return ArrayType.make(componentType((TupleType) m));

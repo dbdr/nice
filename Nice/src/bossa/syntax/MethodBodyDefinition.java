@@ -262,7 +262,7 @@ public class MethodBodyDefinition extends Definition
   {
     body = bossa.syntax.dispatch.analyse$0
     (body, scope, typeScope,
-     !definition.getType().codomain().toString().equals("nice.lang.void"));
+     !definition.getReturnType().toString().equals("nice.lang.void"));
   }
   
   /****************************************************************
@@ -280,7 +280,7 @@ public class MethodBodyDefinition extends Definition
 
   public mlsub.typing.Monotype getReturnType()
   {
-    return definition.getType().codomain();
+    return definition.getReturnType();
   }
 
   void typecheck()

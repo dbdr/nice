@@ -202,16 +202,6 @@ public class NiceMethod extends MethodDeclaration
     return dispatchPrimMethod;
   }
   
-  public gnu.bytecode.Type javaReturnType()
-  {
-    return Types.javaType(getType().codomain());
-  }
-  
-  public gnu.bytecode.Type[] javaArgTypes()
-  {
-    return Types.javaType(getType().domain());
-  }
-  
   public void compile()
   {
   }

@@ -177,7 +177,7 @@ abstract public class MethodDeclaration extends Definition
   
   public gnu.bytecode.Type javaReturnType()
   {
-    return Types.javaType(getType().codomain());
+    return Types.javaType(getReturnType());
   }
   
   public gnu.bytecode.Type[] javaArgTypes()
@@ -207,8 +207,9 @@ abstract public class MethodDeclaration extends Definition
       return "method " + getName();
     
     return
-      (syntacticConstraint == null ? "" : syntacticConstraint)
-      + String.valueOf(getType().codomain())
+      (syntacticConstraint != null ? syntacticConstraint
+       : mlsub.typing.Constraint.toString(getType().getConstraint()))
+      + String.valueOf(getReturnType())
       + " "
       + getName().toQuotedString()
       + "("
@@ -248,6 +249,11 @@ abstract public class MethodDeclaration extends Definition
   public final mlsub.typing.Polytype getType()
   {
     return symbol.getType();
+  }
+  
+  public final mlsub.typing.Monotype getReturnType()
+  {
+    return symbol.getType().codomain();
   }
   
   MethodDeclaration.Symbol symbol;

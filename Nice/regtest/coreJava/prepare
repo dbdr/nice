@@ -8,5 +8,10 @@ sed -e /BODY/"r coreJava.code" -e /BODY/d coreJava.java.template \
 sed -e /BODY/"r coreJava.code" -e /BODY/d coreJava.nice.template \
 	> coreJava.nice
 
-javac coreJava.java
-java coreJava > ok.out
+if javac coreJava.java; then
+  java coreJava > ok.out
+  exit $?
+else
+  exit $?
+fi
+

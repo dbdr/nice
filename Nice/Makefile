@@ -20,6 +20,9 @@ clean:
 
 scratch: clean parser recompile
 
+test:
+	cd ${TOP}/regtest; ./regtest
+
 ## Documentation
 
 jdoc:

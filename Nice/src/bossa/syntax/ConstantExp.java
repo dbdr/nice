@@ -12,7 +12,7 @@
 
 // File    : ConstantExp.java
 // Created : Thu Jul 08 15:36:40 1999 by bonniot
-//$Modified: Tue Jun 20 11:12:26 2000 by Daniel Bonniot $
+//$Modified: Thu Jul 20 16:25:45 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -97,11 +97,49 @@ public class ConstantExp extends Expression
 
   public static Expression makeChar(LocatedString value)
   {
-    if(value.toString().length()!=1)
-      User.error(value, "Invalid character constant: "+value);
+    String s = value.toString();
+    char c;
 
-    char c = value.toString().charAt(0);
-    return new ConstantExp(primChar, gnu.text.Char.make(c), "'"+c+"'",
+  findChar:
+    if (s.length() != 0 && s.charAt(0) == '\\')
+      // \ escape sequence. See JLS 3.10.6
+      {
+	if (s.length() == 2)
+	  {
+	    char c2 = s.charAt(1);
+	    switch(c2)
+	      {
+	      case 'b' : c = '\b'; break findChar;
+	      case 't' : c = '\t'; break findChar;
+	      case 'n' : c = '\n'; break findChar;
+	      case 'f' : c = '\f'; break findChar;
+	      case 'r' : c = '\r'; break findChar;
+	      case '\"': c = '\"'; break findChar;
+	      case '\'': c = '\''; break findChar;
+	      case '\\': c = '\\'; break findChar;
+	      }
+	  }
+
+	try{
+	  int code = Integer.parseInt(s.substring(1), 8);
+	  if(code<0 || code>255)
+	    throw new NumberFormatException();
+	  c = (char) code;    
+	}
+	catch(NumberFormatException e){
+	  User.error(value, "Invalid escape sequence: " + value);
+	  c = ' '; // compiler complains about c not being initialized...
+	}
+      }
+    else
+      {
+	if(value.toString().length()!=1)
+	  User.error(value, "Invalid character constant: " + value);
+
+	c = value.toString().charAt(0);
+      }
+    
+    return new ConstantExp(primChar, gnu.text.Char.make(c), "'" + c + "'",
 			   value.location());
   }
 

@@ -15,8 +15,17 @@
 
   //   STRINGS
   p("Hello, world!");
-  p("String " + "concatenation");
+  p("String " + "\t\t" + "\101 concatenation"); // escapes, octal escape
+  p("\u0041\u0042\u0043"); // unicode escapes
+
+  //   CHARS
+
+  p("" + 'A' + '\n' + '\u0201');
   
+  // unicode in identifiers
+  int é = 12;
+  p("" + é);
+
   //   ARITHMETIC
 
   // ints
@@ -40,6 +49,6 @@
   boolean b = false;
   if(b) p("A"); else p("B");
   p(!b ? "A" : (b ? "B" : "C"));
-  
+
 }
 

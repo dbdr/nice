@@ -83,7 +83,23 @@ for subdir in *; do
   # execute package dependant script before compilation
   if [ -x $subdir/prepare ]; then
     echo -n " (preparing...)"
-    (cd $subdir; prepare)
+    if 
+      (cd $subdir
+      if prepare > prepare.out 2>&1; then
+        true
+      else
+        echo "(preparation FAILED)"
+        cat prepare.out
+        exit 1
+      fi
+      ); 
+    then 
+      true
+    else
+      echo "Skipping this package"
+      continue
+    fi
+    
   fi
   echo
 

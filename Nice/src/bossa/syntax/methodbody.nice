@@ -414,7 +414,7 @@ public class MethodBodyDefinition extends MethodImplementation
 
 	Node.currentFunction = this;
 	if (this.hasThis())
-	  Node.thisExp = new SymbolExp(notNull(parameters)[0], this.location());
+	  Node.thisExp = createSymbolExp(notNull(parameters)[0], this.location());
 
 	typecheck(body);
       } catch(UserError ex){

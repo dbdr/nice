@@ -113,7 +113,7 @@ public abstract class MethodImplementation extends Definition
   void resolveBody()
   {
     if (hasThis())
-      Node.thisExp = new SymbolExp(parameters[0], location());
+      Node.thisExp = dispatch.createSymbolExp(parameters[0], location());
 
     try {
       body = bossa.syntax.dispatch.analyseMethodBody

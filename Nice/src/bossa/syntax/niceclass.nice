@@ -232,7 +232,7 @@ public class CNiceClass extends NiceClass
 			definition.getTypeParameters()));
     thisSymbol = new ThisSymbol(FormalParameters.thisName, thisType, declaringClass: this);
 
-    Node.thisExp = new SymbolExp(thisSymbol, definition.location());
+    Node.thisExp = createSymbolExp(notNull(thisSymbol), definition.location());
     scope.addSymbol(thisSymbol);
 
     for (int i = 0; i < initializers.size(); i++)
@@ -294,7 +294,7 @@ public class CNiceClass extends NiceClass
       if (! initializers.isEmpty())
         {
           this.enterTypingContext();
-          Node.thisExp = new SymbolExp(thisSymbol, definition.location());
+          Node.thisExp = createSymbolExp(notNull(thisSymbol), definition.location());
           for (init : initializers)
             typecheck(init);
         }

@@ -34,12 +34,12 @@ public class OverloadedSymbolExp extends Expression
 
   private Expression uniqueExpression()
   {
-    return new SymbolExp(symbols.get(0), this.location());
+    return createSymbolExp(symbols.get(0), this.location());
   }
   
   private Expression uniqueExpression(VarSymbol sym, mlsub.typing.Polytype t)
   {
-    SymbolExp res = new SymbolExp(sym, this.location());
+    SymbolExp res = cast(createSymbolExp(sym, this.location()));
     res.type = t;
     return res;
   }

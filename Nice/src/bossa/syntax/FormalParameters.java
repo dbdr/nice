@@ -119,7 +119,7 @@ public class FormalParameters extends Node
 	return state;
       }
 
-      private java.util.Stack copies;
+      java.util.Stack copies;
 
       public void setDeclaration (gnu.expr.Declaration declaration, 
 				  boolean isThis)
@@ -129,21 +129,6 @@ public class FormalParameters extends Node
     }
 
     private Symbol symbol;
-
-    static class AccessExp extends SymbolExp
-    {
-      AccessExp (Symbol symbol, Location location)
-      {
-	super(symbol, location);
-      }
-
-      public boolean isAssignable () { return false; }
-
-      public gnu.expr.Expression compile ()
-      {
-	return new gnu.expr.CopyArgument(((Symbol) this.getSymbol()).copies);
-      }
-    }
   }
 
   /**

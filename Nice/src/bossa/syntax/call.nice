@@ -223,7 +223,7 @@ public class CallExp extends Expression
     if (function instanceof SymbolExp)
       {
         SymbolExp func = cast(function);
-	Definition def = func.getSymbol().getDefinition();
+	Definition def = func.symbol.getDefinition();
 
 	if (def instanceof RetypedJavaMethod)
           return func.toString() + arguments;

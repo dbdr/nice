@@ -79,7 +79,7 @@ public class NewExp extends CallExp
   {
     JavaMethod method = JavaClasses.getObjectConstructor();
 
-    function = new SymbolExp(method.getSymbol(), ti.location());
+    function = createSymbolExp(method.getSymbol(), ti.location());
   }
 
   toString() = "new " + ti + arguments;

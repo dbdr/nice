@@ -91,7 +91,7 @@ public class DefaultMethodImplementation extends MethodImplementation
 
     Node.currentFunction = this;
     if (hasThis())
-      Node.thisExp = new SymbolExp(parameters[0], location());
+      Node.thisExp = dispatch.createSymbolExp(parameters[0], location());
 
     try{ 
       bossa.syntax.dispatch.typecheck(body);

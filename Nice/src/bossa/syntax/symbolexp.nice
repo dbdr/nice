@@ -1,7 +1,7 @@
 /**************************************************************************/
 /*                                N I C E                                 */
 /*             A high-level object-oriented research language             */
-/*                        (c) Daniel Bonniot 2000                         */
+/*                        (c) Daniel Bonniot 2004                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -12,40 +12,26 @@
 
 package bossa.syntax;
 
-import java.util.*;
 import bossa.util.*;
-import gnu.expr.*;
 
 /**
    Access to a symbol (variable, function parameter).
 
-   @version $Date$
-   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
 */
 public class SymbolExp extends Expression
 {
-  SymbolExp(VarSymbol symbol, Location loc)
-  {
-    this.symbol = symbol;
-    setLocation(loc);
-  }
-  
-  public boolean isAssignable()
-  {
-    return symbol.isAssignable();
-  }
+  final VarSymbol symbol; 
+ 
+  isAssignable() = symbol.isAssignable();
 
-  FieldAccess getFieldAccessMethod()
-  {
-    return symbol.getFieldAccessMethod();
-  }
+  getFieldAccessMethod() = symbol.getFieldAccessMethod();
 
-  void checkSpecialRequirements(Expression[] arguments)
+  checkSpecialRequirements(arguments)
   {
     symbol.checkSpecialRequirements(arguments);
   }
 
-  void computeType()
+  computeType()
   {
     // Very important: each SymbolExp gets a copy of the type of the symbol.
     // Thus it has fresh binders.
@@ -54,15 +40,10 @@ public class SymbolExp extends Expression
     // are two different SymbolExp objects 
     // (with a reference to the same symbol).
     // So they hold different (but equivalent) types.
-
     type = symbol.getType().cloneType();
   }
 
-  /****************************************************************
-   * Code generation
-   ****************************************************************/
-
-  public gnu.expr.Expression compile()
+  compile()
   {
     try {
       return symbol.compile();
@@ -73,11 +54,11 @@ public class SymbolExp extends Expression
     }
   }
   
-  gnu.expr.Expression generateCodeInCallPosition()
+  generateCodeInCallPosition()
   {
     try {
       gnu.expr.Expression res = symbol.compileInCallPosition();
-      location().write(res);
+      this.location().write(res);
       return res;
     }
     catch(FieldAccess.UsingAsValue e) {
@@ -86,12 +67,9 @@ public class SymbolExp extends Expression
     }
   }
   
-  /** @return the declaration of the variable denoted by this expression,
-      or <code>null</code> if this expression is not a variable.
-  */
-  gnu.expr.Declaration getDeclaration()
+  getDeclaration()
   {
-    gnu.expr.Declaration decl = symbol.getDeclaration();
+    let decl = symbol.getDeclaration();
     
     if(decl==null)
       Internal.error(this+" has no bytecode declaration");
@@ -99,24 +77,40 @@ public class SymbolExp extends Expression
     return decl;
   }
   
-  /****************************************************************
-   * Printing
-   ****************************************************************/
-
   public LocatedString getName()
   {
     return symbol.name;
   }
   
-  public String toString()
-  {
-    return symbol.name.toQuotedString();
-  }
+  toString() = symbol.name.toQuotedString();
+}
 
-  VarSymbol getSymbol()
-  {
-    return symbol;
-  }
+Expression createSymbolExp(VarSymbol symbol, Location loc)
+{
+  let res = new SymbolExp(symbol: symbol);
+  res.setLocation(loc);
+  return res;
+}
 
-  private VarSymbol symbol;
+/**
+   Access to a symbol of a previous formal parameter.
+
+*/
+class ParameterAccessExp extends SymbolExp
+{
+  override FormalParameters.Parameter.Symbol symbol;
+
+  isAssignable() = false;
+
+  compile ()
+  {
+     return new gnu.expr.CopyArgument(this.symbol.copies);
+  }
+}
+
+SymbolExp createParameterAccessExp(FormalParameters.Parameter.Symbol symbol, Location loc)
+{
+  let res = new ParameterAccessExp(symbol: symbol);
+  res.setLocation(loc);
+  return res;
 }

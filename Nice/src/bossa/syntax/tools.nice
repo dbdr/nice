@@ -35,7 +35,7 @@ boolean isCallTo(CallExp e, String name)
 localVariable(Expression e) = null;
 localVariable(SymbolExp e)
 {
-  let sym = e.getSymbol();
+  let sym = e.symbol;
   if (! (sym instanceof bossa.syntax.MonoSymbol))
     return null;
 

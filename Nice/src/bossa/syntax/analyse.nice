@@ -502,7 +502,7 @@ Expression analyseIdent(IdentExp e, Info info, boolean assigned)
 	  if (e.alwaysOverloadedSymbol)
 	    return createOverloadedSymbolExp(sym, notNull(e.ident));
 	  else
-	    return new SymbolExp(sym, e.location());
+	    return createSymbolExp(sym, e.location());
 	}
     }
 
@@ -525,7 +525,7 @@ Expression analyseIdent(IdentExp e, Info info, boolean assigned)
 	        throw error(e, "Parameter " + e + " is not accessible");
 
 	      if (state == 1/*XXX: FormalParameters.Parameter.Symbol.ARGUMENT_REFERENCE*/)
-		  return new FormalParameters.Parameter.AccessExp(sym, e.location());
+		  return createParameterAccessExp(sym, e.location());
 	      // Otherwise, we are in the normal case.
 	    }
 
@@ -546,7 +546,7 @@ Expression analyseIdent(IdentExp e, Info info, boolean assigned)
               return res;
 	    }
 
-	  return new SymbolExp(sym, e.location());
+	  return createSymbolExp(sym, e.location());
         }
       else
         return createOverloadedSymbolExp(symbols, notNull(e.ident));

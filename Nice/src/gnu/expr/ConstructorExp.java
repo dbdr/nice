@@ -28,13 +28,11 @@ public class ConstructorExp extends LambdaExp
     this.thisDecl = thisDecl;
     this.classType = (ClassType) thisDecl.getType();
     thisDecl.context = this;
-    this.primary = true;
   }
 
   public ConstructorExp(ClassType classType)
   {
     this.classType = classType;
-    this.primary = false;
   }
 
   public void setSuperCall(Expression superCall)
@@ -45,7 +43,6 @@ public class ConstructorExp extends LambdaExp
   private Declaration thisDecl;
   private ClassType classType;
   private Expression superCall;
-  private boolean primary;
 
   ClassType getClassType() { return classType; }
 
@@ -91,8 +88,8 @@ public class ConstructorExp extends LambdaExp
 
   void enterFunction (Compilation comp)
   {
-    if (primary)
-      // The super call has to come before anything else.
+    // The super call has to come before anything else.
+    if (superCall != null)
       superCall.compile(comp, Target.Ignore);
 
     // Do the normal stuff.

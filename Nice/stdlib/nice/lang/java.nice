@@ -97,14 +97,14 @@ DateFormat getDateInstance(int style) = native DateFormat DateFormat.getDateInst
 <T> boolean hasNext(Iterator<T>) = native boolean Iterator.hasNext();
 <T> T next(Iterator<T>) = native Object Iterator.next();
 <T> void remove(Iterator<T>) = native void Iterator.remove();
-<T,U | U <: T> void add(ListIterator<T>, U) = native void ListIterator.add(Object);
+<T> void add(ListIterator<T>, T) = native void ListIterator.add(Object);
 <T> boolean hasPrevious(ListIterator<T>) = native boolean ListIterator.hasPrevious();
 <T> int nextIndex(ListIterator<T>) = native int ListIterator.nextIndex();
 <T> T previous(ListIterator<T>) = native Object ListIterator.previous();
 <T> int previousIndex(ListIterator<T>) = native int ListIterator.previousIndex();
-<T,U | U <: T> void set(ListIterator<T>, U) = native void ListIterator.set(Object);
+<T> void set(ListIterator<T>, T) = native void ListIterator.set(Object);
 <T> int compare(Comparator<T>, T, T) = native int Comparator.compare(Object, Object);
-<T,U | U <: T> ?Comparator<U> comparator(SortedSet<T>) = native Comparator SortedSet.comparator();
+<T> ?Comparator<T> comparator(SortedSet<T>) = native Comparator SortedSet.comparator();
 <T> T first(SortedSet<T>) = native Object SortedSet.first();
 <T> T last(SortedSet<T>) = native Object SortedSet.last();
 <T,U | T <: U> SortedSet<T> headSet(SortedSet<T>, U) = native SortedSet SortedSet.headSet(Object);
@@ -114,7 +114,7 @@ DateFormat getDateInstance(int style) = native DateFormat DateFormat.getDateInst
 <K,V> void clear(Map<K,V>) = native void Map.clear();
 <K,V> boolean isEmpty(Map<K,V>) = native boolean Map.isEmpty();
 <K,V> int size(Map<K,V>) = native int Map.size();
-<K,V,T | K <: T> ?Comparator<T> comparator(SortedMap<K,V>) = native Comparator SortedMap.comparator();
+<K,V> ?Comparator<K> comparator(SortedMap<K,V>) = native Comparator SortedMap.comparator();
 <K,V> K firstKey(SortedMap<K,V>) = native Object SortedMap.firstKey();
 <K,V> K lastKey(SortedMap<K,V>) = native Object SortedMap.lastKey();
 <K,V,L | K <: L> SortedMap<K,V> headMap(SortedMap<K,V>, L) = native SortedMap SortedMap.headMap(Object);
@@ -196,15 +196,15 @@ DateFormat getDateInstance(int style) = native DateFormat DateFormat.getDateInst
 <K,K0,V,V0 | K0 <: K, V0 <: V> Hashtable<K,V> Hashtable(Map<K0,V0>) = native new Hashtable(Map);
 <T> TreeSet<T> TreeSet() = native new TreeSet();
 <T,U | U <: T> TreeSet<T> TreeSet(Collection<U>) = native new TreeSet(Collection);
-<T,U | T <: U> TreeSet<T> TreeSet(Comparator<U>) = native new TreeSet(Comparator);
+<T> TreeSet<T> TreeSet(Comparator<T>) = native new TreeSet(Comparator);
 <T> TreeSet<T> TreeSet(SortedSet<T>) = native new TreeSet(SortedSet);
 <K,V> TreeMap<K,V> TreeMap() = native new TreeMap();
-<K,V,T | K <: T> TreeMap<K,V> TreeMap(Comparator<T>) = native new TreeMap(Comparator);
+<K,V> TreeMap<K,V> TreeMap(Comparator<K>) = native new TreeMap(Comparator);
 <K,K0,V,V0 | K0 <: K, V0 <: V> TreeMap<K,V> TreeMap(Map<K0,V0>) = native new TreeMap(Map);
 <K,V> TreeMap<K,V> TreeMap(SortedMap<K,V>) = native new TreeMap(SortedMap);
 
 interface Collection<T> = native java.util.Collection;
-interface Comparator<T> = native java.util.Comparator;
+interface Comparator<-T> = native java.util.Comparator;
 interface Enumeration<T> = native java.util.Enumeration;
 interface List<T> extends Collection<T> = native java.util.List;
 interface Set<T> extends Collection<T> = native java.util.Set;
@@ -319,11 +319,11 @@ class Vector<T> extends AbstractList<T> = native java.util.Vector;
 <T> void shuffle(List<T>) = native void Collections.shuffle(List);
 <T> void shuffle(List<T>, Random) = 
   native void Collections.shuffle(List, Random);
-<T,U | T <: U> T max(Collection<T>, Comparator<U>) = 
+<T> T max(Collection<T>, Comparator<T>) = 
   native Object Collections.max(Collection, Comparator);
-<T,U | T <: U> T min(Collection<T>, Comparator<U>) = 
+<T> T min(Collection<T>, Comparator<T>) = 
   native Object Collections.max(Collection, Comparator);
-<T, U | T <: U> void sort(List<T>, Comparator<U>) = 
+<T> void sort(List<T>, Comparator<T>) = 
   native void Collections.sort(List, Comparator);
 <T> void swap(List<T>, int, int) =
   native void Collections.swap(List, int, int);
@@ -335,11 +335,11 @@ class Vector<T> extends AbstractList<T> = native java.util.Vector;
   native int Collections.indexOfSubList(List, List);
 <T,U | T <: U> int lastIndexOfSubList(List<T>, List<U>) =
   native int Collections.lastIndexOfSubList(List, List);
-<T,U,V | T <: U, T <: V> int binarySearch(List<T>, U, Comparator<V>) = 
+<T,U | T <: U> int binarySearch(List<T>, U, Comparator<T>) = 
   native int Collections.binarySearch(List, Object, Comparator);
-<T,U | T <: U> List<U> singletonList(T) = 
+<T> List<T> singletonList(T) = 
   native List Collections.singletonList(Object);
-<K,K0,V,V0 | K <: K0, V <: V0> Map<K0,V0> singletonMap(K, V) =
+<K,V> Map<K,V> singletonMap(K, V) =
   native Map Collections.singletonMap(Object, Object);
 <T> Collection<T> synchronizedCollection(Collection<T>) =
   native Collection Collections.synchronizedCollection(Collection);

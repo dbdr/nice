@@ -174,7 +174,7 @@ similarEmptyCollection(c#Stack) = new Stack();
   Collections.sort(list, new NiceComparator(comparator: comparator));
 }
 
-class NiceComparator<T> implements java.util.Comparator
+class NiceComparator<-T> implements java.util.Comparator<T>
 {
   final (T,T) -> int comparator;
 

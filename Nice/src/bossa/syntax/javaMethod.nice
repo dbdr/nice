@@ -211,8 +211,15 @@ void fetchMethods(mlsub.typing.TypeConstructor tc, gnu.bytecode.ClassType classT
     classType.addMethods();
 
     for (?gnu.bytecode.Field f = classType.getFields(); f != null; f = f.getNext())
-      if (retyped.get(f) == null)
-        addJavaSymbol(f, makeJavaFieldAccess(f));
+      {
+	// Ignore non-public fields in a "java*" package
+	if ((f.getModifiers() & gnu.bytecode.Access.PUBLIC) == 0 &&
+	    classType.getName().startsWith("java"))
+	  continue;
+
+	if (retyped.get(f) == null)
+	  addJavaSymbol(f, makeJavaFieldAccess(f));
+      }
 
     for (?gnu.bytecode.Method m = classType.getMethods(); m != null; m = m.getNext())
       {

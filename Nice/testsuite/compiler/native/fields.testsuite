@@ -30,6 +30,6 @@ void foo(char) {}
   // Access to private field (possibly, depending on the runtime used)
   let v = ""./*/// FAIL HERE*/ value;
 
-/// FAIL bug
+/// FAIL
   // Access to protected field
-  let f = javax.swing.JComboBox b => b.actionCommand;
+  let f = javax.swing.JComboBox b => b./*/// FAIL HERE */ actionCommand;

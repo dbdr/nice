@@ -556,8 +556,8 @@ Mode for editing/compiling Nice programs.
     ((eq exit-status 1) '("Compiler bug" . "Bug"))
     ((eq exit-status 2) (save-excursion (next-error) '("error" . "error")))
     ((eq exit-status 3) '("successful with warning" . "warning"))
-    (t '("Unknown exit status" . ""))
-  ) 
+    (t `(,(concat "Unknown exit status: " (int-to-string exit-status)) . "?"))
+  )
 ))
 
 (defun nice-compilation-finish-function (buffer result)

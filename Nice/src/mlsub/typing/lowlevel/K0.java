@@ -870,6 +870,9 @@ public final class K0 {
             _toCollapse.or(lx);
           }
           if (x != y && !C.get(y, x)) {
+            // If x is a rigid variable, this is a clash.
+            if (x < m0)
+              throw new LowlevelRigidClash(indexToString(x), indexToString(y));
             // set y < x
             C.set(y, x);
             Ct.set(x, y);

@@ -1,10 +1,10 @@
-/// PASS bug
+/// PASS
   String[] oa2 = ["abc"];
   System.out.println(""+equals([null], oa2));
   /// Toplevel
   <T,U,V | U <: T, V <: T> boolean equals(U[], V[]) = native boolean Arrays.equals(Object[],Object[]);
 
-/// PASS bug
+/// PASS
   String[] sa1 = ["xyz"];
   eq2(sa1, [null]);
   /// Toplevel
@@ -12,7 +12,7 @@
   <Any T> boolean eq2(!T,!T) = true;
   <Any T> boolean eq2(?T, ?T) = false;
   
-/// PASS bug
+/// PASS
   List<String> list1 = new ArrayList();
   List<int> list2 = new ArrayList();
   test(list1,list2);

@@ -14,6 +14,10 @@ import java.util.*;
 <java.util.Collection C, Any T, Any U> C<U> map(C<T>, T->U);
 <java.util.Collection C, Any T> C<T> filter(C<T>, T->boolean);
 
+// A more precise type for filter would be:
+// <Collection C, T, U | T <: U> C<U> filter(C<T>, T -> boolean);
+// This would allow List<A> lA = lB.filter(...) where B is a subclass of A.
+
 <Any T, Any U> U foldLeft(java.util.List<T> l, (U, T)->U f, U init)
 {
   U res = init;
@@ -100,21 +104,21 @@ filter(c, f)
 filter<C,T>(c#ArrayList, test)
 {
   ArrayList<T> res = new ArrayList(c.size());
-  c.iter(fun(T elem) => { if(test(elem)) res.add(elem); });
+  c.iter(T elem => { if(test(elem)) res.add(elem); });
   return res;
 }
 
 filter<C,T>(c#java.util.Vector, test)
 {
   java.util.Vector<T> res = new java.util.Vector(c.size());
-  c.iter(fun(T elem) => { if(test(elem)) res.add(elem); });
+  c.iter(T elem => { if(test(elem)) res.add(elem); });
   return res;
 }
 
 filter<C,T>(c#java.util.Stack, test)
 {
   java.util.Stack<T> res = new java.util.Stack();
-  c.iter(fun(T elem) => { if(test(elem)) res.add(elem); });
+  c.iter(T elem => { if(test(elem)) res.add(elem); });
   return res;
 }
 

@@ -359,13 +359,18 @@ public gnu.expr.Expression getDispatchMethod(NiceMethod def, Module module)
     {
       receiver = getNiceClass(def.getArgTypes()[0]);
 
-      // JVM interfaces cannot contain code.
-      if (receiver != null && receiver.isInterface())
-        receiver = null;
-
-      // Special treatment for serialization at the moment.
-      if (def.getArity() == 2 &&
-          (name.equals("writeObject")||name.equals("readObject")))
+      if (receiver != null &&
+	  (
+	   // JVM interfaces cannot contain code.
+	   receiver.isInterface()
+	   ||
+	   // For the moment, don't compile inside classes from another package
+	   receiver.definition.module.pkg != def.module.pkg
+	   ||
+	   // Special treatment for serialization at the moment.
+	   (def.getArity() == 2 &&
+	    (name.equals("writeObject")||name.equals("readObject")))
+	 ))
         receiver = null;
     }
 

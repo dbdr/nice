@@ -1,0 +1,135 @@
+/// PASS
+  /// package a
+  /// Toplevel
+class A
+{
+  final A x;
+}
+  /// package b import a
+  /// Toplevel
+class B extends A
+{
+  override B x;
+}
+
+/// PASS
+  /// package a
+  /// Toplevel
+class A
+{
+  final A x;
+}
+  /// package b import a
+  /// Toplevel
+class B extends A
+{
+  override B x;
+}
+  /// package c import b
+  /// Toplevel
+class C extends B
+{
+  override C x;
+}
+
+/// FAIL
+  /// package a
+  /// Toplevel
+class A
+{
+  final A x;
+}
+  /// package b import a
+  /// Toplevel
+class B extends A
+{
+  override String /* /// FAIL HERE */ x;
+}
+
+/// PASS
+  /// package a
+  /// Toplevel
+  class A {
+    final ?String s;
+  }
+  /// package b import a
+  /// Toplevel
+  class B extends A {
+    override String s = "abc";
+  }
+
+/// FAIL
+  /// package a
+  /// Toplevel
+class A<T>
+{
+  final List<T> x;
+}
+  /// package b import a
+  /// Toplevel
+
+class B<T> extends A<T>
+{
+  override List<String> /* /// FAIL HERE */ x;
+}
+
+/// PASS
+  /// package a
+  /// Toplevel
+class A {
+  final String x = "abc";
+}
+  /// package b import a
+  assert new A().x.equals("abc");
+  assert new B().x.equals("xyz");
+  /// Toplevel
+class B extends A {
+  override x = "xyz";
+}
+
+/// FAIL
+  /// package a
+  /// Toplevel
+class A {
+  int x;
+}
+  /// package b import a
+  /// Toplevel
+class B extends A {
+  override /* /// FAIL HERE */ x = "abc";
+}
+
+/// PASS bug
+  /// package a
+  /// Toplevel
+class A {
+  final int x;
+}
+  /// package b import a
+  /// Toplevel
+class B extends A {
+  override byte x = 0;
+}
+  /// package c import b
+  assert new C().x == 5;
+  /// Toplevel
+class C extends B {
+  override x = 5;
+}
+
+/// FAIL
+  /// package a
+  /// Toplevel
+class A {
+  final int x;
+}
+  /// package b import a
+  /// Toplevel
+class B extends A {
+  override byte x = 0;
+}
+  /// package c import b
+  /// Toplevel
+class C extends B {
+  override /* /// FAIL HERE */ x = 1000;
+}

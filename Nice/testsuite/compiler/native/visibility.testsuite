@@ -1,0 +1,2 @@
+/// FAIL
+  java.net.Inet4Address /*/// FAIL HERE*/ ip = new java.net.Inet4Address();

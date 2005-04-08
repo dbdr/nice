@@ -15,6 +15,8 @@ void main(String[] args)
      arguments: "package", options: cast(null));
 
   ?String classpath = null;
+  ?String jar = null;
+
   prg.options =
   [
    option("classpath",
@@ -22,19 +24,41 @@ void main(String[] args)
 	  "path",
 	  String path => { classpath = path; }),
 
+   option("jar",
+	  "An archive containing the program to test\nIts main package will be tested by default",
+	  "path",
+	  String opt => { jar = opt; }),
+
    option("man", "Print man page to stdout", visible: false,
 	  () => man(prg))
   ];
 
   List<String> rest = parse(prg, args);
 
-  if (rest.size() == 0)
+  if (rest.size() == 0 && jar == null)
     prg.usage();
+
+  if (jar != null)
+    {
+      if (classpath == null)
+	classpath = jar;
+      else
+	classpath = notNull(jar) + java.io.File.pathSeparator + classpath;
+
+      if (rest.size() == 0)
+	rest = [ mainPackage(notNull(jar)) ];
+    }
 
   rest.foreach(String pkg => {
     if (! runTests(pkg, listener, classpath))
       System.err.println("Package "pkg" was not found");
   });
+}
+
+String mainPackage(String jar)
+{
+  String mainClass = new java.util.jar.JarFile(new java.io.File(jar)).getManifest().getMainAttributes().getValue("Main-Class");
+  return mainClass.substring(0, mainClass.lastIndexOf('.'));
 }
 
 let Listener listener = new Listener();

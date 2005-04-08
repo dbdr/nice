@@ -57,6 +57,7 @@ nice (0.9.11)
     !assert 0==1; // fails always
     ?assert 0==1; // fails if assertions enabled
      assert 0==1; // fails if assertions enabled
+  * niceunit supports a --jar option to test jars.
 
  --
 

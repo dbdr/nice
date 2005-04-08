@@ -134,13 +134,13 @@ public class Field extends Location implements AttrContainer {
     switch (sig1)
       {
       case 'Z':
-        entry = cpool.addInt(((Boolean) value).booleanValue() ? 1 : 0); break;
+        entry = addIfNotDefault(cpool, ((Boolean) value).booleanValue() ? 1 : 0); break;
       case 'C':
-	entry = cpool.addInt(((Character) value).charValue());  break;
+	entry = addIfNotDefault(cpool, ((Character) value).charValue());  break;
       case 'B':
       case 'S':
       case 'I':
-	entry = cpool.addInt(((Number) value).intValue());  break;
+	entry = addIfNotDefault(cpool, ((Number) value).intValue());  break;
       case 'J':
 	entry = cpool.addLong(((Number) value).longValue());  break;
       case 'F':
@@ -150,8 +150,20 @@ public class Field extends Location implements AttrContainer {
       default:
 	entry = cpool.addString(value.toString());  break;
       }
-    ConstantValueAttr attr = new ConstantValueAttr(entry.getIndex());
-    attr.addToFrontOf(this);
+    if (entry != null)
+      {
+        ConstantValueAttr attr = new ConstantValueAttr(entry.getIndex());
+        attr.addToFrontOf(this);
+      }
+  }
+
+  private CpoolEntry addIfNotDefault(ConstantPool cpool, int value)
+  {
+    if (value == 0)
+      // 0 is the default value, no need to specify it.
+      return null;
+    else
+      return cpool.addInt(value);
   }
 
   public String toString()

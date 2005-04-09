@@ -591,29 +591,30 @@ MonoSymbol monoSymbol():
 /***********************************************************************/
 
 TypeSymbol binder(Collection atomics):
-{ TypeIdent ti;
-  TypeConstructor typevar;
-}
+{ TypeIdent ti; }
 {
-( LOOKAHEAD( typeConstructor() "extends" )
-  { TypeIdent typevarid; Monotype m2; }
-  typevarid=typeIdent() "extends"
-  { typevar = new TypeConstructor(typevarid.getName().toString()); }
+( LOOKAHEAD( unlocIdent() "extends" )
+  { String ident; }
+  ident=unlocIdent() "extends"
   ( LOOKAHEAD(typeIdent() ( "," | "|" | ">"))
     ti=typeIdent()
     {
-      atomics.add(new TypeConstructorLeqCst(typevar, ti));
-      return typevar;
+      TypeConstructor tc = new TypeConstructor(ident);
+      atomics.add(new TypeConstructorLeqCst(tc, ti));
+      return tc;
     }
   |
+    { Monotype m2; }
     m2=monotype()
     {
-      atomics.add(new MonotypeLeqCst(typevarid, m2));
+      MonotypeVar typevar = new MonotypeVar(ident);
+      atomics.add(new MonotypeLeqCst(new MonotypeWrapper(typevar), m2));
       return typevar;
     }
   )
 |
   LOOKAHEAD( typeIdent() typeConstructor() )
+  { TypeConstructor typevar; }
   ti=typeIdent()
   typevar=typeConstructor()
   {

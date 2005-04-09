@@ -7,7 +7,12 @@
   /// Toplevel
   <T extends Collection> void foo(T<String> x) {}
 
-/// PASS bug
+/// PASS
   foo(["abc"]);
+  /// Toplevel
+  <T extends Collection<String>> void foo(T x) {}
+
+/// FAIL
+  /*/// FAIL HERE*/ foo([0]);
   /// Toplevel
   <T extends Collection<String>> void foo(T x) {}

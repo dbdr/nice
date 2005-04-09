@@ -159,7 +159,7 @@ public class Field extends Location implements AttrContainer {
 
   private CpoolEntry addIfNotDefault(ConstantPool cpool, int value)
   {
-    if (value == 0)
+    if (value == 0 && ! isFinal())
       // 0 is the default value, no need to specify it.
       return null;
     else

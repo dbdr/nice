@@ -16,7 +16,7 @@ import bossa.util.*;
 
 /**
    A list of binders + atomic constraints.
-   
+
    @see AtomicConstraint
 
  */
@@ -33,9 +33,9 @@ public class Constraint extends Node
   {
     return createConstraint(new ArrayList(binders), new ArrayList(atomics));
   }
-  
+
   mlsub.typing.Constraint resolveToLowlevel()
-  { 
+  {
     return mlsub.typing.Constraint.create(
 	binders.isEmpty() ? null : binders.toArray(),
 	atomics.isEmpty() ? null : atomics.mapToArray(
@@ -53,7 +53,7 @@ public class Constraint extends Node
     // Put in a parsable format.
     StringBuffer res = new StringBuffer("<");
     boolean first = true;
-	
+
     Constraint c = this.shallowClone();
 
     let i = c.binders.iterator();
@@ -80,34 +80,34 @@ public class Constraint extends Node
                     break;
                   }
               }
-		
+
             continue;
           }
 
        let tc = s;
-        boolean ok = false;
-        let j = c.atomics.iterator();
-        while (j.hasNext())
-          {
-            AtomicConstraint atom = j.next();
-            let parent = atom.getParentFor(tc);
-            if (parent!=null)
-              {
-                if (first)
-                  first = false;
-                else
-                  res.append(',');
-                res.append(parent).append(' ').append(tc);
-                j.remove();
-                i.remove();
-                ok = true;
-                break;
-              }
-          }
-        if (!ok)
-	  Internal.error("Unable to print the constraint in a parsable form because of "+tc);
+       boolean ok = false;
+       let j = c.atomics.iterator();
+       while (j.hasNext())
+	 {
+	   AtomicConstraint atom = j.next();
+	   let parent = atom.getParentFor(tc);
+	   if (parent!=null)
+	     {
+	       if (first)
+		 first = false;
+	       else
+		 res.append(',');
+	       res.append(parent).append(' ').append(tc);
+	       j.remove();
+	       i.remove();
+	       ok = true;
+	       break;
+	     }
+	 }
+       if (!ok)
+	 Internal.error("Unable to print the constraint in a parsable form because of "+tc);
       }
-	
+
     res.append(Util.map((res.length()>1 ? ", " : ""),", ","", c.binders));
     res.append(Util.map(" | ",", ","",c.atomics)).append("> ");
     return res.toString();
@@ -143,7 +143,7 @@ public class Constraint extends Node
   {
     if (bs==null)
       return;
-    
+
     for (int i = 0; i<bs.length; i++)
       this.addBinder(bs[i]);
   }
@@ -187,7 +187,7 @@ public Constraint createConstraint(?List<mlsub.typing.TypeSymbol> binders, ?List
 /**
  * The trivial constraint.
  *
- * This field is final, so pointer equality can be used 
+ * This field is final, so pointer equality can be used
  * to test whether a constraint is True.
  *
  * @return a constraint with no binders, always true
@@ -196,7 +196,7 @@ let Constraint trueConstraint = new Constraint(Node.upper, binders: new ArrayLis
 
 /**
    An abstract constraint atom. See children.
-   
+
    @see Constraint
  */
 public abstract class AtomicConstraint
@@ -238,7 +238,7 @@ public AtomicConstraint createSureTypeVar(mlsub.typing.MonotypeVar tv)
 final class AtomicConstraintWrapper extends AtomicConstraint
 {
   private final mlsub.typing.AtomicConstraint atom;
-    
+
   resolve(scope) = atom;
 
   getParentFor(tc)
@@ -260,7 +260,7 @@ final class AtomicConstraintWrapper extends AtomicConstraint
         else
           return null;
       }
-      
+
     return null;
   }
 
@@ -313,7 +313,7 @@ public class TypeConstructorLeqCst extends AtomicConstraint
 
     if (s instanceof mlsub.typing.Interface)
       return new mlsub.typing.ImplementsCst(t1, s);
-    
+
     if (!(s instanceof mlsub.typing.TypeConstructor))
       throw User.error(t2, t2 + " is not a class");
 
@@ -323,7 +323,7 @@ public class TypeConstructorLeqCst extends AtomicConstraint
       {
 	let associatedInterface =
 	  c2.getAssociatedInterface();
-    
+
 	if (associatedInterface!=null)
 	  return new mlsub.typing.ImplementsCst(t1, associatedInterface);
       }
@@ -344,7 +344,7 @@ public class TypeConstructorLeqCst extends AtomicConstraint
 
 /**
    A type constructor implements an interface.
-   
+
 */
 public class ImplementsCst extends AtomicConstraint
 {
@@ -357,7 +357,7 @@ public class ImplementsCst extends AtomicConstraint
     let sitf = itf.resolveToTypeSymbol(scope);
     if (! (sitf instanceof mlsub.typing.Interface))
       throw User.error(itf, itf+" should be an interface");
-    
+
     return new mlsub.typing.ImplementsCst(stc, sitf);
   }
 

@@ -22,11 +22,13 @@ package nice.lang;
     with pre 1.4 JDKs.
 */
 class AssertionFailed extends Error {}
+public new AssertionFailed(Object message) = 
+  this( message.toString(), message instanceof Throwable ? message : null );
 
 void `?assert`(boolean condition) = 
   inline nice.lang.inline.Assert();
 
-void `?assert`(boolean condition, String message) = 
+void `?assert`(boolean condition, Object message) = 
   inline nice.lang.inline.Assert();
 
 /** Always checked assertion. */
@@ -34,15 +36,15 @@ void `!assert`(boolean condition) =
   inline nice.lang.inline.Assert("contract");
 
 /** Always checked assertion. */
-void `!assert`(boolean condition, String message) = 
+void `!assert`(boolean condition, Object message) = 
   inline nice.lang.inline.Assert("contract");
 
 // Here for bootstrap compatibility.
 void `assert`(boolean condition) = 
   inline nice.lang.inline.Assert();
-void `assert`(boolean condition, String message) = 
+void `assert`(boolean condition, Object message) = 
   inline nice.lang.inline.Assert();
 void `alwaysAssert`(boolean condition) = 
   inline nice.lang.inline.Assert("contract");
-void `alwaysAssert`(boolean condition, String message) = 
+void `alwaysAssert`(boolean condition, Object message) = 
   inline nice.lang.inline.Assert("contract");

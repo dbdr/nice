@@ -73,6 +73,7 @@ foo(x) = 1;
   // assertions have an automatic description
   try{
     assert 0 == 1;
+    throw new Exception( "AssertionFailed not thrown." );
   }catch(AssertionFailed afe){
     let message = afe.getMessage(); assert message != null;
     assert message.indexOf( "==" ) != -1 : message;
@@ -92,3 +93,27 @@ foo(x) = 1;
     ?assert 0 == 1;
     throw new Exception( "AssertionFailed not thrown." );
   }catch(AssertionFailed ok){}
+
+/// PASS
+  // support Object message
+  try{
+    !assert 0 == 1 : new Foo();
+    throw new Exception( "AssertionFailed not thrown." );
+  }catch(AssertionFailed ok){
+    !assert ok.getMessage().equals("bar");
+    !assert ok.getCause() == null;
+  }
+  /// Toplevel
+class Foo {
+  toString() = "bar";
+}
+
+/// PASS
+  // if the message is Throwable, it should become a "cause" (as in java.lang.AssertionError).
+  let cause = new Exception("bar");
+  try{
+    !assert 0 == 1 : cause;
+    throw new Exception( "AssertionFailed not thrown." );
+  }catch(AssertionFailed ok){
+    !assert ok.getCause() == cause;
+  }

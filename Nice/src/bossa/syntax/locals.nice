@@ -213,7 +213,7 @@ public Statement createLocalFunction(LocatedString name, Monotype returnType, Fo
 {
   let value = createFunExp(trueConstraint, parameters.getMonoSymbols(), body);
   let symbol = new FunSymbol(name, trueConstraint, parameters, returnType);
-  notNull(symbol.syntacticType).monotype.nullness = /*sure*/2;
+  notNull(symbol.syntacticType).monotype.nullness = nullness_sure;
   return new LocalFunction(left: symbol, value: value, parameters: parameters);
 }
 

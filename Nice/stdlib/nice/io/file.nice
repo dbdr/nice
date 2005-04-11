@@ -25,7 +25,7 @@ package nice.io;
 
 import nice.functional;
 
-class File = native java.io.File;
+import java.io.*;
 
 /** Path concatenation */
 <T> File `/`(File dir, !T file) = new File(dir.getCanonicalPath() 

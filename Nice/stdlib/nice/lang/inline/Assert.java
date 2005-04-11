@@ -81,9 +81,12 @@ public class Assert extends ProcedureN implements Inlineable
     else
       {
 	args[1].compile(comp, Target.pushObject);
-        Method init = args[1].getType().getName().equals(Type.string_type.getName())
-          ? errorInitString : errorInitObject;
-	code.emitInvokeSpecial(init);
+        if(args[1].getType().getName().equals(Type.string_type.getName())){
+          code.emitInvokeSpecial(errorInitString);
+        }else{
+          code.emitInvokeVirtual(errorToString);
+          code.emitInvokeSpecial(errorInitString);
+        }
       }
 
     code.emitThrow();
@@ -95,7 +98,7 @@ public class Assert extends ProcedureN implements Inlineable
   private static final ClassType 
     errorClass = ClassType.make("nice.lang.AssertionFailed");
 
-  private static Method errorInit, errorInitString, errorInitObject;
+  private static Method errorInit, errorInitString, errorToString;
 
   private static void prepare()
   {
@@ -106,8 +109,8 @@ public class Assert extends ProcedureN implements Inlineable
       ("<init>", Access.PUBLIC, new Type[]{}, Type.void_type);
     errorInitString = errorClass.addMethod
       ("<init>", Access.PUBLIC, new Type[]{Type.string_type}, Type.void_type);
-    errorInitObject = errorClass.addMethod
-      ("<init>", Access.PUBLIC, new Type[]{Type.pointer_type}, Type.void_type);
+    errorToString = Type.pointer_type.addMethod
+      ("toString", Access.PUBLIC, new Type[]{}, Type.string_type);
   }
 
   public Type getReturnType (Expression[] args)

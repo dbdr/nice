@@ -107,13 +107,3 @@ foo(x) = 1;
 class Foo {
   toString() = "bar";
 }
-
-/// PASS
-  // if the message is Throwable, it should become a "cause" (as in java.lang.AssertionError).
-  let cause = new Exception("bar");
-  try{
-    !assert 0 == 1 : cause;
-    throw new Exception( "AssertionFailed not thrown." );
-  }catch(AssertionFailed ok){
-    !assert ok.getCause() == cause;
-  }

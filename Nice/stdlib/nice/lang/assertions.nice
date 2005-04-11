@@ -22,8 +22,9 @@ package nice.lang;
     with pre 1.4 JDKs.
 */
 class AssertionFailed extends Error {}
+// To be removed later. Left here for bootstrap compatibility.
 public new AssertionFailed(Object message) = 
-  this( message.toString(), message instanceof Throwable ? message : null );
+  this();
 
 void `?assert`(boolean condition) = 
   inline nice.lang.inline.Assert();

@@ -1,0 +1,66 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2005                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package nice.tools.testsuite;
+
+/**
+   Runner for the testsuite Embedded-DSL.
+
+   @author Daniel Bonniot (bonniot@users.sf.net)
+ */
+
+import nice.io;
+import nice.functional;
+
+import nice.tools.compiler.console;
+import nice.tools.compiler;
+import bossa.modules;
+
+import nice.tools.unit.console;
+import nice.tools.unit;
+
+import java.io.*;
+
+let File tmp = new File("temp-testcase");
+
+public void main(String[] args)
+{
+  let dir = new File(args.length == 0 ? "testsuite" : args[0]);
+  dir.traverse().foreach(File f =>
+    if (f.isDirectory() && f.hasNiceFile())
+      test(f));
+}
+
+boolean hasNiceFile(File dir) =
+  dir.listDir(File f => f.getPath().endsWith(".nice")).length > 0;
+
+void test(File f)
+{
+  let pkg = f.getPath().replace(File.separatorChar, '.');
+
+  println("\nCompiling "pkg);
+
+  let output = consoleOutput();
+  let compilation = new bossa.modules.Compilation
+    (listener: output, parser: new bossa.parser.JavaccParser());
+  compilation.runtimeFile = "share/java/nice.jar";
+  compilation.output = new File(tmp, "test.jar").toString();
+
+  compile(compilation, pkg);
+
+  if (output.errorCount > 0)
+    return;
+
+  println("\nTesting "pkg);
+  let testListener = new nice.tools.unit.console.Listener();
+  runTests(pkg, testListener, new File(tmp, "test.jar") + File.pathSeparator + "classes");
+}

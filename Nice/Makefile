@@ -51,7 +51,7 @@ complete: stable   compiler2 tools libs archive2
 fixpoint: complete compiler3 archive3
 world:    fixpoint check test
 
-tools: nicedoc unit ant publish
+tools: nicedoc unit ant publish nicetestengine
 
 # The bootstrap at the end of the universe ;-)
 universe:
@@ -219,6 +219,9 @@ testengine:
 	@echo "Building the testsuite engine..."
 	@${JAVAC} src/nice/tools/testsuite/*.java ||\
 	echo "Compilation of the testsuite engine failed."
+
+nicetestengine:
+	$(NICEC1) nice.tools.testsuite
 
 visibility:
 	$(NICEC1) -a visibility.jar nice.tools.visibility

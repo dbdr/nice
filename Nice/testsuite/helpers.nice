@@ -1,0 +1,101 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2005                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+/**
+   Helper methods for the testsuite Embedded-DSL.
+
+   The tests are written as nice programs with _test methods.
+   The test methods exercise some aspect of compilation by calling the compiler
+   on certain input, with certain arguments, and in a certain order.
+   These helper methods provide a convenient way to make those calls to the
+   compiler.
+
+   @author Daniel Bonniot (bonniot@users.sf.net)
+ */
+
+import nice.tools.compiler.console;
+import nice.tools.compiler;
+import bossa.modules;
+
+import java.io.*;
+import java.util.jar.*;
+
+let File tmp = new File("temp-testcase");
+
+void compile
+  (String pkg,
+   ?String toplevel,
+   ?String imp = null,
+   ?String main = null,
+   ?String check = null)
+{
+  let dirname = pkg.replace('.', File.separatorChar);
+  let dir = new File(tmp, dirname);
+  dir.mkdirs();
+  writeProgram(new File(dir, "main.nice"), imp, toplevel, main, check);
+
+  let output = consoleOutput();
+
+  let compilation = new bossa.modules.Compilation
+    (listener: output, parser: new bossa.parser.JavaccParser());
+  compilation.sourcePath = tmp.getPath();
+  if (imp != null)
+    compilation.packagePath = new File(tmp, imp + ".jar").toString();
+  compilation.runtimeFile = "share/java/nice.jar";
+  compilation.output = new File(tmp, pkg + ".jar").toString();
+
+  compile(compilation, pkg);
+
+  assert output.errorCount == 0;
+}
+
+private void writeProgram
+  (File to, ?String imp, ?String toplevel, ?String main, ?String check)
+{
+  using(let w = new BufferedWriter(new FileWriter(to))) {
+
+    if (imp != null)
+      w.write("import "imp";");
+
+    if (toplevel != null)
+      w.write(toplevel);
+
+    if (main != null || check != null)
+      {
+	w.write("public void main(String[] args) {\n");
+	if (main != null)
+	  w.write(main);
+	if (check != null)
+	  w.write("\nassert "check";");
+	w.write("\n}\n");
+      }
+
+  }
+}
+
+void run(String jar)
+{
+  run(new java.io.File(tmp, jar + ".jar"));
+}
+
+void run(java.io.File jar)
+{
+  let jarFile = new JarFile(jar);
+  let mainClassName =
+    jarFile.getManifest().getMainAttributes().getValue("Main-Class");
+  let loader = new java.net.URLClassLoader
+    ([jar.toURL(), new java.io.File("share/java/nice.jar").toURL()]);
+  nice.tools.util.JDK.setDefaultAssertionStatus(loader, true);
+  let mainClass = loader.loadClass(mainClassName);
+  let main = mainClass.getMethod("main", [String[].class]);
+  main.invoke(null, [cast(null)]);
+}

@@ -19,7 +19,7 @@ import gnu.bytecode.ClassFileInput;
 
 /**
    A compiled package located in a jar file.
-    
+
    @author Daniel Bonniot (Daniel.Bonniot@inria.fr)
  */
 
@@ -33,12 +33,12 @@ class JarCompiledContent extends CompiledContent
     JarEntry itfEntry = jar.getJarEntry(pkgName + "/package.nicei");
     if (itfEntry == null)
       return null;
-    
+
     JarEntry bytecodeEntry = jar.getJarEntry
       (pkgName + "/" + Package.packageClassName + ".class");
     if (bytecodeEntry == null)
       return null;
-    
+
     JarEntry dispatchEntry = jar.getJarEntry(pkgName + "/dispatch.class");
     if (dispatchEntry == null)
       return null;
@@ -106,38 +106,31 @@ class JarCompiledContent extends CompiledContent
     }
   }
 
-  Content.Stream[] getClasses(boolean wantDispatch)
+  void addClasses(java.util.Set/*<Content.Stream>*/ classes)
   {
-    java.util.List res = new java.util.LinkedList();
     String pkgPrefix = pkg.getName().replace('.', '/') + "/";
 
     java.util.Enumeration en = jar.entries();
     while(en.hasMoreElements())
       {
-	JarEntry e = (JarEntry) en.nextElement();
-	String fullname = e.getName();
-	if (fullname.startsWith(pkgPrefix)
-	    && fullname.indexOf('/', pkgPrefix.length()) == -1
-	    && fullname.endsWith(".class"))
-	  {
-	    String name = fullname.substring(pkgPrefix.length());
-	    if (wantDispatch || !name.equals("dispatch.class"))
-	      try{
-		res.add(new Content.Stream(jar.getInputStream(e), name));
-	      }
-	      catch(IOException ex){
-		User.error(pkg.name,
-			   "Error reading archive " + getName());
-	      }
-	  }
+ 	JarEntry e = (JarEntry) en.nextElement();
+ 	String fullname = e.getName();
+ 	if (fullname.startsWith(pkgPrefix)
+ 	    && fullname.indexOf('/', pkgPrefix.length()) == -1
+ 	    && fullname.endsWith(".class"))
+  	  {
+  	    String name = fullname.substring(pkgPrefix.length());
+            try{
+              classes.add(new Content.Stream(jar.getInputStream(e), name));
+            }
+            catch(IOException ex){
+              User.error(pkg.name,
+                         "Error reading archive " + getName());
+            }
+  	  }
       }
-
-    int len = res.size();
-    if (! wantDispatch)
-      len++;
-    return (Content.Stream[]) res.toArray(new Content.Stream[len]);
   }
-  
+
   InputStream getBytecodeStream()
   {
     try{
@@ -148,12 +141,12 @@ class JarCompiledContent extends CompiledContent
       return null;
     }
   }
-  
+
   public String getName()
   {
     return nice.tools.util.System.prettyPrint(jar);
   }
-  
+
   public String toString()
   {
     return "Compiled package: " + getName();

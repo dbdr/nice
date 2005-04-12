@@ -105,23 +105,15 @@ class DirectoryCompiledContent extends CompiledContent
       return null;
     }
   }
-  
-  Content.Stream[] getClasses(boolean wantDispatch)
+
+  void addClasses(java.util.Set/*<Content.Stream>*/ classes)
   {
-    return getClasses(directory, wantDispatch);
+    addClasses(classes, directory);
   }
-  
-  static Content.Stream[] getClasses(File directory, 
-				     final boolean wantDispatch)
+
+  static void addClasses(java.util.Set/*<Content.Stream>*/ classes, File directory)
   {
-    /*
-      To list out the "dispatch.class" file, 
-      we use the method File.compareTo(File) since it is correct 
-      both on case-sensitive and case-insensitive platforms.
-    */
-    final File dispatchFile = 
-      wantDispatch ? null : new File(directory, "dispatch.class");
-    File[] classes = directory.listFiles
+    File[] files = directory.listFiles
       (new FileFilter()
 	{ 
 	  public boolean accept(File f)
@@ -131,25 +123,19 @@ class DirectoryCompiledContent extends CompiledContent
             if (name.equals("package.nicei"))
               return true;
 
-	    return name.endsWith(".class") 
-	      && (wantDispatch || dispatchFile.compareTo(f) != 0)
-	      && f.isFile();
+	    return name.endsWith(".class") && f.isFile();
 	  }
 	}
        );
 
-    Content.Stream[] res = 
-      new Content.Stream[classes.length + (wantDispatch ? 0 : 1)];
-    for (int i = 0; i < classes.length; i++)
+    for (int i = 0; i < files.length; i++)
       try{
-	res[i] = new Content.Stream
-	  (new BufferedInputStream(new FileInputStream(classes[i])), 
-	   classes[i].getName());
+        classes.add(new Content.Stream
+	  (new BufferedInputStream(new FileInputStream(files[i])),
+           files[i].getName()));
       } catch(FileNotFoundException e) {}
-
-    return res;
   }
-  
+
   private InputStream getFileStream(String name)
   {
     File f = new File(directory, name);

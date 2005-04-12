@@ -33,7 +33,7 @@ let File tmp = new File("temp-testcase");
 
 void compile
   (String pkg,
-   ?String toplevel,
+   ?String toplevel = null,
    ?String imp = null,
    ?String main = null,
    ?String check = null)
@@ -50,7 +50,7 @@ void compile
   compilation.sourcePath = tmp.getPath();
   if (imp != null)
     compilation.packagePath = new File(tmp, imp + ".jar").toString();
-  compilation.runtimeFile = "share/java/nice.jar";
+  compilation.runtimeFile = "classes";
   compilation.output = new File(tmp, pkg + ".jar").toString();
 
   compile(compilation, pkg);
@@ -92,10 +92,13 @@ void run(java.io.File jar)
   let jarFile = new JarFile(jar);
   let mainClassName =
     jarFile.getManifest().getMainAttributes().getValue("Main-Class");
-  let loader = new java.net.URLClassLoader
-    ([jar.toURL(), new java.io.File("share/java/nice.jar").toURL()]);
+  let loader = new nice.tools.util.SelfContainedClassLoader([jar.toURL()]);
   nice.tools.util.JDK.setDefaultAssertionStatus(loader, true);
   let mainClass = loader.loadClass(mainClassName);
   let main = mainClass.getMethod("main", [String[].class]);
-  main.invoke(null, [cast(null)]);
+  try {
+    main.invoke(null, [cast(null)]);
+  } catch (java.lang.reflect.InvocationTargetException e) {
+    throw e.getTargetException();
+  }
 }

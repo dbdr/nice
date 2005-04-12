@@ -51,7 +51,7 @@ void test(File f)
 
   let output = consoleOutput();
   let compilation = new bossa.modules.Compilation
-    (listener: output, parser: new bossa.parser.JavaccParser());
+    (listener: output, parser: new bossa.parser.JavaccParser(), destinationDir: tmp.getPath());
   compilation.runtimeFile = "share/java/nice.jar";
   compilation.output = new File(tmp, "test.jar").toString();
 

@@ -268,8 +268,17 @@
   <property name="checkFail" value="yes" description="whether to fail if there are testsuite regressions" />
   <target name="testengine">
     <mac-javac-single includes="nice/tools/testsuite/*.java" />
+    <mac-nicec-new package="nice.tools.testsuite" />
   </target>
   <target name="check_compiler" depends="archive,testengine">
+    <java classpathref="freshNice"
+          classname="nice.tools.testsuite.dispatch"
+          fork="yes"
+          failonerror="${checkFail}"
+    >
+      <jvmarg line="${jvmArgs}" />
+      <arg value="testsuite/compiler" />
+    </java>
     <java classpathref="freshNice"
           classname="nice.tools.testsuite.TestNice"
           fork="yes"
@@ -280,6 +289,14 @@
     </java>
   </target>
   <target name="check_lib" depends="archive,testengine">
+    <java classpathref="freshNice"
+          classname="nice.tools.testsuite.dispatch"
+          fork="yes"
+          failonerror="${checkFail}"
+    >
+      <jvmarg line="${jvmArgs}" />
+      <arg value="testsuite/compiler" />
+    </java>
     <java classpathref="freshNice"
           classname="nice.tools.testsuite.TestNice"
           fork="yes"
@@ -294,6 +311,7 @@
 
   <target name="clean" description="remove all generated files">
     <delete dir="${build}" />
+    <delete dir="temp-testcase" />
     <delete dir="testsuite-fail-folder" />
     <delete dir="testsuite-temp-folder" />
     <delete>
@@ -308,6 +326,11 @@
         <include name="niceunit" />
         <include name="nicedoc.lnk" />
         <include name="niceunit.lnk" />
+      </fileset>
+      <fileset dir="testsuite">
+        <include name="**/*.class" />
+        <include name="**/*.nicei" />
+        <include name="**/*.jar" />
       </fileset>
     </delete>
     <delete dir="share/java" />

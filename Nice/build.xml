@@ -101,7 +101,7 @@
     <echo message="Existing Nice compiler was found at ${NICE_JAR}" level="info" />
   </target>
 
-  <!-- Bootstrap is split into a sequence of targets, combined in the "bootstrap" target. -->
+  <!-- Bootstrap is split into a sequence of targets, combined in the "compiler1" target. -->
   <target name="core-bootstrap" depends="initialize">
     <mkdir dir="${build}" />
     <move file="src/bossa/syntax/dispatch.java.bootstrap"
@@ -197,10 +197,8 @@
       <attribute name="Build-Id" value="Nice compiler version ${version} (build ${NICE_DATE})" />
     </manifest>
   </target>
-  <target name="compiler1"
-          depends="core-bootstrap,javacc,parser,recompile,setDate,initialize"
-          description="build intermediate compiler"
-  >
+  <target name="compiler" depends="initialize">
+    <!-- The last part of the bootstrapping. -->
     <mac-nicec-old package="bossa.syntax" args="-r" />
     <mac-nicec-old package="nice.tools.compiler.console" args="-R" />
     <!--
@@ -210,7 +208,12 @@
     -->
     <antcall target="makeArchive" />
   </target>
-  <target name="compiler2">
+  <target name="compiler1"
+          depends="core-bootstrap,javacc,parser,recompile,setDate,compiler"
+          description="build intermediate compiler"
+  />
+  <target name="compiler2" depends="initialize">
+    <!-- Rebuild the compiler with itself. -->
     <mac-nicec-new package="bossa.syntax" args="-R" />
     <mac-nicec-new package="nice.tools.compiler.console" args="-R" />
   </target>
@@ -244,8 +247,9 @@
   <!-- The end of bootstrap targets. -->
 
   <target name="makeArchive">
-    <delete file="${build}/nice.jar" />
-    <jar destfile="${build}/nice.jar" duplicate="preserve" manifest="src/nice/tools/compiler/Manifest">
+    <delete file="share/java/nice.jar" />
+    <mkdir dir="share/java" />
+    <jar destfile="share/java/nice.jar" duplicate="preserve" manifest="src/nice/tools/compiler/Manifest">
       <fileset dir="${build}">
         <include name="nice/**" />
         <include name="mlsub/**" />
@@ -254,14 +258,13 @@
       </fileset>
     </jar>
   </target>
-  <available file="${build}/nice.jar" property="haveArchive" />
+  <available file="share/java/nice.jar" property="haveArchive" />
   <target name="archive" unless="haveArchive">
     <antcall target="bootstrap" />
     <antcall target="makeArchive" />
   </target>
 
   <target name="jar" depends="archive" description="compile and put Nice compiler into share/java/nice.jar">
-    <copy file="${build}/nice.jar" todir="share/java" />
   </target>
 
   <!-- Testing targets. -->

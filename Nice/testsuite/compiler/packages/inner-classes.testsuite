@@ -1,0 +1,23 @@
+/// PASS bug
+  /// package a
+  /// TOPLEVEL
+    // Original problem with a Comparator inner class
+    // that can't be renamed because it was registered in a database.
+    // That triggers a problem with special handling of '$' when traversing
+    // bytecode, after wich the class is introduced into mlsub.typing twice:
+    // as "a.Foo$Inner" and as "a.Foo.Inner".
+
+    public class Foo {
+      void nop( Class cl ){}
+      void tryMe(){ this.nop( Foo$Inner.class ); }
+    }
+
+    public interface Itf {
+      public void foo();
+    }
+
+    public class Foo$Inner implements Itf {
+      public foo(){}
+    }
+  /// package b import a
+    new Foo().tryMe();

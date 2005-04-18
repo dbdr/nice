@@ -105,7 +105,19 @@ public class TypeScope implements TypeMap
   
   TypeSymbol get(String name)
   {
-    return (TypeSymbol) map.get(name);
+    TypeSymbol typeSymbol = (TypeSymbol) map.get(name);
+    if (typeSymbol != null) return typeSymbol;
+    // A workaround required to find Nice classes having a '$' in the name.
+    // Such classes are placed into the scope with their correct name,
+    // but when looked up from the bytecode, the '$' is replaced with a '.'.
+    // Therefore we'll try to replace '.' back into '$'.
+    int dot; while (true) {
+      dot = name.lastIndexOf('.');
+      if (-1 == dot) return null;
+      name = name.substring(0,dot) + '$' + name.substring(dot+1);
+      typeSymbol = (TypeSymbol) map.get(name);
+      if (typeSymbol != null) return typeSymbol;
+    }
   }
 
   public final TypeSymbol lookup(String name)

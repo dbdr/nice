@@ -1,4 +1,4 @@
-/// PASS bug
+/// PASS
   /// package a
   /// TOPLEVEL
     // Original problem with a Comparator inner class

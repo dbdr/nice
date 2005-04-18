@@ -271,17 +271,8 @@
   <property name="checkFail" value="yes" description="whether to fail if there are testsuite regressions" />
   <target name="testengine">
     <mac-javac-single includes="nice/tools/testsuite/*.java" />
-    <mac-nicec-new package="nice.tools.testsuite" />
   </target>
   <target name="check_compiler" depends="archive,testengine">
-    <java classpathref="freshNice"
-          classname="nice.tools.testsuite.dispatch"
-          fork="yes"
-          failonerror="${checkFail}"
-    >
-      <jvmarg line="${jvmArgs}" />
-      <arg value="testsuite/compiler" />
-    </java>
     <java classpathref="freshNice"
           classname="nice.tools.testsuite.TestNice"
           fork="yes"
@@ -293,14 +284,6 @@
   </target>
   <target name="check_lib" depends="archive,testengine">
     <java classpathref="freshNice"
-          classname="nice.tools.testsuite.dispatch"
-          fork="yes"
-          failonerror="${checkFail}"
-    >
-      <jvmarg line="${jvmArgs}" />
-      <arg value="testsuite/compiler" />
-    </java>
-    <java classpathref="freshNice"
           classname="nice.tools.testsuite.TestNice"
           fork="yes"
           failonerror="${checkFail}"
@@ -309,11 +292,22 @@
       <arg value="testsuite/lib" />
     </java>
   </target>
-  <target name="check" depends="check_compiler,check_lib" description="run testsuite" />
+  <target name="check_advanced" depends="archive,testengine">
+    <mac-nicec-new package="nice.tools.testsuite" />
+    <java classpathref="freshNice"
+          classname="nice.tools.testsuite.dispatch"
+          fork="yes"
+          failonerror="${checkFail}"
+    >
+      <jvmarg line="${jvmArgs}" />
+    </java>
+  </target>
+  <target name="check" depends="check_compiler,check_lib,check_advanced" description="run testsuite" />
   <!-- The end of testing targets. -->
 
   <target name="clean" description="remove all generated files">
     <delete dir="${build}" />
+    <delete dir="nice" />
     <delete dir="temp-testcase" />
     <delete dir="testsuite-fail-folder" />
     <delete dir="testsuite-temp-folder" />

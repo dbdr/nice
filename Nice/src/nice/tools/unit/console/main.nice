@@ -53,6 +53,8 @@ void main(String[] args)
     if (! runTests(pkg, listener, classpath))
       System.err.println("Package "pkg" was not found");
   });
+
+  println(""listener.nFailures"/"listener.nTests" tests failed");
 }
 
 String mainPackage(String jar)
@@ -65,10 +67,14 @@ let Listener listener = new Listener();
 
 class Listener implements TestListener
 {
+  int nTests = 0;
+  int nFailures = 0;
+
   start(test) = println(test);
-  end(test) {}
+  end(test) { nTests++; }
   failure(test, cause, loader)
   {
+    nFailures++;
     println("Test failed:\n " + cause);
     if (!(iterLocations(test, cause, (?String file, String method, int line) =>
 			println(""file +

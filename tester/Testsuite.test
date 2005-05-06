@@ -3,7 +3,7 @@
 cd Nice
 
 if [ "$ANT_BOOTSTRAP" ]; then
-  /usr/bin/time -o TIME ant check > OUT
+  /usr/bin/time -o TIME ant clean check > OUT
 else
   /usr/bin/time -o TIME make check > OUT
 fi

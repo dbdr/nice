@@ -22,8 +22,7 @@
              includes="@{includes}"
              debug="on"
              optimize="yes"
-             compiler="${compiler}"
-      />
+             compiler="${compiler}" />
     </sequential>
   </macrodef>
   <macrodef name="mac-javac-multi">
@@ -35,8 +34,7 @@
              classpath="@{classpath}"
              debug="on"
              optimize="yes"
-             compiler="${compiler}"
-      >
+             compiler="${compiler}">
         <include />
       </javac>
     </sequential>
@@ -50,8 +48,7 @@
       <java failonerror="yes"
             fork="yes"
             classpath="@{runtime}"
-            classname="nice.tools.compiler.console.dispatch"
-      >
+            classname="nice.tools.compiler.console.dispatch">
         <jvmarg line="${jvmArgs}" />
         <arg value="--sourcepath" />
         <arg value="@{sourcepath}" />
@@ -72,8 +69,7 @@
       <java failonerror="yes"
             fork="yes"
             classpath="@{runtime}"
-            classname="nice.tools.compiler.console.dispatch"
-      >
+            classname="nice.tools.compiler.console.dispatch">
         <jvmarg line="${jvmArgs}" />
         <arg value="--sourcepath" />
         <arg value="@{sourcepath}" />
@@ -106,8 +102,7 @@
     <mkdir dir="${build}" />
     <move file="src/bossa/syntax/dispatch.java.bootstrap"
           tofile="src/bossa/syntax/dispatch.java"
-          failonerror="no"
-    />
+          failonerror="no" />
     <mac-javac-single includes="nice/tools/util/System.java" />
     <mac-nicec-old package="nice.tools.repository" args="-R" />
     <mac-nicec-old package="nice.tools.visibility" args="-r" />
@@ -130,8 +125,7 @@
     <mac-javac-single includes="bossa/syntax/*.java" />
     <move file="src/bossa/syntax/dispatch.java"
           tofile="src/bossa/syntax/dispatch.java.bootstrap"
-          failonerror="no"
-    />
+          failonerror="no" />
     <delete file="${build}/bossa/syntax/dispatch.class" />
     <mac-nicec-old package="bossa.syntax" args="-r" />
   </target>
@@ -210,8 +204,7 @@
   </target>
   <target name="compiler1"
           depends="core-bootstrap,javacc,parser,recompile,setDate,compiler"
-          description="build intermediate compiler"
-  />
+          description="build intermediate compiler" />
   <target name="compiler2" depends="initialize">
     <!-- Rebuild the compiler with itself. -->
     <mac-nicec-new package="bossa.syntax" args="-R" />
@@ -276,8 +269,7 @@
     <java classpathref="freshNice"
           classname="nice.tools.testsuite.TestNice"
           fork="yes"
-          failonerror="${checkFail}"
-    >
+          failonerror="${checkFail}">
       <jvmarg line="${jvmArgs}" />
       <arg value="testsuite/compiler" />
     </java>
@@ -286,8 +278,7 @@
     <java classpathref="freshNice"
           classname="nice.tools.testsuite.TestNice"
           fork="yes"
-          failonerror="${checkFail}"
-    >
+          failonerror="${checkFail}">
       <jvmarg line="${jvmArgs}" />
       <arg value="testsuite/lib" />
     </java>
@@ -297,8 +288,7 @@
     <java classpathref="freshNice"
           classname="nice.tools.testsuite.dispatch"
           fork="yes"
-          failonerror="${checkFail}"
-    >
+          failonerror="${checkFail}">
       <jvmarg line="${jvmArgs}" />
     </java>
   </target>
@@ -333,7 +323,6 @@
     <delete dir="share/java" />
     <move file="src/bossa/syntax/dispatch.java"
           tofile="src/bossa/syntax/dispatch.java.bootstrap"
-          failonerror="no"
-    />
+          failonerror="no" />
   </target>
 </project>

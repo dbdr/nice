@@ -241,7 +241,7 @@ public class Method implements AttrContainer {
        throws java.io.IOException
   {
     
-    if (code == null)
+    if (code == null && !isAbstract())
       throw new Error("Method "+this+" has no code");
       //return;
 

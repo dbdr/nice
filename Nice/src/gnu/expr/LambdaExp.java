@@ -1525,13 +1525,17 @@ public class LambdaExp extends ScopeExp
 		    decl.var = null;
 		  }
 	      }
-	    comp.method.initCode();
-	    allocChildClasses(comp);
-	    allocParameters(comp);
-	    enterFunction(comp);
+            if (comp.curClass.isInterface() && comp.method.isAbstract()){
+              // Interface method. Skip code generation.
+            }else{
+              comp.method.initCode();
+              allocChildClasses(comp);
+              allocParameters(comp);
+              enterFunction(comp);
 
-	    compileBody(comp);
-	    compileEnd(comp);
+              compileBody(comp);
+              compileEnd(comp);
+            }
 	  }
       }
 

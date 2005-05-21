@@ -22,12 +22,10 @@ let gnu.bytecode.Method newError = gnu.bytecode.ClassType.
 	make("java.lang.Error").getDeclaredMethod("<init>",
 	[cast(gnu.bytecode.Type.string_type)]);
 
-public void compileNiceMethod(NiceMethod m, 
-		      Stack<Alternative> sortedAlternatives, 
-		      bossa.modules.Package module)
-{
-  gnu.expr.LambdaExp lexp = m.getLambda();
-    
+private void makeBody(NiceMethod m,
+                      gnu.expr.LambdaExp lexp,
+                      Stack<Alternative> sortedAlternatives){
+
   // parameters of the alternative function are the same in each case, 
   // so we compute them just once
   int arity = m.getArity();
@@ -39,15 +37,60 @@ public void compileNiceMethod(NiceMethod m,
       params[rank++] = new gnu.expr.ReferenceExp(param);
 
   gnu.expr.Expression body = dispatchNiceMethod
-      (sortedAlternatives.iterator(), 
-       m.javaReturnType(), m.javaReturnType().isVoid(), params);
+    (sortedAlternatives.iterator(), 
+     m.javaReturnType(), m.javaReturnType().isVoid(), params);
 
   if (m.isMain())
     body = beautifyUncaughtExceptions(body);
 
-  nice.tools.code.Gen.setMethodBody(lexp, m.getContract().compile(body));
+  body = m.getContract().compile(body);
+  nice.tools.code.Gen.setMethodBody(lexp, body);
 }
-  
+
+public void compileNiceMethod(NiceMethod m, 
+		      Stack<Alternative> sortedAlternatives, 
+		      bossa.modules.Package module)
+{
+  gnu.expr.LambdaExp lexp = m.getLambda();
+
+  makeBody( m, lexp, sortedAlternatives );
+
+  if(m.getArity() != 0){
+    ?NiceClass iface = getNiceClass(m.getArgTypes()[0]);
+    if(iface != null && iface.isInterface() && ! ( m instanceof MethodWithDefault )){
+
+      // If alternative method is implementing an interface,
+      // then generate a dispatch method as a class member,
+      // for Java interface invocations to find the implementation.
+
+      if(bossa.util.Debug.codeGeneration)
+        bossa.util.Debug.println("Generating Nice interface signature for " iface );
+      String name = m.getName().toString();
+      let argTypes = m.javaArgTypes();
+      let retType  = m.javaReturnType();
+      let fullName = m.getFullName();
+      gnu.expr.LambdaExp res = generateMethod
+        (name, argTypes, retType, m.getSymbols(), toplevel: true, member: true);
+      res.parameterCopies = cast(notNull(m.formalParameters()).getParameterCopies());
+      iface.addJavaMethod(res);
+
+      for(alt : sortedAlternatives){
+        ?NiceClass cl = declaringClass(alt);
+        if(cl == null) continue;
+        if(bossa.util.Debug.codeGeneration)
+          bossa.util.Debug.println("Generating Nice dispatch function (interface implementation) for " alt);
+
+        res = generateMethod
+          (name, argTypes, retType, m.getSymbols(), toplevel: true, member: true);
+        res.parameterCopies = cast(notNull(m.formalParameters()).getParameterCopies());
+        res.addBytecodeAttribute(new gnu.bytecode.MiscAttr("id", fullName.getBytes()));
+        makeBody( m, res, sortedAlternatives );
+        cl.addJavaMethod(res);
+      }
+    }
+  }
+}
+
 private gnu.expr.Expression dispatchNiceMethod(Iterator<Alternative> sortedAlternatives, 
 				     gnu.bytecode.Type returnType, 
 				     boolean voidReturn,
@@ -145,18 +188,24 @@ public void compileJavaMethod(JavaMethod m, Stack<Alternative> sortedAlternative
     }
 }
 
-private NiceClass declaringClass(JavaMethod m, Alternative alt)
+private ?NiceClass declaringClass(Alternative alt)
 {
   ?mlsub.typing.TypeConstructor firstArgument = alt.getPatterns()[0].getTC();
   let def = getTypeDefinition(firstArgument);
 
   if (def != null && def.getImplementation() instanceof NiceClass)
     return cast(def.getImplementation());
+  return null;
+}
+
+private NiceClass declaringClass(JavaMethod m, Alternative alt)
+{
+  let cl = declaringClass(alt); if(cl != null) return cl;
 
   // Explain that this cannot be done.
   String msg = m + " is a native method.\n";
 
-  if (firstArgument == null)
+  if (maybeNull(firstArgument) == null)
     msg += "It cannot be implemented without dispatch on the first argument";
   else
     msg += "It cannot be overriden because the first argument " +

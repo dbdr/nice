@@ -1,0 +1,67 @@
+/// COMMENT Testing interface method signatures (Java compatibility)
+
+/// PASS
+  Simple.class.getMethod( "fun", [ String.class ] );
+  /// Toplevel
+  interface Simple { void fun( String ); }
+
+/// PASS
+  let fooI0 = Foo.class.getMethod( "i0", [] );
+  let fooI1 = Foo.class.getMethod( "i1", [ Integer.TYPE ] );
+  let fooI2 = Foo.class.getMethod( "i2", [ Integer.TYPE, Integer.TYPE ] );
+  let fooII = Foo.class.getMethod( "ii", [ Integer.TYPE ] );
+  let barII_1 = Bar.class.getMethod( "ii", [ Integer.TYPE ] );
+  let barII_2 = Bar.class.getMethod( "ii", [ String.class ] );
+  !assert ( fooI0.getModifiers() & java.lang.reflect.Modifier.ABSTRACT ) != 0;
+  !assert ( barII_1.getModifiers() & java.lang.reflect.Modifier.ABSTRACT ) != 0;
+  !assert ( barII_2.getModifiers() & java.lang.reflect.Modifier.ABSTRACT ) != 0;
+  !assert fooI0.getDeclaringClass().equals( Foo.class );
+  !assert barII_1.getDeclaringClass().equals( Foo.class );
+  !assert barII_2.getDeclaringClass().equals( Bar.class );
+  Foo foo = new FooImpl();
+  !assert new Integer( 0 ).equals( fooI0.invoke( foo, [] ) );
+  !assert new Integer( 2 ).equals( fooI1.invoke( foo, [ new Integer( 1 ) ] ) );
+  !assert new Integer( 1 ).equals( fooI2.invoke( foo, [ new Integer( 4 ), new Integer( 3 ) ] ) );
+  !assert new Integer( 9 ).equals( fooII.invoke( foo, [ new Integer( 9 ) ] ) );
+  Bar bar = new BarImpl();
+  !assert new Integer( 0 ).equals( fooI0.invoke( bar, [] ) );
+  !assert new Integer( 2 ).equals( fooI1.invoke( bar, [ new Integer( 1 ) ] ) );
+  !assert new Integer( 1 ).equals( fooI2.invoke( bar, [ new Integer( 4 ), new Integer( 3 ) ] ) );
+  !assert new Integer( 9 ).equals( fooII.invoke( bar, [ new Integer( 9 ) ] ) );
+  !assert new Integer( 9 ).equals( barII_1.invoke( bar, [ new Integer( 9 ) ] ) );
+  !assert new Integer( 1 ).equals( barII_2.invoke( bar, [ "-" ] ) );
+  /// Toplevel
+  interface Foo {
+    int i0();
+    int i1( int );
+    int i2( int, int );
+    int ii( int );
+  }
+  interface Bar extends Foo {
+    int ii( String );
+  }
+  class FooImpl implements Foo {
+    i0() = 0;
+    i1( i ) = i + 1;
+    i2( i, j ) = i - j;
+    ii( i ) = i;
+  }
+  class BarImpl extends FooImpl implements Bar {
+    ii( String s ) = s.length();
+  }
+
+/// PASS
+  let impl = new Impl();
+  A.class.getMethod( "foo", [ A.class ] ).invoke( impl, [ impl ] ).equals( "a" );
+  B.class.getMethod( "foo", [ B.class ] ).invoke( impl, [ impl ] ).equals( "b" );
+  C.class.getMethod( "foo", [ A.class ] ).invoke( impl, [ impl ] ).equals( "a" );
+  C.class.getMethod( "foo", [ B.class ] ).invoke( impl, [ impl ] ).equals( "b" );
+  C.class.getMethod( "foo", [ C.class ] ).invoke( impl, [ impl ] ).equals( "c" );
+  /// Toplevel
+  interface A { String foo( A ); }
+  interface B { String foo( B ); }
+  interface C extends A,B { override String foo( C ); }
+  class Impl implements C {}
+  foo( Impl impl, A arg ) = "a";
+  foo( Impl impl, B arg ) = "b";
+  foo( Impl impl, C arg ) = "c";

@@ -125,6 +125,9 @@ class Modifiers
    void makeInterface( )
    {
 	this.setModifier( INTERFACE );
+        // "Every interface is implicitly abstract",
+        // The Java™ Language Specification Third Edition, 9.1.1.1
+        this.setModifier( ABSTRACT );
    }
 
    boolean isInterface() = this.getModifier( INTERFACE );
@@ -151,7 +154,8 @@ class Modifiers
      if( this.getModifier( VOLATILE ) )     buf.append(" volatile");
      if( this.getModifier( TRANSIENT ) )    buf.append(" transient");
      if( this.getModifier( NATIVE ) )       buf.append(" native");
-     if( this.getModifier( ABSTRACT ) )     buf.append(" abstract");
+     if( ! this.getModifier( INTERFACE ) )
+       if( this.getModifier( ABSTRACT ) )   buf.append(" abstract");
      return buf.toString();
   }
 }

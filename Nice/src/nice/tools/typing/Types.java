@@ -402,8 +402,30 @@ public final class Types
     if (m1 == m2)
       return m1;
 
-    Monotype raw1 = equivalent(m1);
-    Monotype raw2 = equivalent(m2);
+    Monotype raw = rawMerge(equivalent(m1), equivalent(m2));
+    if (raw == null)
+      return null;
+
+    TypeConstructor marker;
+    if (isSure(m1) && isSure(m2))
+      marker = PrimitiveType.sureTC;
+    else
+      marker = PrimitiveType.maybeTC;
+
+    Monotype res = new MonotypeConstructor(marker, new Monotype[]{raw});
+    return res;
+  }
+
+  private static Monotype rawMerge(Monotype raw1, Monotype raw2)
+  {
+    if (raw1 == raw2)
+      return raw1;
+
+    if (raw1 == TopMonotype.instance || raw2 == TopMonotype.instance)
+      return TopMonotype.instance;
+
+    TypeConstructor head1 = raw1.head();
+    TypeConstructor head2 = raw2.head();
 
     TypeConstructor head;
     if (Typing.testRigidLeq(raw1.head(), raw2.head()))
@@ -431,14 +453,6 @@ public final class Types
           }
       }
 
-    Monotype raw = new MonotypeConstructor(head, args);
-
-    TypeConstructor marker;
-    if (isSure(m1) && isSure(m2))
-      marker = PrimitiveType.sureTC;
-    else
-      marker = PrimitiveType.maybeTC;
-
-    return new MonotypeConstructor(marker, new Monotype[]{raw});
+    return new MonotypeConstructor(head, args);
   }
 }

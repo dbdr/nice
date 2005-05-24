@@ -1,0 +1,32 @@
+/// PASS
+  /// Toplevel
+let Object REMOVED = new Object();
+int insertionIndex(Object key){
+  ?Object cur = null;
+  if(cur == REMOVED)
+    return (cur != null && cur != REMOVED) ? 1 : -1;
+  return (cur != null && cur != REMOVED) ? 1 : -1;
+}
+
+/// PASS
+  ?Object o = null;
+  if (true)
+    o = new Object();
+  else
+    assert o instanceof String;
+  Object x = o;
+
+/// PASS
+  A a = new B();
+
+  if (true)
+    assert a instanceof B;
+  else
+    assert a instanceof C;
+
+  A aa = a;
+
+  /// Toplevel
+class A {}
+class B extends A {}
+class C extends A {}

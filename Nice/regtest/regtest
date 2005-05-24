@@ -29,7 +29,7 @@ echo()
 
 compile()
 {
-  (cd ..; LC_CTYPE=french "$NICE_TOP"/bin/nicec \
+  (cd ..; LC_CTYPE=en_US "$NICE_TOP"/bin/nicec \
     -e -r -a regtest/"$1" -d . \
     --classpath=".:${NICE_TOP}/classes" regtest."$1")
   return $?

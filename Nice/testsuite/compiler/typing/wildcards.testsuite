@@ -1,0 +1,17 @@
+/// PASS
+  A<int> ai = new A();
+  A<String> as = new A();
+
+  foo(ai);
+  foo(as);
+  /// Toplevel
+class A<T> {}
+void foo(A<?>) {}
+
+/// PASS
+  /// Toplevel
+class A<T> { T x1; T x2; }
+void swap(A<?> a)
+{
+  (a.x1, a.x2) = (a.x2, a.x1);
+}

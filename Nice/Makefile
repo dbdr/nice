@@ -134,7 +134,7 @@ clean:
 	rm -f bin/{nicedoc,niceunit}
 	if [ -r src/bossa/syntax/dispatch.java -a ! -r src/bossa/syntax/dispatch.java.bootstrap ]; then \
 		mv src/bossa/syntax/dispatch.java src/bossa/syntax/dispatch.java.bootstrap; fi
-	[ -r src/bossa/syntax/dispatch.java ] && rm src/bossa/syntax/dispatch.java
+	rm -f src/bossa/syntax/dispatch.java
 	find . \( -name "*.class" -o -name "*.nicei" -o -name "*~" \) -exec rm {} \;
 
 

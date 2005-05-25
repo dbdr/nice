@@ -98,7 +98,7 @@ public final class Types
   public static Monotype rawType(Monotype m)
   {
     m = m.equivalent();
-    if (! (m.getKind() == NullnessKind.instance))
+    if (m.getKind() != NullnessKind.instance || m == UnknownMonotype.instance)
       return m;
 
     return ((MonotypeConstructor) m).getTP()[0];

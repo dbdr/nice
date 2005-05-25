@@ -15,3 +15,55 @@ void swap(A<?> a)
 {
   (a.x1, a.x2) = (a.x2, a.x1);
 }
+
+/// PASS
+  /// Toplevel
+class A<T> { T x1; T x2; }
+void swap(A<?> a)
+{
+  let tmp = a.x1;
+  a.x1 = a.x2;
+  a.x2 = tmp;
+}
+
+/// FAIL
+  A<int> a = new A(x: 0);
+  A<?> aa = a;
+  /*/// FAIL HERE */ aa.x = "";
+  int i = a.x;
+
+  /// Toplevel
+class A<T> { T x; }
+
+
+/// FAIL
+  A<int,String> a = new A(x1: 0, x2: "");
+  splash(a);
+  int i = a.x1;
+
+  /// Toplevel
+class A<T1,T2> { T1 x1; T2 x2; }
+void splash(A<?,?> a) {
+  /*/// FAIL HERE */ a.x1 = a.x2;
+}
+
+/// FAIL
+  A<int,String> a = new A(x1: 0, x2: "");
+  splash(a);
+  String s = a.x2;
+
+  /// Toplevel
+class A<T1,T2> { T1 x1; T2 x2; }
+void splash(A<?,?> a) {
+  /*/// FAIL HERE */ a.x2 = a.x1;
+}
+
+/// FAIL
+  A<int,String> a = new A(x1: 0, x2: "");
+  splash(a);
+
+  /// Toplevel
+class A<T1,T2> { T1 x1; T2 x2; }
+void splash(A<?,?> a) {
+  int /*/// FAIL HERE */ x = a.x2;
+}

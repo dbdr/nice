@@ -207,7 +207,11 @@ public final class MonotypeVar extends Monotype
   void setUnknown()
     throws mlsub.typing.lowlevel.Unsatisfiable
   {
-    super.setUnknown();
+    if (equivalent != null)
+      equivalent.setUnknown();
+
+    equivalent = UnknownMonotype.instance;
+    persistentKind = null;
     this.unknown = true;
   }
 
@@ -277,6 +281,8 @@ public final class MonotypeVar extends Monotype
   {
     if (equivalent != null)
       return equivalent.canonify();
+    if (isUnknown())
+      return UnknownMonotype.instance;
     // A type var with kind TopKind is equivalent to Top.
     else if (kind == TopMonotype.TopKind.instance)
       return TopMonotype.instance;

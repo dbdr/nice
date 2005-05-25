@@ -84,23 +84,29 @@ public class NullnessKind implements AtomicKind
   public void leq(Element e1, Element e2)
     throws Unsatisfiable
   {
-    MonotypeConstructor m1 = mc(e1), m2 = mc(e2);
+    Monotype m1 = (Monotype) e1;
+    Monotype m2 = (Monotype) e2;
+
+    if (m1.isUnknown() || m2.isUnknown())
+      throw LowlevelUnsatisfiable.instance;
+
+    MonotypeConstructor mc1 = mc(m1), mc2 = mc(m2);
     
-    Engine.leq(m1.getTC(), m2.getTC());
-    Engine.leq(m1.getTP()[0], m2.getTP()[0]);
+    Engine.leq(mc1.getTC(), mc2.getTC());
+    Engine.leq(mc1.getTP()[0], mc2.getTP()[0]);
   }
   
-  private MonotypeConstructor mc(Element e)
+  private MonotypeConstructor mc(Monotype m)
   {
     try
       {
-	return (MonotypeConstructor) ((Monotype) e).equivalent();
+	return (MonotypeConstructor) m.equivalent();
       }
     catch(ClassCastException ex)
       {
 	throw new InternalError
-	  (e + " was expected to be a monotype constructor, " +
-	   " it's a " + e.getClass());
+	  (m + " was expected to be a monotype constructor, " +
+	   " it's a " + m.getClass());
       }
   }
   

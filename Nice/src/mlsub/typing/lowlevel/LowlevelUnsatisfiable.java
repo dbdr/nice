@@ -6,7 +6,7 @@ package mlsub.typing.lowlevel;
  **/
 public class LowlevelUnsatisfiable extends Unsatisfiable 
 {
-  LowlevelUnsatisfiable(String msg)
+  public LowlevelUnsatisfiable(String msg)
   {
     super(msg);
   }
@@ -16,7 +16,7 @@ public class LowlevelUnsatisfiable extends Unsatisfiable
     this("[NO MESSAGE]");
   }
   
-  static LowlevelUnsatisfiable instance = new LowlevelUnsatisfiable();
+  public static LowlevelUnsatisfiable instance = new LowlevelUnsatisfiable();
 
   static boolean refinedReports = true;
   public static void setRefinedReports(boolean flag) {

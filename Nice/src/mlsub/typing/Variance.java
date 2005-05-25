@@ -251,12 +251,12 @@ public final class Variance
 
       case INVARIANT:
         if (tp2[i].isUnknown())
-          return;
+          continue;
 
         if (tp1[i].isUnknown())
           {
             tp2[i].setUnknown();
-            return;
+            continue;
           }
 
 	mlsub.typing.lowlevel.Engine.leq(tp1[i],tp2[i]);

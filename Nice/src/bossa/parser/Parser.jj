@@ -224,7 +224,6 @@ TOKEN: /* Keywords */
 | < TRUE:       "true"		>
 | < FALSE:      "false"		>
 | < ALIKE:      "alike"		> /* Nice specific */
-| < UNKNOWN:	"unknown"       > /* Nice specific */
 //| < THIS:       "this"	>
 | < SUPER:      "super"         >
 | < INSTANCEOF: "instanceof"	>
@@ -704,7 +703,7 @@ Monotype monotypeConstructor():
   // This is fixed during scoping.
 
     t=typeConstructorIdent()
-    "<" [  p=monotypes() ] ">"
+    "<" [  p=typeParameters() ] ">"
     { if(p==null) p=new ArrayList(0);
       last=getToken(0);
 
@@ -823,8 +822,6 @@ Monotype simpleMonotype():
 }
 {
   [
-    // Consume "?" only if it does not appear by itself
-    LOOKAHEAD( "?", { getToken(2).kind != COMMA && getToken(2).kind != GT})
     start="?" { maybe = true; }
   | start="!" { sure = true; }
   ]
@@ -832,7 +829,7 @@ Monotype simpleMonotype():
   (
   res=funOrTupleMonotype()
 |
-  start="alike" [ "<" p=monotypes() ">" ]
+  start="alike" [ "<" p=typeParameters() ">" ]
   { res=bossa.syntax.dispatch.createAlike(p, makeLocation(start)); }
   { res.nullness = bossa.syntax.fun.nullness_absent; }
 |
@@ -854,9 +851,6 @@ Monotype simpleMonotype():
       res.nullness = bossa.syntax.fun.nullness_sure;
   }
   { return res; }
-|
-  ("unknown"  | "?")
-  { return new MonotypeWrapper(mlsub.typing.UnknownMonotype.instance); }
 }
 
 List monotypes():
@@ -867,6 +861,29 @@ List monotypes():
 {
   t=monotype() { res.add(t); }
   ( "," t=monotype() { res.add(t); } )*
+  { return res; }
+}
+
+Monotype typeParameter():
+{
+  Monotype res;
+}
+{
+  // Consume "?" only if it appears by itself
+  LOOKAHEAD( "?", { getToken(2).kind == COMMA || getToken(2).kind == GT})
+  "?" { return new MonotypeWrapper(mlsub.typing.UnknownMonotype.instance); }
+|
+  res=monotype() { return res; }
+}
+
+List typeParameters():
+{
+  List res=new ArrayList();
+  Monotype t;
+}
+{
+  t=typeParameter() { res.add(t); }
+  ( "," t=typeParameter() { res.add(t); } )*
   { return res; }
 }
 
@@ -998,9 +1015,7 @@ MonotypeConstructor superClass():
 { TypeIdent name; List params = null; }
 {
   name=typeIdent()
-    // ignore type parameters
-    // they should be checked
-    [ "<" params = monotypes() ">" ]
+  [ "<" params = typeParameters() ">" ]
   { return bossa.syntax.fun.createMonotypeConstructor(name, params == null ? null : bossa.syntax.dispatch.createTypeParameters(params), name.location()); }
 }
 

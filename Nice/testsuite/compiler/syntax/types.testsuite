@@ -87,3 +87,7 @@
   ?String[?] s3';
   s3' = null;
   s3' = [ null ];
+
+/// FAIL
+  /// Toplevel
+void getValue (? /*/// FAIL HERE*/, int) {}

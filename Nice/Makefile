@@ -132,7 +132,9 @@ clean:
 	rm -f src/nice/tools/compiler/console.jar nicepublish.jar regtest/*.jar
 	rm -rf classes classes-inline share/java src/bossa/parser/{Parse*.java,Token*.java,*CharStream.java}
 	rm -f bin/{nicedoc,niceunit}
-	[ -r src/bossa/syntax/dispatch.java ] && mv src/bossa/syntax/dispatch.java src/bossa/syntax/dispatch.java.bootstrap || true
+	if [ -r src/bossa/syntax/dispatch.java -a ! -r src/bossa/syntax/dispatch.java.bootstrap ]; then \
+		mv src/bossa/syntax/dispatch.java src/bossa/syntax/dispatch.java.bootstrap; fi
+	[ -r src/bossa/syntax/dispatch.java ] && rm src/bossa/syntax/dispatch.java
 	find . \( -name "*.class" -o -name "*.nicei" -o -name "*~" \) -exec rm {} \;
 
 

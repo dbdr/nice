@@ -198,7 +198,7 @@ public class Enumeration
 	     but we are not interested in this. So we skip to the next choice
 	     of kinds for all-marked tags.
 	  */
-	  throw new SolutionFound();
+	  throw SolutionFound.instance;
       }
   }
 
@@ -209,7 +209,10 @@ public class Enumeration
       && k != TopMonotype.TopKind.instance;
   }
 
-  private static class SolutionFound extends RuntimeException {}
+  private static class SolutionFound extends RuntimeException
+  {
+    static SolutionFound instance = new SolutionFound();
+  }
 
   private static List enumerateTags(Element[] tags, boolean[] all)
   {

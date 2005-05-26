@@ -137,8 +137,17 @@ public class Enumeration
 
         if (tag.getKind() == TopMonotype.TopKind.instance)
           {
-            // Tag is "Object". All TCs are solutions.
-            tag = tags[minFloating] = new MonotypeVar("enumeration");
+            if (all[minFloating])
+              // Tag is "Object". All TCs are solutions.
+              tag = tags[minFloating] = new MonotypeVar("enumeration");
+            else
+              {
+                // We only want one solution anyway, which surely exists ;-)
+                // No need to set kinds
+		// recursive call
+		setFloatingKinds(tags, all, minFloating + 1, res, doAll);
+                return;
+              }
           }
         else
           {
@@ -155,7 +164,7 @@ public class Enumeration
 		c != nice.tools.typing.PrimitiveType.nullTC.getKind())
 	      {
 		if(linkDbg && Typing.dbg)
-		  Debug.println("Choosing kind " + c + " for " + tag);
+		  Debug.println("Choosing kind " + c + " for " + minFloating + ":" + tag);
 
 		if (tag instanceof MonotypeVar)
 		  Engine.forceKind(tag, c.associatedKind);
@@ -164,6 +173,7 @@ public class Enumeration
 
 		// recursive call
 		setFloatingKinds(tags, all, minFloating + 1, res, doAll);
+
 		tag.setKind(null);
 	    }
 	  }
@@ -216,7 +226,13 @@ public class Enumeration
 
       for(int i = 0;i<tags.length;i++)
 	{
-	  Engine.Constraint k = Engine.getConstraint(tags[i].getKind());
+          Kind kind = tags[i].getKind();
+
+          if (kind == TopMonotype.TopKind.instance)
+            continue;
+
+	  Engine.Constraint k = Engine.getConstraint(kind);
+
 	  BitVector obs;
 
 	  int idx = kinds.indexOf(k);

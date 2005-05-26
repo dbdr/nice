@@ -187,14 +187,19 @@ private void testMethod(MethodDeclaration method,
 			   Stack<Alternative> sortedAlternatives,
 			   boolean isJavaMethod)
 {
+  boolean[] used = findUsedPositions(method.getArity(), sortedAlternatives);
+
   if (bossa.util.Debug.linkTests)
     {
       bossa.util.Debug.println("\nLink test for "+method);
       for (alt : sortedAlternatives)
         bossa.util.Debug.println("Alternative: "+alt.toString());
-    }
 
-  boolean[] used = findUsedPositions(method.getArity(), sortedAlternatives);
+      print("Argument used: ");
+      for (u : used)
+	print(u + " ");
+      println("");
+    }
 
   let type = method.getType();
   if (type == null)

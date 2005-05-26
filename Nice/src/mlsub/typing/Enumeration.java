@@ -43,10 +43,10 @@ public class Enumeration
     List res = new ArrayList();
 
     Monotype[] tags = null;
-    
+
     if (domain.getMonotype().equivalent() instanceof TupleType)
       tags = ((TupleType) domain.getMonotype().equivalent()).types;
-    
+
     if (tags == null)
       throw new InternalError("enumerate should be done on a tuple domain");
 
@@ -78,7 +78,7 @@ public class Enumeration
   /**
    * Enumerate all the tuples of tags in a Domain
    *
-   * If all[i] is false, we are not interested in getting all solutions 
+   * If all[i] is false, we are not interested in getting all solutions
    * for position i, only one witness is enough.
    *
    * @return a List of TypeConstructor[]
@@ -113,28 +113,28 @@ public class Enumeration
 
     return res;
   }
-  
-  /** Try all combinations of Kinds for free type variables. 
+
+  /** Try all combinations of Kinds for free type variables.
       There are two stages:
       If doAll is true, set the tags for which all solutions must be listed.
       Otherwise, set the other tags, and stop as soon as one solution is found.
    */
-  private static final void setFloatingKinds(Element[] tags, 
+  private static final void setFloatingKinds(Element[] tags,
 					     boolean[] all,
-					     int minFloating, 
+					     int minFloating,
 					     List res,
-					     boolean doAll) 
+					     boolean doAll)
     throws Unsatisfiable
   {
-    while(minFloating<tags.length 
-	  && (all[minFloating] != doAll || 
+    while(minFloating<tags.length
+	  && (all[minFloating] != doAll ||
               isFixedKind(tags[minFloating].getKind())))
       minFloating++;
 
     if(minFloating<tags.length)
       {
         Element tag = tags[minFloating];
-        
+
         if (tag.getKind() == TopMonotype.TopKind.instance)
           {
             // Tag is "Object". All TCs are solutions.
@@ -142,7 +142,7 @@ public class Enumeration
           }
         else
           {
-            // There might be a garbagy Engine.variablesConstraint 
+            // There might be a garbagy Engine.variablesConstraint
             // in the monotype variable variable
             tag.setKind(null);
           }
@@ -150,8 +150,8 @@ public class Enumeration
 	for(Iterator cs = Engine.listConstraints(); cs.hasNext();)
 	  {
 	    Engine.Constraint c = (Engine.Constraint) cs.next();
-	    
-	    if (c.hasConstants() && 
+
+	    if (c.hasConstants() &&
 		c != nice.tools.typing.PrimitiveType.nullTC.getKind())
 	      {
 		if(linkDbg && Typing.dbg)
@@ -181,7 +181,7 @@ public class Enumeration
       {
 	List solutions = enumerateTags(tags, all);
 	res.addAll(solutions);
-	if (solutions.size() > 0) 
+	if (solutions.size() > 0)
 	  /*
 	     We found solutions for the current choice of kinds for tags.
 	     We might find more by changing the kinds of non all-marked tags,
@@ -204,7 +204,7 @@ public class Enumeration
   private static List enumerateTags(Element[] tags, boolean[] all)
   {
     TagsList tuples = new TagsList(tags.length);
-    List kinds = new ArrayList(tags.length); /* euristic: 
+    List kinds = new ArrayList(tags.length); /* euristic:
 						at most one kind per tag */
     List observers = new ArrayList(tags.length); // idem
 
@@ -213,12 +213,12 @@ public class Enumeration
 
     Engine.enter(false);
     try{
-      
+
       for(int i = 0;i<tags.length;i++)
 	{
 	  Engine.Constraint k = Engine.getConstraint(tags[i].getKind());
 	  BitVector obs;
-	  
+
 	  int idx = kinds.indexOf(k);
 	  if(idx<0)
 	    {
@@ -227,7 +227,7 @@ public class Enumeration
 	    }
 	  else
 	    obs = (BitVector) observers.get(idx);
-	  
+
 	  // ignore non matchable kinds
 	  // XXX move up ?
 	  if(tags[i].getKind() instanceof FunTypeKind ||
@@ -239,11 +239,11 @@ public class Enumeration
 	    constTC = (TypeConstructor) tags[i];
 	  else
 	    constTC = ((Monotype) tags[i]).head();
-	  
+
 	  if(constTC == null)
 	    throw new InternalError
 	      (tags[i].getKind() + " is not a valid kind in enumerate");
-	
+
 	  TypeConstructor varTC = new TypeConstructor(constTC.variance);
 	  vars[i] = varTC;
 
@@ -261,11 +261,11 @@ public class Enumeration
 	    return emptyList;
 	  }
 	}
-    
+
       Engine.Constraint[] pKinds = (Engine.Constraint[])
 	kinds.toArray(new Engine.Constraint[kinds.size()]);
-      
-      BitVector[] pObs = (BitVector[]) 
+
+      BitVector[] pObs = (BitVector[])
 	observers.toArray(new BitVector[observers.size()]);
 
       if (enumerateInConstraints(pKinds, pObs, tuples, tags, vars, all))
@@ -274,7 +274,7 @@ public class Enumeration
     finally{
       Engine.backtrack(false, false);
     }
-    
+
     return tuples.tags;
   }
 
@@ -292,10 +292,10 @@ public class Enumeration
     for(int act = 0; act<kinds.length;act++)
       {
 	tuples.startAddition();
-	
+
 	final BitVector obs = observers[act];
 	final mlsub.typing.lowlevel.Engine.Constraint kind = kinds[act];
-	
+
 	kind.enumerate
 	  (obs,
 	   new mlsub.typing.lowlevel.LowlevelSolutionHandler()
@@ -308,7 +308,7 @@ public class Enumeration
                      {
                        /* If this index does not need all solutions
                           (i.e. all[index] is false), and the solution
-                          sol does not pass checkClassConstraint, 
+                          sol does not pass checkClassConstraint,
                           it might have been that some other solution, which
                           we don't generate, would pass. So in this case
                           we should restart to try other solutions for this
@@ -318,7 +318,7 @@ public class Enumeration
 		       TypeConstructor var,solution;
                        var = vars[index];
 
-                       // We only deal with matchable tags, 
+                       // We only deal with matchable tags,
                        // and those that belong to this kind.
                        if (var == null || var.getKind() != kind)
                          continue;
@@ -336,12 +336,12 @@ public class Enumeration
 		       TypeConstructor var, solution;
 		       var = vars[index];
 
-                       // We only deal with matchable tags, 
+                       // We only deal with matchable tags,
                        // and those that belong to this kind.
                        if (var == null || var.getKind() != kind)
                          continue;
 
-		       solution = (TypeConstructor) 
+		       solution = (TypeConstructor)
                          kind.getElement(getSolutionOf(var.getId()));
 		       tuples.set(index, solution);
 		     }
@@ -359,11 +359,11 @@ public class Enumeration
   }
 
   /**
-     Return true if and only if sol can be the runtime tag of a 
+     Return true if and only if sol can be the runtime tag of a
      subtype of var. This especially involves checking the eventual
      constraints on the type parameters of the class sol.
   */
-  private static boolean checkClassConstraint(Element var, 
+  private static boolean checkClassConstraint(Element var,
                                               TypeConstructor sol)
   {
     Constraint constraint = bossa.syntax.dispatch.getTypeDefResolvedConstraint(sol);
@@ -405,18 +405,18 @@ public class Enumeration
     }
   }
 
-  /** 
+  /**
       A list of possible values for tags.
 
       Typical usage:
       <code>
 
       TagsList tags = new TagsList(width);
-      for (...) 
+      for (...)
       {
         ...
         tags.startAddition();
-	for (each possibility for the tags in the group) 
+	for (each possibility for the tags in the group)
 	{
 	  tags.startEntry();
 	  tags.set(tag1, value1);
@@ -447,7 +447,7 @@ public class Enumeration
     // return true if there is no solution
     boolean endAddition()
     {
-      return first; 
+      return first;
     }
 
     /** Call before each possibility for these tags */
@@ -463,7 +463,7 @@ public class Enumeration
 	    }
 	}
       else
-	// copy the first elements at the end, 
+	// copy the first elements at the end,
 	// so that they can be overwritten with the new values
 	for(int i = 0; i < size; i++)
 	  tags.add(((Object[]) tags.get(i)).clone());

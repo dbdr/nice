@@ -163,7 +163,7 @@ public final class MonotypeVar extends Monotype
     if (k == NullnessKind.instance)
       {
         kind = k;
-        equivalent = NullnessKind.instance.persistentFreshMonotype();
+        equivalent = NullnessKind.instance.persistentFreshMonotype(this);
       }
   }
 

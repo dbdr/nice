@@ -49,11 +49,19 @@ public class NullnessKind implements AtomicKind
 
     return new MonotypeConstructor(tc, new Monotype[]{ raw });
   }
-  
-  public Monotype persistentFreshMonotype()
+
+  /**
+     @param base The type variable we create this fresh constructed
+                 monotype for.
+  */
+  public Monotype persistentFreshMonotype(MonotypeVar base)
   {
     TypeConstructor tc = new TypeConstructor(instance);
-    Monotype raw = new MonotypeVar();
+
+    /* It's important to give the raw variable the same name as the base one,
+       so that for the syntactic type <T> ... !T we don't end up printing !t9.
+    */
+    Monotype raw = new MonotypeVar(base.getName());
 
     return new MonotypeConstructor(tc, new Monotype[]{ raw });
   }

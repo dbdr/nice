@@ -60,3 +60,14 @@ abstract class OOMemoize<R,A> implements Method<R,A> {
       return m;
    }
 }
+
+/// PASS
+  /// package a
+  /// Toplevel
+<T> !T foo(T x)
+{
+  assert x != null;
+  return x;
+}
+  /// package b import a
+  String s = foo("");

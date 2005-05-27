@@ -1,0 +1,2 @@
+/// PASS
+  Object obj = Class.forName("java.lang.String").newInstance();

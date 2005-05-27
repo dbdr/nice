@@ -101,7 +101,7 @@ foo(x) = 1;
     throw new Exception( "AssertionFailed not thrown." );
   }catch(AssertionFailed ok){
     !assert ok.getMessage().equals("bar");
-    !assert ok.getCause() == null;
+    //!assert ok.getCause() == null;
   }
   /// Toplevel
 class Foo {

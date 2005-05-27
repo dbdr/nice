@@ -51,3 +51,32 @@ foo(Object x) = true;
   void foo(I x) {}
   foo(A x) {}
   foo(K x) {}
+
+/// FAIL
+  /// Toplevel
+interface I {
+  void /*/// FAIL HERE */ foo(Object o1);
+}
+class A implements I {}
+
+/// PASS
+  /// Toplevel
+interface I1 {}
+interface I2 {}
+
+void foo(I1 i1, I2 i2, Object o1, Object o2, Object o3, Object o4, Object o5, Object o6);
+
+class A implements I1 {}
+foo(A a, i2, o1, o2, o3, o4, o5, o6) {}
+
+/// FAIL
+  /// Toplevel
+interface I1 {}
+interface I2 {}
+
+void /*/// FAIL HERE */ foo(I1 i1, I2 i2, Object o1, Object o2, Object o3, Object o4, Object o5, Object o6);
+
+class A1 implements I1 {}
+class A2 implements I2 {}
+
+// foo implementation missing

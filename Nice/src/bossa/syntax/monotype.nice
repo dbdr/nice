@@ -60,10 +60,7 @@ public abstract class Monotype implements Located
     else if (nullness == nullness_absent)
       {
 	if (raw instanceof mlsub.typing.MonotypeVar)
-	  {
-	    nice.tools.typing.Types.makeMarkedType(raw);
-	    return raw;
-	  }
+	  return raw;
 	else
 	  return sureMonotype(raw);
       }

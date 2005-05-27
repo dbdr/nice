@@ -25,6 +25,12 @@ public class Constraint extends Node
   private List<mlsub.typing.TypeSymbol> binders;
   private List<AtomicConstraint> atomics;
 
+    {
+      for (b : binders)
+	if (b instanceof mlsub.typing.MonotypeVar)
+	  nice.tools.typing.Types.makeMarkedType(b);
+    }
+
   /**
    * Returns a new constraint.
    * The lists are new, but the list elements are the same.

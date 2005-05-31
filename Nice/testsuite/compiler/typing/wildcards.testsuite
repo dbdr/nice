@@ -67,3 +67,9 @@ class A<T1,T2> { T1 x1; T2 x2; }
 void splash(A<?,?> a) {
   int /*/// FAIL HERE */ x = a.x2;
 }
+
+/// PASS
+  /// Toplevel
+class A<T> { T x; }
+void foo(A<?> a) = bar(a.x);
+<T> void bar(T x) {}

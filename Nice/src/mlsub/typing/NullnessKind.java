@@ -95,7 +95,13 @@ public class NullnessKind implements AtomicKind
     Monotype m1 = (Monotype) e1;
     Monotype m2 = (Monotype) e2;
 
-    if (m1.isUnknown() || m2.isUnknown())
+    if (m1.isUnknown())
+      {
+        m2.setUnknown();
+        return;
+      }
+
+    if (m2.isUnknown())
       throw LowlevelUnsatisfiable.instance;
 
     MonotypeConstructor mc1 = mc(m1), mc2 = mc(m2);

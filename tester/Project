@@ -20,5 +20,5 @@ fi
 if [ "$CVS_DATE" ]; then
   cd Nice && make
 else
-  cd Nice && make fixpoint && cp share/java/nice.jar external/nice-bootstrap.jar && make fixpoint && make nicedoc archive
+  cd Nice && make fixpoint java="${JAVA:-java}" javac="${JAVAC:-javac}" && cp share/java/nice.jar external/nice-bootstrap.jar && make fixpoint java="${JAVA:-java}" javac="${JAVAC:-javac}" && make nicedoc archive java="${JAVA:-java}"
 fi

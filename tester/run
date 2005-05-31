@@ -56,6 +56,7 @@ for conffile in ../config.*; do
     # Blank the variable, so it does not keep the previous value if it
     # is not reset to a new value.
     JDK_VERSION=
+    experimental_jvm=false
 
     . $conffile
 
@@ -103,9 +104,10 @@ for conffile in ../config.*; do
 	    echo -n "$testname "
 	    case "$code" in
 		0) echo "OK"         ;;
-		1) echo "FAILURE"    ; failed=true ;;
-		2) echo "WARN"       ;;
+# make exits with 2 on errors
+		1|2) echo "FAILURE"  ; [ "$experimental_jvm" != true ] && failed=true ;;
 		3) echo "IMPOSSIBLE" ;;
+#		4) echo "WARN"       ;;
 		8) echo "SKIP"       ;;
 		*) echo "$((code-10))"      ;;
 	    esac

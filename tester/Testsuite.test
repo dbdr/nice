@@ -5,7 +5,7 @@ cd Nice
 if [ "$ANT_BOOTSTRAP" ]; then
   /usr/bin/time -o TIME ant check > OUT
 else
-  /usr/bin/time -o TIME make check > OUT
+  /usr/bin/time -o TIME make java="${JAVA:-java}" check > OUT
 fi
 RES=$?
 

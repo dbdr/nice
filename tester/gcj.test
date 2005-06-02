@@ -15,6 +15,15 @@ NUM_PREFIX="  regressions: "
 NUM=`tail -10 OUT | grep "$NUM_PREFIX"`
 NUM=`expr "$NUM" : "$NUM_PREFIX"'\(.*\)'`
 
+# Give a warning if we could not find the number of errors
+[ ! $NUM ] && exit 3
+
+if [ $NUM != "`cat ../../gcj.num`" ]; then
+  echo "GCJ errors changed from `cat ../../gcj.num` to $NUM"
+  echo $NUM > ../../gcj.num
+  cp -a OUT ../../gcj.out.`date '+%F'`
+fi
+
 # Number of errors is encoded as 10+number (since smaller numbers have
 # other meanings)
 exit $((10+NUM))

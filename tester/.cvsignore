@@ -4,3 +4,5 @@ setup
 METRICS
 *.metrics
 benchs
+gcj.num
+gcj.out.*

@@ -60,6 +60,11 @@ nice (0.9.11)
   * niceunit supports a --jar option to test jars.
   * It is now possible to use Nice "interface" method from Java
     (that is, method signatures are preserved in interface bytecode).
+  * Unbounded wildcard type parameters are supported (as in Java 5). This
+    allows to avoid using type parameters when their value is not important.
+    For instance:
+
+      boolean isShort(List<?> l) = l.size() < 10;
 
  --
 

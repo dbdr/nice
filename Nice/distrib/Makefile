@@ -1,6 +1,8 @@
+VERSION = ${shell expr "`head -1 ../NEWS`" : '.*(\(.*\))'}
+
 # Get the version from the debian changelog.
 FULL_DEB_VERSION = ${shell expr "`head -1 ../debian/changelog`" : '.*(\(.*\))'}
-VERSION = ${shell expr "$(FULL_DEB_VERSION)" : '\(.*\)-[^-]*'}
+DEB_VERSION = ${shell expr "$(FULL_DEB_VERSION)" : '\(.*\)-[^-]*'}
 DEBIAN_REVISION = ${shell expr "$(FULL_DEB_VERSION)" : '.*-\([^-]*\)'}
 
 CVS_TAG = $(shell echo -n "version_$(VERSION)" | tr -c -- "-_a-zA-Z0-9" "_")
@@ -29,6 +31,9 @@ clean-tmp = rm -rf tmp && mkdir tmp
 all: deb tar zip rpm
 
 deb $(DEB):
+	@[ $(VERSION) ] || ( echo "No version in NEWS file"; false )
+	@[ $(VERSION) = "$(DEB_VERSION)" ] ||\
+		 (echo "Upstream and Debian versions not matching"; false )
 	@echo Creating Debian package version ${VERSION}
 	rm -rf $(BUILDROOT) $(BUILDROOT).orig
 	cd .. && cvs tag -d $(CVS_TAG) && cvs tag $(CVS_TAG)

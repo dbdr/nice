@@ -14,7 +14,7 @@ BUILDDIR = ${CURDIR}/$(BUILDROOT)
 
 BUILTSOURCEFILE = nice_$(VERSION).orig.tar.gz
 TARFILE = Nice-${VERSION}-unix.tar.gz
-SOURCEFILE = Nice-${VERSION}-source.tar.gz
+SOURCEFILE = Nice-${VERSION}-source.tgz
 
 ZIPFILE = Nice-${VERSION}-windows.zip
 ZIP_ROOT = tmp/Nice
@@ -100,11 +100,14 @@ send: ${TARFILE} ${ZIPFILE} ${RPMDIR}/${RPMFILE}
 	 echo lcd ${RPMDIR}; echo put ${RPMFILE} \
 	)\
         | ftp -n upload.sourceforge.net
-	echo -e "Redirect /Wiki http://nice.sourceforge.net/cgi-bin/twiki/view" \
-  "\nRedirect /Nice.tar $(DOWNLOADROOT)/${TARFILE}" \
-  "\nRedirect /Nice-source.tar.gz $(DOWNLOADROOT)/${SOURCEFILE}" \
-  "\nRedirect /Nice.zip $(DOWNLOADROOT)/${ZIPFILE}" \
-  "\nRedirect /nice.deb $(DOWNLOADROOT)/${DEB}" \
-  "\nRedirect /nice.rpm $(DOWNLOADROOT)/${RPMFILE}" \
-  > ../web/.htaccess
+
+htaccess:
+	echo -e "DirectoryIndex index.php index.html\n"\
+"Redirect /Wiki http://nice.sourceforge.net/cgi-bin/twiki/view\n"\
+"Redirect /Nice.tar $(DOWNLOADROOT)/${TARFILE}\n"\
+"Redirect /Nice-source.tar.gz $(DOWNLOADROOT)/${SOURCEFILE}\n"\
+"Redirect /Nice.zip $(DOWNLOADROOT)/${ZIPFILE}\n"\
+"Redirect /nice.deb $(DOWNLOADROOT)/${DEB}\n"\
+"Redirect /nice.rpm $(DOWNLOADROOT)/${RPMFILE}"\
+	> ../web/.htaccess
 

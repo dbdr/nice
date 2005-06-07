@@ -77,7 +77,7 @@ nice (0.9.11)
   * niceunit supports a --jar option to test jars.
   * Bug fixes (negative int hex literals, ...)
 
- --
+ -- Tue,  7 Jun 2005 10:29:08 +0200
 
 nice (0.9.10)
 

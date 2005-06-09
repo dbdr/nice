@@ -255,7 +255,7 @@ public final class Variance
 
         if (tp1[i].isUnknown())
           {
-            tp2[i].setUnknown();
+            tp2[i].setUnknown(true, true);
             continue;
           }
 

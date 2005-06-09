@@ -200,15 +200,53 @@ public final class MonotypeVar extends Monotype
       }
   }
 
+  /**
+     True when this variable was created during the decomposition of T
+     into T0<T1,...> caused by a constraint A<B1,...> <: T
+     This a priori implies T1 = B1 (supposing A is invariant, but the
+     allowUnknown variable marks that T1=? (UnknownMonotype) is also a
+     valid solution.
+  */
+  private boolean allowUnknown = false;
+
+  /**
+     Allow this type's type parameters to be changed to the unknown type.
+  */
+  public void allowUnknownTypeParameters()
+  {
+    if (equivalent instanceof MonotypeConstructor)
+      {
+        MonotypeVar[] tps = (MonotypeVar[]) ((MonotypeConstructor) equivalent).getTP();
+        if (tps != null)
+          for (int i = 0; i < tps.length; i++)
+            {
+              tps[i].allowUnknown = true;
+              if (tps[i].equivalent != null)
+                tps[i].allowUnknownTypeParameters();
+            }
+      }
+  }
+
   private boolean unknown;
 
   boolean isUnknown() { return unknown; }
 
-  void setUnknown()
+  void setUnknown(boolean leq, boolean geq)
     throws mlsub.typing.lowlevel.Unsatisfiable
   {
     if (equivalent != null)
-      equivalent.setUnknown();
+      {
+        if (persistentKind == null)
+          {
+            if (! allowUnknown)
+              throw mlsub.typing.lowlevel.LowlevelUnsatisfiable.instance;
+          }
+        else
+          {
+            Monotype raw = ((MonotypeConstructor) equivalent()).getTP()[0];
+            raw.setUnknown(leq, geq);
+          }
+      }
 
     equivalent = UnknownMonotype.instance;
     persistentKind = null;

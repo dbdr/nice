@@ -122,11 +122,17 @@ abstract public class Monotype implements mlsub.typing.lowlevel.Element
 
   boolean isUnknown() { return false; }
 
-  void setUnknown()
+  void setUnknown(boolean leq, boolean geq)
     throws mlsub.typing.lowlevel.Unsatisfiable
   {
-    mlsub.typing.lowlevel.Engine.leq
-      (TopMonotype.instance, nice.tools.typing.Types.rawType(this));
+    if (leq)
+      throw mlsub.typing.lowlevel.LowlevelUnsatisfiable.instance;
+
+    if (geq)
+      {
+        Monotype raw = nice.tools.typing.Types.rawType(this);
+        mlsub.typing.lowlevel.Engine.leq(TopMonotype.instance, raw);
+      }
   }
 
   /****************************************************************

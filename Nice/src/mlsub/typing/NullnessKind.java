@@ -44,10 +44,10 @@ public class NullnessKind implements AtomicKind
     TypeConstructor tc = new TypeConstructor(instance);
     introduce(tc);
 
-    Monotype raw = new MonotypeVar(existential);
+    MonotypeVar raw = new MonotypeVar(existential);
     Typing.introduce(raw);
 
-    return new MonotypeConstructor(tc, new Monotype[]{ raw });
+    return new MonotypeConstructor(tc, new MonotypeVar[]{ raw });
   }
 
   /**
@@ -61,9 +61,9 @@ public class NullnessKind implements AtomicKind
     /* It's important to give the raw variable the same name as the base one,
        so that for the syntactic type <T> ... !T we don't end up printing !t9.
     */
-    Monotype raw = new MonotypeVar(base.getName());
+    MonotypeVar raw = new MonotypeVar(base.getName());
 
-    return new MonotypeConstructor(tc, new Monotype[]{ raw });
+    return new MonotypeConstructor(tc, new MonotypeVar[]{ raw });
   }
   
   static void introduce(TypeConstructor tc)
@@ -97,12 +97,15 @@ public class NullnessKind implements AtomicKind
 
     if (m1.isUnknown())
       {
-        m2.setUnknown();
+        m2.setUnknown(false, true);
         return;
       }
 
     if (m2.isUnknown())
-      throw LowlevelUnsatisfiable.instance;
+      {
+        m1.setUnknown(true, false);
+        return;
+      }
 
     MonotypeConstructor mc1 = mc(m1), mc2 = mc(m2);
     

@@ -290,6 +290,8 @@ public abstract class Engine
       else
 	{
 	  setKind(e2,k1);
+          if (e2 instanceof mlsub.typing.MonotypeVar)
+            ((mlsub.typing.MonotypeVar) e2).allowUnknownTypeParameters();
 	  k1.leq(e1,e2,initial);
 	}
     else

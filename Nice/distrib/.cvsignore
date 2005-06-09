@@ -1,6 +1,7 @@
 Nice-*-windows.zip
 Nice-*.tar
 *.tar.gz
+*.tgz
 
 # Debian
 *.dsc

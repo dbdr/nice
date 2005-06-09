@@ -138,3 +138,12 @@ void _testEmpty(Cons<?> c)
 {
   let cc = /*/// FAIL HERE */ new Cons(head: 1, tail: c);
 }
+
+
+/// PASS
+  A<?> a = new A(x: 0);
+  let x = a.x;
+  Object o = foo(x);
+  /// Toplevel
+class A<T> { T x; }
+<T0> T0 foo(T0 x) = x;

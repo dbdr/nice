@@ -236,15 +236,15 @@ public final class MonotypeVar extends Monotype
   {
     if (equivalent != null)
       {
-        if (persistentKind == null)
-          {
-            if (! allowUnknown)
-              throw mlsub.typing.lowlevel.LowlevelUnsatisfiable.instance;
-          }
-        else
+        if (kind == NullnessKind.instance)
           {
             Monotype raw = ((MonotypeConstructor) equivalent()).getTP()[0];
             raw.setUnknown(leq, geq);
+          }
+        else
+          {
+            if (! allowUnknown)
+              throw mlsub.typing.lowlevel.LowlevelUnsatisfiable.instance;
           }
       }
 

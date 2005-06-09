@@ -345,7 +345,7 @@ public class NiceSourceFile {
 			return;
 			
 		writer.write("// main method");writer.newLine();
-		writer.write("void main(java.lang.String[] args) {\n");
+		writer.write("void main(java.lang.String[] _args) {\n");
 		writer.write(_mainMethodContent.toString());
 		writer.write("}\n");
 	}

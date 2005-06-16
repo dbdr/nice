@@ -205,7 +205,9 @@ private NiceClass declaringClass(JavaMethod m, Alternative alt)
   // Explain that this cannot be done.
   String msg = m + " is a native method.\n";
 
-  if (maybeNull(firstArgument) == null)
+  ?mlsub.typing.TypeConstructor firstArgument = alt.getPatterns()[0].getTC();
+
+  if (firstArgument == null)
     msg += "It cannot be implemented without dispatch on the first argument";
   else
     msg += "It cannot be overriden because the first argument " +

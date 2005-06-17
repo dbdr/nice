@@ -398,10 +398,10 @@ public class TestNice {
 		File[] files = folder.listFiles();
 		for(int i = 0; i < files.length; i++) {
 			File file = files[i];
-			if (file.isFile())
-				file.delete();
-			else
+			if (file.isDirectory())
 				deleteFolder(file);
+			else
+				file.delete();
 		}
 		folder.delete();
 	}

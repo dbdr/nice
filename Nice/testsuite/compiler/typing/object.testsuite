@@ -78,3 +78,21 @@ void foo(Object o) {
   let Object o = 2;
   <T> T foo(T x) = x;
   foo(#String s) = /*/// FAIL HERE*/ o;
+
+/// FAIL
+  A<int> a = new A(x: 0);
+  /*/// FAIL HERE */ foo(a, new A(x: new Object()));
+  int x = a.x;
+  /// Toplevel
+class A<T> { T x; }
+<T> void foo(A<T> a1, A<T> a2) { a1.x = a2.x; }
+
+/// FAIL
+  let (Object[], int->?Object)->void /*/// FAIL HERE */ f = foo;
+  /// Toplevel
+<T> void foo(List<T>,T) {}
+
+/// FAIL
+  let (?Object[], (int,int))->void /*/// FAIL HERE */ f = foo;
+  /// Toplevel
+<T> void foo(List<T>,T) {}

@@ -268,12 +268,13 @@ public abstract class Engine
               /* If a non-rigid type variable was previously compared to some
                  rigid element, it will have its type.
                  it is still possible for it to be greater than Top
-                 (and therefore equal to Top). For this, we just need to
-                 forget its previous kind.
+                 (and therefore equal to Top), provided it is "free upwards",
+                 that is, has no constraint to be smaller than another element.
+                 For this, we just need to forget its previous kind.
               */
               if (k1 == mlsub.typing.TopMonotype.TopKind.instance &&
                   e2 instanceof mlsub.typing.MonotypeVar &&
-                  ! isRigid(e2))
+                  ! isRigid(e2) && isFreeUpwards(e2))
                 {
                   ((mlsub.typing.MonotypeVar) e2).resetKind(k1);
                   return;
@@ -340,6 +341,7 @@ public abstract class Engine
       }
   }
 
+  public static final int INVALID = -1;
   private static final int FLOATING = -3;
   private static final int RIGID = -4;
 
@@ -355,6 +357,31 @@ public abstract class Engine
     if(k==null)
       throw new InternalError("null constraint in Engine.isRigid for "+e);
     return k.isRigid(e);
+  }
+
+  static boolean isFreeUpwards(Element e)
+  {
+    if (e instanceof mlsub.typing.Monotype)
+      {
+        mlsub.typing.Monotype m = (mlsub.typing.Monotype) e;
+
+        // If there is a constructed equivalent, it is the one that
+        // has been getting the constraints (in particular its head).
+        m = m.equivalent();
+        if (m.head() != null)
+          e = m.head();
+        else
+          e = m;
+      }
+
+    if (e.getId() == FLOATING)
+      /// XXX check frozen leqs?
+      return true;
+
+    if (e.getId() < 0)
+      return false;
+
+    return getConstraint(e.getKind()).isFreeUpwards(e);
   }
 
   /****************************************************************
@@ -998,6 +1025,21 @@ public abstract class Engine
 	return null;
       else
 	return getElement(res);
+    }
+
+
+    boolean isFreeUpwards(Element e)
+    {
+      final int id = e.getId();
+
+      // If there is any i with a id <: i constraint, return false
+      // TODO: handle cases when id <: i where i is non rigid, but not free
+      // upwards
+      for (int i = 0; i < k0.firstNonRigid(); i++)
+        if (i != id && k0.wasEntered(id, i))
+          return false;
+
+      return true;
     }
 
     void mark()

@@ -52,8 +52,8 @@ public class TupleType extends Monotype
    * low-level interface
    ****************************************************************/
 
-  public int getId() 		{ throw new Error(); }
-  public void setId(int value) 	{ throw new Error(); }
+  public int getId()           { return mlsub.typing.lowlevel.Engine.INVALID; }
+  public void setId(int value) { throw new Error(); }
   
   final Kind kind;
   

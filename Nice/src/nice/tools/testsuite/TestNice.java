@@ -193,6 +193,9 @@ public class TestNice {
 	 * @param	args	console arguments
 	 */
 	static public void main(String[] args) {
+
+		_runtime = nice.tools.compiler.dispatch.getNiceRuntime();
+
 		if (!processArgs(args)) {
 			usage();
 			System.exit(1);
@@ -320,7 +323,7 @@ public class TestNice {
 		_gcc = gcc;
 
 		// When doing native compilation, we need a jarred runtime
-		if (_runtime == null)
+		if (_runtime == null || ! _runtime.endsWith(".jar"))
 			_runtime = "share/java/nice.jar";
 	}
 
@@ -581,10 +584,6 @@ public class TestNice {
 		 @return the classloader used to run generated code.
 	*/
 	static ClassLoader getClassLoader() {
-
-		// This is normally where the compiled classes are in the dev tree.
-		if (_runtime == null)
-			_runtime = "classes";
 
 		File[] dirs = { getTempFolder(), new File(getRuntime()) };
 		ClassLoader res = new nice.tools.util.DirectoryClassLoader(dirs, null);

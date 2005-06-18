@@ -144,9 +144,6 @@ JavaFieldAccess createJavaFieldAccess(gnu.bytecode.Field field, mlsub.typing.Mon
 
 ?MethodDeclaration makeJavaFieldAccess(gnu.bytecode.Field f)
 {
-  if (! usedIdentifiers.contains(f.getName()))
-    return null;
-
   try {
     mlsub.typing.Monotype[?] params;
     if (!f.getStaticFlag())

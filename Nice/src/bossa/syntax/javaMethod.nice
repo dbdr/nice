@@ -233,6 +233,9 @@ void fetchMethods(mlsub.typing.TypeConstructor tc, gnu.bytecode.ClassType classT
 	    classType.getName().startsWith("java"))
 	  continue;
 
+	if (! usedIdentifiers.contains(f.getName()))
+	  continue;
+
 	if (retyped.get(f) == null)
 	  addJavaSymbol(f, makeJavaFieldAccess(f));
       }

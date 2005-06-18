@@ -127,7 +127,7 @@ class Content
 
     Definition.currentModule = module;
 
-    pkg.compilation.parser.read(unit.reader, definitions);
+    pkg.compilation.parser.read(unit.reader, module, definitions);
 
     Definition.currentModule = null;
   }

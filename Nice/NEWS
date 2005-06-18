@@ -1,3 +1,11 @@
+nice (0.9.12)
+
+  * Support for static import:
+
+      import static java.lang.Math.PI;
+
+ --
+
 nice (0.9.11)
 
   * maybeNull, a counterpart to notNull, can now be used to inform the compiler

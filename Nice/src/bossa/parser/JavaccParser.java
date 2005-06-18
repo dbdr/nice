@@ -59,7 +59,7 @@ public class JavaccParser implements bossa.modules.Parser
     }
   }
 
-  public void read(Reader r, List definitions)
+  public void read(Reader r, bossa.syntax.Module module, List definitions)
   {
     chrono.start();
     try {
@@ -67,7 +67,7 @@ public class JavaccParser implements bossa.modules.Parser
       Parser parser = new Parser(r);
 
       try{
-	parser.module(definitions, storeDocStrings);
+	parser.module(module, definitions, storeDocStrings);
       }
       catch(ParseException e){
         throw reportError(e);

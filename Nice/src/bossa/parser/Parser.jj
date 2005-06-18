@@ -1943,24 +1943,34 @@ LocatedString readImports(List imports, Collection opens):
 {
   [ "package" pkgName=doted_string() ";" ]
   (
-   "import" name=doted_string()
-   ( ".*" { opens.add(name.toString()); }
-     [ "(" "!" ")"
-       { nice.tools.code.Import.addStrictPackage(name.toString()); }
-     ]
-   |      { imports.add(name); }
+   "import"
+   ( "static" doted_string()
+   |
+     name=doted_string()
+     ( ".*" { opens.add(name.toString()); }
+       [ "(" "!" ")"
+         { nice.tools.code.Import.addStrictPackage(name.toString()); }
+       ]
+     | { imports.add(name); }
+     )
    )
    ";"
   )*
   { return pkgName; }
 }
 
-void readOpens():
-{}
+void readOpens(Module module):
+{ LocatedString s; }
 {
   [ "package" doted_string() ";" ]
   (
-   "import" doted_string() [ ".*" [ "(" "!" ")" ] ]
+   "import"
+   (
+     "static" s=doted_string()
+     { module.addStaticImport(s); }
+   |
+     doted_string() [ ".*" [ "(" "!" ")" ] ]
+   )
    ";"
   )*
 }
@@ -1969,10 +1979,10 @@ void readOpens():
  * Modules
  ****************************************************************/
 
-void module(List definitions, boolean storeDocStrings):
+void module(Module module, List definitions, boolean storeDocStrings):
 {}
 {
-  readOpens()
+  readOpens(module)
   readDefinitions(definitions, storeDocStrings)
 }
 

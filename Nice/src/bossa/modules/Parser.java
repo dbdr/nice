@@ -26,7 +26,7 @@ public interface Parser
 {
   LocatedString readImports(Reader r, List imports, Collection opens);
 
-  void read(Reader r, List definitions);
+  void read(Reader r, bossa.syntax.Module module, List definitions);
 
   /*bossa.syntax.FormalParameters*/Object formalParameters(String parameters);
 }

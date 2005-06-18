@@ -51,4 +51,6 @@ public class dispatch
   { return null; }
 
   public static void _printStackTraceWithSourceInfo(Throwable t) {}
+
+  public static java.util.List findJavaMethods(gnu.bytecode.ClassType c, String s) { return null; }
 }

@@ -130,6 +130,13 @@ abstract public class Monotype implements mlsub.typing.lowlevel.Element
 
     if (geq)
       {
+        // We must check that this monotype is not non-null
+        TypeConstructor head = head();
+        if (head == null)
+          throw mlsub.typing.lowlevel.LowlevelUnsatisfiable.instance;
+        else
+          mlsub.typing.lowlevel.Engine.leq(NullnessKind.maybe, head);
+
         Monotype raw = nice.tools.typing.Types.rawType(this);
         mlsub.typing.lowlevel.Engine.leq(TopMonotype.instance, raw);
       }

@@ -37,7 +37,7 @@ public class NullnessKind implements AtomicKind
 
   public int arity() { return 1; }
 
-  private static TypeConstructor maybe, sure;
+  static TypeConstructor maybe, sure;
 
   public Monotype freshMonotype(boolean existential)
   {

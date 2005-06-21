@@ -21,3 +21,45 @@
   /// Toplevel
   import java.util.*;
   import java.sql.*;
+
+
+/// COMMENT  static import
+
+/// PASS
+  let PI2 = PI/2;
+  /// Toplevel
+import static java.lang.Math.PI;
+
+/// FAIL
+  /// package a
+  /// Toplevel
+import static java.lang.Math.PI;
+  /// package b import a
+  // Check that the static import is not leaked
+  let x = /*/// FAIL HERE */ PI;
+
+/// PASS
+  if (false)
+    gc();
+  /// Toplevel
+import static java.lang.System.gc;
+
+/// FAIL
+  /// Toplevel
+import static /*/// FAIL HERE */ FooBar;
+
+/// FAIL
+  /// Toplevel
+import static FooBar /*/// FAIL HERE */ .;
+
+/// FAIL
+  /// Toplevel
+import static /*/// FAIL HERE */ FooBar.baz;
+
+/// FAIL
+  /// Toplevel
+import static /*/// FAIL HERE */ int.baz;
+
+/// FAIL
+  /// Toplevel
+import static /*/// FAIL HERE */ java.lang.String.baz;

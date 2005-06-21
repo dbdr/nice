@@ -29,7 +29,7 @@ public class UnknownMonotype extends Monotype implements TypeSymbol
 
   public TypeSymbol cloneTypeSymbol() { return this; }
 
-  boolean isUnknown() { return true; }
+  public boolean isUnknown() { return true; }
 
   Monotype canonify() { return this; }
 

@@ -229,9 +229,9 @@ public final class MonotypeVar extends Monotype
 
   private boolean unknown;
 
-  boolean isUnknown() { return unknown; }
+  public boolean isUnknown() { return unknown; }
 
-  void setUnknown(boolean leq, boolean geq)
+  public void setUnknown(boolean leq, boolean geq)
     throws mlsub.typing.lowlevel.Unsatisfiable
   {
     if (equivalent != null)

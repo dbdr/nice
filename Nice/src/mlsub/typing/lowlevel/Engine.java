@@ -532,27 +532,49 @@ public abstract class Engine
 		if(leq.e2.getKind()==null)
 		  {
 		    s.push(leq.e2);
+                    continue;
 		  }
 		else
 		  {
-		    if(leq.e1.getKind()!=leq.e2.getKind())
-		      throw new InternalError("Bad kinding in Engine.setKind 1");
-		    i.remove();
-		    k.leq(leq.e1,leq.e2,initialContext);
-		  }
+                    // General case later
+                  }
 	      else if(leq.e2==e)
                 // If e is Top, e1 <: e is trivial and can be discarded.
                 if (toTop)
-                  i.remove();
+                  {
+                    i.remove();
+                    continue;
+                  }
                 else if (leq.e1.getKind() == null)
-		  s.push(leq.e1);
+		  {
+                    s.push(leq.e1);
+                    continue;
+                  }
 		else
 		  {
-		    if(leq.e1.getKind()!=leq.e2.getKind())
-		      throw new InternalError("Bad kinding in Engine.setKind 2");
-		    i.remove();
-		    k.leq(leq.e1,leq.e2,initialContext);
-		  }
+                    // General case later
+                  }
+              else
+                continue;
+
+              // General case, add leq.e1 <: leq.e2
+              if (leq.e1.getKind() != leq.e2.getKind())
+                throw new InternalError("Bad kinding in Engine.setKind");
+
+              if (leq.e1 instanceof mlsub.typing.Monotype &&
+                  leq.e2 instanceof mlsub.typing.Monotype)
+                {
+                  mlsub.typing.Monotype e1 = (mlsub.typing.Monotype) leq.e1;
+                  mlsub.typing.Monotype e2 = (mlsub.typing.Monotype) leq.e2;
+
+                  if (e1.isUnknown())
+                    e2.setUnknown(false, true);
+                  else if (e2.isUnknown())
+                    e1.setUnknown(true, false);
+                }
+
+              i.remove();
+              k.leq(leq.e1,leq.e2,initialContext);
 	    }
 	}
 	finally{

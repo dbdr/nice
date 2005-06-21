@@ -120,9 +120,9 @@ abstract public class Monotype implements mlsub.typing.lowlevel.Element
     return null;
   }
 
-  boolean isUnknown() { return false; }
+  public boolean isUnknown() { return false; }
 
-  void setUnknown(boolean leq, boolean geq)
+  public void setUnknown(boolean leq, boolean geq)
     throws mlsub.typing.lowlevel.Unsatisfiable
   {
     if (leq)

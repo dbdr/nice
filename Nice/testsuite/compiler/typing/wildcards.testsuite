@@ -166,3 +166,27 @@ class A<T> { T x; }
     }
   /// Toplevel
 <T0> T0 foo(T0 x) = x;
+
+
+/// FAIL
+  A<?,?> ctx = new A();
+  ctx./*/// FAIL HERE */ get0("bar");
+  /// Toplevel
+class A<K,V> { }
+<K, K0, V | K <: K0> void get0(A<K, V>, K0) {}
+
+/// FAIL
+  A<?,?> ctx = new A();
+  ctx./*/// FAIL HERE */ get0("bar");
+  /// Toplevel
+class A<K,V> { }
+<K, K0, V0, V | K <: K0, V <: ?V0> ?V0 get0(A<K, V>, K0) = null;
+
+/// FAIL
+  A<String> a = new A(x: "");
+  A<?> ctx = a;
+  ctx./*/// FAIL HERE */ set0(0);
+  String s = a.x;
+  /// Toplevel
+class A<K> { K x; }
+<K, K0 | K0 <: K> void set0(A<K> a, K0 v) = a.x = v;

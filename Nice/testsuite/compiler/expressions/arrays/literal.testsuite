@@ -56,3 +56,10 @@ var String[][][] s = [[["A"]]];
 
 /// FAIL
   int[] i = [1, /*/// FAIL HERE*/ ""];
+
+/// FAIL
+  let String /* /// FAIL HERE */ foo = [];
+
+/// FAIL
+  /// Toplevel
+  let String /* /// FAIL HERE */ foo = [];

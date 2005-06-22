@@ -228,7 +228,7 @@ public final class Types
 
     Monotype[] parameters = ((MonotypeConstructor) type).getTP();
 
-    if (parameters.length <= rank)
+    if (parameters == null || parameters.length <= rank)
       return null;
     else
       return parameters[rank];

@@ -16,6 +16,7 @@ void main(String[] args)
 
   ?String classpath = null;
   ?String jar = null;
+  boolean systemExit = false;
 
   prg.options =
   [
@@ -30,7 +31,10 @@ void main(String[] args)
 	  String opt => { jar = opt; }),
 
    option("man", "Print man page to stdout", visible: false,
-	  () => man(prg))
+	  () => man(prg)),
+   
+   option("exit", "Invoke System.exit when finished\nExit code will be the number of tests failed",
+    () => { systemExit = true; })
   ];
 
   List<String> rest = parse(prg, args);
@@ -55,6 +59,7 @@ void main(String[] args)
   });
 
   println(""listener.nFailures"/"listener.nTests" tests failed");
+  if (systemExit) System.exit(listener.nFailures);
 }
 
 String mainPackage(String jar)

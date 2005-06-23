@@ -5,9 +5,13 @@ import nice.tools.locator;
 import java.lang.reflect.*;
 
 public boolean runTests(String packageName, TestListener listener,
-			?String classpath = null)
+			?String classpath = null, ?ClassLoader classloader = null)
 {
-  let classloader = classpath == null
+  // A custom classloader might be required, in particular, when testing
+  // multiple packages, to keep opened databases from loosing.
+  // Using separate classloaders will left databases open, locked,
+  // but not accessible from subsequent classloaders.
+  if( classloader == null ) classloader = classpath == null
     ? ClassLoader.getSystemClassLoader()
     : classloaderFromClasspath(notNull(classpath));
 

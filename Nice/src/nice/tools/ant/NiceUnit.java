@@ -129,7 +129,7 @@ public class NiceUnit extends Task {
 			String classpath = this.classpath + 
 				(nestedClasspath != null ? File.pathSeparator+nestedClasspath : "");
 
-			if (! nice.tools.unit.fun.runTests(pack, listener, classpath))
+			if (! nice.tools.unit.fun.runTests(pack, listener, classpath, null))
 				throw new BuildException("Package " + pack + " was not found");
 
 			listener.printSummary();

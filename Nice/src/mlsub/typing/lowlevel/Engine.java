@@ -281,11 +281,15 @@ public abstract class Engine
                 }
 
 	      if(dbg)
-		Debug.println("Bad kinding discovered by Engine : "+
-			      k1+" != "+k2+
-			      "\nfor elements "+e1+" and "+e2);
-	      throw new LowlevelUnsatisfiable("Bad Kinding for "+
-					      e1+ " and "+e2);
+                {
+                  Debug.println("Bad kinding discovered by Engine : "+
+                                k1+" != "+k2+
+                                "\nfor elements "+e1+" and "+e2);
+                  throw new LowlevelUnsatisfiable("Bad Kinding for "+
+                                                  e1+ " and "+e2);
+                }
+              else
+                throw LowlevelUnsatisfiable.instance;
 	    }
 	}
       else

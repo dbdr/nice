@@ -678,7 +678,10 @@ public final class K0 {
     // makes it unnecessary to mark-backtrack in some cases
     if (isRigid(x1) && isRigid(x2)) {
       if (!R.get(x1, x2)) {
-        throw new LowlevelRigidClash(indexToString(x1), indexToString(x2));
+        if (debugK0)
+          throw new LowlevelRigidClash(indexToString(x1), indexToString(x2));
+        else
+          throw LowlevelUnsatisfiable.instance;
       } else {
         return;
       }

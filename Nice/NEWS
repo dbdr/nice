@@ -4,6 +4,8 @@ nice (0.9.12)
 
       import static java.lang.Math.PI;
 
+  * Improved compilation speed.
+
  --
 
 nice (0.9.11)

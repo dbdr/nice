@@ -593,6 +593,7 @@ public final class K0 {
    * Assume x is a valid index and iid is a valid interface id
    **/
   public void indexImplements(int x, int iid) throws Unsatisfiable {
+    usingInterfaces = true;
     S.assume(S.a&& hasBeenInitialized);
     if (LowlevelUnsatisfiable.refinedReports) {
       try {
@@ -1157,13 +1158,18 @@ public final class K0 {
     collect();
   }
 
+  private boolean usingInterfaces = false;
+
   private void prepareConstraint() throws Unsatisfiable {
     collapseMinimal();
-    BitMatrix leq = new BitMatrix(C);
-    leq.closure();
-    computeArrows(leq);
-    saturateAbs(leq);
-    //condense(leq);
+    if (usingInterfaces) {
+      BitMatrix leq = new BitMatrix(C);
+      leq.closure();
+      computeArrows(leq);
+      saturateAbs(leq);
+      //condense(leq);
+      usingInterfaces = false;
+    }
   }
 
 

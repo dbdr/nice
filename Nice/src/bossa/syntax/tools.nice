@@ -224,7 +224,6 @@ mlsub.typing.Polytype voidPolytype() = native nice.tools.typing.PrimitiveType.vo
 mlsub.typing.Monotype boolType() = native nice.tools.typing.PrimitiveType.boolType;
 mlsub.typing.Monotype intType() = native nice.tools.typing.PrimitiveType.intType;
 mlsub.typing.Monotype longType() = native nice.tools.typing.PrimitiveType.longType;
-gnu.bytecode.ClassType Type_pointer_type() = native gnu.bytecode.Type.pointer_type;
 mlsub.typing.TypeConstructor longTC() = native nice.tools.typing.PrimitiveType.longTC;
 mlsub.typing.TypeConstructor intTC() = native nice.tools.typing.PrimitiveType.intTC;
 mlsub.typing.TypeConstructor shortTC() = native nice.tools.typing.PrimitiveType.shortTC;

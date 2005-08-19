@@ -25,6 +25,7 @@ public class NiceMethod extends UserOperator
 
   private ?List<VarSymbol> homonyms = null;
   private ?List<MethodDeclaration> specializedMethods = null;
+  private ?List<MethodDeclaration> specializedMethodsCompileTime = null;
 
   {
     registerDispatchTest(this);
@@ -57,22 +58,26 @@ public class NiceMethod extends UserOperator
   {
     this.findSpecializedMethods();
 
-    if (isOverride && specializedMethods == null)
-      User.error(this, "This method does not override any other method");
-
-    if (! this.inInterfaceFile() && ! isOverride && specializedMethods != null)
+    // Perform checks if we are compiling from source
+    if (! this.inInterfaceFile())
       {
-        let parent = notNull(specializedMethods)[0];
-        boolean sameResult = 
-          this.getReturnType().toString().equals(parent.getReturnType().toString());
+	if (isOverride && specializedMethods == null)
+	  User.error(this, "This method does not override any other method");
 
-        if (sameResult)
-          User.warning(this, "This method overrides " + parent +
+	if (! isOverride && specializedMethods != null)
+	  {
+	    let parent = notNull(specializedMethods)[0];
+	    boolean sameResult =
+	      this.getReturnType().toString().equals(parent.getReturnType().toString());
+
+	    if (sameResult)
+	      User.warning(this, "This method overrides " + parent +
 	"\nYou should make this explicit, either by omitting the return type" +
-                       "\nor by using the 'override' keyword");
-        else
-          User.warning(this, "This method overrides " + parent +
+			   "\nor by using the 'override' keyword");
+	    else
+	      User.warning(this, "This method overrides " + parent +
 	"\nYou should make this explicit by using the 'override' keyword");
+	  }
       }
 
     super;
@@ -84,6 +89,12 @@ public class NiceMethod extends UserOperator
   }
 
   specializesMethods() = specializedMethods != null;
+
+  specializes(MethodDeclaration d)
+  {
+    return specializedMethods != null && notNull(specializedMethods).contains(d) ||
+      specializedMethodsCompileTime != null && notNull(specializedMethodsCompileTime).contains(d);
+  }
 
   private void findSpecializedMethods()
   {
@@ -106,8 +117,16 @@ public class NiceMethod extends UserOperator
 
         let itsDomain = nice.tools.typing.Types.domain(s.getType());
 
-	if (this.specializes(s, ourDomain, itsDomain))
+	if (mlsub.typing.Typing.smaller(ourDomain, itsDomain))
 	  {
+	    // Check if we cannot discover this specialization at runtime
+	    if (! mlsub.typing.Typing.smaller(ourDomain, itsDomain, true) ||
+		nice.tools.typing.Types.typeParameterDispatch(this.getType(), s.getType()))
+	      {
+		this.addSpecializedMethod(d, compileTimeOnly: true);
+		continue;
+	      }
+
 	    // In a compiled package, we don't need checking.
 	    if (! module.compiled())
 	      if (! this.checkOverride(s, d, ourDomain, itsDomain))
@@ -118,8 +137,10 @@ public class NiceMethod extends UserOperator
 	  }
 	else if (this.isSpecializedBy(d, s, ourDomain, itsDomain))
           {
-	    if (! nice.tools.typing.Types.covariantSpecialization(s.getType(), this.getType()))
-	      this.reportReturnTypeError(shouldBeLessPrecise: true, than: d);
+	    // In a compiled package, we don't need checking.
+	    if (! module.compiled())
+	      if (! nice.tools.typing.Types.covariantSpecialization(s.getType(), this.getType()))
+		this.reportReturnTypeError(shouldBeLessPrecise: true, than: d);
 
 	    // d is a specialized version of this.
 	    if (d instanceof NiceMethod)
@@ -132,13 +153,6 @@ public class NiceMethod extends UserOperator
 
     homonyms = null;
   }
-
-  private boolean specializes
-    (VarSymbol s,
-     mlsub.typing.Domain ourDomain, mlsub.typing.Domain itsDomain)
-  =
-     mlsub.typing.Typing.smaller(ourDomain, itsDomain, true)
-  && ! nice.tools.typing.Types.typeParameterDispatch(this.getType(), s.getType());
 
   private boolean isSpecializedBy
     (MethodDeclaration d, VarSymbol s,
@@ -199,8 +213,18 @@ public class NiceMethod extends UserOperator
     return true;
   }
 
-  private void addSpecializedMethod(MethodDeclaration method)
+  private void addSpecializedMethod(MethodDeclaration method, boolean compileTimeOnly = false)
   {
+    if (compileTimeOnly)
+      {
+	if (specializedMethodsCompileTime == null)
+	  specializedMethodsCompileTime = new ArrayList(5);
+
+	notNull(specializedMethodsCompileTime).add(method);
+
+	return;
+      }
+
     if (specializedMethods == null)
       specializedMethods = new ArrayList(5);
 
@@ -219,7 +243,12 @@ public class NiceMethod extends UserOperator
   printInterface(s)
   {
     s.print(keyword(0, visibility));
-    if (specializedMethods != null)
+    // In the compiled package's interface, we write 'override' even when
+    // there are only compile time specializations (which would be invalid
+    // in user source code). This is needed so that we know the method has
+    // some type of override that we recompute at package load time, without
+    // having to do it for all methods.
+    if (specializedMethods != null || specializedMethodsCompileTime != null)
       s.print("override ");
     s.print(this.toString() + ";\n");
   }

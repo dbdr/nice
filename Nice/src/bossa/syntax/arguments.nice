@@ -101,6 +101,20 @@ public class Arguments
   
   int[?] getUsedArguments(VarSymbol s) = usedArguments.get(s);
 
+  boolean usedReordering(VarSymbol s)
+  {
+    let map = this.getUsedArguments(s);
+
+    if (map == null)
+      return false;
+
+    for (int i = 0; i < map.length; i++)
+      if (map[i] != i+1)
+	return true;
+
+    return false;
+  }
+
   /**
      return true if there are arity non-tagged arguments.
   */

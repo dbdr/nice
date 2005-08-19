@@ -178,6 +178,8 @@ var HashMap<String, List<Alternative>> alternativesMap = new HashMap();
 
 public void resetAlternatives()
 {
+  // Temporary, reset should be called directly
+  reset();
   alternativesMap = new HashMap();
 }
 

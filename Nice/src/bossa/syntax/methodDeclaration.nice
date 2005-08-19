@@ -250,6 +250,11 @@ public abstract class MethodDeclaration extends Definition
     return false;
   }
 
+  public boolean specializes(MethodDeclaration d)
+  {
+    return false;
+  }
+
   public ?Iterator<MethodDeclaration> listSpecializedMethods()
   {
    return null;

@@ -142,3 +142,12 @@ abstract class A {
 class B extends A implements I {}
 
 foo(B(I) b) {}
+
+/// PASS
+  /// package a
+  m(int x => false);
+  /// Toplevel
+public <T> void m(T->boolean) {}
+public <T, U> void m(T->?U converter) {}
+  /// package b import a
+  m(int x => false);

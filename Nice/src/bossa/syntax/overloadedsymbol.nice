@@ -106,6 +106,9 @@ public class OverloadedSymbolExp extends Expression
       }
 
     // SECOND PASS: check argument types
+    // This pass takes about half the time of the whole overloading resolution
+    // (which dominates typechecking, which dominates global compile time
+    //  for large packages)
 
     removed.clear();
 
@@ -158,13 +161,15 @@ public class OverloadedSymbolExp extends Expression
       {
 	let res = symbols[0];
 	// store the formal argument types for later use together with the type
+	// this takes about the other half of overloading resolution time
         callExp.setComputedType(notNull(arguments.types.get(res)),
                                 nice.tools.typing.Types.parameters(res.getClonedType()));
+
 	res.releaseClonedType();
 
 	// store the expression (including default arguments)
 	callExp.arguments.computedExpressions = arguments.getExpressions(res);
-	//callExp.arguments = null; // free memory
+	//callExp.arguments.arguments = cast(null); // free memory
 	return this.uniqueExpression();
       }
 
@@ -534,10 +539,13 @@ private void removeNonMinimal(List<VarSymbol> symbols, Arguments arguments)
   if(symbols.size()<2)
     return;
 
-  int len = symbols.size();
+  let len = symbols.size();
+  var remaining = len;
+
   List<VarSymbol> syms = new ArrayList(symbols);
   boolean[] remove = new boolean[len];
 
+  trim:
   for(int s1 = 0; s1<len; s1++) {
 
     mlsub.typing.Domain d1 = domain(syms[s1].getClonedType(),
@@ -558,18 +566,15 @@ private void removeNonMinimal(List<VarSymbol> symbols, Arguments arguments)
 	mlsub.typing.Domain d2 = domain(syms[s2].getClonedType(),
 			     arguments.getUsedArguments(syms[s2]));
 
-	try {
-	  mlsub.typing.Typing.leq(d2, d1);
-	  try {
-	    mlsub.typing.Typing.leq(d1, d2);
-	  }
-	  catch (mlsub.typing.TypingEx e) {
+	if (isLeq(syms[s2], syms[s1], s2, s1, d2, d1, arguments) &&
+	    ! isLeq(syms[s1], syms[s2], s1, s2, d1, d2, arguments))
+	  {
 	    remove[s1] = true;
-	    break;
+	    if (--remaining == 1)
+	      break trim;
+	    else
+	      break;
 	  }
-	}
-	catch(mlsub.typing.TypingEx e){
-	}
       }
   }
 
@@ -582,6 +587,92 @@ private void removeNonMinimal(List<VarSymbol> symbols, Arguments arguments)
 	syms[i].releaseClonedType();
 	symbols.remove(syms[i]);
       }
+}
+
+boolean isLeq(VarSymbol sym1, VarSymbol sym2,
+	      int s1, int s2, mlsub.typing.Domain d1, mlsub.typing.Domain d2,
+	      Arguments arguments)
+{
+  let res = leqFromOverride(sym1, sym2, arguments);
+  if (res != 0)
+    {
+      let result = res == 1;
+      storeLeq(result, sym1, sym2);
+      return result;
+    }
+
+  boolean result = computeIsLeq(s1, s2, d1, d2);
+  // Cache method specificity results.
+  // This is especially important as many frequently used methods
+  // (inline, retyped) are not covered by the leqFromOverride optimization.
+  storeLeq(result, sym1, sym2, arguments);
+  return result;
+}
+
+boolean computeIsLeq(int s1, int s2,
+		     mlsub.typing.Domain d1, mlsub.typing.Domain d2)
+{
+  try {
+    mlsub.typing.Typing.leq(d1, d2);
+    return true;
+  }
+  catch (mlsub.typing.TypingEx e) {
+    return false;
+  }
+}
+
+private int leqFromOverride(VarSymbol s1, VarSymbol s2, Arguments arguments)
+{
+  let reordering =
+    arguments.usedReordering(s1) ||
+    arguments.usedReordering(s2);
+  if (reordering)
+    return 0;
+
+  // Lookup the cache.
+  // This is especially important as many frequently used methods
+  // (inline, retyped) do not have override information.
+  let m = methodLeqs[s1];
+  if (m != null)
+    {
+      let res = m[s2];
+      if (res != null)
+	return res ? 1 : -1;
+    }
+
+  let d1 = s1.getMethodDeclaration();
+  let d2 = s2.getMethodDeclaration();
+  if (d1 == null || d2 == null)
+    return 0;
+
+  if (! (d1 instanceof NiceMethod && d2 instanceof NiceMethod))
+    return 0;
+
+  if (d1.specializes(d2))
+    return 1;
+  else
+    return -1;
+}
+
+let Map<VarSymbol, Map<VarSymbol, boolean>> methodLeqs = new HashMap();
+
+private void storeLeq(boolean result,
+		      VarSymbol s1, VarSymbol s2, Arguments arguments)
+{
+  let reordering =
+    arguments.usedReordering(s1) ||
+    arguments.usedReordering(s2);
+
+  if (! reordering)
+    storeLeq(result, s1, s2);
+}
+
+private void storeLeq(boolean result, VarSymbol s1, VarSymbol s2)
+{
+  var m = methodLeqs[s1];
+  if (m == null)
+    methodLeqs[s1] = m = new HashMap();
+  m[s2] = result;
 }
 
 private mlsub.typing.Domain domain(mlsub.typing.Polytype t, int[?] usedArguments)

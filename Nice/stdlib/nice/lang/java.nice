@@ -320,7 +320,7 @@ class Vector<T> extends AbstractList<T> implements List<T> = native java.util.Ve
 <T> T max(Collection<T>, Comparator<T>) = 
   native Object Collections.max(Collection, Comparator);
 <T> T min(Collection<T>, Comparator<T>) = 
-  native Object Collections.max(Collection, Comparator);
+  native Object Collections.min(Collection, Comparator);
 <T> void sort(List<T>, Comparator<T>) = 
   native void Collections.sort(List, Comparator);
 <T> void swap(List<T>, int, int) =

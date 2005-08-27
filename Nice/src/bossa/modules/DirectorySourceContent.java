@@ -119,6 +119,17 @@ class DirectorySourceContent extends SourceContent
   private BufferedReader read(File f)
   {
     try{
+      String encoding = pkg.compilation.sourceEncoding;
+      if(encoding != null) try{
+        FileInputStream fis = new FileInputStream(f);
+        // No need to wrap the FileInputStream with BufferedInputStream here:
+        // InputStreamReader already contains an input buffer, both in Sun and GNU implementations.
+        InputStreamReader isr = new InputStreamReader(fis, encoding);
+        return new BufferedReader(isr);
+      }catch(UnsupportedEncodingException badEncoding){
+        User.warning("Encoding '" + encoding + "' was rejected while reading " +
+                     nice.tools.util.System.prettyPrint(f));
+      }
       return new BufferedReader(new FileReader(f));
     }
     catch(FileNotFoundException e){

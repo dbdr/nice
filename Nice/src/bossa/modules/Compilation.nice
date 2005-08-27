@@ -33,6 +33,7 @@ class Compilation extends CompilationInterface
   boolean recompilationNeeded = false;
 
   String sourcePath = ".";
+  public ?String sourceEncoding = null;
   ?String packagePath = null;
   ?String destinationDir = null;
 

@@ -24,6 +24,7 @@ public abstract class Compilation extends CompilationInterface
   public String runtimeFile;
 
   public String sourcePath;
+  public String sourceEncoding;
   public String packagePath;
   public String destinationDir;
 

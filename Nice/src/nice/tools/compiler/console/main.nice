@@ -67,6 +67,11 @@ int compile(String[] args)
 	  "path",
 	  String path => { compilation.sourcePath = path; }),
 
+   option("encoding",
+	  purpose: "Character set encoding to be used for .nice source files",
+	  optionHint: "charset",
+	  String charset => { compilation.sourceEncoding = charset; }),
+
    option(letter: 'd', "destination",
 	  "Destination directory for compiled packages",
 	  "dir",

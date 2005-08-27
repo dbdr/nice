@@ -5,6 +5,7 @@ nice (0.9.12)
       import static java.lang.Math.PI;
 
   * Improved compilation speed.
+  * Source files encoding can be specified in nicec command-line arguments.
 
  --
 

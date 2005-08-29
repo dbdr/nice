@@ -31,7 +31,8 @@ import bossa.modules;
 import java.io.*;
 import java.util.jar.*;
 
-let File tmp = new File("temp-testcase");
+public let File TMP = new File("temp-testcase");
+public let String NICE_JAR = "share/java/nice.jar";
 
 class HelpersOutput extends nice.tools.compiler.console.ConsoleOutput {
   File source;
@@ -52,7 +53,7 @@ public File compile
    ?String check = null)
 {
   let dirname = pkg.replace('.', File.separatorChar);
-  let dir = new File(tmp, dirname);
+  let dir = new File(TMP, dirname);
   dir.mkdirs();
   let source = new File(dir, "main.nice");
   writeProgram(source, imp, toplevel, main, check);
@@ -61,11 +62,11 @@ public File compile
 
   let compilation = new bossa.modules.Compilation
     (listener: output, parser: new bossa.parser.JavaccParser());
-  compilation.sourcePath = tmp.getPath();
+  compilation.sourcePath = TMP.getPath();
   if (imp != null)
-    compilation.packagePath = new File(tmp, imp + ".jar").toString();
+    compilation.packagePath = new File(TMP, imp + ".jar").toString();
   compilation.runtimeFile = "classes";
-  let outputJar = new File(tmp, pkg + ".jar");
+  let outputJar = new File(TMP, pkg + ".jar");
   compilation.output = outputJar.getPath();
 
   compile(compilation, pkg);
@@ -102,7 +103,7 @@ private void writeProgram
 
 public void run(String jar)
 {
-  run(new java.io.File(tmp, jar + ".jar"));
+  run(new java.io.File(TMP, jar + ".jar"));
 }
 
 public void run(java.io.File jar)
@@ -110,7 +111,7 @@ public void run(java.io.File jar)
   let jarFile = new JarFile(jar);
   let mainClassName =
     jarFile.getManifest().getMainAttributes().getValue("Main-Class");
-  let loader = new nice.tools.util.SelfContainedClassLoader([jar.toURL()]);
+  let loader = new nice.tools.util.SelfContainedClassLoader([jar.toURL(),new File(NICE_JAR).toURL()]);
   nice.tools.util.JDK.setDefaultAssertionStatus(loader, true);
   let mainClass = loader.loadClass(mainClassName);
   let main = mainClass.getMethod("main", [String[].class]);

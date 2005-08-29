@@ -20,7 +20,7 @@ package nice.tools.compiler.console;
 
 public ConsoleOutput consoleOutput() = new ConsoleOutput();
 
-public final class ConsoleOutput extends StatusCodeListener
+public class ConsoleOutput extends StatusCodeListener
 {
   int errorCount = 0;
   int warningCount = 0;

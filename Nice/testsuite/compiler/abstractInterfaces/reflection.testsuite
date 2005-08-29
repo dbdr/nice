@@ -65,3 +65,14 @@
   foo( Impl impl, A arg ) = "a";
   foo( Impl impl, B arg ) = "b";
   foo( Impl impl, C arg ) = "c";
+
+/// PASS
+  // Checks that methods with default implementation are absent from the Java-compatible interface.
+  Foo.class.getMethod( "abstractMethod", [] );
+  try{
+    Foo.class.getMethod( "aMethodWithCode", [] );
+    !assert false;
+  }catch( java.lang.NoSuchMethodException ok ){}
+  /// Toplevel
+  interface Foo { void abstractMethod(); }
+  String aMethodWithCode( Foo ) = "bar";

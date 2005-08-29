@@ -1,0 +1,48 @@
+/// COMMENT Dynamic dispatch and handling of a wrong classloading order.
+
+import testsuite;
+
+void invokeMain( String packageName, java.net.URL[] jars ){
+  let cl = new java.net.URLClassLoader( jars, fun.class.getClassLoader() );
+  let clazz = cl.loadClass( packageName + ".fun" );
+  let main = clazz.getMethod( "main", [ String[].class ] );
+  try{
+    main.invoke( null, [ [""] ] );
+  }catch( java.lang.reflect.InvocationTargetException error ){
+    let source = TMP.getPath() + '/' + packageName.replace( '.', "/" ) + "/main.nice";
+    printSourceWithLNums( new java.io.File( source ) );
+    let cause = error.getTargetException(); ?assert cause != null;
+    cause.printStackTraceWithSourceInfo( System.err, cl );
+    !assert false;
+  }
+}
+
+void _testExtendsDispatch(){
+  let jarA = compile( "_testExtendsDispatch.a",
+    toplevel: "enum Result { FOO, BAR } class Foo { Result foo() = FOO; }" );
+  let jarB = compile( "_testExtendsDispatch.b",
+    toplevel: "class Bar extends Foo { foo() = BAR; }",
+    imp: "_testExtendsDispatch.a",
+    main: "Foo foo = new Bar(); !assert foo.foo() == BAR;" );
+  let urlNice = new java.io.File( NICE_JAR ).toURL();
+  // This should be okay:
+  invokeMain( "_testExtendsDispatch.b", [ jarB.toURL(), jarA.toURL(), urlNice ] );
+  // Wrong classloading order, extending class is loaded after the extended one:
+  invokeMain( "_testExtendsDispatch.b", [ urlNice, jarA.toURL(), jarB.toURL() ] );
+}
+
+void _testImplementsDispatch(){
+  let jarA = compile( "_testImplementsDispatch.a",
+    toplevel: "enum Result { FOO, BAR }\n" +
+              "interface IF { Result foo(); }\n" +
+              "class Foo implements IF { foo() = FOO; }" );
+  let jarB = compile( "_testImplementsDispatch.b",
+    toplevel: "class Bar implements IF { foo() = BAR; }",
+    imp: "_testImplementsDispatch.a",
+    main: "IF bar = new Bar(); !assert bar.foo() == BAR;" );
+  let urlNice = new java.io.File( NICE_JAR ).toURL();
+  // This should be okay:
+  invokeMain( "_testImplementsDispatch.b", [ jarB.toURL(), jarA.toURL(), urlNice ] );
+  // Wrong classloading order, extending class is loaded after the extended one:
+  invokeMain( "_testImplementsDispatch.b", [ urlNice, jarA.toURL(), jarB.toURL() ] );
+}

@@ -22,6 +22,7 @@
    @author Daniel Bonniot (bonniot@users.sf.net)
  */
 
+import nice.io;
 import nice.tools.compiler.console;
 import nice.tools.compiler;
 import bossa.modules;
@@ -31,7 +32,16 @@ import java.util.jar.*;
 
 let File tmp = new File("temp-testcase");
 
-void compile
+class HelpersOutput extends nice.tools.compiler.console.ConsoleOutput {
+  File source;
+  error(location, message){
+    println( "8<-------------------------------------------------------------------------->8" );
+    println( read( source ) );
+    super;
+  }
+}
+
+public File compile
   (String pkg,
    ?String toplevel = null,
    ?String imp = null,
@@ -41,9 +51,10 @@ void compile
   let dirname = pkg.replace('.', File.separatorChar);
   let dir = new File(tmp, dirname);
   dir.mkdirs();
-  writeProgram(new File(dir, "main.nice"), imp, toplevel, main, check);
+  let source = new File(dir, "main.nice");
+  writeProgram(source, imp, toplevel, main, check);
 
-  let output = consoleOutput();
+  let output = new HelpersOutput( source: source );
 
   let compilation = new bossa.modules.Compilation
     (listener: output, parser: new bossa.parser.JavaccParser());
@@ -51,11 +62,13 @@ void compile
   if (imp != null)
     compilation.packagePath = new File(tmp, imp + ".jar").toString();
   compilation.runtimeFile = "classes";
-  compilation.output = new File(tmp, pkg + ".jar").toString();
+  let outputJar = new File(tmp, pkg + ".jar");
+  compilation.output = outputJar.getPath();
 
   compile(compilation, pkg);
 
-  assert output.errorCount == 0;
+  !assert output.errorCount == 0;
+  return outputJar;
 }
 
 private void writeProgram
@@ -82,12 +95,12 @@ private void writeProgram
   }
 }
 
-void run(String jar)
+public void run(String jar)
 {
   run(new java.io.File(tmp, jar + ".jar"));
 }
 
-void run(java.io.File jar)
+public void run(java.io.File jar)
 {
   let jarFile = new JarFile(jar);
   let mainClassName =

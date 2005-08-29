@@ -264,6 +264,10 @@
   <property name="checkFail" value="yes" description="whether to fail if there are testsuite regressions" />
   <target name="testengine">
     <mac-javac-single includes="nice/tools/testsuite/*.java" />
+    <available file="${build}/nice/tools/testsuite/package.nicei" property="haveAdvancedTestengine" />
+  </target>
+  <target name="testengine_advanced" depends="testengine" unless="haveAdvancedTestengine">
+    <mac-nicec-new package="nice.tools.testsuite" />
   </target>
   <target name="check_compiler" depends="archive,testengine">
     <java classpathref="freshNice"
@@ -283,10 +287,9 @@
       <arg value="testsuite/lib" />
     </java>
   </target>
-  <target name="check_advanced" depends="archive,testengine">
-    <mac-nicec-new package="nice.tools.testsuite" />
+  <target name="check_advanced" depends="archive,testengine,testengine_advanced">
     <java classpathref="freshNice"
-          classname="nice.tools.testsuite.dispatch"
+          classname="nice.tools.testsuite.fun"
           fork="yes"
           failonerror="${checkFail}">
       <jvmarg line="${jvmArgs}" />

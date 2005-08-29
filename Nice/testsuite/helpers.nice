@@ -37,9 +37,11 @@ class HelpersOutput extends nice.tools.compiler.console.ConsoleOutput {
   File source;
   error(location, message){
     println("----1--------10--------20--------30--------40--------50--------60--------70--");
-    int lnum = 0; foreach(readLines(source), (String line)=>println((++lnum>9?""lnum:"0"lnum)+"| "+line));
+    int lnum = 0; foreach(readLines(source),
+      (String line) => println((++lnum > 9 ? ""lnum : "0"lnum) + "| " + line));
     super;
   }
+  progress(packageName, phase){}
 }
 
 public File compile

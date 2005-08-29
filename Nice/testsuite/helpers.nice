@@ -23,6 +23,7 @@
  */
 
 import nice.io;
+import nice.functional;
 import nice.tools.compiler.console;
 import nice.tools.compiler;
 import bossa.modules;
@@ -35,8 +36,8 @@ let File tmp = new File("temp-testcase");
 class HelpersOutput extends nice.tools.compiler.console.ConsoleOutput {
   File source;
   error(location, message){
-    println( "8<-------------------------------------------------------------------------->8" );
-    println( read( source ) );
+    println("----1--------10--------20--------30--------40--------50--------60--------70--");
+    int lnum = 0; foreach(readLines(source), (String line)=>println((++lnum>9?""lnum:"0"lnum)+"| "+line));
     super;
   }
 }
@@ -74,24 +75,26 @@ public File compile
 private void writeProgram
   (File to, ?String imp, ?String toplevel, ?String main, ?String check)
 {
-  using(let w = new BufferedWriter(new FileWriter(to))) {
+  let lines = new LinkedList();
 
     if (imp != null)
-      w.write("import "imp";");
+      lines.add("import "imp";");
 
     if (toplevel != null)
-      w.write(toplevel);
+      lines.add(toplevel);
 
     if (main != null || check != null)
       {
-	w.write("public void main(String[] args) {\n");
+	lines.add("public void main(String[] args) {");
 	if (main != null)
-	  w.write(main);
+	  lines.add(main);
 	if (check != null)
-	  w.write("\nassert "check";");
-	w.write("\n}\n");
+	  lines.add("assert "check";");
+	lines.add("}");
       }
 
+  using(let w = new BufferedWriter(new FileWriter(to))) {
+    w.write(lines.join("\n"));
   }
 }
 

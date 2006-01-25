@@ -2,7 +2,7 @@
 
 ### The Nice compiler
 ###
-### Copyright 2003 Daniel Bonniot
+### Copyright 2006 Daniel Bonniot
 
 ### The Java Virtual Machine can be specified in the JAVA environment variable.
 ### Arguments prefixed by -J will be passed to the JVM.
@@ -16,8 +16,8 @@ find_home()
   # Resolve symlinks.
   while [ -h "$PRG" ]; do
     lsResult=`ls -ld "$PRG"`
-    # d'apres expr sous linux, ^ est implicite 
-    # au debut de la deuxieme chaine et il ne faut pas le mettre
+    # According to linux expr, ^ is implicit
+    # at the beginning of the second string and must be omitted
     link=`expr "$lsResult" : '.*-> \(.*\)$'`
     if expr "$link" : '/.*' > /dev/null; then
         PRG="$link"
@@ -89,6 +89,6 @@ esac
 # Certain JVMs seem to exit by throwing SIGHUP, thus replacing the exit code
 # with 129.
 # This happens only when running inside Emacs with Sun's 1.4.2_04-b05.
-trap "" SIGHUP
+trap "" HUP
 
 exec ${java} $class ${system_args} "$@"

@@ -4,6 +4,7 @@ nice (0.9.12-1) unstable; urgency=low
   * Depend on ant instead of libant1.6-java, since the former is in main now
     (closes: #331649).
   * Removed bashism in /usr/bin/nicec (closes: #339000).
+  * Upgrade to policy 3.6.2 (no changes).
 
  -- Daniel Bonniot <bonniot@users.sf.net>  Wed, 25 Jan 2006 11:16:20 +0100
 

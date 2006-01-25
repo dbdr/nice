@@ -3,7 +3,7 @@ Section: devel
 Priority: optional
 Maintainer: Daniel Bonniot <bonniot@users.sf.net>
 Build-Depends-Indep: debhelper (>> 3.0.0), jikes-classpath (>= 1:1.18), kaffe (>= 1:1.1.1), javacc, groff, ant
-Standards-Version: 3.6.1
+Standards-Version: 3.6.2
 
 Package: nice
 Architecture: all

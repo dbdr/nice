@@ -23,7 +23,7 @@ build-stamp:
 
 	# Ask javac to produce optimized code, but no debugging info
         # so that the package is smaller.
-	$(MAKE) complete JAVAC_FLAGS="-O" java="kaffe" javac="jikes-classpath -nowarn" NICE_ANTJAR=/usr/share/java/ant-1.6.jar
+	$(MAKE) complete JAVAC_FLAGS="-O" java="kaffe" javac="jikes-classpath -nowarn" NICE_ANTJAR=/usr/share/java/ant.jar
 
 	#/usr/bin/docbook-to-man debian/nice.sgml > nice.1
 

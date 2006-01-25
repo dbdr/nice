@@ -1,3 +1,11 @@
+nice (0.9.12-1) unstable; urgency=low
+
+  * New upstream version (closes: #349621).
+  * Depend on ant instead of libant1.6-java, since the former is in main now
+    (closes: #331649).
+
+ -- Daniel Bonniot <bonniot@users.sf.net>  Wed, 25 Jan 2006 11:16:20 +0100
+
 nice (0.9.11-1) unstable; urgency=low
 
   * New upstream version.
@@ -21,7 +29,7 @@ nice (0.9.8-3) unstable; urgency=high
 
   * Work-around kaffe's jar tool bug, which creates duplicate entries.
     Setting urgency to high since 0.9.8-2 is mostly unusable because of this
-    bug (Closes: #268992).
+    bug (closes: #268992).
 
  -- Daniel Bonniot <bonniot@users.sf.net>  Mon, 30 Aug 2004 11:35:58 +0200
 

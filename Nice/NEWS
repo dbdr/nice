@@ -4,10 +4,11 @@ nice (0.9.12)
 
       import static java.lang.Math.PI;
 
-  * Improved compilation speed.
+  * Improved compilation speed (about 15%).
   * Source files encoding can be specified in nicec command-line arguments.
+  * Bugfixes (wildcard types).
 
- --
+ -- Wed, 25 Jan 2006 11:11:43 +0100
 
 nice (0.9.11)
 

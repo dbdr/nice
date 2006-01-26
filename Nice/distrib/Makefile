@@ -59,7 +59,7 @@ tar ${TARFILE}: $(DEB)
 	> ${CURDIR}/tmp/$(BUILDROOT)/share/emacs/site-lisp/nice/nice-startup.el
 	cat $(BUILDROOT)/lib/emacs/nice-startup.el \
 	>>${CURDIR}/tmp/$(BUILDROOT)/share/emacs/site-lisp/nice/nice-startup.el
-	cd tmp && tar -czf ../${TARFILE} $(BUILDROOT) --owner=0 --group=0
+	cd tmp && tar --owner=0 --group=0 -czf ../${TARFILE} $(BUILDROOT)
 
 .PHONY: rpm
 rpm ${RPMDIR}/${RPMFILE}: $(DEB)

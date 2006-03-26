@@ -4,9 +4,12 @@ nice (0.9.12-1) unstable; urgency=low
   * Depend on ant instead of libant1.6-java, since the former is in main now
     (closes: #331649).
   * Removed bashism in /usr/bin/nicec (closes: #339000).
+  * Depend on newer version of kaffe (closes: #336191).
   * Upgrade to policy 3.6.2 (no changes).
+  * Upgrade to debhelper 5.
+  * Sponsored by Petter Reinholdtsen <pere@debian.org>.
 
- -- Daniel Bonniot <bonniot@users.sf.net>  Wed, 25 Jan 2006 11:16:20 +0100
+ -- Daniel Bonniot <bonniot@users.sf.net>  Sun, 26 Mar 2006 18:39:47 +0200
 
 nice (0.9.11-1) unstable; urgency=low
 

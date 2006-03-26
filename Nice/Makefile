@@ -129,7 +129,8 @@ gcj-testsuite:
 	$(GCJ) -g --main=nice.tools.testsuite.TestNice -o bin/testsuite.bin $(GCJTEMP)
 
 clean:
-	rm -f src/nice/tools/compiler/console.jar nicepublish.jar regtest/*.jar
+	rm -f src/nice/tools/compiler/{console.jar,dateBuild.nice,Manifest}
+	rm -f nicepublish.jar regtest/*.jar
 	rm -rf classes classes-inline share/java src/bossa/parser/{Parse*.java,Token*.java,*CharStream.java}
 	rm -f bin/{nicedoc,niceunit}
 	if [ -r src/bossa/syntax/dispatch.java -a ! -r src/bossa/syntax/dispatch.java.bootstrap ]; then \

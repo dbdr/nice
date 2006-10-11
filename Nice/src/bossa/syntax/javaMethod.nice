@@ -287,15 +287,42 @@ void fetchMethod(gnu.bytecode.Method m, mlsub.typing.TypeConstructor tc, gnu.byt
     }
 }
 
-?gnu.bytecode.Method alreadyHasMethod(gnu.bytecode.ClassType c, gnu.bytecode.Method m) =
-   c.getMethod(m.getName(), m.getParameterTypes());
+?gnu.bytecode.Method alreadyHasMethod(gnu.bytecode.ClassType c, gnu.bytecode.Method m) {
+  ?gnu.bytecode.Method res = c.getMethod(m.getName(), m.getParameterTypes());
+  if(res==null)
+    return null;
+  /* 1.5's covariant return types means we need to check return
+     types too.
+   */
+  let thisReturn = m.getReturnType(); 
+  let superReturn = res.getReturnType();
+  if(thisReturn.equals(superReturn))
+    return res;
+  return null;
+}
+private ?gnu.bytecode.Method checkInterfaces(gnu.bytecode.ClassType classType, gnu.bytecode.Method m)
+{
+  /* Check all of the interfaces of classType to see
+     if m is overriding one of them.
+   */
+  ?gnu.bytecode.Method res = null;
+  for (gnu.bytecode.ClassType itf : classType.getInterfaces())
+    {
+      res = alreadyHasMethod(itf,m);
+      if (res != null){
+	return res;
+      }
+    }
+  return null;
+}
 
 private ?gnu.bytecode.Method findBaseMethod(gnu.bytecode.ClassType classType, gnu.bytecode.Method m)
 {
   ?gnu.bytecode.Method res = null;
-
   /* Skips m if it was just overriden in classType
-     but declared in a superclass or superinterface.
+     but declared in a superclass or superinterface
+     and the overriding method did not change the return
+     type.
   */
   ?gnu.bytecode.ClassType superClass = classType.getSuperclass();
 
@@ -306,18 +333,23 @@ private ?gnu.bytecode.Method findBaseMethod(gnu.bytecode.ClassType classType, gn
   */
   if (superClass == null)
     superClass = gnu.bytecode.Type.pointer_type;
-
-  res = alreadyHasMethod(superClass,m);
-  if (res != null)
-    return res;
-
-  for (gnu.bytecode.ClassType itf : classType.getInterfaces())
-    {
-       res = alreadyHasMethod(itf,m);
-       if (res != null)
-         return res;
+  /* Traverse the parents. There is probably a better way to do this
+     rather than seaching the whole set every time. 
+   */
+  for(;superClass!=null; superClass = superClass.getSuperclass()){ 
+    res = checkInterfaces(superClass,m);
+    if (res != null){
+      return res;
     }
-
+    res = alreadyHasMethod(superClass,m);
+    if (res != null){
+      return res;
+    }
+  }
+  res = checkInterfaces(classType,m);
+  if (res != null){
+    return res;
+  }
   return null;
 }
 

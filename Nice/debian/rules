@@ -23,7 +23,8 @@ build-stamp:
 
 	# Ask javac to produce optimized code, but no debugging info
         # so that the package is smaller.
-	$(MAKE) complete JAVAC_FLAGS="-O" java="kaffe" javac="jikes-classpath -nowarn" NICE_ANTJAR=/usr/share/java/ant.jar
+	chmod a+x debian/jar
+	$(MAKE) complete JAVAC_FLAGS="-O" java="kaffe" javac="jikes-classpath -nowarn" jar="debian/jar" NICE_ANTJAR=/usr/share/java/ant.jar
 
 	#/usr/bin/docbook-to-man debian/nice.sgml > nice.1
 
@@ -53,26 +54,17 @@ install: build
 binary-indep: build install
 	dh_testdir
 	dh_testroot
-#	dh_installdebconf	
 	dh_installdocs
 	dh_installexamples
 	dh_installmenu
-#	dh_installlogrotate
 	dh_installemacsen
-#	dh_installpam
-#	dh_installmime
-#	dh_installinit
-#	dh_installcron
 	dh_installman
 	dh_installinfo
 	dh_installchangelogs NEWS
 	dh_link
-#	dh_strip
 	dh_compress
 	dh_fixperms
 	dh_installdeb
-#	dh_perl
-#	dh_shlibdeps
 	dh_gencontrol
 	dh_md5sums
 	dh_builddeb

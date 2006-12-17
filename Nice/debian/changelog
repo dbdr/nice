@@ -1,3 +1,13 @@
+nice (0.9.12-2) unstable; urgency=low
+
+  * Use custom wrapper around zip (taken from gcc) to provide for jar,
+    as fastjar produces corrupted jars (closes: #380363).
+  * Use Build-Depends (not Build-Depends-Indep) for debhelper.
+  * Upgrade to policy 3.7.2.
+  * Sponsored by Petter Reinholdtsen <pere@debian.org>.
+
+ -- Daniel Bonniot <bonniot@users.sf.net>  Sat, 21 Oct 2006 12:50:20 +0200
+
 nice (0.9.12-1) unstable; urgency=low
 
   * New upstream version (closes: #349621).

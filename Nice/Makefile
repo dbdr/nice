@@ -20,7 +20,7 @@ ANT_CLASSPATH= ${shell if [ -n "${NICE_ANTJAR}" ] ; \
 		echo "/usr/share/ant/lib/ant.jar:./external/ant.jar:${CLASSPATH}"; \
 	fi }
 
-SHELL := /bin/sh
+SHELL := /bin/bash
 PWD   := $(shell pwd)
 
 java  = java

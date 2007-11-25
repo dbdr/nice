@@ -3,7 +3,7 @@ Section: devel
 Priority: optional
 Maintainer: Daniel Bonniot <bonniot@users.sf.net>
 Build-Depends: debhelper (>= 5)
-Build-Depends-Indep: jikes-classpath (>= 1:1.18), kaffe (>= 2:1.1.7-4), javacc, groff, ant, zip, unzip
+Build-Depends-Indep: jikes-classpath, gij, javacc, groff, ant, zip, unzip
 Standards-Version: 3.7.2
 
 Package: nice

@@ -4,20 +4,21 @@
 ;;;                                                        
 ;;;              Based on Jazz mode (Francois.Bourdoncle@ensmp.fr)
 ;;;       Adaptation to Nice by Daniel Bonniot (d.bonniot@mail.dotcom.fr)
+;;;
+;;;             Update for recent versions of Emacs based on:
+;;;            http://cc-mode.sourceforge.net/derived-mode-ex.el
 ;;;                                                        
 ;;;                                                        
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(require 'cc-vars)
-(require 'cc-engine)
 (require 'cc-mode)
-(require 'cc-cmds)
-(require 'cc-align)
-(require 'cc-styles)
-(require 'cc-defs)
-(require 'cc-menus)
-(require 'cc-defs)
-(require 'cc-langs)
+
+(eval-when-compile
+  (require 'cc-langs)
+  (require 'cc-fonts))
+
+(eval-and-compile
+  (c-add-language 'nice-mode 'java-mode))
 
 (require 'compile)
 
@@ -385,14 +386,15 @@ Mode for editing/compiling Nice programs.
   nice-link-declaration-face Face used to highlight declaration links"
 
   (interactive)
-  (c-initialize-cc-mode)
   (kill-all-local-variables)
+  (c-initialize-cc-mode t)
   (set-syntax-table nice-mode-syntax-table)
   (setq major-mode 'nice-mode
  	mode-name "Nice"
  	local-abbrev-table java-mode-abbrev-table)
   (use-local-map nice-mode-map)
-  (c-common-init)
+  (c-init-language-vars nice-mode)
+  (c-common-init 'nice-mode)
   (setq comment-start "// "
  	comment-end   ""
  	c-conditional-key c-Nice-conditional-key
@@ -466,6 +468,7 @@ Mode for editing/compiling Nice programs.
          ((nice-file-p name)
           (nice-rename-buffer (file-name-nondirectory
                                (substring name 0 (- (length name) (length nice-extension))))))))))
+  (run-hooks 'c-mode-common-hook)
   (run-hooks 'nice-mode-hook)
   (c-update-modeline))
 

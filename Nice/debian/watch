@@ -1,2 +1,2 @@
-version=2
-ftp://ftp2.sf.net/pub/sourceforge/n/ni/nice/Nice-(\d\.[\d+\.]+)-source\.tar\.(gz|bz2) debian uupdate
+version=3
+http://sf.net/nice/Nice-(.*)-source\.tgz

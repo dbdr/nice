@@ -2,6 +2,9 @@ nice (0.9.13-1) unstable; urgency=low
 
   * New upstream version.
   * Fixed debian/watch url (closes: #450164).
+  * Use gij instead of kaffe for building.
+  * Fixed lintian warnings debian-rules-ignores-make-clean-error and
+    debian-rules-sets-DH_COMPAT.
 
  -- Daniel Bonniot <bonniot@users.sf.net>  Sun, 25 Nov 2007 19:19:11 +0100
 

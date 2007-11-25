@@ -30,25 +30,25 @@ public class TestSuite {
 	 * TODO
 	 * 
 	 */
-	private final String TESTCASE_TYPE_PASS = "pass";
+	private static final String TESTCASE_TYPE_PASS = "pass";
 
 	/**
 	 * TODO
 	 * 
 	 */
-	private final String TESTCASE_TYPE_FAIL = "fail";
+	private static final String TESTCASE_TYPE_FAIL = "fail";
 
 	/**
 	 * TODO
 	 * 
 	 */
-	private final String KEYWORD_GLOBAL = "global";
+	private static final String KEYWORD_GLOBAL = "global";
 
 	/**
 	 * TODO
 	 * 
 	 */
-	private final String KEYWORD_COMMENT = "comment";
+	private static final String KEYWORD_COMMENT = "comment";
 
 
 	/**

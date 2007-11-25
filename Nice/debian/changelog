@@ -3,7 +3,7 @@ nice (0.9.13-1) unstable; urgency=low
   * New upstream version.
   * Fixed debian/watch url (closes: #450164).
 
- --
+ -- Daniel Bonniot <bonniot@users.sf.net>  Sun, 25 Nov 2007 19:19:11 +0100
 
 nice (0.9.12-2) unstable; urgency=low
 

@@ -157,3 +157,15 @@ interface a.A implements I;
 
 // New implementation, which should satisfy both methods.
 class D implements A { foo() = true; }
+
+
+/// PASS
+  // bug #1509635
+  /// package a
+  /// Toplevel
+int foo(int x) = x;
+
+  /// package b import a
+  assert foo(3.3) == 4.3;
+  /// Toplevel
+double foo(double x) = x + 1;

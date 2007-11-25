@@ -309,7 +309,7 @@ public final class Types
      @returns true if functional types t1 and t2 have a partly common domain.
               that is, there exists some types that belong to both domains.
   */
-  public static boolean domainsIntersect(Polytype t1, Polytype t2)
+  public static boolean domainsIntersect(Polytype t1, Polytype t2, boolean dispatchable)
   {
     Typing.enter();
 
@@ -325,8 +325,8 @@ public final class Types
         Typing.introduce(args);
 
         // ... that can be used for both methods ...
-        Typing.leq(args, parameters(t1));
-        Typing.leq(args, parameters(t2));
+        Typing.leq(args, parameters(t1), dispatchable);
+        Typing.leq(args, parameters(t2), dispatchable);
       }
       finally {
         Typing.leave();

@@ -1,3 +1,5 @@
+SHELL := /bin/bash
+
 VERSION = ${shell expr "`head -1 ../NEWS`" : '.*(\(.*\))'}
 
 # Get the version from the debian changelog.

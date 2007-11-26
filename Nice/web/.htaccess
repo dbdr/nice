@@ -1,4 +1,4 @@
--e DirectoryIndex index.php index.html
+DirectoryIndex index.php index.html
 Redirect /Wiki http://nice.sourceforge.net/cgi-bin/twiki/view
 Redirect /Nice.tar http://prdownloads.sourceforge.net/nice/Nice-0.9.13-unix.tar.gz
 Redirect /Nice-source.tar.gz http://prdownloads.sourceforge.net/nice/Nice-0.9.13-source.tgz

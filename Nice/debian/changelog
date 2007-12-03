@@ -1,3 +1,9 @@
+nice (0.9.13-2) unstable; urgency=low
+
+  * Bump standards-version to 3.7.3 (no changes needed).
+
+ --
+
 nice (0.9.13-1) unstable; urgency=low
 
   * New upstream version.

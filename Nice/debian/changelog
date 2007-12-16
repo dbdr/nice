@@ -1,3 +1,10 @@
+nice (0.9.13-3) unstable; urgency=low
+
+  * Fix emacs mode for xemacs21 (closes: #454602).
+  * Sponsored by Petter Reinholdtsen.
+  
+ -- Daniel Bonniot <bonniot@users.sf.net>  Sun, 16 Dec 2007 13:10:47 +0100
+
 nice (0.9.13-2) unstable; urgency=low
 
   * Bump standards-version to 3.7.3 (no changes needed).

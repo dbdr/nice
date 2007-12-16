@@ -15,7 +15,9 @@
 
 (eval-when-compile
   (require 'cc-langs)
-  (require 'cc-fonts nil t))
+  ; cc-fonts is not present in GNU Emacs 21, but it is in 22.
+  ; XEmacs 21 does not accept the NOERROR argument of 'require'.
+  (condition-case nil (require 'cc-fonts) (error nil)))
 
 (eval-and-compile
   (if (fboundp 'c-add-language)

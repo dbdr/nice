@@ -1,8 +1,11 @@
 nice (0.9.13-2) unstable; urgency=low
 
   * Bump standards-version to 3.7.3 (no changes needed).
-
- --
+  * Fixed emacs mode for emacs21, thanks to Aaron Ucko (closes: #454198).
+  * Optimized emacsen byte-compilation on install by using --no-site-file.
+  * Sponsored by Petter Reinholdtsen.
+  
+ -- Daniel Bonniot <bonniot@users.sf.net>  Tue, 04 Dec 2007 09:21:14 +0100
 
 nice (0.9.13-1) unstable; urgency=low
 

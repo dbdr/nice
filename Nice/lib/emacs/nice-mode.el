@@ -15,10 +15,11 @@
 
 (eval-when-compile
   (require 'cc-langs)
-  (require 'cc-fonts))
+  (require 'cc-fonts nil t))
 
 (eval-and-compile
-  (c-add-language 'nice-mode 'java-mode))
+  (if (fboundp 'c-add-language)
+      (c-add-language 'nice-mode 'java-mode)))
 
 (require 'compile)
 
@@ -386,15 +387,21 @@ Mode for editing/compiling Nice programs.
   nice-link-declaration-face Face used to highlight declaration links"
 
   (interactive)
+  (if (not (fboundp 'c-init-language-vars))
+      (c-initialize-cc-mode))
   (kill-all-local-variables)
-  (c-initialize-cc-mode t)
+  (if (fboundp 'c-init-language-vars)
+      (c-initialize-cc-mode t))
   (set-syntax-table nice-mode-syntax-table)
   (setq major-mode 'nice-mode
  	mode-name "Nice"
  	local-abbrev-table java-mode-abbrev-table)
   (use-local-map nice-mode-map)
-  (c-init-language-vars nice-mode)
-  (c-common-init 'nice-mode)
+  (if (fboundp 'c-init-language-vars)
+      (progn
+	(c-init-language-vars nice-mode)
+	(c-common-init 'nice-mode))
+    (c-common-init))
   (setq comment-start "// "
  	comment-end   ""
  	c-conditional-key c-Nice-conditional-key

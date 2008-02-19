@@ -172,7 +172,7 @@
   </target>
   <target name="setDate">
     <!-- TODO: Extract the current Nice version from the head of the NEWS file. -->
-    <property name="version" value="0.9.11 prerelease" />
+    <property name="version" value="0.9.14 prerelease" />
     <property name="to" value="src/nice/tools/compiler/dateBuild.nice" />
     <property name="LET" value="public let String" />
     <tstamp>

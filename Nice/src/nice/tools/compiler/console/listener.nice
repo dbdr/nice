@@ -12,6 +12,8 @@
 
 package nice.tools.compiler.console;
 
+import java.io.*;
+
 /**
    Keep track of messages reported to the user.
 
@@ -42,20 +44,14 @@ public class ConsoleOutput extends StatusCodeListener
   {
     super;
     warningCount++;
-    if (location != null)
-      System.out.println("\n" + location + ":\nwarning: " + message);
-    else
-      System.out.println("\nwarning: " + message);
+    this.showErrorOrWarning(location, notNull(message), System.out, "warning: ");
   }
   
   error(location, message)
   {
     super;
     errorCount++;
-    if (location != null)
-      System.err.println("\n" + location + ":\n" + message);
-    else
-      System.err.println("\n" + message);
+    this.showErrorOrWarning(location, notNull(message), System.err, "" );
   }
   
   /** A bug has occured inside the compiler. */
@@ -69,4 +65,22 @@ public class ConsoleOutput extends StatusCodeListener
        //       "\n\nException: " + exn.toString() +
        "\n\nStack trace:\n" + stackTrace);
   }
+
+  private void showErrorOrWarning(
+    ?bossa.util.Location location,
+    String message,
+    PrintStream to,
+    String messageType )
+    {
+      if( location != null )
+        if( bossa.util.Location.editorMode )
+          for( part : message.split( "\n" ) )
+            to.println("\n" + location + ": " + messageType + part.trim);
+        else
+          to.println("\n" + location + ":\n" + messageType + message);
+      else
+        to.println("\n" + message);
+    }
 }
+
+// vim:ts=2:sts=2:sw=2:expandtab

@@ -89,7 +89,7 @@ In addition to traditional object-oriented features, Nice offers:
   This allows for a more modular style: you don't need to pack classes with
   all possibly useful methods, but you can split them into several packages
   dealing with different aspects. Development can then happen independently
-  if each package.
+  in each package.
   </para><para>
   Multi-methods also extend usual methods with the possibility to
   dispatch on every argument, instead of only the receiver class.

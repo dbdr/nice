@@ -211,7 +211,7 @@
 
 
 (defvar cc-imenu-nice-generic-expression
-  (`
+  `
    ((nil
      (,
       (concat
@@ -226,7 +226,7 @@
        ")[ \t]*"
        "[^;(]"
        "[,a-zA-Z_1-9\n \t]*{"               
-       )) 6)))
+       )) 6))
   "Imenu generic expression for Nice mode.  See `imenu-generic-expression'.")
 
 ;; Face used to select statements/expressions
@@ -532,7 +532,7 @@ Mode for editing/compiling Nice programs.
 	  (nice-root (file-name-directory (buffer-file-name))))
     (setq default-directory nice-directory)
 
-    (setq nice-compilation-buffer (compile-internal cmd "No more errors"))
+    (setq nice-compilation-buffer (compilation-start cmd))
 
     (save-excursion
       (set-buffer nice-compilation-buffer)
@@ -948,7 +948,7 @@ Mode for editing/compiling Nice programs.
     ;; Sort the menu
     (setq entry-list
           (sort entry-list
-                '(lambda (x y)
+                (lambda (x y)
                    (string-lessp (car x) (car y)))))
     ;; Display the menu
     (if (> (length entry-list) 0)
@@ -1105,7 +1105,7 @@ Mode for editing/compiling Nice programs.
   "Formats current buffer in HTML"
   (interactive)
   (when (buffer-file-name) (nice-fontify-buffer))
-  (let ((temp-buffer-show-function '(lambda (buffer))))
+  (let ((temp-buffer-show-function (lambda (buffer))))
     (with-output-to-temp-buffer "*nice-html-listing*"
       (princ "<HTML>\n<BODY BGCOLOR=\"#ffffff\">\n<PRE>\n")
       (let ((close nil)
@@ -1163,7 +1163,7 @@ Mode for editing/compiling Nice programs.
   "Formats current buffer in LaTeX"
   (interactive)
   (when (buffer-file-name) (nice-fontify-buffer))
-  (let ((temp-buffer-show-function '(lambda (buffer))))
+  (let ((temp-buffer-show-function (lambda (buffer))))
     (with-output-to-temp-buffer "*nice-latex-listing*"
       (princ "\\begingroup")
       (princ "\\def\\color#1#2#3{\\special{ps: #1 #2 #3 setrgbcolor}}")

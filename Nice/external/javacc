@@ -2,7 +2,7 @@
 
 # Find or download a version of javacc.jar, and print it.
 
-version=javacc-3.2
+version=3.2
 
 jar=/usr/share/java/javacc.jar
 if [ -r ${jar} ]; then
@@ -12,12 +12,7 @@ fi
 
 jar=${TOP}/external/javacc.jar
 if [ ! -r ${jar} ]; then
-  
-  wget https://javacc.dev.java.net/files/documents/17/686/${version}.zip \
-    -O ${TOP}/external/${version}.zip >&2
-  cd ${TOP}/external
-  unzip -j ${version}.zip ${version}/bin/lib/javacc.jar >&2
-  rm ${version}.zip
+  wget http://central.maven.org/maven2/javacc/javacc/${version}/javacc-${version}.jar -O ${jar}
 fi
 
 echo ${jar}

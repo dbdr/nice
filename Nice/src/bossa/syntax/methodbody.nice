@@ -235,7 +235,7 @@ public class MethodBodyDefinition extends MethodImplementation
     throw User.error
       (this,
        "There is an ambiguity about which version " + 
-       " of the overloaded method \"" + name + 
+       "of the overloaded method \"" + name + 
        "\" this alternative belongs to.\n" +
        "Try to use more patterns.\n\n" +
        "Possible methods:\n" +

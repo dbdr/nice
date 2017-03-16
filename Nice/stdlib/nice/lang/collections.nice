@@ -141,7 +141,7 @@ U foldRight(List<T> list, (T, U)->U func, U init, int from)
     action(elem);
 }
 
-<C,T,U> map(coll, func)
+<C,T,U> map(java.util.Collection coll, func)
 {
   C<U> res = coll.similarEmptyCollection();
   for (T elem : coll)
@@ -150,7 +150,7 @@ U foldRight(List<T> list, (T, U)->U func, U init, int from)
   return res;
 }
 
-<C,T,U> filter(coll, test)
+<C,T,U> filter(java.util.Collection coll, test)
 {
   C<U> res = coll.similarEmptyCollection();
   for (T elem : coll)

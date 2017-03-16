@@ -104,5 +104,6 @@ ClassLoader classloaderFromClasspath(String classpath)
   java.net.URL[] path = parsePath(classpath,
 			 String message => System.err.println(message));
 
-  return new java.net.URLClassLoader(path, /* no parent */ null);
+  ?ClassLoader parent = null;
+  return new java.net.URLClassLoader(path, parent);
 }

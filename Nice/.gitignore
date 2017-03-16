@@ -7,3 +7,9 @@
 /testsuite-fail-folder
 /testsuite-temp-folder
 /tmp
+
+*.class
+*.nicei
+maven.log
+velocity.log
+semantic.cache
